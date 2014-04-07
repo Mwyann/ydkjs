@@ -1,0 +1,78 @@
+<html>
+<head>
+<title>Test YDKJ</title>
+<script src="tiles.js" type="text/javascript"></script>
+<script src="jquery-1.11.0.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+function newScreen() {
+  $('#tmpscreen').html('');
+}
+
+function addTile(tileid, x, y) {
+  var tmpscreen = $('#tmpscreen');
+  var ourtile = tiles[tileid];
+  var ourdiv = $('<div />');
+  ourdiv.css({
+    'background-image':'url("tiles.gif")',
+    'background-repeat':'none',
+    'background-position':(0-ourtile.x)+'px '+(0-ourtile.y)+'px',
+    'width':(ourtile.w)+'px',
+    'height':(ourtile.h)+'px',
+    'position':'absolute',
+    'left':x+'px',
+    'top':y+'px',
+  });
+  ourdiv.appendTo(tmpscreen);
+}
+
+function addFrame(frameid) { // Retourne true s'il y a effectivement quelque chose à afficher (sinon on ne touche à rien)
+  var ourframe = frames[frameid];
+  var val = 0;
+  if (ourframe.nbimg > 0) {
+    var offsetx = ourframe.img[0].ox;
+    var offsety = ourframe.img[0].oy;
+    var sizex = ourframe.img[0].sx;
+    var sizey = ourframe.img[0].sy;
+    val = ourframe.img[0].val;
+    for(var i = 1; i <= ourframe.nbimg; i++) {
+      addTile(ourframe.img[i].idx-1, offsetx+ourframe.img[i].ox, offsety+ourframe.img[i].oy);
+      val = ourframe.img[i].val;
+    }
+    return val;
+  }
+  return val;
+}
+
+function nextScreen() {
+  $('#screen').html($('#tmpscreen').html()); // Meilleure façon de déplacer les éléments ?
+  newScreen();
+}
+
+jQuery(document).ready(function() {
+  newScreen();
+
+  var framenum = 0;
+  var runanim = function() {
+    var val = addFrame(framenum);
+    if (val != 16) nextScreen();
+    //jQuery('<div style="color:#FFF">'+framenum+':'+val+'</div>').appendTo(jQuery('#screen'));
+    framenum++;
+    if (framenum >= frames.length) {
+      framenum = 0;
+    }
+    //setTimeout(runanim,500);
+  }
+  //setTimeout(runanim,500);
+  setInterval(runanim,66);
+});
+
+</script>
+</head>
+
+<body style="background-color:#333">
+  <div id="screen" style="background-color:#000;position:relative;width:640px;height:480px;margin-left:auto;margin-right:auto;margin-top:30px"></div>
+  <div id="tmpscreen" style="display:none"></div>
+  <div id="preload" style="display:none"></div>
+</body>
+</html>
