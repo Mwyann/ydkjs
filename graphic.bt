@@ -1,0 +1,36 @@
+//--------------------------------------
+//--- 010 Editor v5.0 Binary Template
+//
+// File:
+// Author:
+// Revision:
+// Purpose:
+//--------------------------------------
+
+typedef struct {
+    SetBackColor( cLtGreen );
+    ulong offset;
+    ushort sizex;
+    ushort sizey;
+    local int64 currentpos = FTell();
+    FSeek(offset);
+    SetBackColor( cLtBlue );
+    char data[4] <optimize=false>;
+    SetBackColor( cLtGreen );
+    FSeek(currentpos);
+} IMAGE;
+
+typedef struct {
+    SetBackColor( cLtGreen );
+    ushort imagenum1;
+    ushort imagenum2;
+    IMAGE image[imagenum1] <optimize=false>;
+} IMAGELIST;
+
+BigEndian();
+
+SetBackColor( cLtYellow );
+ulong ImagesStartPointer;
+SetBackColor( cNone );
+byte Unknown[ImagesStartPointer-4] <open=suppress>;
+IMAGELIST imagelist;

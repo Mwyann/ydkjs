@@ -1,0 +1,108 @@
+//--------------------------------------
+//--- 010 Editor v5.0 Binary Template
+//
+// File:
+// Author:
+// Revision:
+// Purpose:
+//--------------------------------------
+
+typedef struct {
+    ubyte imgnum; // N° de l'image
+    ubyte val1; // 0, 12, 16, 167 (12 semble dire "stop", 16 semble dire "répéter cette frame à la suivante")
+    short offsetx;
+    short offsety;
+    short sizex;
+    short sizey;
+    ushort imgindex; // On a autant d'images que la valeur max... :-)
+} IMGDEF;
+
+typedef struct {
+    ubyte imgnum; // Devrait être zéro, pour la première image...
+    ubyte val1; // 0, 12, 16, 167 (12 semble dire "stop", 16 semble dire "répéter cette frame à la suivante")
+    short offsetx; // Position des images
+    short offsety;
+    short sizex;
+    short sizey;
+    ushort nbimg; // Nombre d'images à afficher
+    if (nbimg > 0) IMGDEF imgs[nbimg];
+} DEF;
+
+typedef struct {
+    ushort offset;
+    if (offset > 0) {
+      local int64 currentpos3 = FTell();
+      FSeek(headersize+(offset-1)*12);
+      DEF def;
+      FSeek(currentpos3);
+    }
+} ARRAYDEF;
+
+typedef struct {
+    ushort u400; //400/6 = 66, 66 ms par frame ?
+    ushort u6;
+    ushort nbframes;
+    local long headersize = FTell()+nbframes*2;
+    ARRAYDEF array[nbframes] <optimize=false>;
+} ARRAYIMG;
+
+typedef struct {
+    SetBackColor( cLtGreen );
+    ulong offset;
+    ushort sizex;
+    ushort sizey;
+    local int64 currentpos2 = FTell();
+    FSeek(fileoffset+offset);
+    SetBackColor( cLtBlue );
+    char data[4] <optimize=false>;
+    SetBackColor( cLtGreen );
+    FSeek(currentpos2);
+} IMAGE;
+
+typedef struct {
+    SetBackColor( cLtGreen );
+    ushort imagenum1;
+    ushort imagenum2;
+    IMAGE image[imagenum1] <optimize=false>;
+} IMAGELIST;
+
+typedef struct {
+    SetBackColor( cLtGreen );
+    ulong ImagesStartPointer;
+    SetBackColor( cNone );
+    //ushort Unknown[(ImagesStartPointer-4)/2] <open=suppress>;
+    local int64 currentpos = FTell();
+    ARRAYIMG arrayimg;
+    FSeek(currentpos+ImagesStartPointer-4);
+    IMAGELIST imagelist;
+} IMAGEFILE;
+
+typedef struct {
+    SetBackColor( cLtGreen );
+    long subname;
+    ulong fileoffset;
+    ulong filesize;
+    local int64 currentpos = FTell();
+    FSeek(fileoffset);
+    SetBackColor( cLtBlue );
+    if (filename[0] == 'o' && filename[1] == 'f' && filename[2] == 'f' && filename[3] == '4') IMAGEFILE images <optimize=false>;
+    else char data[filesize] <optimize=false>;
+    SetBackColor( cLtGreen );
+    FSeek(currentpos);
+} SUBFILE;
+
+typedef struct {
+    SetBackColor( cLtGreen );
+    char filename[4] <open=suppress>; // Ma00 -> Ma99 (audio), Me/Mh... (audio), STRL = String List (séparées par des 0x00), off4 = images/animations
+    ulong subcount;
+    SUBFILE sub[subcount] <optimize=false>;
+} FILE;
+
+BigEndian();
+SetBackColor( cLtYellow );
+
+char headersrf1[4] <open=suppress>;
+ulong archive_size;
+ulong header_size;
+
+while (FTell() < header_size) FILE file;

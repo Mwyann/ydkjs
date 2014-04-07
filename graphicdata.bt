@@ -1,0 +1,48 @@
+//--------------------------------------
+//--- 010 Editor v5.0 Binary Template
+//
+// File:
+// Author:
+// Revision:
+// Purpose:
+//--------------------------------------
+
+typedef struct {
+    ubyte imgnum; // N° de l'image
+    ubyte val1; // 0, 16, 167
+    short offsetx;
+    short offsety;
+    short sizex;
+    short sizey;
+    ushort imgindex; // On a autant d'images que la valeur max... :-)
+} IMG;
+
+typedef struct {
+    ubyte imgnum; // Devrait être zéro, pour la première image...
+    ubyte val1; // 0, 16, 167
+    short offsetx; // Position des images
+    short offsety;
+    short sizex;
+    short sizey;
+    ushort nbimg; // Nombre d'images à afficher
+    if (nbimg > 0) IMG imgs[nbimg];
+} DEF;
+
+typedef struct {
+    ushort offset;
+    if (offset > 0) {
+      local int64 currentpos = FTell();
+      FSeek(headersize+(offset-1)*12);
+      DEF def;
+      FSeek(currentpos);
+    }
+} ARRAYDEF;
+
+// A priori 20 frames par seconde environ
+
+BigEndian();
+ushort u400;
+ushort u6;
+ushort nbframes;
+local long headersize = 6+nbframes*2;
+ARRAYDEF array[nbframes] <optimize=false>;
