@@ -12,6 +12,7 @@ function newScreen() {
 function addTile(tileid, x, y) {
   var tmpscreen = $('#tmpscreen');
   var ourtile = tiles[tileid];
+  if (!ourtile) return false;
   var ourdiv = $('<div />');
   ourdiv.css({
     'background-image':'url("tiles.gif")',
@@ -26,7 +27,7 @@ function addTile(tileid, x, y) {
   ourdiv.appendTo(tmpscreen);
 }
 
-function addFrame(frameid) { // Retourne true s'il y a effectivement quelque chose à afficher (sinon on ne touche à rien)
+function addFrame(frameid) {
   var ourframe = frames[frameid];
   var val = 0;
   if (ourframe.nbimg > 0) {
@@ -37,26 +38,61 @@ function addFrame(frameid) { // Retourne true s'il y a effectivement quelque cho
     val = ourframe.img[0].val;
     for(var i = 1; i <= ourframe.nbimg; i++) {
       addTile(ourframe.img[i].idx-1, offsetx+ourframe.img[i].ox, offsety+ourframe.img[i].oy);
-      val = ourframe.img[i].val;
+      val = val | ourframe.img[i].val;
     }
     return val;
   }
   return val;
 }
 
+function getFrameVal(frameid) {
+  var ourframe = frames[frameid];
+  var val = 0;
+  if (ourframe.nbimg > 0) {
+    val = ourframe.img[0].val;
+    for(var i = 1; i <= ourframe.nbimg; i++) {
+      val = val | ourframe.img[i].val;
+    }
+    return val;
+  }
+  return val;
+}
+
+
 function nextScreen() {
   $('#screen').html($('#tmpscreen').html()); // Meilleure façon de déplacer les éléments ?
+  /*
+  // Chrome n'aime pas cette façon non plus
+  var newscreen = $('#tmpscreen').clone(true);
+  newscreen.attr('id','screen').attr('style',$('#screen').attr('style'));
+  $('#screen').replaceWith(newscreen);
+  */
+
   newScreen();
+}
+
+function displayFrame(framenum) {
+  addFrame(framenum);
+  nextScreen();
 }
 
 jQuery(document).ready(function() {
   newScreen();
+  // Idée : faire un affichage de la liste des frames, avec possibilité de cliquer desssus pour les afficher (sans animation auto) et défilement avec droite/gauche
+
+/*
+  jQuery('#debug').html('');
+  for(var i = 250;i < 300;i++) { // frames.length
+    jQuery('<a href="#" onclick="displayFrame('+i+');return false">display frame '+i+'</a> (val='+getFrameVal(i)+')<br/>').appendTo('#debug');
+    
+  }
+*/
 
   var framenum = 0;
   var runanim = function() {
     var val = addFrame(framenum);
-    if (val != 16) nextScreen();
-    //jQuery('<div style="color:#FFF">'+framenum+':'+val+'</div>').appendTo(jQuery('#screen'));
+    nextScreen();
+    jQuery('#debuglive').html('frame '+framenum+'/'+(frames.length)+' ; val:'+val);
     framenum++;
     if (framenum >= frames.length) {
       framenum = 0;
@@ -64,14 +100,16 @@ jQuery(document).ready(function() {
     //setTimeout(runanim,500);
   }
   //setTimeout(runanim,500);
-  setInterval(runanim,66);
+  setInterval(runanim,66); // Pourrait être calculé depuis frames[x].fps1/frames[x].fps2
 });
 
 </script>
 </head>
 
-<body style="background-color:#333">
-  <div id="screen" style="background-color:#000;position:relative;width:640px;height:480px;margin-left:auto;margin-right:auto;margin-top:30px"></div>
+<body style="background-color:#EEEEEE">
+  <div id="screen" style="background-color:#EEEEEE;position:relative;width:640px;height:480px;margin-left:auto;margin-right:auto;margin-top:30px"></div>
+  <div id="debuglive" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;"></div>
+  <div id="debug" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;height:150px;overflow-y:scroll"></div>
   <div id="tmpscreen" style="display:none"></div>
   <div id="preload" style="display:none"></div>
 </body>

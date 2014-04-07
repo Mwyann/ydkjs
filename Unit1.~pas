@@ -40,13 +40,13 @@ implementation
 
 {$R *.dfm}
 
-{$R YDKJ.res}
-
 uses GifImage;
 
 var colors:array[0..255] of longint;
     rgbtopalette:array[0..255] of array[0..255] of array[0..255] of byte;
-
+    graphic:array[0..307200] of byte;
+    picture: array[0..307200] of longint;
+    
 procedure InitColors;
 var palette:TBitmap;
     i:byte;
@@ -79,12 +79,39 @@ begin
   result:=rgbtopalette[r][g][b];
 end;
 
+function GetColorIndex(GIF: TGIFSubImage; Color: TColor): Integer;
+var
+  idx, x, y: Integer;
+begin
+  // Find index for color in the colormap.
+  // The same color can be in the colormap more than once.
+  // Not all color indexes may be in use, so check if this index is being used.
+  // Return only an index which is actually being used in the image.
+  // If the index is not being used in the image,
+  // try to find the next index for the color in the colormap.
+  for idx := 0 to GIF.ActiveColorMap.Count - 1 do
+    if GIF.ActiveColorMap.Colors[idx] = Color then
+    begin
+      // Found an index, is it being used in the image?
+      for y := 0 to GIF.Height-1 do
+        for x := 0 to GIF.Width-1 do
+          if GIF.Pixels[x, y] = idx then
+          begin
+            Result := idx;  // Index is used in image.
+            Exit;
+          end;
+      // Index not used in the image, try next index.
+    end;
+  Result := -1;  // didn't find index for the color
+end;
+
 type subimages=record
        subname:longword;
+       fps1,fps2:word;
        nbframes:word;
-       frames:array[0..1000] of record
+       frames:array[0..2500] of record
          nbimages:word;
-         images:array[0..20] of record
+         images:array[0..10] of record
            val1:byte; // Valeur inconnue : 0, 16, 167
            offsetx,offsety:smallint;
            sizex,sizey:word;
@@ -130,110 +157,6 @@ var l:byte;
 begin
   blockread(SRFhandler,l,1);
   result:=l;
-end;
-
-function openSubimages:subimages;
-var si:subimages;
-    fileoffset,imagestartpointer,currentpos,currentpos2:longint;
-    data:array[0..65535] of byte;
-    nbimages,i,j:word;
-    nbframes,frameoffset:word;
-
-    val1:byte;
-    offsetx,offsety:smallint;
-    sizex,sizey:word;
-    nbframeimages:word;
-begin
-  si.subname:=readlw;
-  fileoffset:=readlw;
-  readlw; //filesize
-  currentpos:=filepos(SRFhandler);
-  seek(SRFhandler,fileoffset);
-  // Spécifique aux images à partir de maintenant
-  imagestartpointer:=readlw;
-  // Données d'animation
-  blockread(SRFhandler,data,4); // 2 word qui valent 400 et 6. 400/6 = 66, 66 ms par frame ?
-  nbframes:=readw;
-  si.nbframes:=nbframes;
-  for i:=0 to nbframes-1 do begin
-    frameoffset:=readw;
-    if (frameoffset = 0) then begin
-      si.frames[i].nbimages:=0;
-    end else begin
-      currentpos2:=filepos(SRFhandler);
-      seek(SRFhandler,fileoffset+10+nbframes*2+(frameoffset-1)*12);
-      readb; // imgnum, vaut toujours 0 ici
-      val1:=readb;
-      offsetx:=readw;
-      offsety:=readw;
-      sizex:=readw;
-      sizey:=readw;
-      nbframeimages:=readw;
-      si.frames[i].nbimages:=nbframeimages;
-      si.frames[i].images[0].val1:=val1;
-      si.frames[i].images[0].offsetx:=offsetx;
-      si.frames[i].images[0].offsety:=offsety;
-      si.frames[i].images[0].sizex:=sizex;
-      si.frames[i].images[0].sizey:=sizey;
-      if (nbframeimages > 0) then for j:=1 to nbframeimages do begin
-        readb; // imgnum mais on l'a avec j de toutes façons
-        si.frames[i].images[j].val1:=readb;
-        si.frames[i].images[j].offsetx:=readw;
-        si.frames[i].images[j].offsety:=readw;
-        si.frames[i].images[j].sizex:=readw;
-        si.frames[i].images[j].sizey:=readw;
-        si.frames[i].images[j].imgindex:=readw;
-      end;
-      seek(SRFhandler,currentpos2);
-    end;
-  end;
-
-  // Liste d'images
-  seek(SRFhandler,fileoffset+imagestartpointer);
-  nbimages:=readw;
-  if (nbimages <> readw) then begin // Présent deux fois dans le fichier, pourquoi...
-    form1.Label2.caption:='Alert nbimage different';
-  end;
-  si.nbimages:=nbimages;
-  for i:=0 to nbimages-1 do begin
-    si.images[i].offset:=fileoffset+readlw;
-    si.images[i].width:=readw;
-    si.images[i].height:=readw;
-  end;
-  seek(SRFhandler,currentpos);
-  result:=si;
-end;
-
-procedure openSubfile(t:string;id:longword);
-begin
-  if (t='off4') then begin
-    off4[id]:=openSubimages;
-  end;
-end;
-
-function openSRF(filename:string):shortint;
-var buf:array[0..3] of byte;
-    archivesize,headersize:longword;
-    i,subcount:longword;
-begin
-  assignfile(SRFhandler,filename);
-  reset(SRFhandler,1);
-  blockread(SRFhandler,buf,4);
-  if (buf[0] <> $73) and (buf[1] <> $72) and (buf[2] <> $66) and (buf[3] <> $31) then begin // srf1
-    result:=-1;
-    exit;
-  end;
-  archivesize:=readlw;
-  headersize:=readlw;
-  form1.Label1.Caption:='Archive size: '+inttostr(archivesize)+' ; Header size: '+inttostr(headersize);
-
-  //seek(SRFhandler,3324); // Direct dans les images (off4) de INTRO1.SRF
-  seek(SRFhandler,$490); // Direct dans les images (off4) de TITLE.SRF
-  blockread(SRFhandler,buf,4);
-  subcount:=readlw;
-  for i:=0 to subcount-1 do openSubfile(chr(buf[0])+chr(buf[1])+chr(buf[2])+chr(buf[3]),i);
-
-  result:=0;
 end;
 
 procedure decodeImageBuffer(buf:array of byte; var bufresult:array of longint; buflen:longint);
@@ -323,8 +246,223 @@ begin
   end;
 end;
 
-var graphic:array[0..307200] of byte;
-    picture: array[0..307200] of longint;
+procedure exportSubimagesToGif(si:subimages;filename:string);
+var GIF:TGifImage;
+    Ext: TGIFGraphicControlExtension;
+    ResultAdd:Integer;
+    idx: Integer;
+    pic:TPicture;
+    w,h,x,y,realy:integer;
+    pos,graphlen: longint;
+    off4pos,i,j:word;
+    maxwidth,maxheight:integer;
+    js:string;
+    f:system.text;
+begin
+  // Positionnement très simple et très inefficace des sprites
+  maxwidth:=0;maxheight:=0;
+  for off4pos:=0 to si.nbimages-1 do with si.images[off4pos] do begin
+    if (width > maxwidth) then maxwidth:=width;
+    inc(maxheight,height);
+  end;
+
+  // Dessin à partir de longbitmap
+  pic:=TPicture.Create;
+  pic.Bitmap.Width:=maxwidth;
+  pic.Bitmap.Height:=maxheight;
+  pic.Bitmap.Canvas.Brush.Color:=$FF80FF; // Remplir l'image de la couleur transparente
+  pic.Bitmap.Canvas.FillRect(pic.Bitmap.Canvas.ClipRect);
+
+  js:='var tiles=new Array();';
+  realy:=0;
+  for off4pos:=0 to si.nbimages-1 do begin
+    seek(SRFhandler,si.images[off4pos].offset);
+    w:=si.images[off4pos].width;
+    h:=si.images[off4pos].height;
+    blockread(SRFhandler,graphic,307200,graphlen);
+    decodeImageBuffer(graphic,picture,w*h);
+    js:=js+'tiles['+inttostr(off4pos)+']={x:0,y:'+inttostr(realy)+',w:'+inttostr(w)+',h:'+inttostr(h)+'};';
+    x:=0;
+    y:=0;
+    pos:=0;
+    while y < h do begin
+      pic.Bitmap.Canvas.Pixels[x,realy] := picture[pos];
+      inc(pos);
+      inc(x);
+      if (x >= w) then begin
+        x:=0;
+        inc(y);
+        inc(realy);
+      end;
+    end;
+  end;
+
+  // Create GIF
+  GIF := TGIFImage.Create;
+  GIF.Width := maxwidth;
+  GIF.Height := maxheight;
+  GIF.ColorReduction := rmNone;  // rmQuantize rmNone
+  //  GIF.DitherMode := dmNearest;  // no dither, use nearest color in palette
+  GIF.DitherMode := dmNearest;       // dmNearest dmFloydSteinberg
+  GIF.Compression := gcLZW;
+
+  // Add image
+  ResultAdd:=GIF.Add(pic.Graphic);
+  // Add Graphic Control Extension (for transparent color)
+  Ext := TGIFGraphicControlExtension.Create(GIF.Images[ResultAdd]);
+  idx := GetColorIndex(GIF.Images[ResultAdd], $FF80FF);
+  if idx in [0..255] then
+  begin
+    Ext.Transparent := True;
+    Ext.TransparentColorIndex := idx;
+  end;
+  GIF.Images[ResultAdd].Extensions.Add(Ext);
+
+  // Save GIF
+  GIF.SaveToFile(filename+'.gif');
+
+  // Release GIF
+  GIF.Free;
+
+  // Add frames to JS
+
+  js:=js+#13#10'var frames=new Array();';
+  for i:=0 to si.nbframes-1 do begin
+    js:=js+'frames['+inttostr(i)+']={nbimg:'+inttostr(si.frames[i].nbimages);
+    if (si.frames[i].nbimages > 0) then begin
+      js:=js+',fps1:'+inttostr(si.fps1)+',fps2:'+inttostr(si.fps2)+',img:[';
+      for j:=0 to si.frames[i].nbimages do begin
+        js:=js+'{'
+        +'val:'+inttostr(si.frames[i].images[j].val1)+','
+        +'ox:'+inttostr(si.frames[i].images[j].offsetx)+','
+        +'oy:'+inttostr(si.frames[i].images[j].offsety)+','
+        +'sx:'+inttostr(si.frames[i].images[j].sizex)+','
+        +'sy:'+inttostr(si.frames[i].images[j].sizey)+','
+        +'idx:'+inttostr(si.frames[i].images[j].imgindex)
+        +'},';
+      end;
+      js:=js+']';
+    end;
+    js:=js+'};';
+  end;
+
+  // Save JS
+  assignfile(f,filename+'.js');
+  rewrite(f);
+  writeln(f,js);
+  closefile(f);
+
+  form1.Label1.Caption:='Conversion done.';
+end;
+
+function openSubimages(subname,fileoffset,filesize:longint):subimages;
+var si:subimages;
+    imagestartpointer,currentpos,currentpos2:longint;
+    nbimages,i,j:word;
+    nbframes,frameoffset:word;
+
+    val1:byte;
+    offsetx,offsety:smallint;
+    sizex,sizey:word;
+    nbframeimages:word;
+begin
+  si.subname:=subname;
+  currentpos:=filepos(SRFhandler);
+  seek(SRFhandler,fileoffset);
+  // Spécifique aux images à partir de maintenant
+  imagestartpointer:=readlw;
+  // Données d'animation
+  si.fps1:=readw; // 400
+  si.fps2:=readw; // 6   400/6 = 66, 66 ms par frame ?
+  nbframes:=readw;
+  si.nbframes:=nbframes;
+  for i:=0 to nbframes-1 do begin
+    frameoffset:=readw;
+    if (frameoffset = 0) then begin
+      si.frames[i].nbimages:=0;
+    end else begin
+      currentpos2:=filepos(SRFhandler);
+      seek(SRFhandler,fileoffset+10+nbframes*2+(frameoffset-1)*12);
+      readb; // imgnum, vaut toujours 0 ici
+      val1:=readb;
+      offsetx:=readw;
+      offsety:=readw;
+      sizex:=readw;
+      sizey:=readw;
+      nbframeimages:=readw;
+      si.frames[i].nbimages:=nbframeimages;
+      si.frames[i].images[0].val1:=val1;
+      si.frames[i].images[0].offsetx:=offsetx;
+      si.frames[i].images[0].offsety:=offsety;
+      si.frames[i].images[0].sizex:=sizex;
+      si.frames[i].images[0].sizey:=sizey;
+      if (nbframeimages > 0) then for j:=1 to nbframeimages do begin
+        readb; // imgnum mais on l'a avec j de toutes façons
+        si.frames[i].images[j].val1:=readb;
+        si.frames[i].images[j].offsetx:=readw;
+        si.frames[i].images[j].offsety:=readw;
+        si.frames[i].images[j].sizex:=readw;
+        si.frames[i].images[j].sizey:=readw;
+        si.frames[i].images[j].imgindex:=readw;
+      end;
+      seek(SRFhandler,currentpos2);
+    end;
+  end;
+
+  // Liste d'images
+  seek(SRFhandler,fileoffset+imagestartpointer);
+  nbimages:=readw;
+  if (nbimages <> readw) then begin // Présent deux fois dans le fichier, pourquoi...
+    form1.Label2.caption:='Alert nbimage different';
+  end;
+  si.nbimages:=nbimages;
+  for i:=0 to nbimages-1 do begin
+    si.images[i].offset:=fileoffset+readlw;
+    si.images[i].width:=readw;
+    si.images[i].height:=readw;
+  end;
+  seek(SRFhandler,currentpos);
+  result:=si;
+end;
+
+procedure openSubfile(t:string;id:longword);
+var subname,fileoffset,filesize:longint;
+
+begin
+  subname:=readlw;
+  fileoffset:=readlw;
+  filesize:=readlw;
+  if (t='off4') then begin
+    off4[id]:=openSubimages(subname,fileoffset,filesize);
+  end;
+
+end;
+
+function openSRF(filename:string):shortint;
+var buf:array[0..3] of byte;
+    archivesize,headersize:longint;
+    i,subcount:longword;
+begin
+  assignfile(SRFhandler,filename);
+  reset(SRFhandler,1);
+  blockread(SRFhandler,buf,4);
+  if (buf[0] <> $73) and (buf[1] <> $72) and (buf[2] <> $66) and (buf[3] <> $31) then begin // srf1
+    result:=-1;
+    exit;
+  end;
+  archivesize:=readlw;
+  headersize:=readlw;
+  form1.Label1.Caption:='Archive size: '+inttostr(archivesize)+' ; Header size: '+inttostr(headersize);
+
+  while filepos(SRFhandler) < headersize do begin
+    blockread(SRFhandler,buf,4);
+    subcount:=readlw;
+    for i:=0 to subcount-1 do begin
+      openSubfile(chr(buf[0])+chr(buf[1])+chr(buf[2])+chr(buf[3]),i);
+    end;
+  end;
+  result:=0;
+end;
 
 procedure TForm1.Button1Click(Sender: TObject);
 var f:file;
@@ -389,7 +527,7 @@ end;
 procedure TForm1.Button3Click(Sender: TObject);
 var i:word;
 begin
-  openSRF('TITLE.SRF');
+  openSRF('10TIMER.SRF');
   ComboBox1.Items.Clear;
   for i:=0 to off4[0].nbimages-1 do begin
     ComboBox1.Items.Add(inttostr(i));
@@ -435,141 +573,9 @@ begin
   InitColors;
 end;
 
-function GetColorIndex(GIF: TGIFSubImage; Color: TColor): Integer;
-var
-  idx, x, y: Integer;
-begin
-  // Find index for color in the colormap.
-  // The same color can be in the colormap more than once.
-  // Not all color indexes may be in use, so check if this index is being used.
-  // Return only an index which is actually being used in the image.
-  // If the index is not being used in the image,
-  // try to find the next index for the color in the colormap.
-  for idx := 0 to GIF.ActiveColorMap.Count - 1 do
-    if GIF.ActiveColorMap.Colors[idx] = Color then
-    begin
-      // Found an index, is it being used in the image?
-      for y := 0 to GIF.Height-1 do
-        for x := 0 to GIF.Width-1 do
-          if GIF.Pixels[x, y] = idx then
-          begin
-            Result := idx;  // Index is used in image.
-            Exit;
-          end;
-      // Index not used in the image, try next index.
-    end;
-  Result := -1;  // didn't find index for the color
-end;
-
 procedure TForm1.Button4Click(Sender: TObject);
-var GIF:TGifImage;
-    Ext: TGIFGraphicControlExtension;
-    ResultAdd:Integer;
-    idx: Integer;
-    pic:TPicture;
-    w,h,x,y,realy:integer;
-    pos,graphlen: longint;
-    off4num,off4pos,i,j:word;
-    maxwidth,maxheight:integer;
-    js:string;
-    f:system.text;
 begin
-  off4num:=4;
-
-  // Positionnement très simple et très inefficace des sprites
-  maxwidth:=0;maxheight:=0;
-  for off4pos:=0 to off4[off4num].nbimages-1 do with off4[off4num].images[off4pos] do begin
-    if (width > maxwidth) then maxwidth:=width;
-    inc(maxheight,height);
-  end;
-
-  // Dessin à partir de longbitmap
-  pic:=TPicture.Create;
-  pic.Bitmap.Width:=maxwidth;
-  pic.Bitmap.Height:=maxheight;
-  pic.Bitmap.Canvas.Brush.Color:=$FF80FF; // Remplir l'image de la couleur transparente
-  pic.Bitmap.Canvas.FillRect(pic.Bitmap.Canvas.ClipRect);
-
-  js:='var tiles=new Array();';
-  realy:=0;
-  for off4pos:=0 to off4[off4num].nbimages-1 do begin
-    seek(SRFhandler,off4[off4num].images[off4pos].offset);
-    w:=off4[off4num].images[off4pos].width;
-    h:=off4[off4num].images[off4pos].height;
-    blockread(SRFhandler,graphic,307200,graphlen);
-    decodeImageBuffer(graphic,picture,w*h);
-    js:=js+'tiles['+inttostr(off4pos)+']={x:0,y:'+inttostr(realy)+',w:'+inttostr(w)+',h:'+inttostr(h)+'};';
-    x:=0;
-    y:=0;
-    pos:=0;
-    while y < h do begin
-      pic.Bitmap.Canvas.Pixels[x,realy] := picture[pos];
-      inc(pos);
-      inc(x);
-      if (x >= w) then begin
-        x:=0;
-        inc(y);
-        inc(realy);
-      end;
-    end;
-  end;
-
-  // Create GIF
-  GIF := TGIFImage.Create;
-  GIF.Width := maxwidth;
-  GIF.Height := maxheight;
-  GIF.ColorReduction := rmNone;  // rmQuantize rmNone
-  //  GIF.DitherMode := dmNearest;  // no dither, use nearest color in palette
-  GIF.DitherMode := dmNearest;       // dmNearest dmFloydSteinberg
-  GIF.Compression := gcLZW;
-
-  // Add image
-  ResultAdd:=GIF.Add(pic.Graphic);
-  // Add Graphic Control Extension (for transparent color)
-  Ext := TGIFGraphicControlExtension.Create(GIF.Images[ResultAdd]);
-  idx := GetColorIndex(GIF.Images[ResultAdd], $FF80FF);
-  if idx in [0..255] then
-  begin
-    Ext.Transparent := True;
-    Ext.TransparentColorIndex := idx;
-  end;
-  GIF.Images[ResultAdd].Extensions.Add(Ext);
-
-  // Save GIF
-  GIF.SaveToFile('tiles.gif');
-
-  // Release GIF
-  GIF.Free;
-
-  // Add frames to JS
-
-  js:=js+#13#10'var frames=new Array();';
-  for i:=0 to off4[off4num].nbframes-1 do begin
-    js:=js+'frames['+inttostr(i)+']={nbimg:'+inttostr(off4[off4num].frames[i].nbimages);
-    if (off4[off4num].frames[i].nbimages > 0) then begin
-      js:=js+',img:[';
-      for j:=0 to off4[off4num].frames[i].nbimages do begin
-        js:=js+'{'
-        +'val:'+inttostr(off4[off4num].frames[i].images[j].val1)+','
-        +'ox:'+inttostr(off4[off4num].frames[i].images[j].offsetx)+','
-        +'oy:'+inttostr(off4[off4num].frames[i].images[j].offsety)+','
-        +'sx:'+inttostr(off4[off4num].frames[i].images[j].sizex)+','
-        +'sy:'+inttostr(off4[off4num].frames[i].images[j].sizey)+','
-        +'idx:'+inttostr(off4[off4num].frames[i].images[j].imgindex)
-        +'},';
-      end;
-      js:=js+']';
-    end;
-    js:=js+'};';
-  end;
-
-  // Save JS
-  assignfile(f,'tiles.js');
-  rewrite(f);
-  writeln(f,js);
-  closefile(f);
-
-  Label1.Caption:='Conversion done.';
+  exportSubimagesToGif(off4[0],'html\tiles');
 end;
 
 end.

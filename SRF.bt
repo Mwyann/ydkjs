@@ -7,9 +7,21 @@
 // Purpose:
 //--------------------------------------
 
+/*
+
+val1 :
+
+0, 12, 16, 167
+
+12 semble dire "stop"
+16 semble dire "répéter cette frame à la suivante" ou placer un marqueur, une pause au milieu d'une animation
+32 ou 48 semble demander d'utiliser une autre ressource image (exemple le curseur de saisie)
+
+*/
+
 typedef struct {
     ubyte imgnum; // N° de l'image
-    ubyte val1; // 0, 12, 16, 167 (12 semble dire "stop", 16 semble dire "répéter cette frame à la suivante")
+    ubyte val1; // 
     short offsetx;
     short offsety;
     short sizex;
@@ -19,7 +31,7 @@ typedef struct {
 
 typedef struct {
     ubyte imgnum; // Devrait être zéro, pour la première image...
-    ubyte val1; // 0, 12, 16, 167 (12 semble dire "stop", 16 semble dire "répéter cette frame à la suivante")
+    ubyte val1;
     short offsetx; // Position des images
     short offsety;
     short sizex;
