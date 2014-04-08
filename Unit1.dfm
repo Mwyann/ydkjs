@@ -5,7 +5,7 @@ object Form1: TForm1
   BorderStyle = bsSingle
   Caption = 'Form1'
   ClientHeight = 556
-  ClientWidth = 667
+  ClientWidth = 666
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -21,12 +21,6 @@ object Form1: TForm1
     Top = 64
     Width = 640
     Height = 480
-  end
-  object Image1: TImage
-    Left = 672
-    Top = 64
-    Width = 369
-    Height = 265
   end
   object Label1: TLabel
     Left = 16
@@ -49,13 +43,6 @@ object Form1: TForm1
     Height = 13
     Caption = 'Decoded:'
   end
-  object Label4: TLabel
-    Left = 848
-    Top = 48
-    Width = 38
-    Height = 13
-    Caption = 'Original:'
-  end
   object Label5: TLabel
     Left = 16
     Top = 40
@@ -65,56 +52,47 @@ object Form1: TForm1
   end
   object Label6: TLabel
     Left = 456
-    Top = 16
+    Top = 32
     Width = 18
     Height = 13
     Caption = 'off4'
   end
-  object Button1: TButton
-    Left = 760
-    Top = 16
-    Width = 75
-    Height = 25
-    Caption = 'Try to decode'
-    TabOrder = 0
-    OnClick = Button1Click
-  end
-  object Button2: TButton
-    Left = 904
-    Top = 16
-    Width = 75
-    Height = 25
-    Caption = 'BMP to raw'
-    TabOrder = 1
-    OnClick = Button2Click
-  end
   object ComboBox1: TComboBox
     Left = 480
-    Top = 16
+    Top = 32
     Width = 73
     Height = 21
     Enabled = False
     ItemHeight = 13
-    TabOrder = 2
+    TabOrder = 0
     OnChange = ComboBox1Change
   end
   object Button3: TButton
     Left = 368
-    Top = 16
+    Top = 32
     Width = 75
     Height = 25
     Caption = 'Open SRF'
-    TabOrder = 3
+    TabOrder = 1
     OnClick = Button3Click
   end
   object Button4: TButton
     Left = 568
-    Top = 16
+    Top = 32
     Width = 75
     Height = 25
     Caption = 'Convert to GIF'
     Enabled = False
-    TabOrder = 4
+    TabOrder = 2
     OnClick = Button4Click
+  end
+  object SRFList: TComboBox
+    Left = 368
+    Top = 8
+    Width = 273
+    Height = 21
+    Style = csDropDownList
+    ItemHeight = 13
+    TabOrder = 3
   end
 end

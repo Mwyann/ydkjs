@@ -75,7 +75,7 @@ typedef struct {
     SetBackColor( cLtGreen );
     ushort imagenum1;
     ushort imagenum2;
-    IMAGE image[imagenum1] <optimize=false>;
+    if (imagenum1 > 0) IMAGE image[imagenum1] <optimize=false>;
 } IMAGELIST;
 
 typedef struct {

@@ -1,52 +1,49 @@
-unit Unit1;
+unit YDKJUnit;
 
 interface
 
-uses
-  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ExtCtrls;
+uses Graphics;
 
-type
-  TForm1 = class(TForm)
-    PaintBox1: TPaintBox;
-    Button1: TButton;
-    Button2: TButton;
-    Image1: TImage;
-    Label1: TLabel;
-    Label2: TLabel;
-    Label3: TLabel;
-    Label4: TLabel;
-    Label5: TLabel;
-    ComboBox1: TComboBox;
-    Button3: TButton;
-    Label6: TLabel;
-    Button4: TButton;
-    procedure Button1Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
-    procedure ComboBox1Change(Sender: TObject);
-    procedure FormShow(Sender: TObject);
-    procedure Button4Click(Sender: TObject);
-  private
-    { Déclarations privées }
-  public
-    { Déclarations publiques }
-  end;
+type subimages=record
+       subname:longword;
+       fps1,fps2:word;
+       nbframes:word;
+       frames:array[0..2500] of record
+         nbimages:word;
+         images:array[0..10] of record
+           val1:byte; // Valeur inconnue : 0, 16, 167
+           offsetx,offsety:smallint;
+           sizex,sizey:word;
+           imgindex:word;
+         end;
+       end;
+       nbimages:word;
+       images:array[0..1000] of record
+         width,height:word;
+         offset:longint;
+       end;
+     end;
 
-var
-  Form1: TForm1;
+var SRFhandler:file;
+    off4:array[0..200] of subimages;
+    nboff4:word;
+
+function openSRF(filename:string):shortint;
+procedure exportSubimagesToGif(si:subimages;filename:string);
+
+procedure decodeImageBuffer(buf:array of byte; var bufresult:array of longint; buflen:longint);
 
 implementation
 
-{$R *.dfm}
-
-uses GifImage;
+uses SysUtils,GifImage;
 
 var colors:array[0..255] of longint;
     rgbtopalette:array[0..255] of array[0..255] of array[0..255] of byte;
     graphic:array[0..307200] of byte;
-    picture: array[0..307200] of longint;
-    
+    picture:array[0..307200] of longint;
+
+// Fonctions palette
+
 procedure InitColors;
 var palette:TBitmap;
     i:byte;
@@ -105,28 +102,7 @@ begin
   Result := -1;  // didn't find index for the color
 end;
 
-type subimages=record
-       subname:longword;
-       fps1,fps2:word;
-       nbframes:word;
-       frames:array[0..2500] of record
-         nbimages:word;
-         images:array[0..10] of record
-           val1:byte; // Valeur inconnue : 0, 16, 167
-           offsetx,offsety:smallint;
-           sizex,sizey:word;
-           imgindex:word;
-         end;
-       end;
-       nbimages:word;
-       images:array[0..1000] of record
-         width,height:word;
-         offset:longint;
-       end;
-     end;
-
-var SRFhandler:file;
-    off4:array[0..200] of subimages;
+// Lecture du fichier
 
 function BE4(l:Longword):Longword; // bigendian 4 octets
 begin
@@ -159,6 +135,8 @@ begin
   result:=l;
 end;
 
+// Décodage des images
+
 procedure decodeImageBuffer(buf:array of byte; var bufresult:array of longint; buflen:longint);
 var bitmap:array[0..307200] of byte;
     infos:array[0..2] of byte;
@@ -169,8 +147,8 @@ var bitmap:array[0..307200] of byte;
     nextbg,bglength:longint;
 
 begin
-  form1.Label2.Caption:='';
-  form1.Label5.Caption:='';
+  //form1.Label2.Caption:='';
+  //form1.Label5.Caption:='';
   l:=0;
   pos:=0;
   extrapixels:=buf[0]-2;
@@ -246,13 +224,17 @@ begin
   end;
 end;
 
+// Export des images/animations en Gif+JS
+
+const verticalGIF = 1; // 1 = GIF en mode vertical, 0 en mode horizontal
+
 procedure exportSubimagesToGif(si:subimages;filename:string);
 var GIF:TGifImage;
     Ext: TGIFGraphicControlExtension;
     ResultAdd:Integer;
     idx: Integer;
     pic:TPicture;
-    w,h,x,y,realy:integer;
+    w,h,x,y,realx,realy:integer;
     pos,graphlen: longint;
     off4pos,i,j:word;
     maxwidth,maxheight:integer;
@@ -261,9 +243,18 @@ var GIF:TGifImage;
 begin
   // Positionnement très simple et très inefficace des sprites
   maxwidth:=0;maxheight:=0;
+  js:='';
+
+  if si.nbimages > 0 then begin
+
   for off4pos:=0 to si.nbimages-1 do with si.images[off4pos] do begin
-    if (width > maxwidth) then maxwidth:=width;
-    inc(maxheight,height);
+    if (verticalGIF = 1) then begin
+      if (width > maxwidth) then maxwidth:=width;
+      inc(maxheight,height);
+    end else begin
+      if (height > maxheight) then maxheight:=height;
+      inc(maxwidth,width);
+    end;
   end;
 
   // Dessin à partir de longbitmap
@@ -273,7 +264,8 @@ begin
   pic.Bitmap.Canvas.Brush.Color:=$FF80FF; // Remplir l'image de la couleur transparente
   pic.Bitmap.Canvas.FillRect(pic.Bitmap.Canvas.ClipRect);
 
-  js:='var tiles=new Array();';
+  js:=js+'var tiles=new Array();';
+  realx:=0;
   realy:=0;
   for off4pos:=0 to si.nbimages-1 do begin
     seek(SRFhandler,si.images[off4pos].offset);
@@ -281,20 +273,20 @@ begin
     h:=si.images[off4pos].height;
     blockread(SRFhandler,graphic,307200,graphlen);
     decodeImageBuffer(graphic,picture,w*h);
-    js:=js+'tiles['+inttostr(off4pos)+']={x:0,y:'+inttostr(realy)+',w:'+inttostr(w)+',h:'+inttostr(h)+'};';
+    js:=js+'tiles['+inttostr(off4pos)+']={x:'+inttostr(realx)+',y:'+inttostr(realy)+',w:'+inttostr(w)+',h:'+inttostr(h)+'};';
     x:=0;
     y:=0;
     pos:=0;
     while y < h do begin
-      pic.Bitmap.Canvas.Pixels[x,realy] := picture[pos];
+      pic.Bitmap.Canvas.Pixels[x+realx,y+realy] := picture[pos];
       inc(pos);
       inc(x);
       if (x >= w) then begin
         x:=0;
         inc(y);
-        inc(realy);
       end;
     end;
+    if (verticalGIF = 1) then inc(realy,h) else inc(realx,w);
   end;
 
   // Create GIF
@@ -323,6 +315,8 @@ begin
 
   // Release GIF
   GIF.Free;
+  
+  end;
 
   // Add frames to JS
 
@@ -351,9 +345,9 @@ begin
   rewrite(f);
   writeln(f,js);
   closefile(f);
-
-  form1.Label1.Caption:='Conversion done.';
 end;
+
+// Lecture du format off4
 
 function openSubimages(subname,fileoffset,filesize:longint):subimages;
 var si:subimages;
@@ -413,17 +407,21 @@ begin
   seek(SRFhandler,fileoffset+imagestartpointer);
   nbimages:=readw;
   if (nbimages <> readw) then begin // Présent deux fois dans le fichier, pourquoi...
-    form1.Label2.caption:='Alert nbimage different';
+    //form1.Label2.caption:='Alert nbimage different';
   end;
   si.nbimages:=nbimages;
-  for i:=0 to nbimages-1 do begin
-    si.images[i].offset:=fileoffset+readlw;
-    si.images[i].width:=readw;
-    si.images[i].height:=readw;
+  if nbimages > 0 then begin // On peut n'avoir aucune image, mais des frames... exemple avec 5QDemo.srf, premier bloc
+    for i:=0 to nbimages-1 do begin
+      si.images[i].offset:=fileoffset+readlw;
+      si.images[i].width:=readw;
+      si.images[i].height:=readw;
+    end;
   end;
   seek(SRFhandler,currentpos);
   result:=si;
 end;
+
+// Lecture d'un subfile, en fonction du type
 
 procedure openSubfile(t:string;id:longword);
 var subname,fileoffset,filesize:longint;
@@ -434,13 +432,15 @@ begin
   filesize:=readlw;
   if (t='off4') then begin
     off4[id]:=openSubimages(subname,fileoffset,filesize);
+    if (id > nboff4) then nboff4:=id;
   end;
-
 end;
+
+// Lecture d'un fichier SRF
 
 function openSRF(filename:string):shortint;
 var buf:array[0..3] of byte;
-    archivesize,headersize:longint;
+    headersize:longint;
     i,subcount:longword;
 begin
   assignfile(SRFhandler,filename);
@@ -450,9 +450,10 @@ begin
     result:=-1;
     exit;
   end;
-  archivesize:=readlw;
+  readlw; // archivesize
   headersize:=readlw;
-  form1.Label1.Caption:='Archive size: '+inttostr(archivesize)+' ; Header size: '+inttostr(headersize);
+  //form1.Label1.Caption:='Archive size: '+inttostr(archivesize)+' ; Header size: '+inttostr(headersize);
+  nboff4:=0;
 
   while filepos(SRFhandler) < headersize do begin
     blockread(SRFhandler,buf,4);
@@ -464,118 +465,6 @@ begin
   result:=0;
 end;
 
-procedure TForm1.Button1Click(Sender: TObject);
-var f:file;
-    pos, graphlen: longint;
-    pic:TPicture;
-    x,y:word;
-    w,h:word;
-begin
-  w:=299;h:=39;
-  assignfile(f,'D4884F.graphic');
-  reset(f,1);
-  blockread(f,graphic,307200,graphlen);
-  closefile(f);
-
-  decodeImageBuffer(graphic,picture,w*h);
-
-  // Comparaison avec le bitmap d'origine
-  Image1.Picture.LoadFromFile('D4884F.bmp');
-
-  // Dessin à partir de longbitmap
-  pic:=TPicture.Create;
-  pic.Bitmap.Width:=PaintBox1.Width;
-  pic.Bitmap.Height:=PaintBox1.Height;
-  x:=0;
-  y:=0;
-  pos:=0;
-  Label1.Caption:='';
-  while y < h do begin
-    pic.Bitmap.Canvas.Pixels[x,y] := picture[pos];
-    if (Label1.Caption = '') and (pic.Bitmap.Canvas.Pixels[x,y] <> Image1.Canvas.Pixels[x,y]) then begin
-      Label1.Caption:='First diff: '+inttostr(pos)+' byte, x='+inttostr(x+1)+' y='+inttostr(y+1);
-    end;
-    inc(pos);
-    inc(x);
-    if (x >= w) then begin
-      x:=0;
-      inc(y);
-    end;
-  end;
-  if (Label1.Caption = '') then Label1.Caption := 'No diff :-)';
-  PaintBox1.Canvas.CopyRect(pic.Bitmap.Canvas.ClipRect, pic.Bitmap.Canvas, PaintBox1.Canvas.ClipRect);
-end;
-
-procedure TForm1.Button2Click(Sender: TObject);
-var c:byte;
-    x,y:word;
-    l:longint;
-    f:file;
-begin
-  assignfile(f,'176.raw');
-  rewrite(f,1);
-  Image1.Picture.LoadFromFile('176.bmp');
-  for y:=0 to Image1.Picture.Height-1 do
-  for x:=0 to Image1.Picture.Width-1 do begin
-    l:=Image1.Canvas.Pixels[x,y];
-    c:=pixel2palette(l);
-    blockwrite(f,c,1);
-  end;
-  closefile(f);
-end;
-
-procedure TForm1.Button3Click(Sender: TObject);
-var i:word;
-begin
-  openSRF('10TIMER.SRF');
-  ComboBox1.Items.Clear;
-  for i:=0 to off4[0].nbimages-1 do begin
-    ComboBox1.Items.Add(inttostr(i));
-  end;
-  ComboBox1.Enabled:=true;
-  Button4.Enabled:=true;
-end;
-
-procedure TForm1.ComboBox1Change(Sender: TObject);
-var pos, graphlen: longint;
-    pic:TPicture;
-    x,y:word;
-    w,h:word;
-begin
-  seek(SRFhandler,off4[0].images[ComboBox1.ItemIndex].offset);
-  w:=off4[0].images[ComboBox1.ItemIndex].width;
-  h:=off4[0].images[ComboBox1.ItemIndex].height;
-  blockread(SRFhandler,graphic,307200,graphlen);
-  decodeImageBuffer(graphic,picture,w*h);
-
-  // Dessin à partir de longbitmap
-  pic:=TPicture.Create;
-  pic.Bitmap.Width:=PaintBox1.Width;
-  pic.Bitmap.Height:=PaintBox1.Height;
-  x:=0;
-  y:=0;
-  pos:=0;
-  Label1.Caption:='';
-  while y < h do begin
-    pic.Bitmap.Canvas.Pixels[x,y] := picture[pos];
-    inc(pos);
-    inc(x);
-    if (x >= w) then begin
-      x:=0;
-      inc(y);
-    end;
-  end;
-  PaintBox1.Canvas.CopyRect(pic.Bitmap.Canvas.ClipRect, pic.Bitmap.Canvas, PaintBox1.Canvas.ClipRect);
-end;
-
-procedure TForm1.FormShow(Sender: TObject);
 begin
   InitColors;
-end;
-
-procedure TForm1.Button4Click(Sender: TObject);
-begin
-  exportSubimagesToGif(off4[0],'html\tiles');
-end;
-
 end.
