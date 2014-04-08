@@ -43,7 +43,7 @@ var i:word;
 begin
   openSRF(SRFbasedir+SRFList.Items[SRFList.ItemIndex]);
   ComboBox1.Items.Clear;
-  off4:=subimages(SRFdata.filelist[idfileoff4].subfile[1].data^);
+  off4:=subimages(SRFdata.filelist[idfileoff4].subfile[0].data^);
   if off4.nbimages > 0 then begin
     for i:=0 to off4.nbimages-1 do begin
       ComboBox1.Items.Add(inttostr(i));
@@ -64,7 +64,7 @@ var pos, graphlen: longint;
     w,h:word;
     off4:subimages;
 begin
-  off4:=subimages(SRFdata.filelist[idfileoff4].subfile[1].data^);
+  off4:=subimages(SRFdata.filelist[idfileoff4].subfile[0].data^);
   seek(SRFhandler,off4.images[ComboBox1.ItemIndex].offset);
   w:=off4.images[ComboBox1.ItemIndex].width;
   h:=off4.images[ComboBox1.ItemIndex].height;
@@ -136,7 +136,8 @@ end;
 procedure TForm1.FormShow(Sender: TObject);
 begin
   resbasedir:=IncludeTrailingBackSlash2('html\res');
-  SRFbasedir:=IncludeTrailingBackSlash2('L:\Jeux\YDKJ\JACK Demo\Riviera');
+  SRFbasedir:=IncludeTrailingBackSlash2('R:\JACKDemo\JACK Demo\Riviera');
+  //SRFbasedir:=IncludeTrailingBackSlash2('.');
   FileSearch(SRFbasedir);
   //FileSearch('.');
   SRFList.ItemIndex:=0;
@@ -153,16 +154,30 @@ begin
   result:=filename;
 end;
 
-procedure TForm1.Button4Click(Sender: TObject);
-var off4file,off4pos:word;
-    fullname:string;
+function removespaces(s:string):string;
+var t:string;
+    i:word;
 begin
-  off4file:=idfileoff4;
-  fullname:=GetCurrentDir()+'\'+resbasedir+SRFList.Items[SRFList.ItemIndex];
-  ForceDirectories(SafeFileName(ExtractFileDir(fullname)));
-  if SRFdata.filelist[off4file].nbsub > 0 then begin
-    for off4pos:=0 to SRFdata.filelist[off4file].nbsub-1 do begin
-      exportSubimagesToGif(subimages(SRFdata.filelist[off4file].subfile[off4pos].data^),RemoveExt(resbasedir+SRFList.Items[SRFList.ItemIndex])+'_'+inttostr(off4pos));
+  t:='';
+  for i:=1 to length(s) do if s[i] <> ' ' then t:=t+s[i];
+  result:=t;
+end;
+
+procedure TForm1.Button4Click(Sender: TObject);
+var filepos,subpos:word;
+    fullname,ftype:string;
+begin
+  if SRFdata.nbfiles > 0 then for filepos:=0 to SRFdata.nbfiles-1 do begin
+    ftype:=SRFdata.filelist[filepos].ftype;
+    if SRFdata.filelist[filepos].nbsub > 0 then for subpos:=0 to SRFdata.filelist[filepos].nbsub-1 do begin
+      fullname:=RemoveExt(SafeFileName(GetCurrentDir()+'\'+resbasedir+SRFList.Items[SRFList.ItemIndex]))+'\'+removespaces(ftype);
+      ForceDirectories(fullname);
+      fullname:=fullname+'\'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname);
+      if (filetype(ftype)='subimages') then begin
+        exportSubimagesToGif(subimages(SRFdata.filelist[filepos].subfile[subpos].data^),fullname);
+      end else if (filetype(ftype)='subsound') then begin
+        exportSubsoundToFile(subsound(SRFdata.filelist[filepos].subfile[subpos].data^),fullname);
+      end;
     end;
   end;
   Label1.Caption:='Conversion complete.';

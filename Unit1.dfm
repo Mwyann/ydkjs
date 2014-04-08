@@ -67,7 +67,7 @@ object Form1: TForm1
     Top = 32
     Width = 75
     Height = 25
-    Caption = 'Convert to GIF'
+    Caption = 'Convert to res'
     Enabled = False
     TabOrder = 2
     OnClick = Button4Click

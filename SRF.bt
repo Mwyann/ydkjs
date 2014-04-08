@@ -66,7 +66,7 @@ typedef struct {
     local int64 currentpos2 = FTell();
     FSeek(fileoffset+offset);
     SetBackColor( cLtBlue );
-    char data[4] <optimize=false>;
+    char data[4] <optimize=false,open=suppress>;
     SetBackColor( cLtGreen );
     FSeek(currentpos2);
 } IMAGE;
@@ -91,6 +91,18 @@ typedef struct {
 
 typedef struct {
     SetBackColor( cLtGreen );
+    ushort header1[14]; // Aucune différence, que ce soit un wav normal ou un AIFC...
+    ushort bitrate; // 22050 a priori toujours
+    ushort header2[6]; // header2[5] : FE3C (aifc) ou FF3C (wav)
+    long samples; // Nombre d'échantillons, à 16 bits il faut donc multiplier par 2 (en aifc, cette valeur est utilisée dans le fichier aifc, position 0x24)
+    ushort header3[7];
+    char compression[4]; // ima4 (aifc) ou rien (wav)
+    ushort header4[10]; // header4[2] : 16 (wav) ou 0 (aifc), header4[6] : FFFF (aifc) ou 0 (wav), header4[9] : 16 (aifc) ou 0 (wav)
+    ubyte snddata[filesize-84] <open=suppress>;
+} SOUNDFILE;
+
+typedef struct {
+    SetBackColor( cLtGreen );
     long subname;
     ulong fileoffset;
     ulong filesize;
@@ -98,7 +110,9 @@ typedef struct {
     FSeek(fileoffset);
     SetBackColor( cLtBlue );
     if (filename[0] == 'o' && filename[1] == 'f' && filename[2] == 'f' && filename[3] == '4') IMAGEFILE images <optimize=false>;
-    else char data[filesize] <optimize=false>;
+    else if (filename[0] == 's' && filename[1] == 'n' && filename[2] == 'd' && filename[3] == ' ') SOUNDFILE sound <optimize=false>;
+    else if (filename[0] == 'M') SOUNDFILE sound <optimize=false>;
+    else char data[filesize] <optimize=false,open=suppress>;
     SetBackColor( cLtGreen );
     FSeek(currentpos);
 } SUBFILE;

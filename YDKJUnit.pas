@@ -24,16 +24,17 @@ type subimages=record
      end;
 
 type subsound=record
-       subname:longword;
        aifc:boolean; // si false, c'est du wav normal
-       offset,size:longint;
+       offset,size:longword;
+       samples:longword;
      end;
 
 type subfile=record
        ftype:string[4]; // off4, snd....
        nbsub:word;
        subfile:array[0..255] of record
-         subname,fileoffset,filesize:longint;
+         subname:longint;
+         fileoffset,filesize:longword;
          data:pointer; // Pointeur qui dépendra du type
        end;
      end;
@@ -47,7 +48,9 @@ var SRFhandler:file;
 
 function openSRF(filename:string):shortint;
 procedure closeSRF;
+function filetype(ftype:string):string;
 procedure exportSubimagesToGif(si:subimages;filename:string);
+procedure exportSubsoundToFile(ss:subsound;filename:string);
 
 procedure decodeImageBuffer(buf:array of byte; var bufresult:array of longint; buflen:longint);
 
@@ -363,11 +366,11 @@ begin
   closefile(f);
 end;
 
-// Lecture du format off4
+// Lecture du format des images (off4)
 
-function openSubimages(fileoffset,filesize:longint):pointer; // ^subimages
+function openSubimages(filesize:longint):pointer; // ^subimages
 var si:^subimages;
-    imagestartpointer,currentpos,currentpos2:longint;
+    imagestartpointer,currentpos2,fileoffset:longint;
     nbimages,i,j:word;
     nbframes,frameoffset:word;
 
@@ -377,9 +380,7 @@ var si:^subimages;
     nbframeimages:word;
 begin
   getmem(si,sizeof(subimages));
-  currentpos:=filepos(SRFhandler);
-  seek(SRFhandler,fileoffset);
-  // Spécifique aux images à partir de maintenant
+  fileoffset:=filepos(SRFhandler);
   imagestartpointer:=readlw;
   // Données d'animation
   si^.fps1:=readw; // 400
@@ -435,15 +436,144 @@ begin
       si^.images[i].height:=readw;
     end;
   end;
-  seek(SRFhandler,currentpos);
   result:=si;
+end;
+
+// Export des sons en wav ou aifc
+
+procedure exportSubsoundToFile(ss:subsound;filename:string);
+var f:file;
+    data:array[0..8191] of byte;
+    size:longword;
+
+procedure invertdata; // Inverse les mots dans data
+var i:word;
+    a:byte;
+begin
+  for i:=0 to 4095 do begin
+    a:=data[i*2];
+    data[i*2]:=data[i*2+1];
+    data[i*2+1]:=a;
+  end;
+end;
+
+begin
+  if (ss.aifc) then assignfile(f,filename+'.aifc') else assignfile(f,filename+'.wav');
+  rewrite(f,1);
+
+  if (ss.aifc) then begin // AIFC
+    // Construction du header
+    data[0]:=ord('F');data[1]:=ord('O');data[2]:=ord('R');data[3]:=ord('M');
+    size:=ss.size+92;
+    data[4]:=(size and $FF000000) shr 24;data[5]:=(size and $FF0000) shr 16;data[6]:=(size and $FF00) shr 8;data[7]:=(size and $FF);
+    data[8]:=ord('A');data[9]:=ord('I');data[10]:=ord('F');data[11]:=ord('C');data[12]:=ord('F');data[13]:=ord('V');data[14]:=ord('E');data[15]:=ord('R');
+    data[16]:=$00;data[17]:=$00;data[18]:=$00;data[19]:=$04;data[20]:=$A2;data[21]:=$80;data[22]:=$51;data[23]:=$40;
+    data[24]:=ord('C');data[25]:=ord('O');data[26]:=ord('M');data[27]:=ord('M');data[28]:=$00;data[29]:=$00;data[30]:=$00;data[31]:=$16;
+    data[32]:=$00;data[33]:=$01;
+    data[34]:=(ss.samples and $FF000000) shr 24;data[35]:=(ss.samples and $FF0000) shr 16;data[36]:=(ss.samples and $FF00) shr 8;data[37]:=(ss.samples and $FF); // Samples
+    data[38]:=$00;data[39]:=$10;
+    data[40]:=$40;data[41]:=$0D;data[42]:=$AF;data[43]:=$C8;data[44]:=$00;data[45]:=$00;data[46]:=$00;data[47]:=$00;
+    data[48]:=$00;data[49]:=$00;data[50]:=ord('i');data[51]:=ord('m');data[52]:=ord('a');data[53]:=ord('4');data[54]:=ord('S');data[55]:=ord('S');
+    data[56]:=ord('N');data[57]:=ord('D');
+    size:=ss.size+38;
+    data[58]:=(size and $FF000000) shr 24;data[59]:=(size and $FF0000) shr 16;data[60]:=(size and $FF00) shr 8;data[61]:=(size and $FF);
+    data[62]:=$00;data[63]:=$00;
+    data[64]:=$00;data[65]:=$00;data[66]:=$00;data[67]:=$00;data[68]:=$00;data[69]:=$00;
+
+    blockwrite(f,data,70);
+
+    // On copie les données en brut
+    size:=ss.size;
+    seek(SRFhandler,ss.offset);
+    while size > 0 do begin
+      if (size > 8192) then begin
+        blockread(SRFhandler,data,8192);
+        blockwrite(f,data,8192);
+        dec(size,8192);
+      end else begin
+        blockread(SRFhandler,data,size);
+        blockwrite(f,data,size);
+        size:=0;
+      end;
+    end;
+
+  end else begin // WAV
+    // Construction du header
+    data[0]:=ord('R');data[1]:=ord('I');data[2]:=ord('F');data[3]:=ord('F');
+    size:=ss.size+120;
+    data[4]:=(size and $FF);data[5]:=(size and $FF00) shr 8;data[6]:=(size and $FF0000) shr 16;data[7]:=(size and $FF000000) shr 24;
+    data[8]:=ord('W');data[9]:=ord('A');data[10]:=ord('V');data[11]:=ord('E');data[12]:=ord('f');data[13]:=ord('m');data[14]:=ord('t');data[15]:=ord(' ');
+    data[16]:=$10;data[17]:=$00;data[18]:=$00;data[19]:=$00;data[20]:=$01;data[21]:=$00;data[22]:=$01;data[23]:=$00;
+    data[24]:=$E4;data[25]:=$57;data[26]:=$00;data[27]:=$00;data[28]:=$C8;data[29]:=$AF;data[30]:=$00;data[31]:=$00;
+
+    data[32]:=$02;data[33]:=$00;data[34]:=$10;data[35]:=$00;data[36]:=ord('d');data[37]:=ord('a');data[38]:=ord('t');data[39]:=ord('a');
+    size:=ss.size;
+    data[40]:=(size and $FF);data[41]:=(size and $FF00) shr 8;data[42]:=(size and $FF0000) shr 16;data[43]:=(size and $FF000000) shr 24;
+
+    blockwrite(f,data,44);
+
+    // On copie les données en brut, en inversant les word
+    size:=ss.size;
+    seek(SRFhandler,ss.offset);
+    while size > 0 do begin
+      if (size > 8192) then begin
+        blockread(SRFhandler,data,8192);
+        invertdata;
+        blockwrite(f,data,8192);
+        dec(size,8192);
+      end else begin
+        blockread(SRFhandler,data,size);
+        invertdata;
+        blockwrite(f,data,size);
+        size:=0;
+      end;
+    end;
+
+  end;
+
+  closefile(f);
+end;
+
+// Lecture du format des sons (snd, M*xx)
+
+function openSubsound(filesize:longint):pointer; // ^subsound
+var ss:^subsound;
+    data:array[0..41] of byte;
+    samples:longword;
+begin
+  getmem(ss,sizeof(subsound));
+
+  blockread(SRFhandler,data,42); // Infos inutiles a priori
+  samples:=readlw;
+  ss.samples:=samples;
+  blockread(SRFhandler,data,38); // Compression en 14-17
+  ss.offset:=filepos(SRFhandler);
+  ss.size:=filesize-84; // Taille totale moins le header
+
+  ss.aifc:=false;
+
+  if (data[14] = 0) and (data[15] = 0) and (data[16] = 0) and (data[17] = 0) then begin // WAV
+    ss.aifc:=false;
+  end else if (data[14] = $69) and (data[15] = $6D) and (data[16] = $61) and (data[17] = $34) then begin // AIFC (ima4)
+    ss.aifc:=true;
+  end;
+
+  result:=ss;
+end;
+
+function filetype(ftype:string):string;
+begin
+  result:='';
+  if (ftype='off4') then result:='subimages';
+  if (ftype='snd ') then result:='subsound';
+  if (ftype[1]='M') then result:='subsound';
 end;
 
 // Lecture du fichier SRF
 
 function openSRF(filename:string):shortint;
 var buf:array[0..3] of byte;
-    headersize:longint;
+    headersize,currentpos:longint;
     i,subcount:longword;
 begin
   closeSRF;
@@ -465,13 +595,18 @@ begin
     subcount:=readlw;
     ftype:=chr(buf[0])+chr(buf[1])+chr(buf[2])+chr(buf[3]);
     nbsub:=subcount;
-    for i:=0 to subcount-1 do begin
+    if (subcount > 0) then for i:=0 to subcount-1 do begin
       subfile[i].subname:=readlw;
       subfile[i].fileoffset:=readlw;
       subfile[i].filesize:=readlw;
-      if (ftype='off4') then begin
-        subfile[i].data:=openSubimages(subfile[i].fileoffset,subfile[i].filesize);
+      currentpos:=filepos(SRFhandler);
+      seek(SRFhandler,subfile[i].fileoffset);
+      if (filetype(ftype)='subimages') then begin
+        subfile[i].data:=openSubimages(subfile[i].filesize);
+      end else if (filetype(ftype)='subsound') then begin
+        subfile[i].data:=openSubsound(subfile[i].filesize);
       end;
+      seek(SRFhandler,currentpos);
     end;
     inc(SRFdata.nbfiles);
   end;
