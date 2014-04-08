@@ -3,7 +3,7 @@ object Form1: TForm1
   Top = 136
   BorderIcons = [biSystemMenu, biMinimize]
   BorderStyle = bsSingle
-  Caption = 'Form1'
+  Caption = 'YDKJ Extractor'
   ClientHeight = 556
   ClientWidth = 666
   Color = clBtnFace
@@ -25,30 +25,16 @@ object Form1: TForm1
   object Label1: TLabel
     Left = 16
     Top = 8
-    Width = 32
+    Width = 30
     Height = 13
-    Caption = 'Label1'
-  end
-  object Label2: TLabel
-    Left = 16
-    Top = 24
-    Width = 32
-    Height = 13
-    Caption = 'Label2'
+    Caption = 'Status'
   end
   object Label3: TLabel
-    Left = 288
-    Top = 48
-    Width = 47
-    Height = 13
-    Caption = 'Decoded:'
-  end
-  object Label5: TLabel
     Left = 16
-    Top = 40
-    Width = 32
+    Top = 48
+    Width = 41
     Height = 13
-    Caption = 'Label5'
+    Caption = 'Preview:'
   end
   object Label6: TLabel
     Left = 456

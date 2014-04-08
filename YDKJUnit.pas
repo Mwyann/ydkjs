@@ -5,10 +5,9 @@ interface
 uses Graphics;
 
 type subimages=record
-       subname:longword;
        fps1,fps2:word;
        nbframes:word;
-       frames:array[0..2500] of record
+       frames:array[0..3000] of record
          nbimages:word;
          images:array[0..10] of record
            val1:byte; // Valeur inconnue : 0, 16, 167
@@ -24,14 +23,35 @@ type subimages=record
        end;
      end;
 
+type subsound=record
+       subname:longword;
+       aifc:boolean; // si false, c'est du wav normal
+       offset,size:longint;
+     end;
+
+type subfile=record
+       ftype:string[4]; // off4, snd....
+       nbsub:word;
+       subfile:array[0..255] of record
+         subname,fileoffset,filesize:longint;
+         data:pointer; // Pointeur qui dépendra du type
+       end;
+     end;
+
 var SRFhandler:file;
-    off4:array[0..200] of subimages;
-    nboff4:word;
+    SRFdata:record
+      loaded:boolean;
+      nbfiles:word;
+      filelist:array[0..255] of subfile;
+    end;
 
 function openSRF(filename:string):shortint;
+procedure closeSRF;
 procedure exportSubimagesToGif(si:subimages;filename:string);
 
 procedure decodeImageBuffer(buf:array of byte; var bufresult:array of longint; buflen:longint);
+
+function idfileoff4:word;
 
 implementation
 
@@ -147,8 +167,6 @@ var bitmap:array[0..307200] of byte;
     nextbg,bglength:longint;
 
 begin
-  //form1.Label2.Caption:='';
-  //form1.Label5.Caption:='';
   l:=0;
   pos:=0;
   extrapixels:=buf[0]-2;
@@ -159,11 +177,9 @@ begin
     inc(l);
   end;
   while (l+extrapixels < buflen) and (l < 307200) do begin
-    //if (form1.Label2.Caption = '') then form1.Label5.Caption:='Last bitfield in raw before diff: '+inttostr(pos);
     widebf:=buf[pos];inc(pos);
     widebf:=(widebf shl 1) or 1;
     while (widebf and $FF) <> 0 do begin
-      //if (l >= 524) and (form1.Label2.Caption = '') then form1.Label2.Caption:='Raw filepos: '+inttostr(pos);
       status := (widebf and $100) shr 8;
       widebf := widebf shl 1;
       if (status = 0) then begin // Pixel copié tel quel
@@ -349,8 +365,8 @@ end;
 
 // Lecture du format off4
 
-function openSubimages(subname,fileoffset,filesize:longint):subimages;
-var si:subimages;
+function openSubimages(fileoffset,filesize:longint):pointer; // ^subimages
+var si:^subimages;
     imagestartpointer,currentpos,currentpos2:longint;
     nbimages,i,j:word;
     nbframes,frameoffset:word;
@@ -360,20 +376,21 @@ var si:subimages;
     sizex,sizey:word;
     nbframeimages:word;
 begin
-  si.subname:=subname;
+  getmem(si,sizeof(subimages));
   currentpos:=filepos(SRFhandler);
   seek(SRFhandler,fileoffset);
   // Spécifique aux images à partir de maintenant
   imagestartpointer:=readlw;
   // Données d'animation
-  si.fps1:=readw; // 400
-  si.fps2:=readw; // 6   400/6 = 66, 66 ms par frame ?
+  si^.fps1:=readw; // 400
+  si^.fps2:=readw; // 6   400/6 = 66, 66 ms par frame ?
   nbframes:=readw;
-  si.nbframes:=nbframes;
+  si^.nbframes:=nbframes;
+  if nbframes > 0 then begin
   for i:=0 to nbframes-1 do begin
     frameoffset:=readw;
     if (frameoffset = 0) then begin
-      si.frames[i].nbimages:=0;
+      si^.frames[i].nbimages:=0;
     end else begin
       currentpos2:=filepos(SRFhandler);
       seek(SRFhandler,fileoffset+10+nbframes*2+(frameoffset-1)*12);
@@ -384,87 +401,104 @@ begin
       sizex:=readw;
       sizey:=readw;
       nbframeimages:=readw;
-      si.frames[i].nbimages:=nbframeimages;
-      si.frames[i].images[0].val1:=val1;
-      si.frames[i].images[0].offsetx:=offsetx;
-      si.frames[i].images[0].offsety:=offsety;
-      si.frames[i].images[0].sizex:=sizex;
-      si.frames[i].images[0].sizey:=sizey;
+      si^.frames[i].nbimages:=nbframeimages;
+      si^.frames[i].images[0].val1:=val1;
+      si^.frames[i].images[0].offsetx:=offsetx;
+      si^.frames[i].images[0].offsety:=offsety;
+      si^.frames[i].images[0].sizex:=sizex;
+      si^.frames[i].images[0].sizey:=sizey;
       if (nbframeimages > 0) then for j:=1 to nbframeimages do begin
         readb; // imgnum mais on l'a avec j de toutes façons
-        si.frames[i].images[j].val1:=readb;
-        si.frames[i].images[j].offsetx:=readw;
-        si.frames[i].images[j].offsety:=readw;
-        si.frames[i].images[j].sizex:=readw;
-        si.frames[i].images[j].sizey:=readw;
-        si.frames[i].images[j].imgindex:=readw;
+        si^.frames[i].images[j].val1:=readb;
+        si^.frames[i].images[j].offsetx:=readw;
+        si^.frames[i].images[j].offsety:=readw;
+        si^.frames[i].images[j].sizex:=readw;
+        si^.frames[i].images[j].sizey:=readw;
+        si^.frames[i].images[j].imgindex:=readw;
       end;
       seek(SRFhandler,currentpos2);
     end;
+  end;
   end;
 
   // Liste d'images
   seek(SRFhandler,fileoffset+imagestartpointer);
   nbimages:=readw;
   if (nbimages <> readw) then begin // Présent deux fois dans le fichier, pourquoi...
-    //form1.Label2.caption:='Alert nbimage different';
+    //form1.Label1.caption:='Alert nbimage different';
   end;
-  si.nbimages:=nbimages;
+  si^.nbimages:=nbimages;
   if nbimages > 0 then begin // On peut n'avoir aucune image, mais des frames... exemple avec 5QDemo.srf, premier bloc
     for i:=0 to nbimages-1 do begin
-      si.images[i].offset:=fileoffset+readlw;
-      si.images[i].width:=readw;
-      si.images[i].height:=readw;
+      si^.images[i].offset:=fileoffset+readlw;
+      si^.images[i].width:=readw;
+      si^.images[i].height:=readw;
     end;
   end;
   seek(SRFhandler,currentpos);
   result:=si;
 end;
 
-// Lecture d'un subfile, en fonction du type
-
-procedure openSubfile(t:string;id:longword);
-var subname,fileoffset,filesize:longint;
-
-begin
-  subname:=readlw;
-  fileoffset:=readlw;
-  filesize:=readlw;
-  if (t='off4') then begin
-    off4[id]:=openSubimages(subname,fileoffset,filesize);
-    if (id > nboff4) then nboff4:=id;
-  end;
-end;
-
-// Lecture d'un fichier SRF
+// Lecture du fichier SRF
 
 function openSRF(filename:string):shortint;
 var buf:array[0..3] of byte;
     headersize:longint;
     i,subcount:longword;
 begin
+  closeSRF;
   assignfile(SRFhandler,filename);
   reset(SRFhandler,1);
   blockread(SRFhandler,buf,4);
   if (buf[0] <> $73) and (buf[1] <> $72) and (buf[2] <> $66) and (buf[3] <> $31) then begin // srf1
+    closeSRF;
     result:=-1;
     exit;
   end;
+  SRFdata.loaded:=true;
   readlw; // archivesize
   headersize:=readlw;
-  //form1.Label1.Caption:='Archive size: '+inttostr(archivesize)+' ; Header size: '+inttostr(headersize);
-  nboff4:=0;
 
-  while filepos(SRFhandler) < headersize do begin
+  SRFdata.nbfiles:=0;
+  while filepos(SRFhandler) < headersize do with SRFdata.filelist[SRFdata.nbfiles] do begin
     blockread(SRFhandler,buf,4);
     subcount:=readlw;
+    ftype:=chr(buf[0])+chr(buf[1])+chr(buf[2])+chr(buf[3]);
+    nbsub:=subcount;
     for i:=0 to subcount-1 do begin
-      openSubfile(chr(buf[0])+chr(buf[1])+chr(buf[2])+chr(buf[3]),i);
+      subfile[i].subname:=readlw;
+      subfile[i].fileoffset:=readlw;
+      subfile[i].filesize:=readlw;
+      if (ftype='off4') then begin
+        subfile[i].data:=openSubimages(subfile[i].fileoffset,subfile[i].filesize);
+      end;
     end;
+    inc(SRFdata.nbfiles);
   end;
   result:=0;
 end;
 
+function idfileoff4:word;
+var i:word;
+begin
+  result:=9999;  // Oui, drôle de n° de code d'erreur, mais bon, on est en unsigned...
+  if (SRFdata.nbfiles > 0) then
+    for i:=0 to SRFdata.nbfiles-1 do if (SRFdata.filelist[i].ftype = 'off4') then result:=i;
+end;
+
+procedure closeSRF;
+var i,j:word;
+begin
+  if SRFdata.loaded then closefile(SRFhandler);
+  if (SRFdata.nbfiles > 0) then for i:=0 to SRFdata.nbfiles-1 do begin
+    if (SRFdata.filelist[i].nbsub > 0) then for j:=0 to SRFdata.filelist[i].nbsub-1 do Freemem(SRFdata.filelist[i].subfile[j].data);
+  end;
+  SRFdata.nbfiles:=0;
+  SRFdata.loaded:=false;
+end;
+
 begin
   InitColors;
+  SRFdata.loaded:=false;
+  closeSRF;
 end.

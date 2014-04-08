@@ -10,9 +10,7 @@ type
   TForm1 = class(TForm)
     PaintBox1: TPaintBox;
     Label1: TLabel;
-    Label2: TLabel;
     Label3: TLabel;
-    Label5: TLabel;
     ComboBox1: TComboBox;
     Button3: TButton;
     Label6: TLabel;
@@ -41,11 +39,13 @@ var SRFbasedir,resbasedir:string;
 
 procedure TForm1.Button3Click(Sender: TObject);
 var i:word;
+    off4:subimages;
 begin
   openSRF(SRFbasedir+SRFList.Items[SRFList.ItemIndex]);
   ComboBox1.Items.Clear;
-  if off4[1].nbimages > 0 then begin
-    for i:=0 to off4[1].nbimages-1 do begin
+  off4:=subimages(SRFdata.filelist[idfileoff4].subfile[1].data^);
+  if off4.nbimages > 0 then begin
+    for i:=0 to off4.nbimages-1 do begin
       ComboBox1.Items.Add(inttostr(i));
     end;
   end;
@@ -62,10 +62,12 @@ var pos, graphlen: longint;
     pic:TPicture;
     x,y:word;
     w,h:word;
+    off4:subimages;
 begin
-  seek(SRFhandler,off4[1].images[ComboBox1.ItemIndex].offset);
-  w:=off4[1].images[ComboBox1.ItemIndex].width;
-  h:=off4[1].images[ComboBox1.ItemIndex].height;
+  off4:=subimages(SRFdata.filelist[idfileoff4].subfile[1].data^);
+  seek(SRFhandler,off4.images[ComboBox1.ItemIndex].offset);
+  w:=off4.images[ComboBox1.ItemIndex].width;
+  h:=off4.images[ComboBox1.ItemIndex].height;
   blockread(SRFhandler,graphic,307200,graphlen);
   decodeImageBuffer(graphic,picture,w*h);
 
@@ -152,14 +154,15 @@ begin
 end;
 
 procedure TForm1.Button4Click(Sender: TObject);
-var off4pos:word;
+var off4file,off4pos:word;
     fullname:string;
 begin
+  off4file:=idfileoff4;
   fullname:=GetCurrentDir()+'\'+resbasedir+SRFList.Items[SRFList.ItemIndex];
   ForceDirectories(SafeFileName(ExtractFileDir(fullname)));
-  if nboff4 > 0 then begin
-    for off4pos:=0 to nboff4-1 do begin
-      exportSubimagesToGif(off4[off4pos],RemoveExt(resbasedir+SRFList.Items[SRFList.ItemIndex])+'_'+inttostr(off4pos));
+  if SRFdata.filelist[off4file].nbsub > 0 then begin
+    for off4pos:=0 to SRFdata.filelist[off4file].nbsub-1 do begin
+      exportSubimagesToGif(subimages(SRFdata.filelist[off4file].subfile[off4pos].data^),RemoveExt(resbasedir+SRFList.Items[SRFList.ItemIndex])+'_'+inttostr(off4pos));
     end;
   end;
   Label1.Caption:='Conversion complete.';
