@@ -135,6 +135,7 @@ YDKJFile.prototype.free = function() {
   preloadpool[this.url].used--;
   if (preloadpool[this.url].used <= 0) {
     jQuery('#preload').find('#file'+this.id).remove();
+    this.res = undefined;
     preloadpool[this.url] = 0;
   }
 }
@@ -611,7 +612,7 @@ YDKJMode.prototype.start = function() {
     this.IntroJackDemo.ended(function(){
       this.free();
       thisMode.IntroJackDemo.delay(function(){
-        thisMode.MusicJack.stopResource();
+        thisMode.MusicJack.free();
         thisMode.IntroJack.free();
         thisMode.category.start(); // On passe au choix de la catégorie
       },300);
@@ -650,6 +651,7 @@ YDKJMode.prototype.start = function() {
   
   if (this.modename == 'Category') {
     this.SFXChoiceCategory.ended(function(){
+      thisMode.SFXChoiceCategory.free();
       thisMode.SFXChoiceCategory = new YDKJResource('Category/SFXChoiceCategory');
       thisMode.ChooseCategoryPlayer3.delay(function(){
         this.playResource();
@@ -660,7 +662,9 @@ YDKJMode.prototype.start = function() {
           if (choice == 49) chosed = thisMode.ChoiceCategory1;
           else if (choice == 50) chosed = thisMode.ChoiceCategory2;
           else if (choice == 51) chosed = thisMode.ChoiceCategory3;
-          else chosed = 0;
+          else if (choice == -1) { // Timeout
+            // A gérer
+          } else chosed = 0;
           if (chosed) {
             unbindKeyListener(listener);
             thisChooseCategory.free();
@@ -668,23 +672,18 @@ YDKJMode.prototype.start = function() {
             thisMode.LoopCategory1.free();
             thisMode.LoopCategory2.free();
             thisMode.LoopCategory3.free();
-            /*
-            chosed.ended(function(){
-              thisMode.question.start();
-            });
-            */
             
             thisMode.SFXChoiceCategory.ended(function(){
               thisMode.ChooseCategory1.free();
               thisMode.ChooseCategoryText.free();
               chosed.free();
-              thisMode.question.start();
+              thisMode.question.start(); // On démarre la question choisie
             });
             
             thisMode.SFXChoiceCategory.playResource();
             chosed.playResource();
           }
-        });
+        },10000); // 10 secondes de timeout
       },100);
     });
     
@@ -753,7 +752,7 @@ YDKJMode.prototype.start = function() {
     
     blueZoom();
     
-    thisMode.question = new YDKJMode(thisMode.game, 'Question'); // Preload de la question pendant l'animation
+    thisMode.question = new YDKJMode(thisMode.game, 'Question'); // Preload de la question suivante pendant l'animation (il faudrait précharger les 3 questions possibles)
   }
   
   if (this.modename == 'Question') {
@@ -770,7 +769,13 @@ YDKJMode.prototype.start = function() {
 }
 
 YDKJMode.prototype.free = function() {
-  // Libérer les ressources ici
+  for (var i in this) {
+    if (this[i] instanceof YDKJResource) {
+      this[i].free();
+      this[i] = undefined;
+      delete this[i];
+    }
+  }
 }
 
 /********** YDKJGame **********/
