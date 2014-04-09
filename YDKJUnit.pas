@@ -236,6 +236,7 @@ begin
         bufresult[pos]:=$FF80FF; // Transparent (couleur inexistante dans la palette, rose clair)
         inc(pos);
         dec(bglength);
+        if (pos >= 307200) then break; // TODO: QNUMBERS.SRF, image n°48 (la dernière) fait dépasser la valeur de la position...
       end;
       bglength:=-1;
     end else if (pos=nextbg) then begin
@@ -244,6 +245,7 @@ begin
       bufresult[pos] := colors[bitmap[i]];
       inc(pos);
     end;
+    if (pos >= 307200) then break;
   end;
 end;
 
