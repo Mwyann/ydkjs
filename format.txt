@@ -1,13 +1,11 @@
 Bitfield : 8 prochains blocs, dans l'ordre HI->LO. 0 = pixel brut, 1 = répétition
 
-1, répétition à 2 octets : distance, puis demi-octet haut = nombre à répéter + 2 (demi-octet bas : distance += 0x100 * demi-octet bas)
-Exemple 0x2210 = 0x22 pixels en arrière : répéter les 1+2 = 3 pixels
+1 = répétition, à 2 octets : distance = 1er octet + 0x100 * LO(2eme octet), nombre de pixels = HI(2eme octet) + 2
+Exemple 0x2210 = 0x022 pixels en arrière : répéter les 1+2 = 3 pixels
 Exemple 0x1C21 = 0x11C pixels en arrière : répéter les 2+2 = 4 pixels
 
-Autres exemples de répétition, à 3 octets (HI(2eme octet) = 0) :
-C0 00 25 : Offset 0x0C0, 0x10+0x25 répétitions ? Ou bien on répète la couleur à cet endroit 0x10+0x25 fois ?
-02 02 FF : Offset 0x202, 0x10+0xFF répétitions ? Ou bien on répète la couleur à cet endroit 0x10+0xFF fois ?
+Répétition à 3 octets (HI(2eme octet) = 0) : distance = 1er octet + 0x100 * LO(2eme octet), nombre de pixels = 3eme octet + 0x10 :
+C0 00 25 : Offset 0x0C0, 0x25+0x10 répétitions
+02 02 FF : Offset 0x202, 0xFF+0x10 répétitions
 
 00 FF : en fait, 00 = nombre de pixels de fond à écrire, FF = nombre de pixels à attendre avant la prochaine définition
-
-31 != ED
