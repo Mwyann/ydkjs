@@ -58,8 +58,8 @@ function SeamlessLoop() {
 	this.cb_loaded;
 	this.cb_loaded_flag = new Boolean();
 	this.timeout;
-	this.playDelay = 1500;//-30;
-	this.stopDelay = 20;//30;
+	this.playDelay = -30; // IE 1500
+	this.stopDelay = 30;  // IE 20
 	if(this.is.chrome) this.playDelay = -25;
 	if(this.is.chrome) this.stopDelay = 25;
 	if(this.is.ff) this.playDelay = -25;

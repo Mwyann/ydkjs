@@ -8,6 +8,8 @@
 <script src="SeamlessLoop.js" type="text/javascript"></script>
 <script type="text/javascript">
 
+/********** Quelques fonctions pour le son **********/
+
 function AudioSpecs() {
   	this.is = {
 			  ff: Boolean(!(window.mozInnerScreenX == null) && /firefox/.test( navigator.userAgent.toLowerCase() )),
@@ -29,6 +31,8 @@ function AudioSpecs() {
 }
 
 var audiospecs = new AudioSpecs();
+
+/********** Quelques fonctions pour le preload **********/
 
 // 'fireOne' argument is optional, if set, will invoke the callback once for every
 // image in the 'this' collection, thus making 'this' in the callback that element alone
@@ -66,6 +70,87 @@ function waitForAudio(selector,callback) {
   waitloop();
 }
 
+/********** YDKJFile **********/
+
+var preloadpool = new Array();
+var fileID = 0;
+function YDKJFile(filetype,url) {
+  this.id = fileID++;
+  this.filetype = filetype;
+  this.url = url;
+  this.res = 0;
+  
+  this.preloaded = 0;
+  this.readyFunctions = [];
+  
+  var thisFile = this;
+  var preload = jQuery('#preload');
+  
+  var isready = function() {
+    thisFile.preloaded = 1;
+    for(var i = 0; i < thisFile.readyFunctions.length; i++) {
+      thisFile.readyFunctions[i].call(thisFile);
+    }
+  }
+  
+  if (filetype == 'gif') {
+    this.res = preload.append('<img />').children().last().attr('id','file'+this.id).attr('src',this.url)
+    this.res.imagesLoaded(isready);
+  }
+  
+  if (filetype == 'js') {
+    jQuery.ajax({
+      url: this.url,
+      type: 'get',
+      dataType: 'text',
+      success: function(html, status, xhr) {
+        //eval(html);
+        thisFile.res = html;
+        isready();
+      },
+      error: function (xhr, ajaxOptions, thrownError){
+        //displayLoader(false);
+      }
+    });
+  }
+  
+  if (filetype == 'audio') {
+    this.res = preload.append('<audio />').children().last().attr('id','file'+this.id);
+    var a = this.res.get(0);
+    if (a.canPlayType('audio/ogg')) this.res.append('<source />').children().last().attr('type','audio/ogg').attr('src',this.url+'.ogg');
+    else if (a.canPlayType('audio/mpeg')) this.res.append('<source />').children().last().attr('type','audio/mpeg').attr('src',this.url+'.mp3');
+    else {
+      this.res.append('<source />').children().last().attr('type','audio/ogg').attr('src',this.url+'.ogg');
+      this.res.append('<source />').children().last().attr('type','audio/mpeg').attr('src',this.url+'.mp3');
+    }
+    waitForAudio(this.res,isready);
+  }
+}
+
+YDKJFile.prototype.ready = function(f) {
+  if (!this.preloaded) this.readyFunctions.push(f); else f.call(this);
+}
+
+YDKJFile.prototype.free = function() {
+  preloadpool[this.url].used--;
+  if (preloadpool[this.url].used <= 0) {
+    jQuery('#preload').find('#file'+this.id).remove();
+    preloadpool[this.url] = 0;
+  }
+}
+
+function getYDKJFile(filetype,url) {
+  if (preloadpool[url]) {
+    preloadpool[url].used++;
+    return preloadpool[url].file;
+  }
+  var f = new YDKJFile(filetype,url);
+  preloadpool[url] = {file:f,used:1};
+  return f;
+}
+
+
+/********** YDKJAnimation **********/
 
 var animID=0;
 function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop) {
@@ -91,22 +176,15 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop) {
   this.readyFunctions = [];
 
   // Lancement du preload
-  var preload = jQuery('#preload');
-  
-  //preload.html(''); // Sera à faire, par animation ou par fichier, voire au destroy d'une animation
 
-  if (this.urlGif != '') preload.append('<img />').children().last().attr('id','img'+this.id).attr('src',this.urlGif);
+  this.gif = 0;
+  if (this.urlGif != '') this.gif = getYDKJFile('gif',this.urlGif);
+  this.js = 0;
+  if (this.urlJS != '') this.js = getYDKJFile('js',this.urlJS);
+  this.audio = 0;
+  if (this.urlAudio != '') this.audio = getYDKJFile('audio',this.urlAudio);
 
-  if (this.urlAudio != '') {
-    var t = preload.append('<audio />').children().last().attr('id','snd'+this.id);
-    var a = t.get(0);
-    if (a.canPlayType('audio/ogg')) t.append('<source />').children().last().attr('type','audio/ogg').attr('src',this.urlAudio+'.ogg');
-    else if (a.canPlayType('audio/mpeg')) t.append('<source />').children().last().attr('type','audio/mpeg').attr('src',this.urlAudio+'.mp3');
-    else {
-      t.append('<source />').children().last().attr('type','audio/ogg').attr('src',this.urlAudio+'.ogg');
-      t.append('<source />').children().last().attr('type','audio/mpeg').attr('src',this.urlAudio+'.mp3');
-    }
-  }
+  // Vérifier le statut du preload, dans l'ordre inverse, soit : gif -> js -> audio -> seamlessloop
 
   var thisAnim = this;
   
@@ -118,8 +196,8 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop) {
   }
   
   var audioready = function() {
-    if ((thisAnim.urlAudio != '') && (thisAnim.loop)) {
-      var audiofile = jQuery('audio#snd'+thisAnim.id);
+    if ((thisAnim.audio) && (thisAnim.loop)) {
+      var audiofile = thisAnim.audio.res;
       if (audiofile) {
         var audioelem = audiofile.get(0);
         thisAnim.seamlessLoop = new SeamlessLoop();
@@ -129,32 +207,22 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop) {
     } else seamlessloopready();
   }
   
-  var imgready = function() {
-    if (thisAnim.urlAudio != '') waitForAudio("#preload audio#snd"+thisAnim.id, audioready);
-    else audioready();
+  var jsready = function() {
+    if (thisAnim.js) {
+      eval(thisAnim.js.res);
+      thisAnim.tiles = tiles;
+      thisAnim.frames = frames;
+    }
+    if (thisAnim.audio) thisAnim.audio.ready(audioready); else audioready();
   }
   
-  var jsready = function(){
-    if (thisAnim.urlGif != '') jQuery('#preload img#img'+thisAnim.id).imagesLoaded(imgready);
-    else imgready();
+  var gifready = function() {
+    if (thisAnim.js) thisAnim.js.ready(jsready); else jsready();
   }
   
-  if (urlJS != '') {
-    $.ajax({
-      url: this.urlJS, // le nom du fichier indiqué dans le formulaire
-      type: 'get', // la méthode indiquée dans le formulaire (get ou post)
-      dataType: 'text',
-      success: function(html, status, xhr) { // je récupère la réponse du fichier PHP
-        eval(html);
-        thisAnim.tiles = tiles;
-        thisAnim.frames = frames;
-        jsready();
-      },
-      error: function (xhr, ajaxOptions, thrownError){
-        //displayLoader(false);
-      }
-    });
-  } else jsready();
+  if (this.gif) this.gif.ready(gifready); else gifready();
+  
+  // Méthodes privées
     
   this.newScreen = function() {
     $('#tmpscreen').html(''); // Faire un tmpscreen pour chaque anim (ou via des class)
@@ -278,12 +346,12 @@ YDKJAnimation.prototype.playAnim = function() {
     this.intervalTimer = intervaltimer;
   }
 
-  if (this.urlAudio != '') {
+  if (this.audio) {
     if ((this.loop) && (this.seamlessLoop)) {
       this.seamlessLoop.volume=audiospecs.maxVolume;
       this.seamlessLoop.start('loop'+this.id);
     } else {
-      var audiofile = jQuery('audio#snd'+this.id);
+      var audiofile = this.audio.res;
       if (audiofile) {
         var audioelem = audiofile.get(0);
         var ended = function() {
@@ -313,13 +381,13 @@ YDKJAnimation.prototype.stopAnim = function() {
     }
   }
   
-  if (this.urlAudio != '') {
+  if (this.audio) {
     if ((this.loop) && (this.seamlessLoop)) {
       this.seamlessLoop.stop();
     } else {
       if (this.audiostopTimer) clearTimeout(this.audiostopTimer);
       this.audiostopTimer = 0;
-      var audiofile = jQuery('audio#snd'+this.id);
+      var audiofile = this.audio.res;
       if (audiofile) {
         var audioelem = audiofile.get(0);
         audioelem.pause();
@@ -333,11 +401,11 @@ YDKJAnimation.prototype.setVolume = function(vol) {
   if (vol > 1) vol = vol/100;
   vol = vol*audiospecs.maxVolume;
   
-  if (this.urlAudio != '') {
+  if (this.audio) {
     if ((this.loop) && (this.seamlessLoop)) {
       this.seamlessLoop.setVolume(vol);
     } else {
-      var audiofile = jQuery('audio#snd'+this.id);
+      var audiofile = this.audio.res;
       if (audiofile) {
         var audioelem = audiofile.get(0);
         audioelem.volume = vol;
@@ -345,6 +413,8 @@ YDKJAnimation.prototype.setVolume = function(vol) {
     }
   }
 }
+
+/********** YDKJResource **********/
 
 function YDKJResource(resourceName) {
   this.resourceName = resourceName;
@@ -416,43 +486,91 @@ YDKJResource.prototype.stopResource = function(delay) {
   this.animation.stopAnim();
 }
 
+/********** YDKJMode **********/
+
+function YDKJMode(game, modename) {
+  this.modename = modename;
+  this.game = game;
+  
+  // preload
+  if (this.modename == 'Intro') {
+    this.IntroPreTitle = new YDKJResource('Intro/IntroPreTitle');
+    this.IntroJack = new YDKJResource('Intro/IntroJack');
+    
+    this.MusicJack = new YDKJResource('Intro/MusicJack');
+    this.SFXBang = new YDKJResource('Intro/SFXBang');
+    this.SFXJackTitle = new YDKJResource('Intro/SFXJackTitle');
+    this.IntroJackTitle = new YDKJResource('Intro/IntroJackTitle');
+    this.IntroJackDemo = new YDKJResource('Intro/IntroJackDemo');
+  }
+  
+  if (this.modename == 'Category') {
+    this.SFXShowCategoryScreen = new YDKJResource('Category/SFXShowCategoryScreen');
+  }
+}
+
+YDKJMode.prototype.start = function() {
+  var thisMode = this;
+  
+  if (this.modename == 'Intro') {
+    this.IntroJackDemo.ended(function(){
+      thisMode.IntroJackDemo.delay(function(){
+        thisMode.MusicJack.stopResource();
+        thisMode.category.start(); // On passe à la catégorie. En principe, on pourrait aussi libérer l'objet Intro (et ses ressources) puisqu'on a fini avec.
+      },300);
+    });
+    
+    this.IntroJackTitle.ended(function(){
+      thisMode.IntroJackDemo.delay(function(){
+        this.playResource();
+        thisMode.category = new YDKJMode(thisMode.game, 'Category'); // Preload des catégories pendant le speech
+      },300);
+    });
+    
+    this.SFXJackTitle.ended(function(){
+      thisMode.IntroJackTitle.delay(function(){
+        thisMode.MusicJack.animation.setVolume(50); // On baisse le volume de la musique de fond
+        this.playResource();
+      },300);
+    });
+    
+    this.SFXBang.ended(function(){
+      thisMode.SFXJackTitle.delay(function(){this.playResource()},300);
+    });
+    
+    this.IntroPreTitle.ended(function(){
+      thisMode.IntroJack.playResource();
+      thisMode.MusicJack.playResource();
+      thisMode.SFXBang.delay(function(){this.playResource()},300);
+    });
+    
+    this.IntroPreTitle.playResource();
+  }
+  
+  if (this.modename == 'Category') {
+    this.SFXShowCategoryScreen.playResource();
+  }
+}
+
+/********** YDKJGame **********/
+
+function YDKJGame() {
+  this.players = new Array();
+  this.intro = new YDKJMode(this, 'Intro');
+}
+
+YDKJGame.prototype.start = function() {
+  this.intro.start();
+}
+
+/********** Début du document **********/
+
 jQuery(document).ready(function() {
-
-  var IntroPreTitle = new YDKJResource('Intro/IntroPreTitle');
-  var IntroJack = new YDKJResource('Intro/IntroJack');
-  
-  var MusicJack = new YDKJResource('Intro/MusicJack');
-  var SFXBang = new YDKJResource('Intro/SFXBang');
-  var SFXJackTitle = new YDKJResource('Intro/SFXJackTitle');
-  var IntroJackTitle = new YDKJResource('Intro/IntroJackTitle');
-  var IntroJackDemo = new YDKJResource('Intro/IntroJackDemo');
-  
-  var SFXShowCategoryScreen = new YDKJResource('Category/SFXShowCategoryScreen');
-
-  IntroJackDemo.ended(function(){
-    SFXShowCategoryScreen.delay(function(){MusicJack.stopResource();this.playResource()},300);
-  });
-  
-  IntroJackTitle.ended(function(){
-    IntroJackDemo.delay(function(){this.playResource()},300);
-  });
-  
-  SFXJackTitle.ended(function(){
-    IntroJackTitle.delay(function(){MusicJack.animation.setVolume(50);this.playResource()},300);
-  });
-  
-  SFXBang.ended(function(){
-    SFXJackTitle.delay(function(){this.playResource()},300);
-  });
-  
-  IntroPreTitle.ended(function(){
-    IntroJack.playResource();
-    MusicJack.playResource();
-    SFXBang.delay(function(){this.playResource()},300);
-  });
-  
-  IntroPreTitle.playResource();
+  var game = new YDKJGame();
+  game.start();
 });
+
+/********** Debug **********/
 
 function playqnumber(id,variante) {
   var zid = id;
