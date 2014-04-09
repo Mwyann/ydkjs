@@ -153,15 +153,17 @@ function getYDKJFile(filetype,url) {
 /********** YDKJAnimation **********/
 
 var animID=0;
-function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop) {
+function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
   this.id = animID++;
   this.urlGif = urlGif;
   this.urlJS = urlJS;
   this.urlAudio = urlAudio;
   if (typeof(framestart) === 'undefined') framestart = 0;
   if (typeof(loop) === 'undefined') loop = 0;
+  if (typeof(framestop) === 'undefined') framestop = 0;
   this.framestart = framestart;
   this.loop = loop;
+  this.framestop = framestop;
   this.seamlessLoop = 0;
   
   this.end = 0;
@@ -338,15 +340,17 @@ YDKJAnimation.prototype.playAnim = function() {
     this.newScreen();
 
     var framenum = this.framestart;
+    var framestop = this.frames.length-1;
+    if (this.framestop) framestop = this.framestop;
     this.intervalTimer = 0;
     var intervaltimer = 0;
     var runanim = function() {
       //setTimeout(runanim,66);
       var val = thisAnim.addFrame(framenum);
-      if ((val & 4) == 0) thisAnim.nextScreen();
+      if (((val & 4) == 0) || ((val & 8) != 0)) thisAnim.nextScreen();
       jQuery('#debuglive').html('frame '+framenum+'/'+(thisAnim.frames.length-1)+' ; val:'+val);
       framenum++;
-      if ((framenum >= thisAnim.frames.length) || ((val & 16) != 0)) {
+      if ((framenum > framestop) || ((val & 16) != 0)) {
         if (thisAnim.loop) framenum = thisAnim.framestart; else {
           thisAnim.endTrigger(1);
           clearInterval(intervaltimer);
@@ -461,12 +465,14 @@ function YDKJResource(resourceName) {
   var resJS = '';
   var resAudio = '';
   var resFramestart = 0;
+  var resFramestop = 0;
   var resLoop = 0;
   if ((YDKJanim[sp[0]]) && (YDKJanim[sp[0]][sp[1]])) {
     var resGif = 'res/'+YDKJanim[sp[0]][sp[1]]['res']+'/'+YDKJanim[sp[0]][sp[1]]['name']+'.gif';
     var resJS = 'res/'+YDKJanim[sp[0]][sp[1]]['res']+'/'+YDKJanim[sp[0]][sp[1]]['name']+'.js';
     var resFramestart = YDKJanim[sp[0]][sp[1]]['framestart'];
     if (YDKJanim[sp[0]][sp[1]]['loop']) var resLoop = 1;
+    if (YDKJanim[sp[0]][sp[1]]['framestop']) var resFramestop = YDKJanim[sp[0]][sp[1]]['framestop'];
   }
   
   if ((YDKJsnd[sp[0]]) && (YDKJsnd[sp[0]][sp[1]])) {
@@ -474,7 +480,7 @@ function YDKJResource(resourceName) {
     if (YDKJsnd[sp[0]][sp[1]]['loop']) var resLoop = 1;
   }
   
-  this.animation = new YDKJAnimation(resGif,resJS,resAudio,resFramestart,resLoop);
+  this.animation = new YDKJAnimation(resGif,resJS,resAudio,resFramestart,resLoop,resFramestop);
 
   var thisResource = this;
 
@@ -508,6 +514,9 @@ YDKJResource.prototype.delay = function(f,delay) {
 
 YDKJResource.prototype.playResource = function() {
   var thisResource = this;
+
+  this.end = 0;
+  
   this.animation.ready(function(){
     thisResource.animation.playAnim();
   });
@@ -524,6 +533,23 @@ YDKJResource.prototype.resetResource = function() {
 YDKJResource.prototype.free = function() {
   this.animation.free();
 }
+
+/********** Saisie au clavier **********/
+
+function bindKeyListener(callback,timeout){
+  if (typeof(timeout) === 'undefined') timeout = 0;
+  var listener = function(event){
+    event.preventDefault();
+    callback(event.which);
+  }
+  jQuery(window).bind('keypress',listener);
+  return listener;
+}
+
+function unbindKeyListener(listener) {
+  jQuery(window).unbind('keypress',listener);
+}
+
 
 /********** YDKJMode **********/
 
@@ -548,16 +574,31 @@ function YDKJMode(game, modename) {
     
     this.MusicChooseCategoryStart = new YDKJResource('Category/MusicChooseCategoryStart');
     this.MusicChooseCategoryLoop = new YDKJResource('Category/MusicChooseCategoryLoop');
+    this.ShowCategories = new YDKJResource('Category/ShowCategories');
     this.SFXShowCategories = new YDKJResource('Category/SFXShowCategories');
     
     this.ChooseCategory1 = new YDKJResource('Category/ChooseCategory1');
     //this.ChooseCategory2 = new YDKJResource('Category/ChooseCategory2');
     //this.ChooseCategory3 = new YDKJResource('Category/ChooseCategory3');
+    this.ChooseCategoryText = new YDKJResource('Category/ChooseCategoryText');
     
     this.ChooseCategoryPlayer1 = new YDKJResource('Category/ChooseCategoryPlayer1');
     this.ChooseCategoryPlayer2 = new YDKJResource('Category/ChooseCategoryPlayer2');
     this.ChooseCategoryPlayer3 = new YDKJResource('Category/ChooseCategoryPlayer3');
     
+    this.SFXChoiceCategory = new YDKJResource('Category/SFXChoiceCategory');
+    
+    this.LoopCategory1 = new YDKJResource('Category/LoopCategory1');
+    this.LoopCategory2 = new YDKJResource('Category/LoopCategory2');
+    this.LoopCategory3 = new YDKJResource('Category/LoopCategory3');
+    this.ChoiceCategory1 = new YDKJResource('Category/ChoiceCategory1');
+    this.ChoiceCategory2 = new YDKJResource('Category/ChoiceCategory2');
+    this.ChoiceCategory3 = new YDKJResource('Category/ChoiceCategory3');
+  }
+  
+  if (this.modename == 'Question') {
+    this.JingleQuestion1 = new YDKJResource('Category/JingleQuestion1');
+    this.BGQuestion1 = new YDKJResource('Category/BGQuestion1');
   }
 }
 
@@ -608,10 +649,54 @@ YDKJMode.prototype.start = function() {
   }
   
   if (this.modename == 'Category') {
-    this.SFXShowCategories.ended(function(){
+    this.SFXChoiceCategory.ended(function(){
+      thisMode.SFXChoiceCategory = new YDKJResource('Category/SFXChoiceCategory');
       thisMode.ChooseCategoryPlayer3.delay(function(){
         this.playResource();
+        var thisChooseCategory = this;
+        
+        var listener = bindKeyListener(function(choice) {
+          var chosed = 0;
+          if (choice == 49) chosed = thisMode.ChoiceCategory1;
+          else if (choice == 50) chosed = thisMode.ChoiceCategory2;
+          else if (choice == 51) chosed = thisMode.ChoiceCategory3;
+          else chosed = 0;
+          if (chosed) {
+            unbindKeyListener(listener);
+            thisChooseCategory.free();
+            thisMode.MusicChooseCategoryLoop.free();
+            thisMode.LoopCategory1.free();
+            thisMode.LoopCategory2.free();
+            thisMode.LoopCategory3.free();
+            /*
+            chosed.ended(function(){
+              thisMode.question.start();
+            });
+            */
+            
+            thisMode.SFXChoiceCategory.ended(function(){
+              thisMode.ChooseCategory1.free();
+              thisMode.ChooseCategoryText.free();
+              chosed.free();
+              thisMode.question.start();
+            });
+            
+            thisMode.SFXChoiceCategory.playResource();
+            chosed.playResource();
+          }
+        });
       },100);
+    });
+    
+    this.SFXShowCategories.ended(function(){
+      thisMode.SFXChoiceCategory.delay(function(){
+        this.playResource();
+        thisMode.ShowCategories.free();
+        thisMode.ChooseCategoryText.playResource();
+        thisMode.LoopCategory1.playResource();
+        thisMode.LoopCategory2.playResource();
+        thisMode.LoopCategory3.playResource();
+      },300);
     });
 
     this.MusicChooseCategoryStart.ended(function(){
@@ -620,6 +705,7 @@ YDKJMode.prototype.start = function() {
     
     this.ChooseCategory1.ended(function(){
       thisMode.SFXShowCategories.delay(function(){
+        thisMode.ShowCategories.playResource();
         this.playResource();
       },300);
     });
@@ -666,6 +752,20 @@ YDKJMode.prototype.start = function() {
     }
     
     blueZoom();
+    
+    thisMode.question = new YDKJMode(thisMode.game, 'Question'); // Preload de la question pendant l'animation
+  }
+  
+  if (this.modename == 'Question') {
+    this.JingleQuestion1.ended(function(){
+      thisMode.JingleQuestion1.free();
+      thisMode.BGQuestion1.delay(function(){
+        this.playResource();
+      },100);
+    });
+    
+    jQuery('#screen').css('background-color','#000').html(''); // Je vide manuellement l'écran.
+    this.JingleQuestion1.playResource();
   }
 }
 
@@ -681,7 +781,7 @@ function YDKJGame() {
 }
 
 YDKJGame.prototype.start = function() {
-  var gamemode = new YDKJMode(this, 'Category');
+  var gamemode = new YDKJMode(this, 'Intro');
   gamemode.start();
 }
 
@@ -690,6 +790,9 @@ YDKJGame.prototype.start = function() {
 jQuery(document).ready(function() {
   var game = new YDKJGame();
   game.start();
+  
+  //var anim = new YDKJAnimation('res/5QDemo/off4/10000.gif','res/5QDemo/off4/10000.js','',0,1);
+  //anim.ready(function(){anim.playAnim();});
 });
 
 /********** Debug **********/
