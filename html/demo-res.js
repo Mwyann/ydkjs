@@ -207,4 +207,9 @@ var YDKJanim = {
 		'IntroPreTitle':{res:'5QDemo',name:'off4/3540',framestart:0,loop:0},
 		'IntroJack':{res:'5QDemo',name:'off4/3540',framestart:58,loop:0},
 	},
+  'Category':{
+		'ChooseCategory1':{res:'5QDemo',name:'off4/10000',framestart:7,loop:0},
+		'ChooseCategory2':{res:'5QDemo',name:'off4/10001',framestart:7,loop:0},
+		'ChooseCategory3':{res:'5QDemo',name:'off4/10002',framestart:7,loop:0},
+	},
 };

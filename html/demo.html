@@ -225,11 +225,16 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop) {
   // Méthodes privées
     
   this.newScreen = function() {
-    $('#tmpscreen').html(''); // Faire un tmpscreen pour chaque anim (ou via des class)
+    var thisdiv = $('#tmpscreen').find('#anim'+this.id);
+    if (thisdiv.length == 0) {
+      thisdiv = jQuery('<div />').attr('id','anim'+this.id);
+      thisdiv.appendTo($('#tmpscreen'));
+    }
+    thisdiv.html('');
   }
   
   this.addTile = function(tileid, x, y) {
-    var tmpscreen = $('#tmpscreen');
+    var tmpscreen = $('#tmpscreen').find('#anim'+this.id);
     var ourtile = this.tiles[tileid];
     if (!ourtile) return false;
     var ourdiv = $('<div />');
@@ -279,7 +284,16 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop) {
   
   this.nextScreen = function() {
     // Ne pas remplacer tout le screen (uniquement supprimer lorsqu'on destroy l'animation (pas stop, on peut vouloir stopper sans supprimer))
-    $('#screen').html($('#tmpscreen').html()); // Meilleure façon de déplacer les éléments ?
+    var thisdiv = $('#screen').find('#anim'+this.id);
+    var tmpscreen = $('#tmpscreen').find('#anim'+this.id);
+    if (thisdiv.length == 0) {
+      thisdiv = jQuery('<div />').attr('id','anim'+this.id).css({
+        'position':'absolute',
+      });
+      thisdiv.appendTo($('#screen'));
+    }
+    $('#screen').find('.markedAsRemoved').remove(); // Supprimer les éléments marqués
+    thisdiv.html(tmpscreen.html()); // Meilleure façon de déplacer les éléments ?
     
     /*
     // Chrome n'aime pas cette façon non plus (en fait il aime pas en local uniquement... il gère le cache des images différemment il faut croire ?)
@@ -322,7 +336,7 @@ YDKJAnimation.prototype.playAnim = function() {
   
   if (this.urlGif != '') {
     this.newScreen();
-  
+
     var framenum = this.framestart;
     this.intervalTimer = 0;
     var intervaltimer = 0;
@@ -395,6 +409,23 @@ YDKJAnimation.prototype.stopAnim = function() {
       }
     }
   }
+}
+
+YDKJAnimation.prototype.resetAnim = function() {
+  this.stopAnim();
+  if (this.urlGif != '') {
+    this.newScreen();
+    this.nextScreen();
+  }
+}
+
+YDKJAnimation.prototype.free = function() {
+  this.stopAnim();
+  if (this.gif) this.gif.free();
+  if (this.js) this.js.free();
+  if (this.audio) this.audio.free();
+  jQuery('#screen').find('#anim'+this.id).addClass('markedAsRemoved'); // Sera retiré réellement à la prochaine animation (pour éviter les écrans noirs entre animations)
+  jQuery('#tmpscreen').find('#anim'+this.id).remove();
 }
 
 YDKJAnimation.prototype.setVolume = function(vol) {
@@ -482,8 +513,16 @@ YDKJResource.prototype.playResource = function() {
   });
 }
 
-YDKJResource.prototype.stopResource = function(delay) {
+YDKJResource.prototype.stopResource = function() {
   this.animation.stopAnim();
+}
+
+YDKJResource.prototype.resetResource = function() {
+  this.animation.resetAnim();
+}
+
+YDKJResource.prototype.free = function() {
+  this.animation.free();
 }
 
 /********** YDKJMode **********/
@@ -506,21 +545,39 @@ function YDKJMode(game, modename) {
   
   if (this.modename == 'Category') {
     this.SFXShowCategoryScreen = new YDKJResource('Category/SFXShowCategoryScreen');
+    
+    this.MusicChooseCategoryStart = new YDKJResource('Category/MusicChooseCategoryStart');
+    this.MusicChooseCategoryLoop = new YDKJResource('Category/MusicChooseCategoryLoop');
+    this.SFXShowCategories = new YDKJResource('Category/SFXShowCategories');
+    
+    this.ChooseCategory1 = new YDKJResource('Category/ChooseCategory1');
+    //this.ChooseCategory2 = new YDKJResource('Category/ChooseCategory2');
+    //this.ChooseCategory3 = new YDKJResource('Category/ChooseCategory3');
+    
+    this.ChooseCategoryPlayer1 = new YDKJResource('Category/ChooseCategoryPlayer1');
+    this.ChooseCategoryPlayer2 = new YDKJResource('Category/ChooseCategoryPlayer2');
+    this.ChooseCategoryPlayer3 = new YDKJResource('Category/ChooseCategoryPlayer3');
+    
   }
 }
 
 YDKJMode.prototype.start = function() {
   var thisMode = this;
+  if (this.game.currentmode) this.game.currentmode.free();
+  this.game.currentmode = this;
   
   if (this.modename == 'Intro') {
     this.IntroJackDemo.ended(function(){
+      this.free();
       thisMode.IntroJackDemo.delay(function(){
         thisMode.MusicJack.stopResource();
-        thisMode.category.start(); // On passe à la catégorie. En principe, on pourrait aussi libérer l'objet Intro (et ses ressources) puisqu'on a fini avec.
+        thisMode.IntroJack.free();
+        thisMode.category.start(); // On passe au choix de la catégorie
       },300);
     });
     
     this.IntroJackTitle.ended(function(){
+      this.free();
       thisMode.IntroJackDemo.delay(function(){
         this.playResource();
         thisMode.category = new YDKJMode(thisMode.game, 'Category'); // Preload des catégories pendant le speech
@@ -528,6 +585,7 @@ YDKJMode.prototype.start = function() {
     });
     
     this.SFXJackTitle.ended(function(){
+      this.free();
       thisMode.IntroJackTitle.delay(function(){
         thisMode.MusicJack.animation.setVolume(50); // On baisse le volume de la musique de fond
         this.playResource();
@@ -535,11 +593,13 @@ YDKJMode.prototype.start = function() {
     });
     
     this.SFXBang.ended(function(){
+      this.free();
       thisMode.SFXJackTitle.delay(function(){this.playResource()},300);
     });
     
     this.IntroPreTitle.ended(function(){
       thisMode.IntroJack.playResource();
+      this.free();
       thisMode.MusicJack.playResource();
       thisMode.SFXBang.delay(function(){this.playResource()},300);
     });
@@ -548,19 +608,81 @@ YDKJMode.prototype.start = function() {
   }
   
   if (this.modename == 'Category') {
+    this.SFXShowCategories.ended(function(){
+      thisMode.ChooseCategoryPlayer3.delay(function(){
+        this.playResource();
+      },100);
+    });
+
+    this.MusicChooseCategoryStart.ended(function(){
+      thisMode.MusicChooseCategoryLoop.playResource();
+    });
+    
+    this.ChooseCategory1.ended(function(){
+      thisMode.SFXShowCategories.delay(function(){
+        this.playResource();
+      },300);
+    });
+    
+    this.SFXShowCategoryScreen.ended(function(){
+      thisMode.MusicChooseCategoryStart.playResource();
+    });
+    
     this.SFXShowCategoryScreen.playResource();
+    // Jouer l'animation du zoom bleu
+    
+    var blueZoom = function() {
+      var step=0;
+      var sizes=[{x:40,y:30}, // Tailles d'origine du jeu, svp
+                 {x:80,y:60},
+                 {x:160,y:120},
+                 {x:240,y:180},
+                 {x:320,y:240},
+                 {x:400,y:300},
+                 {x:480,y:360},
+                 {x:560,y:420},
+                 {x:640,y:480}];
+      var blueDiv = jQuery('<div />').addClass('markedAsRemoved');
+      blueDiv.appendTo(jQuery('#screen'));
+      var interval = 0;
+      var nextStep = function() {
+        if (step < 9) {
+          blueDiv.css({
+            'background-color':'#00C',
+            'width':(sizes[step].x)+'px',
+            'height':(sizes[step].y)+'px',
+            'position':'absolute',
+            'left':Math.round((640-sizes[step].x)/2)+'px',
+            'top':Math.round((480-sizes[step].y)/2)+'px',
+          });
+          step++;
+        } else {
+          clearInterval(interval);
+          jQuery('#screen').css('background-color','#00C');
+          thisMode.ChooseCategory1.playResource();
+        }
+      }
+      interval=setInterval(nextStep,50);
+    }
+    
+    blueZoom();
   }
+}
+
+YDKJMode.prototype.free = function() {
+  // Libérer les ressources ici
 }
 
 /********** YDKJGame **********/
 
 function YDKJGame() {
   this.players = new Array();
-  this.intro = new YDKJMode(this, 'Intro');
+  this.currentmode = 0;
 }
 
 YDKJGame.prototype.start = function() {
-  this.intro.start();
+  var gamemode = new YDKJMode(this, 'Category');
+  gamemode.start();
 }
 
 /********** Début du document **********/
@@ -590,7 +712,7 @@ function playqnumber(id,variante) {
 
 <body style="background-color:#000">
   <div id="screen" style="background-color:#000;position:relative;width:640px;height:480px;overflow:hidden;margin-left:auto;margin-right:auto;margin-top:30px">
-    <img src="ajax-loader.gif" style="position:absolute;left:293px;top:212px" />
+    <img src="ajax-loader.gif" style="position:absolute;left:293px;top:212px" class="markedAsRemoved"/>
   </div> <!-- Couleur #EEE pour l'intro -->
   <div id="debuglive" style="display:none;background-color:#000;color:#FFF;padding:5px;margin-top:10px;"><br/></div>
   <div id="debug" style="display:none;background-color:#000;color:#FFF;padding:5px;margin-top:10px;height:150px;overflow-y:scroll"></div>
