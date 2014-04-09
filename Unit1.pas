@@ -39,18 +39,20 @@ var SRFbasedir,resbasedir:string;
 
 procedure TForm1.Button3Click(Sender: TObject);
 var i:word;
-    off4:subimages;
+    off4:^subimages;
 begin
   openSRF(SRFbasedir+SRFList.Items[SRFList.ItemIndex]);
   ComboBox1.Items.Clear;
-  off4:=subimages(SRFdata.filelist[idfileoff4].subfile[0].data^);
-  if off4.nbimages > 0 then begin
-    for i:=0 to off4.nbimages-1 do begin
+  if (idfileoff4 < 9999) then begin
+  off4:=SRFdata.filelist[idfileoff4].subfile[0].data;
+  if off4^.nbimages > 0 then begin
+    for i:=0 to off4^.nbimages-1 do begin
       ComboBox1.Items.Add(inttostr(i));
     end;
   end;
   ComboBox1.Enabled:=true;
   ComboBox1.ItemIndex:=0;
+  end;
   Button4.Enabled:=true;
 end;
 
@@ -62,12 +64,12 @@ var pos, graphlen: longint;
     pic:TPicture;
     x,y:word;
     w,h:word;
-    off4:subimages;
+    off4:^subimages;
 begin
-  off4:=subimages(SRFdata.filelist[idfileoff4].subfile[0].data^);
-  seek(SRFhandler,off4.images[ComboBox1.ItemIndex].offset);
-  w:=off4.images[ComboBox1.ItemIndex].width;
-  h:=off4.images[ComboBox1.ItemIndex].height;
+  off4:=SRFdata.filelist[idfileoff4].subfile[0].data;
+  seek(SRFhandler,off4^.images[ComboBox1.ItemIndex].offset);
+  w:=off4^.images[ComboBox1.ItemIndex].width;
+  h:=off4^.images[ComboBox1.ItemIndex].height;
   blockread(SRFhandler,graphic,307200,graphlen);
   decodeImageBuffer(graphic,picture,w*h);
 
@@ -159,7 +161,9 @@ var t:string;
     i:word;
 begin
   t:='';
-  for i:=1 to length(s) do if s[i] <> ' ' then t:=t+s[i];
+  for i:=1 to length(s) do begin
+    if (s[i] <> ' ') then if (s[i] = '#') then t:=t+'0' else t:=t+s[i];
+  end;
   result:=t;
 end;
 
@@ -169,14 +173,20 @@ var filepos,subpos:word;
 begin
   if SRFdata.nbfiles > 0 then for filepos:=0 to SRFdata.nbfiles-1 do begin
     ftype:=SRFdata.filelist[filepos].ftype;
+    // if (filetype(ftype)='string') then // Considérer que c'est une liste de chaines, à exporter en un seul fichier JS
+
     if SRFdata.filelist[filepos].nbsub > 0 then for subpos:=0 to SRFdata.filelist[filepos].nbsub-1 do begin
       fullname:=RemoveExt(SafeFileName(GetCurrentDir()+'\'+resbasedir+SRFList.Items[SRFList.ItemIndex]))+'\'+removespaces(ftype);
       ForceDirectories(fullname);
       fullname:=fullname+'\'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname);
       if (filetype(ftype)='subimages') then begin
-        exportSubimagesToGif(subimages(SRFdata.filelist[filepos].subfile[subpos].data^),fullname);
+        exportSubimagesToGif(SRFdata.filelist[filepos].subfile[subpos],fullname);
       end else if (filetype(ftype)='subsound') then begin
-        exportSubsoundToFile(subsound(SRFdata.filelist[filepos].subfile[subpos].data^),fullname);
+        exportSubsoundToFile(SRFdata.filelist[filepos].subfile[subpos],fullname);
+      end else if (filetype(ftype)='string') then begin
+        exportStringToFile(SRFdata.filelist[filepos].subfile[subpos],fullname);
+      end else if (filetype(ftype)='stringlist') then begin
+        exportStringlistToFile(SRFdata.filelist[filepos].subfile[subpos],fullname);
       end;
     end;
   end;

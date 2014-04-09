@@ -98,8 +98,35 @@ typedef struct {
     ushort header3[7];
     char compression[4]; // ima4 (aifc) ou rien (wav)
     ushort header4[10]; // header4[2] : 16 (wav) ou 0 (aifc), header4[6] : FFFF (aifc) ou 0 (wav), header4[9] : 16 (aifc) ou 0 (wav)
-    ubyte snddata[filesize-84] <open=suppress>;
+    ubyte snddata[filesize-84] <open=suppress>; // wav : il faut reverse les octets
 } SOUNDFILE;
+
+typedef struct {
+    SetBackColor( cLtGreen );
+    char str[filesize] <open=suppress>;
+} STRING;
+
+typedef struct {
+    SetBackColor( cLtGreen );
+    char strl[filesize] <open=suppress>;
+} STRINGLIST;
+
+typedef struct {
+    SetBackColor( cLtGreen );
+    ulong nbans;
+    ubyte ans[nbans];
+} ANSLIST;
+
+typedef struct {
+    ubyte strlen;
+    char str[strlen] <open=suppress>;
+} STRING2;
+
+typedef struct {
+    SetBackColor( cLtGreen );
+    ushort nbstr;
+    STRING2 strl[nbstr] <optimize=false>;
+} STRINGLIST2;
 
 typedef struct {
     SetBackColor( cLtGreen );
@@ -112,6 +139,10 @@ typedef struct {
     if (filename[0] == 'o' && filename[1] == 'f' && filename[2] == 'f' && filename[3] == '4') IMAGEFILE images <optimize=false>;
     else if (filename[0] == 's' && filename[1] == 'n' && filename[2] == 'd' && filename[3] == ' ') SOUNDFILE sound <optimize=false>;
     else if (filename[0] == 'M') SOUNDFILE sound <optimize=false>;
+    else if (filename[0] == 'S' && filename[1] == 'T' && filename[2] == 'R' && filename[3] == ' ') STRING str <optimize=false>;
+    else if (filename[0] == 'S' && filename[1] == 'T' && filename[2] == 'R' && filename[3] == 'L') STRINGLIST strl <optimize=false>;
+    else if (filename[0] == 'A' && filename[1] == 'N' && filename[2] == 'S' && filename[3] == '#') ANSLIST strl <optimize=false>;
+    else if (filename[0] == 'S' && filename[1] == 'T' && filename[2] == 'R' && filename[3] == '#') STRINGLIST2 strl <optimize=false>;
     else char data[filesize] <optimize=false,open=suppress>;
     SetBackColor( cLtGreen );
     FSeek(currentpos);

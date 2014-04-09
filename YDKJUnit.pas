@@ -4,12 +4,12 @@ interface
 
 uses Graphics;
 
-type subimages=record
+type subimages=record // Type à utiliser uniquement sous forme de pointeur (subimages^) car structure trop grande pour la pile (stack overflow)
        fps1,fps2:word;
        nbframes:word;
        frames:array[0..3000] of record
          nbimages:word;
-         images:array[0..10] of record
+         images:array[0..64] of record
            val1:byte; // Valeur inconnue : 0, 16, 167
            offsetx,offsety:smallint;
            sizex,sizey:word;
@@ -29,14 +29,16 @@ type subsound=record
        samples:longword;
      end;
 
+type subsubfile=record
+       subname:longint;
+       fileoffset,filesize:longword;
+       data:pointer; // Pointeur qui dépendra du type
+     end;
+
 type subfile=record
        ftype:string[4]; // off4, snd....
        nbsub:word;
-       subfile:array[0..255] of record
-         subname:longint;
-         fileoffset,filesize:longword;
-         data:pointer; // Pointeur qui dépendra du type
-       end;
+       subfile:array[0..255] of subsubfile;
      end;
 
 var SRFhandler:file;
@@ -49,8 +51,10 @@ var SRFhandler:file;
 function openSRF(filename:string):shortint;
 procedure closeSRF;
 function filetype(ftype:string):string;
-procedure exportSubimagesToGif(si:subimages;filename:string);
-procedure exportSubsoundToFile(ss:subsound;filename:string);
+procedure exportSubimagesToGif(ssf:subsubfile;filename:string);
+procedure exportSubsoundToFile(ssf:subsubfile;filename:string);
+procedure exportStringToFile(ssf:subsubfile;filename:string);
+procedure exportStringlistToFile(ssf:subsubfile;filename:string);
 
 procedure decodeImageBuffer(buf:array of byte; var bufresult:array of longint; buflen:longint);
 
@@ -247,8 +251,9 @@ end;
 
 const verticalGIF = 1; // 1 = GIF en mode vertical, 0 en mode horizontal
 
-procedure exportSubimagesToGif(si:subimages;filename:string);
-var GIF:TGifImage;
+procedure exportSubimagesToGif(ssf:subsubfile;filename:string);
+var si:^subimages;
+    GIF:TGifImage;
     Ext: TGIFGraphicControlExtension;
     ResultAdd:Integer;
     idx: Integer;
@@ -263,10 +268,11 @@ begin
   // Positionnement très simple et très inefficace des sprites
   maxwidth:=0;maxheight:=0;
   js:='';
+  si:=ssf.data;
 
-  if si.nbimages > 0 then begin
+  if si^.nbimages > 0 then begin
 
-  for off4pos:=0 to si.nbimages-1 do with si.images[off4pos] do begin
+  for off4pos:=0 to si^.nbimages-1 do with si^.images[off4pos] do begin
     if (verticalGIF = 1) then begin
       if (width > maxwidth) then maxwidth:=width;
       inc(maxheight,height);
@@ -286,10 +292,10 @@ begin
   js:=js+'var tiles=new Array();';
   realx:=0;
   realy:=0;
-  for off4pos:=0 to si.nbimages-1 do begin
-    seek(SRFhandler,si.images[off4pos].offset);
-    w:=si.images[off4pos].width;
-    h:=si.images[off4pos].height;
+  for off4pos:=0 to si^.nbimages-1 do begin
+    seek(SRFhandler,si^.images[off4pos].offset);
+    w:=si^.images[off4pos].width;
+    h:=si^.images[off4pos].height;
     blockread(SRFhandler,graphic,307200,graphlen);
     decodeImageBuffer(graphic,picture,w*h);
     js:=js+'tiles['+inttostr(off4pos)+']={x:'+inttostr(realx)+',y:'+inttostr(realy)+',w:'+inttostr(w)+',h:'+inttostr(h)+'};';
@@ -339,25 +345,26 @@ begin
 
   // Add frames to JS
 
-  js:=js+#13#10'var frames=new Array();';
-  for i:=0 to si.nbframes-1 do begin
-    js:=js+'frames['+inttostr(i)+']={nbimg:'+inttostr(si.frames[i].nbimages);
-    if (si.frames[i].nbimages > 0) then begin
-      js:=js+',fps1:'+inttostr(si.fps1)+',fps2:'+inttostr(si.fps2)+',img:[';
-      for j:=0 to si.frames[i].nbimages do begin
+  js:=js+#13#10'var frames=[';
+  for i:=0 to si^.nbframes-1 do begin
+    js:=js+'{nbimg:'+inttostr(si^.frames[i].nbimages);
+    if (si^.frames[i].nbimages > 0) then begin
+      js:=js+',fps1:'+inttostr(si^.fps1)+',fps2:'+inttostr(si^.fps2)+',img:[';
+      for j:=0 to si^.frames[i].nbimages do begin
         js:=js+'{'
-        +'val:'+inttostr(si.frames[i].images[j].val1)+','
-        +'ox:'+inttostr(si.frames[i].images[j].offsetx)+','
-        +'oy:'+inttostr(si.frames[i].images[j].offsety)+','
-        +'sx:'+inttostr(si.frames[i].images[j].sizex)+','
-        +'sy:'+inttostr(si.frames[i].images[j].sizey)+','
-        +'idx:'+inttostr(si.frames[i].images[j].imgindex)
+        +'val:'+inttostr(si^.frames[i].images[j].val1)+','
+        +'ox:'+inttostr(si^.frames[i].images[j].offsetx)+','
+        +'oy:'+inttostr(si^.frames[i].images[j].offsety)+','
+        +'sx:'+inttostr(si^.frames[i].images[j].sizex)+','
+        +'sy:'+inttostr(si^.frames[i].images[j].sizey)+','
+        +'idx:'+inttostr(si^.frames[i].images[j].imgindex)
         +'},';
       end;
       js:=js+']';
     end;
-    js:=js+'};';
+    js:=js+'},';
   end;
+  js:=js+'];';
 
   // Save JS
   assignfile(f,filename+'.js');
@@ -441,8 +448,9 @@ end;
 
 // Export des sons en wav ou aifc
 
-procedure exportSubsoundToFile(ss:subsound;filename:string);
-var f:file;
+procedure exportSubsoundToFile(ssf:subsubfile;filename:string);
+var ss:subsound;
+    f:file;
     data:array[0..8191] of byte;
     size:longword;
 
@@ -458,6 +466,7 @@ begin
 end;
 
 begin
+  ss:=subsound(ssf.data^);
   if (ss.aifc) then assignfile(f,filename+'.aifc') else assignfile(f,filename+'.wav');
   rewrite(f,1);
 
@@ -561,12 +570,88 @@ begin
   result:=ss;
 end;
 
+function MactoUTF8(c:char):string; // Caractère MAC vers UTF8, est-ce une bonne idée si on doit utiliser les glyph inclus dans les .SRF de toutes façons ?
+begin
+  if (ord(c) = $D5) then result:='\''' // '
+  else if (ord(c) = $7B) then result:=' ' // Demi-espace
+  else if (ord(c) = $88) then result:=chr($C3)+chr($A0) // à
+  else if (ord(c) = $8E) then result:=chr($C3)+chr($A9) // é
+  else if (ord(c) = $8F) then result:=chr($C3)+chr($A8) // è
+  else if (ord(c) = $90) then result:=chr($C3)+chr($AA) // ê
+  else if (ord(c) = $9D) then result:=chr($C3)+chr($B9) // ù
+  else if (ord(c) = $AA) then result:=chr($E2)+chr($84)+chr($A2) // ™
+  else result:=c;
+end;
+
+// Export d'une string
+
+procedure exportStringToFile(ssf:subsubfile;filename:string);
+var f:system.text;
+    data:array[0..65535] of char;
+    js,s:string;
+    i:word;
+
+begin
+  assignfile(f,filename+'.js');
+  rewrite(f);
+
+  seek(SRFhandler,ssf.fileoffset);
+  blockread(SRFhandler,data,ssf.filesize);
+  s:='';
+  for i:=0 to ssf.filesize-1 do begin
+    if (data[i] <> #00) then s:=s+MactoUTF8(data[i]);
+  end;
+  js:='var string='''+s+''';';
+
+  writeln(f,js);
+
+  closefile(f);
+end;
+
+// Export d'une stringlist
+
+procedure exportStringlistToFile(ssf:subsubfile;filename:string);
+var f:system.text;
+    data:array[0..65535] of char;
+    js,s:string;
+    i:word;
+
+begin
+  assignfile(f,filename+'.js');
+  rewrite(f);
+
+  js:='var stringlist=[';
+  seek(SRFhandler,ssf.fileoffset);
+  blockread(SRFhandler,data,ssf.filesize);
+  s:='';
+  for i:=0 to ssf.filesize-1 do begin
+    if (data[i] <> #00) then begin
+      s:=s+MactoUTF8(data[i]);
+    end else begin
+      if (s <> '') then begin
+        js:=js+''''+s+''',';
+        s:='';
+      end;
+    end;
+  end;
+  js:=js+'];';
+
+  writeln(f,js);
+
+  closefile(f);
+end;
+
 function filetype(ftype:string):string;
 begin
   result:='';
   if (ftype='off4') then result:='subimages';
   if (ftype='snd ') then result:='subsound';
   if (ftype[1]='M') then result:='subsound';
+  if (ftype='STR ') then result:='string';
+  if (ftype='STRL') then result:='stringlist';
+  // Utilisés pour le Couci-Couça, entre autres
+  if (ftype='ANS#') then result:='answers';
+  if (ftype='STR#') then result:='stringlist2';
 end;
 
 // Lecture du fichier SRF
@@ -605,6 +690,8 @@ begin
         subfile[i].data:=openSubimages(subfile[i].filesize);
       end else if (filetype(ftype)='subsound') then begin
         subfile[i].data:=openSubsound(subfile[i].filesize);
+      end else begin
+        subfile[i].data:=nil;
       end;
       seek(SRFhandler,currentpos);
     end;
