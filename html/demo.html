@@ -16,8 +16,8 @@ function AudioSpecs() {
 			  chrome: Boolean(window.chrome),
 			  safari: Boolean(!window.chrome && /safari/.test( navigator.userAgent.toLowerCase() ) && window.getComputedStyle && !window.globalStorage && !window.opera)
 			};
-	this.playDelay = -30;
-	this.stopDelay = 30;
+	this.playDelay = -30; // IE 1500
+	this.stopDelay = 30;  // IE 20
 	this.maxVolume = 1;
 	if(this.is.chrome) this.playDelay = -25;
 	if(this.is.chrome) this.stopDelay = 25;
@@ -99,8 +99,13 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop) {
 
   if (this.urlAudio != '') {
     var t = preload.append('<audio />').children().last().attr('id','snd'+this.id);
-    t.append('<source />').children().last().attr('type','audio/ogg').attr('src',this.urlAudio+'.ogg');
-    t.append('<source />').children().last().attr('type','audio/mpeg').attr('src',this.urlAudio+'.mp3');
+    var a = t.get(0);
+    if (a.canPlayType('audio/ogg')) t.append('<source />').children().last().attr('type','audio/ogg').attr('src',this.urlAudio+'.ogg');
+    else if (a.canPlayType('audio/mpeg')) t.append('<source />').children().last().attr('type','audio/mpeg').attr('src',this.urlAudio+'.mp3');
+    else {
+      t.append('<source />').children().last().attr('type','audio/ogg').attr('src',this.urlAudio+'.ogg');
+      t.append('<source />').children().last().attr('type','audio/mpeg').attr('src',this.urlAudio+'.mp3');
+    }
   }
 
   var thisAnim = this;
@@ -118,7 +123,7 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop) {
       if (audiofile) {
         var audioelem = audiofile.get(0);
         thisAnim.seamlessLoop = new SeamlessLoop();
-        thisAnim.seamlessLoop.addUri(thisAnim.urlAudio+'.ogg',audioelem.duration*1000,'loop'+thisAnim.id); // .ogg uniquement pour l'instant.
+        thisAnim.seamlessLoop.addUri(thisAnim.urlAudio,audioelem.duration*1000,'loop'+thisAnim.id);
         seamlessloopready();
       }
     } else seamlessloopready();
@@ -150,6 +155,87 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop) {
       }
     });
   } else jsready();
+    
+  this.newScreen = function() {
+    $('#tmpscreen').html(''); // Faire un tmpscreen pour chaque anim (ou via des class)
+  }
+  
+  this.addTile = function(tileid, x, y) {
+    var tmpscreen = $('#tmpscreen');
+    var ourtile = this.tiles[tileid];
+    if (!ourtile) return false;
+    var ourdiv = $('<div />');
+    ourdiv.css({
+      'background-image':'url("'+this.urlGif+'")',
+      'background-repeat':'none',
+      'background-position':(0-ourtile.x)+'px '+(0-ourtile.y)+'px',
+      'width':(ourtile.w)+'px',
+      'height':(ourtile.h)+'px',
+      'position':'absolute',
+      'left':x+'px',
+      'top':y+'px',
+    });
+    ourdiv.appendTo(tmpscreen);
+  }
+  
+  this.addFrame = function(frameid) {
+    var ourframe = this.frames[frameid];
+    var val = 0;
+    if (ourframe.nbimg > 0) {
+      var offsetx = ourframe.img[0].ox;
+      var offsety = ourframe.img[0].oy;
+      var sizex = ourframe.img[0].sx;
+      var sizey = ourframe.img[0].sy;
+      val = ourframe.img[0].val;
+      for(var i = 1; i <= ourframe.nbimg; i++) {
+        this.addTile(ourframe.img[i].idx-1, offsetx+ourframe.img[i].ox, offsety+ourframe.img[i].oy);
+        val = val | ourframe.img[i].val;
+      }
+      return val;
+    }
+    return val;
+  }
+  
+  this.getFrameVal = function(frameid) {
+    var ourframe = this.frames[frameid];
+    var val = 0;
+    if (ourframe.nbimg > 0) {
+      val = ourframe.img[0].val;
+      for(var i = 1; i <= ourframe.nbimg; i++) {
+        val = val | ourframe.img[i].val;
+      }
+      return val;
+    }
+    return val;
+  }
+  
+  this.nextScreen = function() {
+    // Ne pas remplacer tout le screen (uniquement supprimer lorsqu'on destroy l'animation (pas stop, on peut vouloir stopper sans supprimer))
+    $('#screen').html($('#tmpscreen').html()); // Meilleure façon de déplacer les éléments ?
+    
+    /*
+    // Chrome n'aime pas cette façon non plus (en fait il aime pas en local uniquement... il gère le cache des images différemment il faut croire ?)
+    var newscreen = $('#tmpscreen').clone(true);
+    newscreen.attr('id','screen').attr('style',$('#screen').attr('style'));
+    $('#screen').replaceWith(newscreen);
+    */
+  
+    this.newScreen();
+  }
+  
+  this.endTrigger = function(e) {
+    if (this.end == 255) return false;
+    // e = 1 : animation, e = 2 : audio
+    this.end = this.end | e;
+    if (((this.urlGif == '') && (this.urlAudio != '') && (this.end == 2)) 
+     || ((this.urlGif != '') && (this.urlAudio == '') && (this.end == 1)) 
+     || ((this.urlGif != '') && (this.urlAudio != '') && (this.end == 3))) {
+      this.end = 255; // Pour éviter de relancer le trigger
+      for(var i = 0; i < this.endedFunctions.length; i++) {
+        this.endedFunctions[i].call(this);
+      }
+    }
+  }
 }
 
 YDKJAnimation.prototype.ready = function(f) {
@@ -158,95 +244,6 @@ YDKJAnimation.prototype.ready = function(f) {
 
 YDKJAnimation.prototype.ended = function(f) {
   if (this.end != 255) this.endedFunctions.push(f); else f.call(this);
-}
-
-YDKJAnimation.prototype.newScreen = function() {
-  $('#tmpscreen').html(''); // Faire un tmpscreen pour chaque anim (ou via des class)
-}
-
-YDKJAnimation.prototype.addTile = function(tileid, x, y) {
-  var tmpscreen = $('#tmpscreen');
-  var ourtile = this.tiles[tileid];
-  if (!ourtile) return false;
-  var ourdiv = $('<div />');
-  ourdiv.css({
-    'background-image':'url("'+this.urlGif+'")',
-    'background-repeat':'none',
-    'background-position':(0-ourtile.x)+'px '+(0-ourtile.y)+'px',
-    'width':(ourtile.w)+'px',
-    'height':(ourtile.h)+'px',
-    'position':'absolute',
-    'left':x+'px',
-    'top':y+'px',
-  });
-  ourdiv.appendTo(tmpscreen);
-}
-
-YDKJAnimation.prototype.addFrame = function(frameid) {
-  var ourframe = this.frames[frameid];
-  var val = 0;
-  if (ourframe.nbimg > 0) {
-    var offsetx = ourframe.img[0].ox;
-    var offsety = ourframe.img[0].oy;
-    var sizex = ourframe.img[0].sx;
-    var sizey = ourframe.img[0].sy;
-    val = ourframe.img[0].val;
-    for(var i = 1; i <= ourframe.nbimg; i++) {
-      this.addTile(ourframe.img[i].idx-1, offsetx+ourframe.img[i].ox, offsety+ourframe.img[i].oy);
-      val = val | ourframe.img[i].val;
-    }
-    return val;
-  }
-  return val;
-}
-
-YDKJAnimation.prototype.getFrameVal = function(frameid) {
-  var ourframe = this.frames[frameid];
-  var val = 0;
-  if (ourframe.nbimg > 0) {
-    val = ourframe.img[0].val;
-    for(var i = 1; i <= ourframe.nbimg; i++) {
-      val = val | ourframe.img[i].val;
-    }
-    return val;
-  }
-  return val;
-}
-
-
-YDKJAnimation.prototype.nextScreen = function() {
-  // Ne pas remplacer tout le screen (uniquement supprimer lorsqu'on destroy l'animation (pas stop, on peut vouloir stopper sans supprimer))
-  $('#screen').html($('#tmpscreen').html()); // Meilleure façon de déplacer les éléments ?
-  
-  /*
-  // Chrome n'aime pas cette façon non plus (en fait il aime pas en local uniquement... il gère le cache des images différemment il faut croire ?)
-  var newscreen = $('#tmpscreen').clone(true);
-  newscreen.attr('id','screen').attr('style',$('#screen').attr('style'));
-  $('#screen').replaceWith(newscreen);
-  */
-
-  this.newScreen();
-}
-
-/*
-YDKJAnimation.prototype.displayFrame = function(framenum) {
-  this.addFrame(framenum);
-  this.nextScreen();
-}
-*/
-
-YDKJAnimation.prototype.endTrigger = function(e) {
-  if (this.end == 255) return false;
-  // e = 1 : animation, e = 2 : audio
-  this.end = this.end | e;
-  if (((this.urlGif == '') && (this.urlAudio != '') && (this.end == 2)) 
-   || ((this.urlGif != '') && (this.urlAudio == '') && (this.end == 1)) 
-   || ((this.urlGif != '') && (this.urlAudio != '') && (this.end == 3))) {
-    this.end = 255; // Pour éviter de relancer le trigger
-    for(var i = 0; i < this.endedFunctions.length; i++) {
-      this.endedFunctions[i].call(this);
-    }
-  }
 }
 
 YDKJAnimation.prototype.playAnim = function() {
