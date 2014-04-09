@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8" />
 <title>Test YDKJ</title>
-<script src="res/5QDemo/off4/-2030.js" type="text/javascript"></script>
 <script src="jquery-1.11.0.min.js" type="text/javascript"></script>
 <script type="text/javascript">
 
@@ -41,17 +40,72 @@ function waitForAudio(callback) {
   if (totalAudio) window.setTimeout(function(){waitForAudio(callback)},50); else callback.call();
 }
 
-function newScreen() {
+
+
+function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop) {
+  this.urlGif = urlGif;
+  this.urlJS = urlJS;
+  this.urlAudio = urlAudio;
+  if (typeof(framestart) === 'undefined') framestart = 0;
+  if (typeof(loop) === 'undefined') loop = 0;
+  this.framestart = framestart;
+  this.loop = loop;
+
+  this.tiles = 0;
+  this.frames = 0;
+
+  this.preloaded = 0;
+  this.readyFunctions = [];
+
+  // Lancement du preload
+  var preload = jQuery('#preload');
+  preload.html('');
+
+  preload.append('<img />').children().last().attr('id','img').attr('src',this.urlGif);
+
+  var t = preload.append('<audio />').children().last().attr('id','snd');
+  t.append('<source />').children().last().attr('type','audio/ogg').attr('src',this.urlAudio+'.ogg');
+  t.append('<source />').children().last().attr('type','audio/mpeg').attr('src',this.urlAudio+'.mp3');
+
+  var thisAnim = this;
+  jQuery('#preload img').imagesLoaded(function (e) {
+    waitForAudio(function(){
+      $.ajax({
+        url: thisAnim.urlJS, // le nom du fichier indiqué dans le formulaire
+        type: 'get', // la méthode indiquée dans le formulaire (get ou post)
+        dataType: 'text',
+        success: function(html, status, xhr) { // je récupère la réponse du fichier PHP
+          eval(html);
+          thisAnim.tiles = tiles;
+          thisAnim.frames = frames;
+          thisAnim.preloaded = 1;
+          for(var i = 0; i < thisAnim.readyFunctions.length; i++) {
+            thisAnim.readyFunctions[i].call(thisAnim);
+          }
+        },
+        error: function (xhr, ajaxOptions, thrownError){
+            //displayLoader(false);
+        }
+      });
+    });
+  }, true);
+}
+
+YDKJAnimation.prototype.ready = function(f) {
+  if (!this.preloaded) this.readyFunctions.push(f); else f.call(this);
+};
+
+YDKJAnimation.prototype.newScreen = function() {
   $('#tmpscreen').html('');
 }
 
-function addTile(tileid, x, y) {
+YDKJAnimation.prototype.addTile = function(tileid, x, y) {
   var tmpscreen = $('#tmpscreen');
-  var ourtile = tiles[tileid];
+  var ourtile = this.tiles[tileid];
   if (!ourtile) return false;
   var ourdiv = $('<div />');
   ourdiv.css({
-    'background-image':'url("res/5QDemo/off4/-2030.gif")',
+    'background-image':'url("'+this.urlGif+'")',
     'background-repeat':'none',
     'background-position':(0-ourtile.x)+'px '+(0-ourtile.y)+'px',
     'width':(ourtile.w)+'px',
@@ -63,8 +117,8 @@ function addTile(tileid, x, y) {
   ourdiv.appendTo(tmpscreen);
 }
 
-function addFrame(frameid) {
-  var ourframe = frames[frameid];
+YDKJAnimation.prototype.addFrame = function(frameid) {
+  var ourframe = this.frames[frameid];
   var val = 0;
   if (ourframe.nbimg > 0) {
     var offsetx = ourframe.img[0].ox;
@@ -73,7 +127,7 @@ function addFrame(frameid) {
     var sizey = ourframe.img[0].sy;
     val = ourframe.img[0].val;
     for(var i = 1; i <= ourframe.nbimg; i++) {
-      addTile(ourframe.img[i].idx-1, offsetx+ourframe.img[i].ox, offsety+ourframe.img[i].oy);
+      this.addTile(ourframe.img[i].idx-1, offsetx+ourframe.img[i].ox, offsety+ourframe.img[i].oy);
       val = val | ourframe.img[i].val;
     }
     return val;
@@ -81,8 +135,8 @@ function addFrame(frameid) {
   return val;
 }
 
-function getFrameVal(frameid) {
-  var ourframe = frames[frameid];
+YDKJAnimation.prototype.getFrameVal = function(frameid) {
+  var ourframe = this.frames[frameid];
   var val = 0;
   if (ourframe.nbimg > 0) {
     val = ourframe.img[0].val;
@@ -95,74 +149,110 @@ function getFrameVal(frameid) {
 }
 
 
-function nextScreen() {
+YDKJAnimation.prototype.nextScreen = function() {
   $('#screen').html($('#tmpscreen').html()); // Meilleure façon de déplacer les éléments ?
   /*
-  // Chrome n'aime pas cette façon non plus
+  // Chrome n'aime pas cette façon non plus (en fait il aime pas en local uniquement... il gère le cache des images différemment il faut croire ?)
   var newscreen = $('#tmpscreen').clone(true);
   newscreen.attr('id','screen').attr('style',$('#screen').attr('style'));
   $('#screen').replaceWith(newscreen);
   */
 
-  newScreen();
+  this.newScreen();
 }
 
-function displayFrame(framenum) {
-  addFrame(framenum);
-  nextScreen();
+YDKJAnimation.prototype.displayFrame = function(framenum) {
+  this.addFrame(framenum);
+  this.nextScreen();
+}
+
+YDKJAnimation.prototype.playAnim = function() {
+  if (!this.preloaded) return false; // Ou bien attendre le preload ?
+
+  this.newScreen();
+
+  var framenum = this.framestart;
+  var intervaltimer = 0;
+  var thisAnim = this;
+  var runanim = function() {
+    //setTimeout(runanim,66);
+    var val = thisAnim.addFrame(framenum);
+    if (val != 36) thisAnim.nextScreen();
+    jQuery('#debuglive').html('frame '+framenum+'/'+(thisAnim.frames.length)+' ; val:'+val);
+    framenum++;
+    if ((framenum >= thisAnim.frames.length) || (val == 16)) {
+      if (thisAnim.loop) framenum = thisAnim.framestart; else clearInterval(intervaltimer);
+    }
+  }
+
+  //runanim();
+  intervaltimer = setInterval(runanim,66); // Pourrait être calculé depuis frames[x].fps1/frames[x].fps2
+
+  var audiofile = jQuery('#snd').get(0);
+  audiofile.currentTime = 0;
+  audiofile.play();
 }
 
 jQuery(document).ready(function() {
-  newScreen();
-  // Idée : faire un affichage de la liste des frames, avec possibilité de cliquer desssus pour les afficher (sans animation auto) et défilement avec droite/gauche
+  
+  // Idée : faire un affichage de la liste des frames, avec possibilité de cliquer desssus pour les afficher (sans animation auto) et défilement avec droite/gauche (en <select> plutôt ?)
 
-/*
-  jQuery('#debug').html('');
-  for(var i = 250;i < 300;i++) { // frames.length
-    jQuery('<a href="#" onclick="displayFrame('+i+');return false">display frame '+i+'</a> (val='+getFrameVal(i)+')<br/>').appendTo('#debug');
-    
-  }
-*/
-
-  var framenum = 0;
-  var runanim = function() {
-    var val = addFrame(framenum);
-    if (val != 36) nextScreen();
-    jQuery('#debuglive').html('frame '+framenum+'/'+(frames.length)+' ; val:'+val);
-    framenum++;
-    if (framenum >= frames.length) {
-      framenum = 0;
-    }
-    //setTimeout(runanim,500);
-  }
-
-  jQuery('#preload img').imagesLoaded(function (e) {
-	waitForAudio(function(){
-	  //setTimeout(runanim,500);
-	  setInterval(runanim,66); // Pourrait être calculé depuis frames[x].fps1/frames[x].fps2
-
-	  var audiofile = jQuery('#snd1003').get(0);
-	  audiofile.currentTime = 0;
-	  audiofile.play();
-	});
-  }, true);
+  /*
+  var anim = new YDKJAnimation('res/QNUMBERS/off4/-1010.gif','res/QNUMBERS/off4/-1010.js','res/QNUMBERS/snd/1002',0,0);
+  anim.ready(function(){
+    anim.playAnim();
+  });
+  */
 
 });
+
+function playqnumber(id,variante) {
+  var zid = id;
+  if (id < 10) zid = '0'+id;
+
+  var anim = new YDKJAnimation('res/QNUMBERS/off4/-'+variante+zid+'0.gif','res/QNUMBERS/off4/-'+variante+zid+'0.js','res/QNUMBERS/snd/'+id+'00'+(variante+1),0,0);
+  anim.ready(function(){anim.playAnim();});
+
+  // id 7,1 : val == 83 qui fait un défaut d'affichage sur celle là...
+  // id 9,2 : val == 5 qui fait un défaut d'affichage sur celle là, et 57 aussi...
+  // id 15,2 : val == 22
+}
 
 </script>
 </head>
 
 <body style="background-color:#333">
   <div id="screen" style="background-color:#000;position:relative;width:640px;height:480px;overflow:hidden;margin-left:auto;margin-right:auto;margin-top:30px"></div> <!-- Couleur #EEE pour l'intro -->
-  <div id="debuglive" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;"></div>
-  <div id="debug" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;height:150px;overflow-y:scroll"></div>
-  <div id="tmpscreen" style="display:none"></div>
-  <div id="preload" style="display:none">
-    <img src="res/5QDemo/off4/-2030.gif" />
-    <audio id="snd1003">
-      <source type="audio/ogg" src="res/5QDemo/snd/3003.ogg" />
-      <source type="audio/mpeg" src="res/5QDemo/snd/3003.mp3" />
-    </audio>
+  <div id="debuglive" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;"><br/></div>
+  <div id="debug" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;height:150px;overflow-y:scroll">
+    Choose a question's animation:
+    <table><tr><td width="250">
+      Q1 : <a href="#" onclick="playqnumber(1,1);return false;">1</a> <a href="#" onclick="playqnumber(1,2);return false;">2</a> <a href="#" onclick="playqnumber(1,3);return false;">3</a><br/>
+      Q2 : <a href="#" onclick="playqnumber(2,1);return false;">1</a> <a href="#" onclick="playqnumber(2,2);return false;">2</a> <a href="#" onclick="playqnumber(2,3);return false;">3</a><br/>
+      Q3 : <a href="#" onclick="playqnumber(3,1);return false;">1</a> <a href="#" onclick="playqnumber(3,2);return false;">2</a> <a href="#" onclick="playqnumber(3,3);return false;">3</a><br/>
+      Q4 : <a href="#" onclick="playqnumber(4,1);return false;">1</a> <a href="#" onclick="playqnumber(4,2);return false;">2</a> <a href="#" onclick="playqnumber(4,3);return false;">3</a><br/>
+      Q5 : <a href="#" onclick="playqnumber(5,1);return false;">1</a> <a href="#" onclick="playqnumber(5,2);return false;">2</a> <a href="#" onclick="playqnumber(5,3);return false;">3</a><br/>
+    </td><td width="250">
+      Q6 : <a href="#" onclick="playqnumber(6,1);return false;">1</a> <a href="#" onclick="playqnumber(6,2);return false;">2</a> <a href="#" onclick="playqnumber(6,3);return false;">3</a><br/>
+      Q7 : <a href="#" onclick="playqnumber(7,1);return false;">1</a> <a href="#" onclick="playqnumber(7,2);return false;">2</a><br/>
+      Q8 : <a href="#" onclick="playqnumber(8,1);return false;">1</a> <a href="#" onclick="playqnumber(8,2);return false;">2</a><br/>
+      Q9 : <a href="#" onclick="playqnumber(9,1);return false;">1</a> <a href="#" onclick="playqnumber(9,2);return false;">2</a><br/>
+      Q10 : <a href="#" onclick="playqnumber(10,1);return false;">1</a> <a href="#" onclick="playqnumber(10,2);return false;">2</a><br/>
+    </td><td width="250">
+      Q11 : <a href="#" onclick="playqnumber(11,1);return false;">1</a> <a href="#" onclick="playqnumber(11,2);return false;">2</a><br/>
+      Q12 : <a href="#" onclick="playqnumber(12,1);return false;">1</a> <a href="#" onclick="playqnumber(12,2);return false;">2</a><br/>
+      Q13 : <a href="#" onclick="playqnumber(13,1);return false;">1</a> <a href="#" onclick="playqnumber(13,2);return false;">2</a><br/>
+      Q14 : <a href="#" onclick="playqnumber(14,1);return false;">1</a> <a href="#" onclick="playqnumber(14,2);return false;">2</a><br/>
+      Q15 : <a href="#" onclick="playqnumber(15,1);return false;">1</a> <a href="#" onclick="playqnumber(15,2);return false;">2</a><br/>
+    </td><td>
+      Q16 : <a href="#" onclick="playqnumber(16,1);return false;">1</a> <a href="#" onclick="playqnumber(16,2);return false;">2</a><br/>
+      Q17 : <a href="#" onclick="playqnumber(17,1);return false;">1</a> <a href="#" onclick="playqnumber(17,2);return false;">2</a><br/>
+      Q18 : <a href="#" onclick="playqnumber(18,1);return false;">1</a> <a href="#" onclick="playqnumber(18,2);return false;">2</a><br/>
+      Q19 : <a href="#" onclick="playqnumber(19,1);return false;">1</a> <a href="#" onclick="playqnumber(19,2);return false;">2</a><br/>
+      Q20 : <a href="#" onclick="playqnumber(20,1);return false;">1</a> <a href="#" onclick="playqnumber(20,2);return false;">2</a><br/>
+    </td></tr></table>
   </div>
+  <div id="tmpscreen" style="display:none"></div>
+  <div id="preload" style="display:none"></div>
 </body>
 </html>

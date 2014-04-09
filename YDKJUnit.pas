@@ -27,6 +27,7 @@ type subsound=record
        aifc:boolean; // si false, c'est du wav normal
        offset,size:longword;
        samples:longword;
+       frames,rate:word;
      end;
 
 type subsubfile=record
@@ -482,8 +483,10 @@ begin
     data[24]:=ord('C');data[25]:=ord('O');data[26]:=ord('M');data[27]:=ord('M');data[28]:=$00;data[29]:=$00;data[30]:=$00;data[31]:=$16;
     data[32]:=$00;data[33]:=$01;
     data[34]:=(ss.samples and $FF000000) shr 24;data[35]:=(ss.samples and $FF0000) shr 16;data[36]:=(ss.samples and $FF00) shr 8;data[37]:=(ss.samples and $FF); // Samples
-    data[38]:=$00;data[39]:=$10;
-    data[40]:=$40;data[41]:=$0D;data[42]:=$AF;data[43]:=$C8;data[44]:=$00;data[45]:=$00;data[46]:=$00;data[47]:=$00;
+    data[38]:=$00;data[39]:=$10; // sampleSize (16)
+    data[40]:=(ss.frames and $FF00) shr 8;data[41]:=(ss.frames and $FF); // numSampleFrames
+    data[42]:=(ss.rate and $FF00) shr 8;data[43]:=(ss.rate and $FF); // sampleRate
+    data[44]:=$00;data[45]:=$00;data[46]:=$00;data[47]:=$00;
     data[48]:=$00;data[49]:=$00;data[50]:=ord('i');data[51]:=ord('m');data[52]:=ord('a');data[53]:=ord('4');data[54]:=ord('S');data[55]:=ord('S');
     data[56]:=ord('N');data[57]:=ord('D');
     size:=ss.size+38;
@@ -550,22 +553,22 @@ end;
 function openSubsound(filesize:longint):pointer; // ^subsound
 var ss:^subsound;
     data:array[0..41] of byte;
-    samples:longword;
 begin
   getmem(ss,sizeof(subsound));
 
   blockread(SRFhandler,data,42); // Infos inutiles a priori
-  samples:=readlw;
-  ss.samples:=samples;
-  blockread(SRFhandler,data,38); // Compression en 14-17
+  ss.samples:=readlw;
+  ss.frames:=readw;
+  ss.rate:=readw;
+  blockread(SRFhandler,data,34); // Compression en 10-13
   ss.offset:=filepos(SRFhandler);
   ss.size:=filesize-84; // Taille totale moins le header
 
   ss.aifc:=false;
 
-  if (data[14] = 0) and (data[15] = 0) and (data[16] = 0) and (data[17] = 0) then begin // WAV
+  if (data[10] = 0) and (data[11] = 0) and (data[12] = 0) and (data[13] = 0) then begin // WAV
     ss.aifc:=false;
-  end else if (data[14] = $69) and (data[15] = $6D) and (data[16] = $61) and (data[17] = $34) then begin // AIFC (ima4)
+  end else if (data[10] = $69) and (data[11] = $6D) and (data[12] = $61) and (data[13] = $34) then begin // AIFC (ima4)
     ss.aifc:=true;
   end;
 
