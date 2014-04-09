@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Demo YDKJ</title>
+<script src="demo-res.js" type="text/javascript"></script>
+<script src="jquery-1.11.0.min.js" type="text/javascript"></script>
+<script src="SeamlessLoop.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+function AudioSpecs() {
+  	this.is = {
+			  ff: Boolean(!(window.mozInnerScreenX == null) && /firefox/.test( navigator.userAgent.toLowerCase() )),
+			  ie: Boolean(document.all && !window.opera),
+			  opera: Boolean(window.opera),
+			  chrome: Boolean(window.chrome),
+			  safari: Boolean(!window.chrome && /safari/.test( navigator.userAgent.toLowerCase() ) && window.getComputedStyle && !window.globalStorage && !window.opera)
+			};
+	this.playDelay = -30;
+	this.stopDelay = 30;
+	this.maxVolume = 1;
+	if(this.is.chrome) this.playDelay = -25;
+	if(this.is.chrome) this.stopDelay = 25;
+	if(this.is.chrome) this.maxVolume = 0.8;
+	if(this.is.ff) this.playDelay = -25;
+	if(this.is.ff) this.stopDelay = 85;
+	if(this.is.opera) this.playDelay = 5;
+	if(this.is.opera) this.stopDelay = 0;
+}
+
+var audiospecs = new AudioSpecs();
+
+// 'fireOne' argument is optional, if set, will invoke the callback once for every
+// image in the 'this' collection, thus making 'this' in the callback that element alone
+// If it's not used, the callback will be invoked once all the images in the collection has
+// been loaded. And 'this' will be the jQuery collection of the filtered 'img' elements.
+
+jQuery.fn.imagesLoaded = function(callback, fireOne) {
+  var
+    args = arguments,
+    elems = this.filter('img'),
+    elemsLen = elems.length - 1;
+
+  elems
+    .bind('load', function(e) {
+        if (fireOne) {
+            !elemsLen-- && callback.call(elems, e);
+        } else {
+            callback.call(this, e);
+        }
+    }).each(function() {
+        // cached images don't fire load sometimes, so we reset src.
+        if (this.complete || this.complete === undefined) {
+            if (jQuery(this).hasClass('alreadyLoaded')) jQuery(this).trigger('load'); else this.src = this.src;
+        }
+    });
+}
+
+function waitForAudio(selector,callback) {
+  var waitloop = function() {
+    var elems = jQuery(selector);
+    var totalAudio = elems.length;
+    elems.each(function(){if (this.duration) totalAudio--;});
+    if (totalAudio) window.setTimeout(function(){waitloop()},50); else callback.call();
+  }
+  waitloop();
+}
+
+
+var animID=0;
+function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop) {
+  this.id = animID++;
+  this.urlGif = urlGif;
+  this.urlJS = urlJS;
+  this.urlAudio = urlAudio;
+  if (typeof(framestart) === 'undefined') framestart = 0;
+  if (typeof(loop) === 'undefined') loop = 0;
+  this.framestart = framestart;
+  this.loop = loop;
+  this.seamlessLoop = 0;
+  
+  this.end = 0;
+  this.endedFunctions = [];
+
+  this.tiles = 0;
+  this.frames = 0;
+  this.intervalTimer = 0;
+  this.audiostopTimer = 0;
+
+  this.preloaded = 0;
+  this.readyFunctions = [];
+
+  // Lancement du preload
+  var preload = jQuery('#preload');
+  
+  //preload.html(''); // Sera à faire, par animation ou par fichier, voire au destroy d'une animation
+
+  if (this.urlGif != '') preload.append('<img />').children().last().attr('id','img'+this.id).attr('src',this.urlGif);
+
+  if (this.urlAudio != '') {
+    var t = preload.append('<audio />').children().last().attr('id','snd'+this.id);
+    t.append('<source />').children().last().attr('type','audio/ogg').attr('src',this.urlAudio+'.ogg');
+    t.append('<source />').children().last().attr('type','audio/mpeg').attr('src',this.urlAudio+'.mp3');
+  }
+
+  var thisAnim = this;
+  
+  var seamlessloopready = function() {
+    thisAnim.preloaded = 1;
+    for(var i = 0; i < thisAnim.readyFunctions.length; i++) {
+      thisAnim.readyFunctions[i].call(thisAnim);
+    }
+  }
+  
+  var audioready = function() {
+    if ((thisAnim.urlAudio != '') && (thisAnim.loop)) {
+      var audiofile = jQuery('audio#snd'+thisAnim.id);
+      if (audiofile) {
+        var audioelem = audiofile.get(0);
+        thisAnim.seamlessLoop = new SeamlessLoop();
+        thisAnim.seamlessLoop.addUri(thisAnim.urlAudio+'.ogg',audioelem.duration*1000,'loop'+thisAnim.id); // .ogg uniquement pour l'instant.
+        seamlessloopready();
+      }
+    } else seamlessloopready();
+  }
+  
+  var imgready = function() {
+    if (thisAnim.urlAudio != '') waitForAudio("#preload audio#snd"+thisAnim.id, audioready);
+    else audioready();
+  }
+  
+  var jsready = function(){
+    if (thisAnim.urlGif != '') jQuery('#preload img#img'+thisAnim.id).imagesLoaded(imgready);
+    else imgready();
+  }
+  
+  if (urlJS != '') {
+    $.ajax({
+      url: this.urlJS, // le nom du fichier indiqué dans le formulaire
+      type: 'get', // la méthode indiquée dans le formulaire (get ou post)
+      dataType: 'text',
+      success: function(html, status, xhr) { // je récupère la réponse du fichier PHP
+        eval(html);
+        thisAnim.tiles = tiles;
+        thisAnim.frames = frames;
+        jsready();
+      },
+      error: function (xhr, ajaxOptions, thrownError){
+        //displayLoader(false);
+      }
+    });
+  } else jsready();
+}
+
+YDKJAnimation.prototype.ready = function(f) {
+  if (!this.preloaded) this.readyFunctions.push(f); else f.call(this);
+};
+
+YDKJAnimation.prototype.ended = function(f) {
+  if (this.end != 255) this.endedFunctions.push(f); else f.call(this);
+}
+
+YDKJAnimation.prototype.newScreen = function() {
+  $('#tmpscreen').html(''); // Faire un tmpscreen pour chaque anim (ou via des class)
+}
+
+YDKJAnimation.prototype.addTile = function(tileid, x, y) {
+  var tmpscreen = $('#tmpscreen');
+  var ourtile = this.tiles[tileid];
+  if (!ourtile) return false;
+  var ourdiv = $('<div />');
+  ourdiv.css({
+    'background-image':'url("'+this.urlGif+'")',
+    'background-repeat':'none',
+    'background-position':(0-ourtile.x)+'px '+(0-ourtile.y)+'px',
+    'width':(ourtile.w)+'px',
+    'height':(ourtile.h)+'px',
+    'position':'absolute',
+    'left':x+'px',
+    'top':y+'px',
+  });
+  ourdiv.appendTo(tmpscreen);
+}
+
+YDKJAnimation.prototype.addFrame = function(frameid) {
+  var ourframe = this.frames[frameid];
+  var val = 0;
+  if (ourframe.nbimg > 0) {
+    var offsetx = ourframe.img[0].ox;
+    var offsety = ourframe.img[0].oy;
+    var sizex = ourframe.img[0].sx;
+    var sizey = ourframe.img[0].sy;
+    val = ourframe.img[0].val;
+    for(var i = 1; i <= ourframe.nbimg; i++) {
+      this.addTile(ourframe.img[i].idx-1, offsetx+ourframe.img[i].ox, offsety+ourframe.img[i].oy);
+      val = val | ourframe.img[i].val;
+    }
+    return val;
+  }
+  return val;
+}
+
+YDKJAnimation.prototype.getFrameVal = function(frameid) {
+  var ourframe = this.frames[frameid];
+  var val = 0;
+  if (ourframe.nbimg > 0) {
+    val = ourframe.img[0].val;
+    for(var i = 1; i <= ourframe.nbimg; i++) {
+      val = val | ourframe.img[i].val;
+    }
+    return val;
+  }
+  return val;
+}
+
+
+YDKJAnimation.prototype.nextScreen = function() {
+  // Ne pas remplacer tout le screen (uniquement supprimer lorsqu'on destroy l'animation (pas stop, on peut vouloir stopper sans supprimer))
+  $('#screen').html($('#tmpscreen').html()); // Meilleure façon de déplacer les éléments ?
+  
+  /*
+  // Chrome n'aime pas cette façon non plus (en fait il aime pas en local uniquement... il gère le cache des images différemment il faut croire ?)
+  var newscreen = $('#tmpscreen').clone(true);
+  newscreen.attr('id','screen').attr('style',$('#screen').attr('style'));
+  $('#screen').replaceWith(newscreen);
+  */
+
+  this.newScreen();
+}
+
+/*
+YDKJAnimation.prototype.displayFrame = function(framenum) {
+  this.addFrame(framenum);
+  this.nextScreen();
+}
+*/
+
+YDKJAnimation.prototype.endTrigger = function(e) {
+  if (this.end == 255) return false;
+  // e = 1 : animation, e = 2 : audio
+  this.end = this.end | e;
+  if (((this.urlGif == '') && (this.urlAudio != '') && (this.end == 2)) 
+   || ((this.urlGif != '') && (this.urlAudio == '') && (this.end == 1)) 
+   || ((this.urlGif != '') && (this.urlAudio != '') && (this.end == 3))) {
+    this.end = 255; // Pour éviter de relancer le trigger
+    for(var i = 0; i < this.endedFunctions.length; i++) {
+      this.endedFunctions[i].call(this);
+    }
+  }
+}
+
+YDKJAnimation.prototype.playAnim = function() {
+  if (!this.preloaded) return false; // Ou bien attendre le preload ?
+  
+  this.end = 0;
+  var thisAnim = this;
+  
+  if (this.urlGif != '') {
+    this.newScreen();
+  
+    var framenum = this.framestart;
+    this.intervalTimer = 0;
+    var intervaltimer = 0;
+    var runanim = function() {
+      //setTimeout(runanim,66);
+      var val = thisAnim.addFrame(framenum);
+      if ((val & 4) == 0) thisAnim.nextScreen();
+      jQuery('#debuglive').html('frame '+framenum+'/'+(thisAnim.frames.length-1)+' ; val:'+val);
+      framenum++;
+      if ((framenum >= thisAnim.frames.length) || ((val & 16) != 0)) {
+        if (thisAnim.loop) framenum = thisAnim.framestart; else {
+          thisAnim.endTrigger(1);
+          clearInterval(intervaltimer);
+          thisAnim.intervalTimer = 0;
+        }
+      }
+    }
+  
+    //runanim();
+    intervaltimer = setInterval(runanim,66); // Pourrait être calculé depuis frames[x].fps1/frames[x].fps2
+    this.intervalTimer = intervaltimer;
+  }
+
+  if (this.urlAudio != '') {
+    if ((this.loop) && (this.seamlessLoop)) {
+      this.seamlessLoop.volume=audiospecs.maxVolume;
+      this.seamlessLoop.start('loop'+this.id);
+    } else {
+      var audiofile = jQuery('audio#snd'+this.id);
+      if (audiofile) {
+        var audioelem = audiofile.get(0);
+        var ended = function() {
+          thisAnim.audiostopTimer = 0;
+          if (!thisAnim.loop) {
+            setTimeout(function() {
+              audioelem.pause();
+              audioelem.currentTime = 0;
+            }, audiospecs.stopDelay);
+            thisAnim.endTrigger(2);
+          }
+        }
+        thisAnim.audiostopTimer = setTimeout(ended, audioelem.duration*1000+audiospecs.playDelay);
+        if (audioelem.currentTime) audioelem.currentTime = 0;
+        audioelem.volume=audiospecs.maxVolume;
+        audioelem.play();
+      }
+    }
+  }
+}
+
+YDKJAnimation.prototype.stopAnim = function() {
+  if (this.urlGif != '') {
+    if (this.intervalTimer) {
+      clearInterval(this.intervalTimer);
+      this.intervalTimer = 0;
+    }
+  }
+  
+  if (this.urlAudio != '') {
+    if ((this.loop) && (this.seamlessLoop)) {
+      this.seamlessLoop.stop();
+    } else {
+      if (this.audiostopTimer) clearTimeout(this.audiostopTimer);
+      this.audiostopTimer = 0;
+      var audiofile = jQuery('audio#snd'+this.id);
+      if (audiofile) {
+        var audioelem = audiofile.get(0);
+        audioelem.pause();
+        audioelem.currentTime = 0;
+      }
+    }
+  }
+}
+
+YDKJAnimation.prototype.setVolume = function(vol) {
+  if (vol > 1) vol = vol/100;
+  vol = vol*audiospecs.maxVolume;
+  
+  if (this.urlAudio != '') {
+    if ((this.loop) && (this.seamlessLoop)) {
+      this.seamlessLoop.setVolume(vol);
+    } else {
+      var audiofile = jQuery('audio#snd'+this.id);
+      if (audiofile) {
+        var audioelem = audiofile.get(0);
+        audioelem.volume = vol;
+      }
+    }
+  }
+}
+
+function YDKJResource(resourceName) {
+  this.resourceName = resourceName;
+  
+  this.preloaded = 0;
+  this.readyFunctions = [];
+  
+  this.end = 0;
+  this.endedFunctions = [];
+  
+  var sp = resourceName.split('/');
+  var resGif = '';
+  var resJS = '';
+  var resAudio = '';
+  var resFramestart = 0;
+  var resLoop = 0;
+  if ((YDKJanim[sp[0]]) && (YDKJanim[sp[0]][sp[1]])) {
+    var resGif = 'res/'+YDKJanim[sp[0]][sp[1]]['res']+'/'+YDKJanim[sp[0]][sp[1]]['name']+'.gif';
+    var resJS = 'res/'+YDKJanim[sp[0]][sp[1]]['res']+'/'+YDKJanim[sp[0]][sp[1]]['name']+'.js';
+    var resFramestart = YDKJanim[sp[0]][sp[1]]['framestart'];
+    if (YDKJanim[sp[0]][sp[1]]['loop']) var resLoop = 1;
+  }
+  
+  if ((YDKJsnd[sp[0]]) && (YDKJsnd[sp[0]][sp[1]])) {
+    var resAudio = 'res/'+YDKJsnd[sp[0]][sp[1]]['res']+'/'+YDKJsnd[sp[0]][sp[1]]['name']+'/'+YDKJsnd[sp[0]][sp[1]]['min'];
+    if (YDKJsnd[sp[0]][sp[1]]['loop']) var resLoop = 1;
+  }
+  
+  this.animation = new YDKJAnimation(resGif,resJS,resAudio,resFramestart,resLoop);
+
+  var thisResource = this;
+
+  this.animation.ended(function() {
+    thisResource.end = 1;
+    for(var i = 0; i < thisResource.endedFunctions.length; i++) {
+      thisResource.endedFunctions[i].call(thisResource);
+    }
+  });
+  
+  this.animation.ready(function(){
+    thisResource.preloaded = 1;
+    for(var i = 0; i < thisResource.readyFunctions.length; i++) {
+      thisResource.readyFunctions[i].call(thisResource);
+    }
+  });
+}
+
+YDKJResource.prototype.ready = function(f) {
+  if (!this.preloaded) this.readyFunctions.push(f); else f.call(this);
+};
+
+YDKJResource.prototype.ended = function(f) {
+  if (!this.end) this.endedFunctions.push(f); else f.call(this);
+};
+
+YDKJResource.prototype.delay = function(f,delay) {
+  var thisResource = this;
+  if (delay) setTimeout(function(){f.call(thisResource)},delay); else f.call(this);
+}
+
+YDKJResource.prototype.playResource = function() {
+  var thisResource = this;
+  this.animation.ready(function(){
+    thisResource.animation.playAnim();
+  });
+}
+
+YDKJResource.prototype.stopResource = function(delay) {
+  this.animation.stopAnim();
+}
+
+jQuery(document).ready(function() {
+
+  var IntroPreTitle = new YDKJResource('Intro/IntroPreTitle');
+  var IntroJack = new YDKJResource('Intro/IntroJack');
+  
+  var MusicJack = new YDKJResource('Intro/MusicJack');
+  var SFXBang = new YDKJResource('Intro/SFXBang');
+  var SFXJackTitle = new YDKJResource('Intro/SFXJackTitle');
+  var IntroJackTitle = new YDKJResource('Intro/IntroJackTitle');
+  var IntroJackDemo = new YDKJResource('Intro/IntroJackDemo');
+  
+  var SFXShowCategoryScreen = new YDKJResource('Category/SFXShowCategoryScreen');
+
+  IntroJackDemo.ended(function(){
+    SFXShowCategoryScreen.delay(function(){MusicJack.stopResource();this.playResource()},300);
+  });
+  
+  IntroJackTitle.ended(function(){
+    IntroJackDemo.delay(function(){this.playResource()},300);
+  });
+  
+  SFXJackTitle.ended(function(){
+    IntroJackTitle.delay(function(){MusicJack.animation.setVolume(50);this.playResource()},300);
+  });
+  
+  SFXBang.ended(function(){
+    SFXJackTitle.delay(function(){this.playResource()},300);
+  });
+  
+  IntroPreTitle.ended(function(){
+    IntroJack.playResource();
+    MusicJack.playResource();
+    SFXBang.delay(function(){this.playResource()},300);
+  });
+  
+  IntroPreTitle.playResource();
+});
+
+function playqnumber(id,variante) {
+  var zid = id;
+  if (id < 10) zid = '0'+id;
+
+  var anim = new YDKJAnimation('res/QNUMBERS/off4/-'+variante+zid+'0.gif','res/QNUMBERS/off4/-'+variante+zid+'0.js','res/QNUMBERS/snd/'+id+'00'+(variante+1),0,0);
+  anim.ready(function(){anim.playAnim();});
+
+  // id 7,1 : val == 83 qui fait un défaut d'affichage sur celle là...
+  // id 9,2 : val == 5 qui fait un défaut d'affichage sur celle là, et 57 aussi...
+  // id 15,2 : val == 22
+  // id 19,2 : val == 35 sur plusieurs frames qui fait un beau bug
+}
+
+</script>
+</head>
+
+<body style="background-color:#000">
+  <div id="screen" style="background-color:#000;position:relative;width:640px;height:480px;overflow:hidden;margin-left:auto;margin-right:auto;margin-top:30px">
+    <img src="ajax-loader.gif" style="position:absolute;left:293px;top:212px" />
+  </div> <!-- Couleur #EEE pour l'intro -->
+  <div id="debuglive" style="display:none;background-color:#000;color:#FFF;padding:5px;margin-top:10px;"><br/></div>
+  <div id="debug" style="display:none;background-color:#000;color:#FFF;padding:5px;margin-top:10px;height:150px;overflow-y:scroll"></div>
+  <div id="tmpscreen" style="display:none"></div>
+  <div id="preload" style="display:none"></div>
+</body>
+</html>

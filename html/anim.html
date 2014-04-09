@@ -68,27 +68,28 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop) {
   t.append('<source />').children().last().attr('type','audio/mpeg').attr('src',this.urlAudio+'.mp3');
 
   var thisAnim = this;
-  jQuery('#preload img').imagesLoaded(function (e) {
-    waitForAudio(function(){
-      $.ajax({
-        url: thisAnim.urlJS, // le nom du fichier indiqué dans le formulaire
-        type: 'get', // la méthode indiquée dans le formulaire (get ou post)
-        dataType: 'text',
-        success: function(html, status, xhr) { // je récupère la réponse du fichier PHP
-          eval(html);
-          thisAnim.tiles = tiles;
-          thisAnim.frames = frames;
+  
+  $.ajax({
+    url: thisAnim.urlJS, // le nom du fichier indiqué dans le formulaire
+    type: 'get', // la méthode indiquée dans le formulaire (get ou post)
+    dataType: 'text',
+    success: function(html, status, xhr) { // je récupère la réponse du fichier PHP
+      eval(html);
+      thisAnim.tiles = tiles;
+      thisAnim.frames = frames;
+      jQuery('#preload img').imagesLoaded(function (e) {
+        waitForAudio(function(){
           thisAnim.preloaded = 1;
           for(var i = 0; i < thisAnim.readyFunctions.length; i++) {
             thisAnim.readyFunctions[i].call(thisAnim);
           }
-        },
-        error: function (xhr, ajaxOptions, thrownError){
-            //displayLoader(false);
-        }
+        }, true);
       });
-    });
-  }, true);
+    },
+    error: function (xhr, ajaxOptions, thrownError){
+        //displayLoader(false);
+    }
+  });
 }
 
 YDKJAnimation.prototype.ready = function(f) {
@@ -178,9 +179,9 @@ YDKJAnimation.prototype.playAnim = function() {
     //setTimeout(runanim,66);
     var val = thisAnim.addFrame(framenum);
     if (val != 36) thisAnim.nextScreen();
-    jQuery('#debuglive').html('frame '+framenum+'/'+(thisAnim.frames.length)+' ; val:'+val);
+    jQuery('#debuglive').html('frame '+framenum+'/'+(thisAnim.frames.length-1)+' ; val:'+val);
     framenum++;
-    if ((framenum >= thisAnim.frames.length) || (val == 16)) {
+    if (framenum >= thisAnim.frames.length) { // || (val == 16)
       if (thisAnim.loop) framenum = thisAnim.framestart; else clearInterval(intervaltimer);
     }
   }
@@ -216,6 +217,7 @@ function playqnumber(id,variante) {
   // id 7,1 : val == 83 qui fait un défaut d'affichage sur celle là...
   // id 9,2 : val == 5 qui fait un défaut d'affichage sur celle là, et 57 aussi...
   // id 15,2 : val == 22
+  // id 19,2 : val == 35 sur plusieurs frames qui fait un beau bug
 }
 
 </script>
