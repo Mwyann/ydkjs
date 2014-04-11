@@ -170,26 +170,44 @@ end;
 procedure TForm1.Button4Click(Sender: TObject);
 var filepos,subpos:word;
     fullname,ftype:string;
+    strings:string;
+    f:system.text;
 begin
+  strings:='';
   if SRFdata.nbfiles > 0 then for filepos:=0 to SRFdata.nbfiles-1 do begin
     ftype:=SRFdata.filelist[filepos].ftype;
     // if (filetype(ftype)='string') then // Considérer que c'est une liste de chaines, à exporter en un seul fichier JS
 
     if SRFdata.filelist[filepos].nbsub > 0 then for subpos:=0 to SRFdata.filelist[filepos].nbsub-1 do begin
-      fullname:=RemoveExt(SafeFileName(GetCurrentDir()+'\'+resbasedir+SRFList.Items[SRFList.ItemIndex]))+'\'+removespaces(ftype);
-      ForceDirectories(fullname);
-      fullname:=fullname+'\'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname);
-      if (filetype(ftype)='subimages') then begin
-        exportSubimagesToGif(SRFdata.filelist[filepos].subfile[subpos],fullname);
-      end else if (filetype(ftype)='subsound') then begin
-        exportSubsoundToFile(SRFdata.filelist[filepos].subfile[subpos],fullname);
-      end else if (filetype(ftype)='string') then begin
-        exportStringToFile(SRFdata.filelist[filepos].subfile[subpos],fullname);
-      end else if (filetype(ftype)='stringlist') then begin
-        exportStringlistToFile(SRFdata.filelist[filepos].subfile[subpos],fullname);
+      if (filetype(ftype)<>'string') then begin
+        fullname:=RemoveExt(SafeFileName(GetCurrentDir()+'\'+resbasedir+SRFList.Items[SRFList.ItemIndex]))+'\'+removespaces(ftype);
+        ForceDirectories(fullname);
+        fullname:=fullname+'\'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname);
+        if (filetype(ftype)='subimages') then begin
+          exportSubimagesToGif(SRFdata.filelist[filepos].subfile[subpos],fullname);
+        end else if (filetype(ftype)='subsound') then begin
+          exportSubsoundToFile(SRFdata.filelist[filepos].subfile[subpos],fullname);
+        end else if (filetype(ftype)='string') then begin
+          //exportStringToFile(SRFdata.filelist[filepos].subfile[subpos],fullname);
+        end else if (filetype(ftype)='stringlist') then begin
+          exportStringlistToFile(SRFdata.filelist[filepos].subfile[subpos],fullname);
+        end;
+      end else begin
+        strings:=strings+'{id:'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname)+',str:'''+readString(SRFdata.filelist[filepos].subfile[subpos])+'''},';
       end;
     end;
   end;
+
+  if (strings <> '') then begin
+    fullname:=RemoveExt(SafeFileName(GetCurrentDir()+'\'+resbasedir+SRFList.Items[SRFList.ItemIndex]));
+    ForceDirectories(fullname);
+    fullname:=fullname+'\STR.js';
+    assignfile(f,fullname);
+    rewrite(f);
+    write(f,'var STR = ['+strings+'];');
+    closefile(f);
+  end;
+
   Label1.Caption:='Conversion complete.';
 end;
 

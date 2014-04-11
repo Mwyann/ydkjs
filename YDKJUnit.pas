@@ -54,6 +54,7 @@ procedure closeSRF;
 function filetype(ftype:string):string;
 procedure exportSubimagesToGif(ssf:subsubfile;filename:string);
 procedure exportSubsoundToFile(ssf:subsubfile;filename:string);
+function readString(ssf:subsubfile):string;
 procedure exportStringToFile(ssf:subsubfile;filename:string);
 procedure exportStringlistToFile(ssf:subsubfile;filename:string);
 
@@ -590,26 +591,28 @@ end;
 
 // Export d'une string
 
-procedure exportStringToFile(ssf:subsubfile;filename:string);
-var f:system.text;
-    data:array[0..65535] of char;
-    js,s:string;
+function readString(ssf:subsubfile):string;
+var data:array[0..65535] of char;
+    s:string;
     i:word;
 
 begin
-  assignfile(f,filename+'.js');
-  rewrite(f);
-
   seek(SRFhandler,ssf.fileoffset);
   blockread(SRFhandler,data,ssf.filesize);
   s:='';
   for i:=0 to ssf.filesize-1 do begin
     if (data[i] <> #00) then s:=s+MactoUTF8(data[i]);
   end;
-  js:='var string='''+s+''';';
+  result:=s;
+end;
 
-  writeln(f,js);
+procedure exportStringToFile(ssf:subsubfile;filename:string);
+var f:system.text;
 
+begin
+  assignfile(f,filename+'.js');
+  rewrite(f);
+  writeln(f,'var string='''+readString(ssf)+''';');
   closefile(f);
 end;
 

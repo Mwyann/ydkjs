@@ -3,6 +3,42 @@
 <head>
 <meta charset="UTF-8" />
 <title>Demo YDKJ</title>
+<style>
+@font-face {
+font-family:"JackCondensed";
+src: url("fonts/JAC_____.TTF") format('truetype') /* TTF file for CSS3 browsers */
+}
+
+@font-face {
+font-family:"JackExtraCond";
+src: url("fonts/JAeC____.TTF") format('truetype') /* TTF file for CSS3 browsers */
+}
+
+@font-face {
+font-family:"JackInput";
+src: url("fonts/JAi_____.TTF") format('truetype') /* TTF file for CSS3 browsers */
+}
+
+@font-face {
+font-family:"JackRoman";
+src: url("fonts/JAr_____.TTF") format('truetype') /* TTF file for CSS3 browsers */
+}
+
+/*
+.verticalcenter {
+  height:200px;
+  line-height:200px;
+}
+
+.verticalcenter span { 
+  width:100px;
+  vertical-align:middle;
+  display:inline-block;
+  line-height:normal;
+}
+*/
+
+</style>
 <script src="demo-res.js" type="text/javascript"></script>
 <script src="jquery-1.11.0.min.js" type="text/javascript"></script>
 <script src="SeamlessLoop.js" type="text/javascript"></script>
@@ -349,6 +385,7 @@ YDKJAnimation.prototype.playAnim = function() {
       //setTimeout(runanim,66);
       var val = thisAnim.addFrame(framenum);
       if (((val & 4) == 0) || ((val & 8) != 0)) thisAnim.nextScreen();
+      if (((val & 32) != 0) && ((val & 8) != 0) && (thisAnim.animCallback)) thisAnim.animCallback();
       jQuery('#debuglive').html('frame '+framenum+'/'+(thisAnim.frames.length-1)+' ; val:'+val);
       framenum++;
       if ((framenum > framestop) || ((val & 16) != 0)) {
@@ -450,6 +487,10 @@ YDKJAnimation.prototype.setVolume = function(vol) {
   }
 }
 
+YDKJAnimation.prototype.setAnimCallback = function(callback) {
+  this.animCallback = callback;
+}
+
 /********** YDKJResource **********/
 
 function YDKJResource(resourceName) {
@@ -515,9 +556,7 @@ YDKJResource.prototype.delay = function(f,delay) {
 
 YDKJResource.prototype.playResource = function() {
   var thisResource = this;
-
   this.end = 0;
-  
   this.animation.ready(function(){
     thisResource.animation.playAnim();
   });
@@ -529,6 +568,10 @@ YDKJResource.prototype.stopResource = function() {
 
 YDKJResource.prototype.resetResource = function() {
   this.animation.resetAnim();
+}
+
+YDKJResource.prototype.setAnimCallback = function(callback) {
+  this.animation.setAnimCallback(callback);
 }
 
 YDKJResource.prototype.free = function() {
@@ -554,9 +597,10 @@ function unbindKeyListener(listener) {
 
 /********** YDKJMode **********/
 
-function YDKJMode(game, modename) {
+function YDKJMode(game, modename, options) {
   this.modename = modename;
   this.game = game;
+  this.options = options;
   
   // preload
   if (this.modename == 'Intro') {
@@ -595,6 +639,12 @@ function YDKJMode(game, modename) {
     this.ChoiceCategory1 = new YDKJResource('Category/ChoiceCategory1');
     this.ChoiceCategory2 = new YDKJResource('Category/ChoiceCategory2');
     this.ChoiceCategory3 = new YDKJResource('Category/ChoiceCategory3');
+    
+    // Précharger les questions avec l'interface de catégorie
+    this.questiontitle = ['Keuf you !', 'Ma meilleure boum', 'C\'est dur vraiment plus longtemps'];
+    this.question1 = new YDKJMode(this.game, 'Question', {res:'QFold1/ABB'}); // Preload des questions suivantes
+    this.question2 = new YDKJMode(this.game, 'Question', {res:'QFold1/ABE'});
+    this.question3 = new YDKJMode(this.game, 'Question', {res:'QFold1/AJM'});
   }
   
   if (this.modename == 'Question') {
@@ -607,6 +657,7 @@ YDKJMode.prototype.start = function() {
   var thisMode = this;
   if (this.game.currentmode) this.game.currentmode.free();
   this.game.currentmode = this;
+  this.skiplistener = 0;
   
   if (this.modename == 'Intro') {
     this.IntroJackDemo.ended(function(){
@@ -614,6 +665,7 @@ YDKJMode.prototype.start = function() {
       thisMode.IntroJackDemo.delay(function(){
         thisMode.MusicJack.free();
         thisMode.IntroJack.free();
+        if (this.skiplistener) unbindKeyListener(this.skiplistener);
         thisMode.category.start(); // On passe au choix de la catégorie
       },300);
     });
@@ -623,6 +675,10 @@ YDKJMode.prototype.start = function() {
       thisMode.IntroJackDemo.delay(function(){
         this.playResource();
         thisMode.category = new YDKJMode(thisMode.game, 'Category'); // Preload des catégories pendant le speech
+        this.skiplistener = bindKeyListener(function(choice) {
+          unbindKeyListener(thisMode.skiplistener);
+          if (choice == 32) thisMode.category.start(); // Barre espace = on passe au choix de la catégorie
+        });
       },300);
     });
     
@@ -638,6 +694,8 @@ YDKJMode.prototype.start = function() {
       this.free();
       thisMode.SFXJackTitle.delay(function(){this.playResource()},300);
     });
+    
+    //this.IntroJack.setAnimCallback(function(){alert('ok');});
     
     this.IntroPreTitle.ended(function(){
       thisMode.IntroJack.playResource();
@@ -659,9 +717,10 @@ YDKJMode.prototype.start = function() {
         
         var listener = bindKeyListener(function(choice) {
           var chosed = 0;
-          if (choice == 49) chosed = thisMode.ChoiceCategory1;
-          else if (choice == 50) chosed = thisMode.ChoiceCategory2;
-          else if (choice == 51) chosed = thisMode.ChoiceCategory3;
+          var nextquestion = 0;
+          if (choice == 49) {chosed = thisMode.ChoiceCategory1; nextquestion = thisMode.question1;}
+          else if (choice == 50) {chosed = thisMode.ChoiceCategory2; nextquestion = thisMode.question2;}
+          else if (choice == 51) {chosed = thisMode.ChoiceCategory3; nextquestion = thisMode.question3;}
           else if (choice == -1) { // Timeout
             // A gérer
           } else chosed = 0;
@@ -677,7 +736,7 @@ YDKJMode.prototype.start = function() {
               thisMode.ChooseCategory1.free();
               thisMode.ChooseCategoryText.free();
               chosed.free();
-              thisMode.question.start(); // On démarre la question choisie
+              nextquestion.start(); // On démarre la question choisie
             });
             
             thisMode.SFXChoiceCategory.playResource();
@@ -701,6 +760,8 @@ YDKJMode.prototype.start = function() {
     this.MusicChooseCategoryStart.ended(function(){
       thisMode.MusicChooseCategoryLoop.playResource();
     });
+    
+    //this.ShowCategories.setAnimCallback(function(){alert('ok');});
     
     this.ChooseCategory1.ended(function(){
       thisMode.SFXShowCategories.delay(function(){
@@ -727,7 +788,7 @@ YDKJMode.prototype.start = function() {
                  {x:480,y:360},
                  {x:560,y:420},
                  {x:640,y:480}];
-      var blueDiv = jQuery('<div />').addClass('markedAsRemoved');
+      var blueDiv = jQuery('<div />').css('z-index','2000').addClass('markedAsRemoved');
       blueDiv.appendTo(jQuery('#screen'));
       var interval = 0;
       var nextStep = function() {
@@ -747,12 +808,10 @@ YDKJMode.prototype.start = function() {
           thisMode.ChooseCategory1.playResource();
         }
       }
-      interval=setInterval(nextStep,50);
+      interval=setInterval(nextStep,40);
     }
     
     blueZoom();
-    
-    thisMode.question = new YDKJMode(thisMode.game, 'Question'); // Preload de la question suivante pendant l'animation (il faudrait précharger les 3 questions possibles)
   }
   
   if (this.modename == 'Question') {
@@ -781,7 +840,11 @@ YDKJMode.prototype.free = function() {
 /********** YDKJGame **********/
 
 function YDKJGame() {
-  this.players = new Array();
+  this.players = new Array(
+    {name:'Jeff',score:0},
+    {name:'Frédéric',score:0},
+    {name:'Alicia',score:0}
+  );
   this.currentmode = 0;
 }
 

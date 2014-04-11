@@ -226,4 +226,9 @@ var YDKJanim = {
 		'BGQuestion2':{res:'5QDemo',name:'off4/-2020',framestart:56,loop:0},
 		'BGQuestion3':{res:'5QDemo',name:'off4/-2030',framestart:55,loop:0},
 	},
+	'Question':{
+	  'TimerComesIn1':{res:'5QDemo',name:'off4/8017',framestart:0,loop:0},
+	  'TimerComesIn2':{res:'5QDemo',name:'off4/8041',framestart:0,loop:0},
+	  'Round1':{res:'5QDemo',name:'off4/8014',framestart:0,loop:0},
+	}
 };
