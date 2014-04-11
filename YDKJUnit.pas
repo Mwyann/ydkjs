@@ -578,8 +578,8 @@ end;
 
 function MactoUTF8(c:char):string; // Caractère MAC vers UTF8, est-ce une bonne idée si on doit utiliser les glyph inclus dans les .SRF de toutes façons ?
 begin
-  if (ord(c) = $D5) then result:='\''' // '
-  else if (ord(c) = $7B) then result:=' ' // Demi-espace
+  if (ord(c) = $D5) then result:=chr($E2)+chr($80)+chr($99) // ’
+  else if (ord(c) = $7B) then result:=chr($C2)+chr($A0) // Espace insécable
   else if (ord(c) = $88) then result:=chr($C3)+chr($A0) // à
   else if (ord(c) = $8E) then result:=chr($C3)+chr($A9) // é
   else if (ord(c) = $8F) then result:=chr($C3)+chr($A8) // è

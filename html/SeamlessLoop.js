@@ -151,9 +151,9 @@ SeamlessLoop.prototype.setVolume = function(vol) {
 
 SeamlessLoop.prototype.stop = function() {
 	clearTimeout(this.timeout);
-	this.actual._1.currentTime = 0;
+	if (this.actual._1.currentTime) this.actual._1.currentTime = 0;
 	this.actual._1.pause();
-	this.actual._2.currentTime = 0;
+	if (this.actual._2.currentTime) this.actual._2.currentTime = 0;
 	this.actual._2.pause();
 };
 

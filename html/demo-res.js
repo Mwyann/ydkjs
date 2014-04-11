@@ -72,7 +72,7 @@ var YDKJsnd = {
 		'SFXRevealAnswer':{res:'5QDemo',name:'Mc95',min:1,max:1},
 		'SFXRevealFreeAnswer':{res:'5QDemo',name:'Mc79',min:1,max:1},
 		'SFXShowQuestion':{res:'5QDemo',name:'Mc80',min:1,max:1},
-		'SFXTimerComesIn':{res:'5QDemo',name:'Mc98',min:1,max:1},
+		'SFXTimerComesIn1':{res:'5QDemo',name:'Mc98',min:1,max:1},
 		'SFXTypingBack':{res:'5QDemo',name:'Mc91',min:1,max:1},
 		'SFXTypingHeartBeat':{res:'5QDemo',name:'Mc90',min:1,max:1},
 		'SFXTypingKey':{res:'5QDemo',name:'Mc89',min:1,max:1},
@@ -199,7 +199,7 @@ var YDKJsnd = {
 		'SFXShowHiScoreTwice':{res:'5QDemo',name:'Ml58',min:1,max:1},
 		'SFXShowScore':{res:'5QDemo',name:'Ml42',min:1,max:1},
 		'SuggestPlayAgain':{res:'5QDemo',name:'Ml04',min:1,max:1},
-	}
+	},
 };
 
 var YDKJanim = {
@@ -230,5 +230,7 @@ var YDKJanim = {
 	  'TimerComesIn1':{res:'5QDemo',name:'off4/8017',framestart:0,loop:0},
 	  'TimerComesIn2':{res:'5QDemo',name:'off4/8041',framestart:0,loop:0},
 	  'Round1':{res:'5QDemo',name:'off4/8014',framestart:0,loop:0},
+	  'AnnounceValue2000F':{res:'5QDemo',name:'off4/11020',framestart:16,loop:0},
+	  'HideValue2000F':{res:'5QDemo',name:'off4/11020',framestart:35,loop:0},
 	}
 };

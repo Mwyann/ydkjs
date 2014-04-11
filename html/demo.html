@@ -520,6 +520,9 @@ function YDKJResource(resourceName) {
   if ((YDKJsnd[sp[0]]) && (YDKJsnd[sp[0]][sp[1]])) {
     var resAudio = 'res/'+YDKJsnd[sp[0]][sp[1]]['res']+'/'+YDKJsnd[sp[0]][sp[1]]['name']+'/'+YDKJsnd[sp[0]][sp[1]]['min'];
     if (YDKJsnd[sp[0]][sp[1]]['loop']) var resLoop = 1;
+  } else if ((YDKJsnd[sp[0]]) && (YDKJsnd[sp[0]]['SFX'+sp[1]])) {
+    var resAudio = 'res/'+YDKJsnd[sp[0]]['SFX'+sp[1]]['res']+'/'+YDKJsnd[sp[0]]['SFX'+sp[1]]['name']+'/'+YDKJsnd[sp[0]]['SFX'+sp[1]]['min'];
+    if (YDKJsnd[sp[0]]['SFX'+sp[1]]['loop']) var resLoop = 1;
   }
   
   this.animation = new YDKJAnimation(resGif,resJS,resAudio,resFramestart,resLoop,resFramestop);
@@ -582,10 +585,7 @@ YDKJResource.prototype.free = function() {
 
 function bindKeyListener(callback,timeout){
   if (typeof(timeout) === 'undefined') timeout = 0;
-  var listener = function(event){
-    event.preventDefault();
-    callback(event.which);
-  }
+  var listener = function(event){callback(event.which)};
   jQuery(window).bind('keypress',listener);
   return listener;
 }
@@ -620,7 +620,7 @@ function YDKJMode(game, modename, options) {
     this.MusicChooseCategoryStart = new YDKJResource('Category/MusicChooseCategoryStart');
     this.MusicChooseCategoryLoop = new YDKJResource('Category/MusicChooseCategoryLoop');
     this.ShowCategories = new YDKJResource('Category/ShowCategories');
-    this.SFXShowCategories = new YDKJResource('Category/SFXShowCategories');
+    //this.SFXShowCategories = new YDKJResource('Category/SFXShowCategories');
     
     this.ChooseCategory1 = new YDKJResource('Category/ChooseCategory1');
     //this.ChooseCategory2 = new YDKJResource('Category/ChooseCategory2');
@@ -641,15 +641,32 @@ function YDKJMode(game, modename, options) {
     this.ChoiceCategory3 = new YDKJResource('Category/ChoiceCategory3');
     
     // Précharger les questions avec l'interface de catégorie
-    this.questiontitle = ['Keuf you !', 'Ma meilleure boum', 'C\'est dur vraiment plus longtemps'];
+    this.questiontitles = ['Keuf you !', 'Ma meilleure boum', 'C’est dur vraiment plus longtemps'];
     this.question1 = new YDKJMode(this.game, 'Question', {res:'QFold1/ABB'}); // Preload des questions suivantes
     this.question2 = new YDKJMode(this.game, 'Question', {res:'QFold1/ABE'});
     this.question3 = new YDKJMode(this.game, 'Question', {res:'QFold1/AJM'});
   }
   
   if (this.modename == 'Question') {
-    this.JingleQuestion1 = new YDKJResource('Category/JingleQuestion1');
-    this.BGQuestion1 = new YDKJResource('Category/BGQuestion1');
+    this.JingleQuestion = new YDKJResource('Category/JingleQuestion1'); // Charger les bonnes ressources en fonction du n° de la question
+    this.BGQuestion = new YDKJResource('Category/BGQuestion1');
+    
+    this.AnnounceCategory = new YDKJResource('Question/AnnounceCategory');
+    this.AnnounceValue = new YDKJResource('Question/AnnounceValue2000F'); // Ici aussi, charger la valeur correcte
+    this.HideValue = new YDKJResource('Question/HideValue2000F');
+    this.TimerComesIn = new YDKJResource('Question/TimerComesIn1'); // 1 ou 2 au hasard ? Ou spécifique à un type de question ?
+    
+    this.strjs = getYDKJFile('js','res/'+this.options.res+'/STR.js');
+    
+    this.QuestionTitle = new YDKJAnimation('','','res/'+this.options.res+'/snd/1');
+    this.PreQuestion = new YDKJAnimation('','','res/'+this.options.res+'/snd/2');
+    this.Question = new YDKJAnimation('','','res/'+this.options.res+'/snd/3');
+    this.Answers = new YDKJAnimation('','','res/'+this.options.res+'/snd/5');
+    this.EndQuestion = new YDKJAnimation('','','res/'+this.options.res+'/snd/6');
+    this.Answer1 = new YDKJAnimation('','','res/'+this.options.res+'/snd/7');
+    this.Answer2 = new YDKJAnimation('','','res/'+this.options.res+'/snd/8');
+    this.Answer3 = new YDKJAnimation('','','res/'+this.options.res+'/snd/9');
+    this.Answer4 = new YDKJAnimation('','','res/'+this.options.res+'/snd/10');
   }
 }
 
@@ -695,7 +712,7 @@ YDKJMode.prototype.start = function() {
       thisMode.SFXJackTitle.delay(function(){this.playResource()},300);
     });
     
-    //this.IntroJack.setAnimCallback(function(){alert('ok');});
+    //this.IntroJack.setAnimCallback(function(){alert('ok');}); // Afficher le nom des joueurs et leur argent
     
     this.IntroPreTitle.ended(function(){
       thisMode.IntroJack.playResource();
@@ -718,14 +735,30 @@ YDKJMode.prototype.start = function() {
         var listener = bindKeyListener(function(choice) {
           var chosed = 0;
           var nextquestion = 0;
-          if (choice == 49) {chosed = thisMode.ChoiceCategory1; nextquestion = thisMode.question1;}
-          else if (choice == 50) {chosed = thisMode.ChoiceCategory2; nextquestion = thisMode.question2;}
-          else if (choice == 51) {chosed = thisMode.ChoiceCategory3; nextquestion = thisMode.question3;}
+          if (choice == 49) chosed = 1;
+          else if (choice == 50) chosed = 2;
+          else if (choice == 51) chosed = 3;
           else if (choice == -1) { // Timeout
             // A gérer
           } else chosed = 0;
           if (chosed) {
+          	var choice, nextquestion;
+          	switch(chosed) {
+          		case 1:
+          			choice = thisMode.ChoiceCategory1;
+          			nextquestion = thisMode.question1;
+          		break;
+          		case 2:
+          			choice = thisMode.ChoiceCategory2;
+          			nextquestion = thisMode.question2;
+          		break;
+          		case 3:
+          			choice = thisMode.ChoiceCategory3;
+          			nextquestion = thisMode.question3;
+          		break;
+          	}
             unbindKeyListener(listener);
+            jQuery('#screen .QuestionTitle:not(#QuestionTitle'+(chosed-1)+')').remove();
             thisChooseCategory.free();
             thisMode.MusicChooseCategoryLoop.free();
             thisMode.LoopCategory1.free();
@@ -735,18 +768,18 @@ YDKJMode.prototype.start = function() {
             thisMode.SFXChoiceCategory.ended(function(){
               thisMode.ChooseCategory1.free();
               thisMode.ChooseCategoryText.free();
-              chosed.free();
+              choice.free();
               nextquestion.start(); // On démarre la question choisie
             });
             
             thisMode.SFXChoiceCategory.playResource();
-            chosed.playResource();
+            choice.playResource();
           }
         },10000); // 10 secondes de timeout
       },100);
     });
     
-    this.SFXShowCategories.ended(function(){
+    this.ShowCategories.ended(function(){
       thisMode.SFXChoiceCategory.delay(function(){
         this.playResource();
         thisMode.ShowCategories.free();
@@ -761,11 +794,38 @@ YDKJMode.prototype.start = function() {
       thisMode.MusicChooseCategoryLoop.playResource();
     });
     
-    //this.ShowCategories.setAnimCallback(function(){alert('ok');});
+    var ShowCategoryNum = 0;
+    this.ShowCategories.setAnimCallback(function(){
+    	if (ShowCategoryNum < 3) {
+    		var title = thisMode.questiontitles[ShowCategoryNum];
+    		var div = jQuery('<div />').addClass('QuestionTitle').attr('id','QuestionTitle'+ShowCategoryNum).css({ // Titre de la catégorie
+	  			'position':'absolute',
+	  			'width':'0px',
+	  			'height':'100px',
+	  			'line-height':'100px',
+	  			'left':'130px',
+	  			'top':(163+100*ShowCategoryNum)+'px',
+	  			'overflow':'hidden'
+	  		});
+	  		
+	  		jQuery('<div />').css({
+	  			'width':'500px',
+	  			'vertical-align':'middle',
+  				'display':'inline-block',
+	  			'font-size':'32px',
+	  			'line-height':'32px',
+	  			'color':'#FC0',
+	  			'font-family':'JackRoman'
+	  		}).html(title).appendTo(div);
+	  			
+	  		div.appendTo('#screen').animate({'width':'500px'},150);
+	    		
+    		ShowCategoryNum++;
+    	}
+    });
     
     this.ChooseCategory1.ended(function(){
-      thisMode.SFXShowCategories.delay(function(){
-        thisMode.ShowCategories.playResource();
+      thisMode.ShowCategories.delay(function(){
         this.playResource();
       },300);
     });
@@ -815,15 +875,110 @@ YDKJMode.prototype.start = function() {
   }
   
   if (this.modename == 'Question') {
-    this.JingleQuestion1.ended(function(){
-      thisMode.JingleQuestion1.free();
-      thisMode.BGQuestion1.delay(function(){
+  	this.TimerComesIn.ended(function(){
+  		var div = jQuery('<div />').css({ // Titre de la catégorie
+  			'position':'absolute',
+  			'height':'70px',
+  			'line-height':'70px',
+  			'left':'70px',
+  			'top':'0'
+  		});
+  		
+  		var titlediv = jQuery('<div />').css({
+  			'position':'relative',
+  			'left':'-150px',
+  			'width':'300px',
+  			'vertical-align':'middle',
+				'display':'inline-block',
+  			'font-size':'20px',
+  			'line-height':'24px',
+  			'color':'#33F',
+  			'font-family':'JackRoman',
+				'-webkit-transform':'scale(0.0, 1.0)',
+    		'-moz-transform':'scale(0.0, 1.0)',
+    		'-ms-transform':'scale(0.0, 1.0)',
+    		'-o-transform':'scale(0.0, 1.0)',
+    		'transform':'scale(0.0,1.0)',
+  		}).html(thisMode.STR[0].str);
+  		
+  		titlediv.appendTo(div);
+  		
+  		var expandInterval = 0;
+  		var expandVal = 0.0;
+  		var expand = function() {
+  			expandVal += 0.15;
+  			if (expandVal >= 1) {
+  				clearInterval(expandInterval);
+  				expandVal = 1;
+  			}
+  			titlediv.css({
+  				'left':(0-(150*(1-expandVal)))+'px',
+					'-webkit-transform':'scale('+expandVal+',1.0)',
+	    		'-moz-transform':'scale('+expandVal+', 1.0)',
+	    		'-ms-transform':'scale('+expandVal+', 1.0)',
+	    		'-o-transform':'scale('+expandVal+', 1.0)',
+	    		'transform':'scale('+expandVal+',1.0)',
+  			});
+  		} 		
+  		expandInterval = setInterval(expand,66);
+  		
+  		div.appendTo('#screen');
+  	});
+  	
+  	this.AnnounceValue.ended(function(){
+  		this.free();
+  		jQuery('#screen #QuestionTitle').css('font-style','italic').delay(100).animate({'left':'-500px'},500,function(){
+	  		jQuery('#screen #QuestionTitle').remove();
+	  		thisMode.TimerComesIn.delay(function(){
+	  			this.playResource();
+	  		},300);
+  		});
+  		thisMode.HideValue.playResource();
+  		thisMode.PreQuestion.playAnim();
+  	});
+  	this.QuestionTitle.ended(function(){
+  		this.free();
+  		thisMode.AnnounceValue.playResource();
+  	});
+  	
+  	this.AnnounceCategory.ended(function(){
+  		var textsize = 70;
+  		if (thisMode.STR[0].str.length < 20) textsize = 120;
+  		
+  		jQuery('<div />').attr('id','QuestionTitle').css({ // Titre de la catégorie
+  			'color':'#FFF',
+  			'font-family':'JackExtraCond',
+  			'text-align':'center',
+  			'font-size':Math.round(textsize*0.90)+'px',
+  			'line-height':textsize+'px',
+  			'position':'absolute',
+  			'width':'450px',
+  			'left':'95px',
+  			'top':Math.round(125+textsize*0.05)+'px',
+  			'opacity':'0'
+  		}).html(thisMode.STR[0].str).appendTo('#screen').animate({
+  			'top':'125px',
+  			'font-size':textsize+'px',
+  			'line-height':Math.round(textsize*1.10)+'px',
+  			'opacity':'1'}
+  		,250);
+  		thisMode.QuestionTitle.playAnim();
+  	});
+  	
+    this.JingleQuestion.ended(function(){
+      thisMode.JingleQuestion.free();
+      thisMode.BGQuestion.delay(function(){
         this.playResource();
+        thisMode.AnnounceCategory.playResource();
       },100);
     });
     
     jQuery('#screen').css('background-color','#000').html(''); // Je vide manuellement l'écran.
-    this.JingleQuestion1.playResource();
+    this.strjs.ready(function(){
+    	eval(thisMode.strjs.res);
+    	thisMode.STR = STR;
+    	thisMode.JingleQuestion.playResource();
+  	});
   }
 }
 
@@ -840,6 +995,7 @@ YDKJMode.prototype.free = function() {
 /********** YDKJGame **********/
 
 function YDKJGame() {
+	jQuery.fx.interval = 66;
   this.players = new Array(
     {name:'Jeff',score:0},
     {name:'Frédéric',score:0},
@@ -850,6 +1006,8 @@ function YDKJGame() {
 
 YDKJGame.prototype.start = function() {
   var gamemode = new YDKJMode(this, 'Intro');
+  //var gamemode = new YDKJMode(this, 'Category');
+  //var gamemode = new YDKJMode(this, 'Question', {res:'QFold1/AJM'});
   gamemode.start();
 }
 

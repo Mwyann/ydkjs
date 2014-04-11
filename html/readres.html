@@ -456,7 +456,7 @@ YDKJAnimation.prototype.setVolume = function(vol) {
 
 jQuery(document).ready(function() {
   
-  anim = new YDKJAnimation('res/5QDemo/off4/8018.gif','res/5QDemo/off4/8018.js','',0,0);
+  anim = new YDKJAnimation('res/5QDemo/off4/11020.gif','res/5QDemo/off4/11020.js','',0,0);
   anim.ready(function() {
     var select = jQuery('<select onchange="playAnim(this);" />');
     var opt = jQuery('<option />').attr('value',0).html(0);
@@ -489,7 +489,7 @@ jQuery(document).ready(function() {
 
 function playAnim(t) {
   var jt = jQuery(t);
-  anim = new YDKJAnimation('res/5QDemo/off4/3540.gif','res/5QDemo/off4/3540.js','',jt.val(),0);
+  anim = new YDKJAnimation('res/5QDemo/off4/11020.gif','res/5QDemo/off4/11020.js','',jt.val(),0);
   anim.ended(function() {
     this.free();
   });
