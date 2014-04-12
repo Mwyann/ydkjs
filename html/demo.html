@@ -651,10 +651,54 @@ function YDKJMode(game, modename, options) {
     this.JingleQuestion = new YDKJResource('Category/JingleQuestion1'); // Charger les bonnes ressources en fonction du n° de la question
     this.BGQuestion = new YDKJResource('Category/BGQuestion1');
     
+    this.value = 2000;
+    
     this.AnnounceCategory = new YDKJResource('Question/AnnounceCategory');
-    this.AnnounceValue = new YDKJResource('Question/AnnounceValue2000F'); // Ici aussi, charger la valeur correcte
+    this.AnnounceValue = new YDKJResource('Question/AnnounceValue'+this.value+'F');
+    this.VoiceAnnounceValue = new YDKJResource('Question/VoiceAnnounceValue'+this.value+'F');
     this.HideValue = new YDKJResource('Question/HideValue2000F');
     this.TimerComesIn = new YDKJResource('Question/TimerComesIn1'); // 1 ou 2 au hasard ? Ou spécifique à un type de question ?
+    this.SFXShowQuestion = new YDKJResource('Question/SFXShowQuestion');
+    this.JingleReadQuestion = new YDKJResource('Question/JingleReadQuestion');
+    this.JingleTimer = new YDKJResource('Question/JingleTimer');
+    
+    this.ShowPlayer1Key = new YDKJResource('Question/ShowPlayer1Key');
+	  this.Player1Answer = new YDKJResource('Question/Player1Answer');
+	  this.Player1AnswerLoop = new YDKJResource('Question/Player1AnswerLoop');
+	  this.Player1Correct = new YDKJResource('Question/Player1Correct');
+	  this.Player1Wrong = new YDKJResource('Question/Player1Wrong');
+	  this.Player1Cancel = new YDKJResource('Question/Player1Cancel');
+	  
+	  this.ShowPlayer2Key = new YDKJResource('Question/ShowPlayer2Key');
+	  this.Player2Answer = new YDKJResource('Question/Player2Answer');
+	  this.Player2AnswerLoop = new YDKJResource('Question/Player2AnswerLoop');
+	  this.Player2Correct = new YDKJResource('Question/Player2Correct');
+	  this.Player2Wrong = new YDKJResource('Question/Player2Wrong');
+	  this.Player2Cancel = new YDKJResource('Question/Player2Cancel');
+	  
+	  this.ShowPlayer3Key = new YDKJResource('Question/ShowPlayer3Key');
+	  this.Player3Answer = new YDKJResource('Question/Player3Answer');
+	  this.Player3AnswerLoop = new YDKJResource('Question/Player3AnswerLoop');
+	  this.Player3Correct = new YDKJResource('Question/Player3Correct');
+	  this.Player3Wrong = new YDKJResource('Question/Player3Wrong');
+	  this.Player3Cancel = new YDKJResource('Question/Player3Cancel');
+	  
+	  this.NumberAnswer1 = new YDKJResource('Question/NumberAnswer1');
+	  this.NumberAnswer2 = new YDKJResource('Question/NumberAnswer2');
+	  this.NumberAnswer3 = new YDKJResource('Question/NumberAnswer3');
+	  this.NumberAnswer4 = new YDKJResource('Question/NumberAnswer4');
+	  this.LoopAnswer1 = new YDKJResource('Question/LoopAnswer1');
+	  this.LoopAnswer2 = new YDKJResource('Question/LoopAnswer2');
+	  this.LoopAnswer3 = new YDKJResource('Question/LoopAnswer3');
+	  this.LoopAnswer4 = new YDKJResource('Question/LoopAnswer4');
+	  this.CorrectAnswer1 = new YDKJResource('Question/CorrectAnswer1');
+	  this.CorrectAnswer2 = new YDKJResource('Question/CorrectAnswer2');
+	  this.CorrectAnswer3 = new YDKJResource('Question/CorrectAnswer3');
+	  this.CorrectAnswer4 = new YDKJResource('Question/CorrectAnswer4');
+	  this.WrongAnswer1 = new YDKJResource('Question/WrongAnswer1');
+	  this.WrongAnswer2 = new YDKJResource('Question/WrongAnswer2');
+	  this.WrongAnswer3 = new YDKJResource('Question/WrongAnswer3');
+	  this.WrongAnswer4 = new YDKJResource('Question/WrongAnswer4');
     
     this.strjs = getYDKJFile('js','res/'+this.options.res+'/STR.js');
     
@@ -817,9 +861,9 @@ YDKJMode.prototype.start = function() {
 	  			'color':'#FC0',
 	  			'font-family':'JackRoman'
 	  		}).html(title).appendTo(div);
-	  			
+	  		
 	  		div.appendTo('#screen').animate({'width':'500px'},150);
-	    		
+	      
     		ShowCategoryNum++;
     	}
     });
@@ -875,6 +919,29 @@ YDKJMode.prototype.start = function() {
   }
   
   if (this.modename == 'Question') {
+    
+    this.Answers.ended(function(){
+      this.free();
+      thisMode.JingleReadQuestion.delay(function(){
+        thisMode.JingleReadQuestion.free();
+        thisMode.JingleTimer.playResource();
+      },100);
+    });
+    
+    this.Question.ended(function(){
+      this.free();
+      thisMode.JingleReadQuestion.delay(function(){
+        thisMode.Answers.playAnim();
+      },100);
+    });
+    
+    this.SFXShowQuestion.ended(function(){
+      this.delay(function(){
+        thisMode.JingleReadQuestion.playResource();
+        thisMode.Question.playAnim();
+      },300);
+    });
+    
   	this.TimerComesIn.ended(function(){
   		var div = jQuery('<div />').css({ // Titre de la catégorie
   			'position':'absolute',
@@ -910,6 +977,41 @@ YDKJMode.prototype.start = function() {
   			if (expandVal >= 1) {
   				clearInterval(expandInterval);
   				expandVal = 1;
+  				
+  				thisMode.PreQuestion.ended(function(){
+  				  this.free();
+  				  
+        		var div = jQuery('<div />').css({ // Texte de la question
+        			'position':'absolute',
+        			'height':'150px',
+        			'line-height':'150px',
+        			'left':'-560px',
+        			'top':'70px'
+        		});
+        		
+        		var textdiv = jQuery('<div />').css({
+        			'position':'relative',
+        			'width':'560px',
+        			'vertical-align':'middle',
+      				'display':'inline-block',
+        			'font-size':'36px',
+        			'line-height':'34px',
+        			'color':'#FFF',
+        			'font-family':'JackExtraCond',
+        			'font-style':'italic',
+        			'text-align':'center'
+        		}).html(thisMode.STR[1].str);
+        		
+        		textdiv.appendTo(div);
+        		
+        		div.appendTo('#screen').animate({'left':'40px'},300,function(){textdiv.css({'font-style':'normal'})});
+  		
+  				  thisMode.SFXShowQuestion.playResource();
+  				  
+  				  thisMode.ShowPlayer1Key.playResource();
+  				  thisMode.ShowPlayer2Key.playResource();
+  				  thisMode.ShowPlayer3Key.playResource();
+  				});
   			}
   			titlediv.css({
   				'left':(0-(150*(1-expandVal)))+'px',
@@ -919,14 +1021,25 @@ YDKJMode.prototype.start = function() {
 	    		'-o-transform':'scale('+expandVal+', 1.0)',
 	    		'transform':'scale('+expandVal+',1.0)',
   			});
-  		} 		
+  		}
   		expandInterval = setInterval(expand,66);
   		
   		div.appendTo('#screen');
+  		
+  		var valuediv = jQuery('<div />').css({ // Valeur de la question
+  			'position':'absolute',
+  			'text-align':'right',
+  			'font-size':'20px',
+  			'color':'#33F',
+  			'font-family':'JackRoman',
+  			'right':'-80px',
+  			'top':'22px'
+  		}).html(thisMode.value+' F').appendTo('#screen').animate({'right':'20px'}, 500).animate({'right':'15px'}, 200);
   	});
   	
-  	this.AnnounceValue.ended(function(){
+  	this.VoiceAnnounceValue.ended(function(){
   		this.free();
+  		thisMode.AnnounceValue.free();
   		jQuery('#screen #QuestionTitle').css('font-style','italic').delay(100).animate({'left':'-500px'},500,function(){
 	  		jQuery('#screen #QuestionTitle').remove();
 	  		thisMode.TimerComesIn.delay(function(){
@@ -934,16 +1047,21 @@ YDKJMode.prototype.start = function() {
 	  		},300);
   		});
   		thisMode.HideValue.playResource();
-  		thisMode.PreQuestion.playAnim();
+  		thisMode.VoiceAnnounceValue.delay(function(){
+  		  thisMode.PreQuestion.playAnim();
+  		},150);
   	});
+  	
   	this.QuestionTitle.ended(function(){
   		this.free();
-  		thisMode.AnnounceValue.playResource();
+  		thisMode.VoiceAnnounceValue.delay(function() {
+  		  this.playResource();
+  		},100);
   	});
   	
   	this.AnnounceCategory.ended(function(){
   		var textsize = 70;
-  		if (thisMode.STR[0].str.length < 20) textsize = 120;
+  		if (thisMode.STR[0].str.length < 15) textsize = 120;
   		
   		jQuery('<div />').attr('id','QuestionTitle').css({ // Titre de la catégorie
   			'color':'#FFF',
@@ -961,8 +1079,14 @@ YDKJMode.prototype.start = function() {
   			'font-size':textsize+'px',
   			'line-height':Math.round(textsize*1.10)+'px',
   			'opacity':'1'}
-  		,250);
-  		thisMode.QuestionTitle.playAnim();
+  		,250,function(){
+  		  thisMode.AnnounceValue.delay(function(){
+  		    this.playResource();
+  		  },150);
+  		});
+  		thisMode.AnnounceCategory.delay(function(){
+  		  thisMode.QuestionTitle.playAnim();
+  		},100);
   	});
   	
     this.JingleQuestion.ended(function(){

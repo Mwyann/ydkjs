@@ -268,7 +268,7 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
       }
       return val;
     }
-    return -1;
+    return val;
   }
   
   this.getFrameVal = function(frameid) {
@@ -281,7 +281,7 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
       }
       return val;
     }
-    return -1;
+    return val;
   }
   
   this.nextScreen = function() {
@@ -347,12 +347,8 @@ YDKJAnimation.prototype.playAnim = function() {
     var runanim = function() {
       //setTimeout(runanim,66);
       var val = thisAnim.addFrame(framenum);
-      if (val == -1) {framenum++; val = thisAnim.addFrame(framenum);}
-      if (val == -1) {framenum++; val = thisAnim.addFrame(framenum);}
-      if (val == -1) {framenum++; val = thisAnim.addFrame(framenum);}
-      if (val == -1) {framenum++; val = thisAnim.addFrame(framenum);}
-      
       if (((val & 4) == 0) || ((val & 8) != 0)) thisAnim.nextScreen();
+      if (((val & 32) != 0) && ((val & 8) != 0) && (thisAnim.animCallback)) thisAnim.animCallback();
       jQuery('#debuglive').html('frame '+framenum+'/'+(thisAnim.frames.length-1)+' ; val:'+val);
       framenum++;
       if ((framenum > framestop) || ((val & 16) != 0)) {
@@ -454,9 +450,13 @@ YDKJAnimation.prototype.setVolume = function(vol) {
   }
 }
 
+YDKJAnimation.prototype.setAnimCallback = function(callback) {
+  this.animCallback = callback;
+}
+
 jQuery(document).ready(function() {
   
-  anim = new YDKJAnimation('res/5QDemo/off4/11020.gif','res/5QDemo/off4/11020.js','',0,0);
+  anim = new YDKJAnimation('res/5QDemo/off4/14930.gif','res/5QDemo/off4/14930.js','',0,0);
   anim.ready(function() {
     var select = jQuery('<select onchange="playAnim(this);" />');
     var opt = jQuery('<option />').attr('value',0).html(0);
@@ -489,7 +489,7 @@ jQuery(document).ready(function() {
 
 function playAnim(t) {
   var jt = jQuery(t);
-  anim = new YDKJAnimation('res/5QDemo/off4/11020.gif','res/5QDemo/off4/11020.js','',jt.val(),0);
+  anim = new YDKJAnimation('res/5QDemo/off4/14930.gif','res/5QDemo/off4/14930.js','',jt.val(),0);
   anim.ended(function() {
     this.free();
   });
@@ -505,7 +505,7 @@ function playAnim(t) {
   <div id="screen" style="background-color:#000;position:relative;width:640px;height:480px;overflow:hidden;margin-left:auto;margin-right:auto;margin-top:30px"></div> <!-- Couleur #EEE pour l'intro -->
   <div id="debuglive" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;"><br/></div>
   <div id="debug" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;height:150px;overflow-y:scroll">
-    
+    <input type="text" onblur="playAnim(this);" />
 
   </div>
   <div id="tmpscreen" style="display:none"></div>
