@@ -24,19 +24,15 @@ font-family:"JackRoman";
 src: url("fonts/JAr_____.TTF") format('truetype') /* TTF file for CSS3 browsers */
 }
 
-/*
-.verticalcenter {
-  height:200px;
-  line-height:200px;
+span, div {
+  cursor:default;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
-
-.verticalcenter span { 
-  width:100px;
-  vertical-align:middle;
-  display:inline-block;
-  line-height:normal;
-}
-*/
 
 </style>
 <script src="demo-res.js" type="text/javascript"></script>
@@ -109,6 +105,8 @@ function waitForAudio(selector,callback) {
 /********** YDKJFile **********/
 
 var preloadpool = new Array();
+var preloadfifo = new Array();
+var preloadprocesses = 0;
 var fileID = 0;
 function YDKJFile(filetype,url) {
   this.id = fileID++;
@@ -119,29 +117,41 @@ function YDKJFile(filetype,url) {
   this.preloaded = 0;
   this.readyFunctions = [];
   
+  if (preloadprocesses < 2) {
+    preloadprocesses++;
+    this.preload();
+  } else preloadfifo.push(this);
+}
+
+YDKJFile.prototype.preload = function(f) {
   var thisFile = this;
   var preload = jQuery('#preload');
   
   var isready = function() {
     thisFile.preloaded = 1;
+    
+    var nextfile = preloadfifo.shift();
+    if (nextfile) nextfile.preload(); else preloadprocesses--;
+    
     for(var i = 0; i < thisFile.readyFunctions.length; i++) {
       thisFile.readyFunctions[i].call(thisFile);
     }
   }
   
-  if (filetype == 'gif') {
+  if (this.filetype == 'gif') {
     this.res = preload.append('<img />').children().last().attr('id','file'+this.id).attr('src',this.url)
     this.res.imagesLoaded(isready);
   }
   
-  if (filetype == 'js') {
+  if (this.filetype == 'js') {
     jQuery.ajax({
       url: this.url,
       type: 'get',
       dataType: 'text',
       success: function(html, status, xhr) {
-        //eval(html);
-        thisFile.res = html;
+        var res = new Array();
+        eval(html);
+        thisFile.res = res;
         isready();
       },
       error: function (xhr, ajaxOptions, thrownError){
@@ -150,7 +160,7 @@ function YDKJFile(filetype,url) {
     });
   }
   
-  if (filetype == 'audio') {
+  if (this.filetype == 'audio') {
     this.res = preload.append('<audio />').children().last().attr('id','file'+this.id);
     var a = this.res.get(0);
     if (a.canPlayType('audio/ogg')) this.res.append('<source />').children().last().attr('type','audio/ogg').attr('src',this.url+'.ogg');
@@ -248,9 +258,8 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
   
   var jsready = function() {
     if (thisAnim.js) {
-      eval(thisAnim.js.res);
-      thisAnim.tiles = tiles;
-      thisAnim.frames = frames;
+      thisAnim.tiles = thisAnim.js.res['tiles'];
+      thisAnim.frames = thisAnim.js.res['frames'];
     }
     if (thisAnim.audio) thisAnim.audio.ready(audioready); else audioready();
   }
@@ -594,6 +603,36 @@ function unbindKeyListener(listener) {
   jQuery(window).unbind('keypress',listener);
 }
 
+/********** Animation de transformation **********/
+
+function animTransform(elem,fromx,tox,fromy,toy,speed,w,h,callback) {
+	var expandInterval = 0;
+	var expandValX = fromx;
+	var expandValY = fromy;
+	var expand = function() {
+		expandValX += (tox-fromx)*speed;
+		expandValY += (toy-fromy)*speed;
+		
+		if (tox > fromx) {if (expandValX >= tox) expandValX = tox;} else {if (expandValX <= tox) expandValX = tox;}
+		if (toy > fromy) {if (expandValY >= toy) expandValY = toy;} else {if (expandValY <= toy) expandValY = toy;}
+		
+		if ((expandValX == tox) && (expandValY == toy)) {
+			clearInterval(expandInterval);
+			if (callback) callback();
+		}
+	  
+		elem.css({
+			'left':(0-((w/2)*(1-expandValX)))+'px',
+			'top':(0-((h/2)*(1-expandValY)))+'px',
+			'-webkit-transform':'scale('+expandValX+', '+expandValY+')',
+  		'-moz-transform':'scale('+expandValX+', '+expandValY+')',
+  		'-ms-transform':'scale('+expandValX+', '+expandValY+')',
+  		'-o-transform':'scale('+expandValX+', '+expandValY+')',
+  		'transform':'scale('+expandValX+', '+expandValY+')',
+		});
+	}
+	expandInterval = setInterval(expand,66);
+}
 
 /********** YDKJMode **********/
 
@@ -642,9 +681,9 @@ function YDKJMode(game, modename, options) {
     
     // Précharger les questions avec l'interface de catégorie
     this.questiontitles = ['Keuf you !', 'Ma meilleure boum', 'C’est dur vraiment plus longtemps'];
-    this.question1 = new YDKJMode(this.game, 'Question', {res:'QFold1/ABB'}); // Preload des questions suivantes
-    this.question2 = new YDKJMode(this.game, 'Question', {res:'QFold1/ABE'});
-    this.question3 = new YDKJMode(this.game, 'Question', {res:'QFold1/AJM'});
+    this.question1 = new YDKJMode(this.game, 'Question', {res:'QFold1/ABB', correctanswer:3}); // Preload des questions suivantes
+    this.question2 = new YDKJMode(this.game, 'Question', {res:'QFold1/ABE', correctanswer:3});
+    this.question3 = new YDKJMode(this.game, 'Question', {res:'QFold1/AJM', correctanswer:4});
   }
   
   if (this.modename == 'Question') {
@@ -658,13 +697,22 @@ function YDKJMode(game, modename, options) {
     this.VoiceAnnounceValue = new YDKJResource('Question/VoiceAnnounceValue'+this.value+'F');
     this.HideValue = new YDKJResource('Question/HideValue2000F');
     this.TimerComesIn = new YDKJResource('Question/TimerComesIn1'); // 1 ou 2 au hasard ? Ou spécifique à un type de question ?
+    this.PrepareTimer = new YDKJResource('Question/PrepareTimer');
     this.SFXShowQuestion = new YDKJResource('Question/SFXShowQuestion');
     this.JingleReadQuestion = new YDKJResource('Question/JingleReadQuestion');
     this.JingleTimer = new YDKJResource('Question/JingleTimer');
+    this.SFXPlayerBuzz = new YDKJResource('Question/SFXPlayerBuzz');
+    this.SFXPlayerKey = new YDKJResource('Question/SFXPlayerKey');
+    this.SFXPlayerWrong1 = new YDKJResource('Question/SFXPlayerWrong1'); // On efface la réponse
+    this.SFXPlayerWrong2 = new YDKJResource('Question/SFXPlayerWrong2'); // On fait tomber le joueur
+    this.SFXPlayerCorrect = new YDKJResource('Question/SFXPlayerCorrect');
+    if (this.game.players.length == 3) this.DefaultRevealAnswer = new YDKJResource('Question/DefaultRevealLastAnswer');
+    else this.DefaultRevealAnswer = new YDKJResource('Question/DefaultRevealAnswer');
     
     this.ShowPlayer1Key = new YDKJResource('Question/ShowPlayer1Key');
 	  this.Player1Answer = new YDKJResource('Question/Player1Answer');
 	  this.Player1AnswerLoop = new YDKJResource('Question/Player1AnswerLoop');
+    this.PlayerBuzzedPlayer1 = new YDKJResource('Question/PlayerBuzzedPlayer1');
 	  this.Player1Correct = new YDKJResource('Question/Player1Correct');
 	  this.Player1Wrong = new YDKJResource('Question/Player1Wrong');
 	  this.Player1Cancel = new YDKJResource('Question/Player1Cancel');
@@ -672,6 +720,7 @@ function YDKJMode(game, modename, options) {
 	  this.ShowPlayer2Key = new YDKJResource('Question/ShowPlayer2Key');
 	  this.Player2Answer = new YDKJResource('Question/Player2Answer');
 	  this.Player2AnswerLoop = new YDKJResource('Question/Player2AnswerLoop');
+    this.PlayerBuzzedPlayer2 = new YDKJResource('Question/PlayerBuzzedPlayer2');
 	  this.Player2Correct = new YDKJResource('Question/Player2Correct');
 	  this.Player2Wrong = new YDKJResource('Question/Player2Wrong');
 	  this.Player2Cancel = new YDKJResource('Question/Player2Cancel');
@@ -679,6 +728,7 @@ function YDKJMode(game, modename, options) {
 	  this.ShowPlayer3Key = new YDKJResource('Question/ShowPlayer3Key');
 	  this.Player3Answer = new YDKJResource('Question/Player3Answer');
 	  this.Player3AnswerLoop = new YDKJResource('Question/Player3AnswerLoop');
+    this.PlayerBuzzedPlayer3 = new YDKJResource('Question/PlayerBuzzedPlayer3');
 	  this.Player3Correct = new YDKJResource('Question/Player3Correct');
 	  this.Player3Wrong = new YDKJResource('Question/Player3Wrong');
 	  this.Player3Cancel = new YDKJResource('Question/Player3Cancel');
@@ -700,7 +750,15 @@ function YDKJMode(game, modename, options) {
 	  this.WrongAnswer3 = new YDKJResource('Question/WrongAnswer3');
 	  this.WrongAnswer4 = new YDKJResource('Question/WrongAnswer4');
     
+    this.LastPlayer1 = new YDKJResource('Question/LastPlayer1');
+		this.LastPlayer2 = new YDKJResource('Question/LastPlayer2');
+		this.LastPlayer3 = new YDKJResource('Question/LastPlayer3');
+		this.LastPlayers12 = new YDKJResource('Question/LastPlayers12');
+		this.LastPlayers13 = new YDKJResource('Question/LastPlayers13');
+		this.LastPlayers23 = new YDKJResource('Question/LastPlayers23');
+    
     this.strjs = getYDKJFile('js','res/'+this.options.res+'/STR.js');
+    this.correctanswer = this.options.correctanswer;
     
     this.QuestionTitle = new YDKJAnimation('','','res/'+this.options.res+'/snd/1');
     this.PreQuestion = new YDKJAnimation('','','res/'+this.options.res+'/snd/2');
@@ -826,11 +884,11 @@ YDKJMode.prototype.start = function() {
     this.ShowCategories.ended(function(){
       thisMode.SFXChoiceCategory.delay(function(){
         this.playResource();
-        thisMode.ShowCategories.free();
         thisMode.ChooseCategoryText.playResource();
         thisMode.LoopCategory1.playResource();
         thisMode.LoopCategory2.playResource();
         thisMode.LoopCategory3.playResource();
+        thisMode.ShowCategories.free();
       },300);
     });
 
@@ -920,6 +978,157 @@ YDKJMode.prototype.start = function() {
   
   if (this.modename == 'Question') {
     
+    thisMode.SFXPlayerWrong2.ended(function(){
+      thisMode.JingleTimer.delay(function(){
+        thisMode.availPlayers[thisMode.currentPlayer] = 0;
+        thisMode.availAnswers[thisMode.currentAns] = 0;
+        thisMode.currentPlayer = 0;
+        thisMode.currentAns = 0;
+        
+        if (thisMode.availPlayers[1]) {
+          if (thisMode.availPlayers[2]) thisMode.LastPlayers = thisMode.LastPlayers12;
+          else if (thisMode.availPlayers[3]) thisMode.LastPlayers = thisMode.LastPlayers13;
+          else thisMode.LastPlayers = thisMode.LastPlayer1;
+        } else if (thisMode.availPlayers[2]) {
+          if (thisMode.availPlayers[3]) thisMode.LastPlayers = thisMode.LastPlayers23;
+          else thisMode.LastPlayers = thisMode.LastPlayer2;
+        } else if (thisMode.availPlayers[3]) {
+          thisMode.LastPlayers = thisMode.LastPlayer3;
+        } else {
+          // Plus aucun joueur
+          thisMode.LastPlayers = 0;
+          unbindKeyListener(thisMode.listener);
+          thisMode.DefaultRevealAnswer.playResource();
+        }
+        
+        if (thisMode.LastPlayers)  {
+          this.playResource();
+          thisMode.LastPlayers.playResource();
+        }
+      },200);
+    });
+    
+    var wrong1 = function(){
+      thisMode.SFXPlayerWrong2.delay(function() {
+        switch (thisMode.currentPlayer) {
+          case 1:
+            thisMode.Player1Wrong.playResource();
+            thisMode.Player1AnswerLoop.free();
+          break;
+          case 2:
+            thisMode.Player2Wrong.playResource();
+            thisMode.Player2AnswerLoop.free();
+          break;
+          case 3:
+            thisMode.Player3Wrong.playResource();
+            thisMode.Player3AnswerLoop.free();
+          break;
+        }
+        this.playResource();
+      },100);
+    }
+    
+    thisMode.WrongAnswer1.ended(wrong1);
+    thisMode.WrongAnswer2.ended(wrong1);
+    thisMode.WrongAnswer3.ended(wrong1);
+    thisMode.WrongAnswer4.ended(wrong1);
+
+    var checkAnswer = function(){
+      if (thisMode.currentAns != thisMode.correctanswer) { // Mauvaise réponse
+        switch(thisMode.currentAns){
+          case 1:
+            thisMode.WrongAnswer1.playResource();
+            thisMode.LoopAnswer1.free();
+          break;
+          case 2:
+            thisMode.WrongAnswer2.playResource();
+            thisMode.LoopAnswer2.free();
+          break;
+          case 3:
+            thisMode.WrongAnswer3.playResource();
+            thisMode.LoopAnswer3.free();
+          break;
+          case 4:
+            thisMode.WrongAnswer4.playResource();
+            thisMode.LoopAnswer4.free();
+          break;
+        }
+        animTransform(thisMode.availAnswers[thisMode.currentAns],1,0,1,1,0.18,thisMode.availAnswers[thisMode.currentAns].width(),0);
+        thisMode.SFXPlayerWrong1.playResource();
+      } else { // Bonne réponse
+        switch(thisMode.currentAns){
+          case 1:
+            thisMode.CorrectAnswer1.playResource();
+            thisMode.LoopAnswer1.free();
+          break;
+          case 2:
+            thisMode.CorrectAnswer2.playResource();
+            thisMode.LoopAnswer2.free();
+          break;
+          case 3:
+            thisMode.CorrectAnswer3.playResource();
+            thisMode.LoopAnswer3.free();
+          break;
+          case 4:
+            thisMode.CorrectAnswer4.playResource();
+            thisMode.LoopAnswer4.free();
+          break;
+        }
+        switch (thisMode.currentPlayer) {
+          case 1:
+            thisMode.Player1Correct.playResource();
+            thisMode.Player1AnswerLoop.free();
+          break;
+          case 2:
+            thisMode.Player2Correct.playResource();
+            thisMode.Player2AnswerLoop.free();
+          break;
+          case 3:
+            thisMode.Player3Correct.playResource();
+            thisMode.Player3AnswerLoop.free();
+          break;
+        }
+        thisMode.SFXPlayerCorrect.playResource();
+        unbindKeyListener(thisMode.listener);
+      }
+    };
+    
+    this.Answer1.ended(checkAnswer);
+    this.Answer2.ended(checkAnswer);
+    this.Answer3.ended(checkAnswer);
+    this.Answer4.ended(checkAnswer);
+    
+    this.Player1Answer.ended(function(){
+      thisMode.Player1AnswerLoop.playResource();
+      this.free();
+    });
+    this.Player2Answer.ended(function(){
+      thisMode.Player2AnswerLoop.playResource();
+      this.free();
+    });
+    this.Player3Answer.ended(function(){
+      thisMode.Player3AnswerLoop.playResource();
+      this.free();
+    });
+    
+    this.SFXPlayerBuzz.ended(function(){
+      this.delay(function(){
+        // Remise du compteur à 10
+        thisMode.JingleTimer.playResource();
+        
+        // Vas-y joueur X
+        if (thisMode.currentPlayer == 1) {
+          thisMode.PlayerBuzzedPlayer1.playResource();
+        }
+        if (thisMode.currentPlayer == 2) {
+          thisMode.PlayerBuzzedPlayer2.playResource();
+        }
+        if (thisMode.currentPlayer == 3) {
+          thisMode.PlayerBuzzedPlayer3.playResource();
+        }
+      },150);
+    });
+    
     this.Answers.ended(function(){
       this.free();
       thisMode.JingleReadQuestion.delay(function(){
@@ -935,11 +1144,207 @@ YDKJMode.prototype.start = function() {
       },100);
     });
     
+    thisMode.PrepareTimer.ended(function(){
+      this.delay(function(){
+        thisMode.NumberAnswer1.playResource();
+        thisMode.NumberAnswer2.playResource();
+        thisMode.NumberAnswer3.playResource();
+        thisMode.NumberAnswer4.playResource();
+        
+        var div1 = jQuery('<div />').css({ // Réponse 1
+    			'position':'absolute',
+    			'left':'138px',
+    			'top':'223px',
+    			'width':'500px'
+    		}).appendTo('#screen');
+        var ans1 = jQuery('<div />').css({
+    			'position':'absolute',
+    			'left':'150px',
+    			'font-size':'26px',
+    			'color':'#FC0',
+    			'font-family':'JackCondensed',
+  				'-webkit-transform':'scale(1.0, 0.0)',
+      		'-moz-transform':'scale(1.0, 0.0)',
+      		'-ms-transform':'scale(1.0, 0.0)',
+      		'-o-transform':'scale(1.0, 0.0)',
+      		'transform':'scale(1.0, 0.0)',
+    		}).html(thisMode.STR[2].str).appendTo(div1);
+        animTransform(ans1,1,1,0,1,0.10,0,26);
+        
+        var div2 = jQuery('<div />').css({ // Réponse 2
+    			'position':'absolute',
+    			'left':'138px',
+    			'top':'255px',
+    			'width':'500px'
+    		}).appendTo('#screen');
+        var ans2 = jQuery('<div />').css({
+    			'position':'absolute',
+    			'left':'150px',
+    			'font-size':'26px',
+    			'color':'#FC0',
+    			'font-family':'JackCondensed',
+  				'-webkit-transform':'scale(1.0, 0.0)',
+      		'-moz-transform':'scale(1.0, 0.0)',
+      		'-ms-transform':'scale(1.0, 0.0)',
+      		'-o-transform':'scale(1.0, 0.0)',
+      		'transform':'scale(1.0, 0.0)',
+    		}).html(thisMode.STR[3].str).appendTo(div2);
+        animTransform(ans2,1,1,0,1,0.10,0,26);
+        
+        var div3 = jQuery('<div />').css({ // Réponse 3
+    			'position':'absolute',
+    			'left':'138px',
+    			'top':'286px',
+    			'width':'500px'
+    		}).appendTo('#screen');
+        var ans3 = jQuery('<div />').css({
+    			'position':'absolute',
+    			'left':'150px',
+    			'font-size':'26px',
+    			'color':'#FC0',
+    			'font-family':'JackCondensed',
+  				'-webkit-transform':'scale(1.0, 0.0)',
+      		'-moz-transform':'scale(1.0, 0.0)',
+      		'-ms-transform':'scale(1.0, 0.0)',
+      		'-o-transform':'scale(1.0, 0.0)',
+      		'transform':'scale(1.0, 0.0)',
+    		}).html(thisMode.STR[4].str).appendTo(div3);
+        animTransform(ans3,1,1,0,1,0.10,0,26);
+        
+        var div4 = jQuery('<div />').css({ // Réponse 4
+    			'position':'absolute',
+    			'left':'138px',
+    			'top':'318px',
+    			'width':'500px'
+    		}).appendTo('#screen');
+        var ans4 = jQuery('<div />').css({
+    			'position':'absolute',
+    			'left':'150px',
+    			'font-size':'26px',
+    			'color':'#FC0',
+    			'font-family':'JackCondensed',
+  				'-webkit-transform':'scale(1.0, 0.0)',
+      		'-moz-transform':'scale(1.0, 0.0)',
+      		'-ms-transform':'scale(1.0, 0.0)',
+      		'-o-transform':'scale(1.0, 0.0)',
+      		'transform':'scale(1.0, 0.0)',
+    		}).html(thisMode.STR[5].str).appendTo(div4);
+        animTransform(ans4,1,1,0,1,0.10,0,26);
+        
+        thisMode.availAnswers = new Array();
+        thisMode.availAnswers[1] = ans1;
+        thisMode.availAnswers[2] = ans2;
+        thisMode.availAnswers[3] = ans3;
+        thisMode.availAnswers[4] = ans4;
+        thisMode.availPlayers = new Array();
+        thisMode.availPlayers[1] = 1;
+        thisMode.availPlayers[2] = 1;
+        thisMode.availPlayers[3] = 1;
+        
+        thisMode.currentPlayer = 0;
+        thisMode.currentAns = 0;
+        thisMode.listener = bindKeyListener(function(choice) {
+          if (thisMode.currentPlayer == 0) {
+            if (choice == 113) thisMode.currentPlayer = 1; // Joueur 1
+            if (choice == 98) thisMode.currentPlayer = 2; // Joueur 2
+            if (choice == 112) thisMode.currentPlayer = 3; // Joueur 3
+            if (!thisMode.availPlayers[thisMode.currentPlayer]) thisMode.currentPlayer = 0;
+            
+            // Si réponses 1 à 4 : 1 seul joueur = réponse directe, 2 ou 3 joueurs : "On appuie d'abord sur la lettre !"
+            
+            if (thisMode.currentPlayer) {
+              thisMode.Question.free();
+              thisMode.Answers.free();
+              thisMode.JingleReadQuestion.free();
+              if (thisMode.LastPlayers) thisMode.LastPlayers.free();
+              thisMode.JingleTimer.stopResource();
+              thisMode.SFXPlayerBuzz.playResource();
+              switch (thisMode.currentPlayer) {
+                case 1:
+                  thisMode.ShowPlayer1Key.free();
+                  thisMode.Player1Answer.playResource();
+                break;
+                case 2:
+                  thisMode.ShowPlayer2Key.free();
+                  thisMode.Player2Answer.playResource();
+                break;
+                case 3:
+                  thisMode.ShowPlayer3Key.free();
+                  thisMode.Player3Answer.playResource();
+                break;
+              }
+            }
+          } else if (thisMode.currentAns == 0) { // Réponse d'un joueur
+            if (choice == 49) thisMode.currentAns = 1;
+            if (choice == 50) thisMode.currentAns = 2;
+            if (choice == 51) thisMode.currentAns = 3;
+            if (choice == 52) thisMode.currentAns = 4;
+            if (!thisMode.availAnswers[thisMode.currentAns]) thisMode.currentAns = 0;
+            
+            if (thisMode.currentAns) {
+              thisMode.SFXPlayerKey.ended(function(){
+                this.delay(function(){
+                  thisMode.SFXPlayerKey = new YDKJResource('Question/SFXPlayerKey');
+                  this.free();
+                  switch(thisMode.currentAns){
+                    case 1:
+                      thisMode.Answer1.playAnim();
+                    break;
+                    case 2:
+                      thisMode.Answer2.playAnim();
+                    break;
+                    case 3:
+                      thisMode.Answer3.playAnim();
+                    break;
+                    case 4:
+                      thisMode.Answer4.playAnim();
+                    break;
+                  }
+                },150);
+              });
+              switch (thisMode.currentPlayer) {
+                case 1:
+                  thisMode.PlayerBuzzedPlayer1.free();
+                break;
+                case 2:
+                  thisMode.PlayerBuzzedPlayer2.free();
+                break;
+                case 3:
+                  thisMode.PlayerBuzzedPlayer3.free();
+                break;
+              }
+              switch(thisMode.currentAns){
+                case 1:
+                  thisMode.NumberAnswer1.free();
+                  thisMode.LoopAnswer1.playResource();
+                break;
+                case 2:
+                  thisMode.NumberAnswer2.free();
+                  thisMode.LoopAnswer2.playResource();
+                break;
+                case 3:
+                  thisMode.NumberAnswer3.free();
+                  thisMode.LoopAnswer3.playResource();
+                break;
+                case 4:
+                  thisMode.NumberAnswer4.free();
+                  thisMode.LoopAnswer4.playResource();
+                break;
+              }
+              thisMode.JingleTimer.stopResource();
+              thisMode.SFXPlayerKey.playResource();
+            }
+          }
+        });
+        
+      },1000);
+    });
+    
     this.SFXShowQuestion.ended(function(){
       this.delay(function(){
-        thisMode.JingleReadQuestion.playResource();
-        thisMode.Question.playAnim();
-      },300);
+        thisMode.TimerComesIn.free();
+        thisMode.PrepareTimer.playResource();
+      },500);
     });
     
   	this.TimerComesIn.ended(function(){
@@ -966,65 +1371,56 @@ YDKJMode.prototype.start = function() {
     		'-ms-transform':'scale(0.0, 1.0)',
     		'-o-transform':'scale(0.0, 1.0)',
     		'transform':'scale(0.0,1.0)',
-  		}).html(thisMode.STR[0].str);
-  		
-  		titlediv.appendTo(div);
-  		
-  		var expandInterval = 0;
-  		var expandVal = 0.0;
-  		var expand = function() {
-  			expandVal += 0.15;
-  			if (expandVal >= 1) {
-  				clearInterval(expandInterval);
-  				expandVal = 1;
-  				
-  				thisMode.PreQuestion.ended(function(){
-  				  this.free();
-  				  
-        		var div = jQuery('<div />').css({ // Texte de la question
-        			'position':'absolute',
-        			'height':'150px',
-        			'line-height':'150px',
-        			'left':'-560px',
-        			'top':'70px'
-        		});
-        		
-        		var textdiv = jQuery('<div />').css({
-        			'position':'relative',
-        			'width':'560px',
-        			'vertical-align':'middle',
-      				'display':'inline-block',
-        			'font-size':'36px',
-        			'line-height':'34px',
-        			'color':'#FFF',
-        			'font-family':'JackExtraCond',
-        			'font-style':'italic',
-        			'text-align':'center'
-        		}).html(thisMode.STR[1].str);
-        		
-        		textdiv.appendTo(div);
-        		
-        		div.appendTo('#screen').animate({'left':'40px'},300,function(){textdiv.css({'font-style':'normal'})});
-  		
-  				  thisMode.SFXShowQuestion.playResource();
-  				  
-  				  thisMode.ShowPlayer1Key.playResource();
-  				  thisMode.ShowPlayer2Key.playResource();
-  				  thisMode.ShowPlayer3Key.playResource();
-  				});
-  			}
-  			titlediv.css({
-  				'left':(0-(150*(1-expandVal)))+'px',
-					'-webkit-transform':'scale('+expandVal+',1.0)',
-	    		'-moz-transform':'scale('+expandVal+', 1.0)',
-	    		'-ms-transform':'scale('+expandVal+', 1.0)',
-	    		'-o-transform':'scale('+expandVal+', 1.0)',
-	    		'transform':'scale('+expandVal+',1.0)',
-  			});
-  		}
-  		expandInterval = setInterval(expand,66);
+  		}).html(thisMode.STR[0].str).appendTo(div);
   		
   		div.appendTo('#screen');
+  		
+  		animTransform(titlediv,0,1,1,1,0.15,300,0,function(){
+  		  thisMode.PreQuestion.ended(function(){
+				  this.free();
+				  
+      		var div = jQuery('<div />').css({ // Texte de la question
+      			'position':'absolute',
+      			'height':'150px',
+      			'line-height':'150px',
+      			'left':'-560px',
+      			'top':'70px'
+      		});
+      		
+      		var textdiv = jQuery('<div />').css({
+      			'position':'relative',
+      			'width':'560px',
+      			'vertical-align':'middle',
+    				'display':'inline-block',
+      			'font-size':'36px',
+      			'line-height':'34px',
+      			'color':'#FFF',
+      			'font-family':'JackExtraCond',
+      			'font-style':'italic',
+      			'text-align':'center'
+      		}).html(thisMode.STR[1].str);
+      		
+      		textdiv.appendTo(div);
+      		
+      		div.appendTo('#screen').animate({'left':'40px'},300,function(){textdiv.css({'font-style':'normal'})});
+		
+          thisMode.SFXShowQuestion.playResource();
+          thisMode.JingleReadQuestion.playResource();
+          thisMode.JingleReadQuestion.delay(function() {
+            thisMode.Question.playAnim();
+          },300);
+				});
+				
+				thisMode.ShowPlayer1Key.delay(function(){
+  				this.playResource();
+  			  thisMode.ShowPlayer2Key.delay(function(){
+  			    this.playResource();
+  			    thisMode.ShowPlayer3Key.delay(function(){
+  			      this.playResource();
+            },100);
+  			  },100);
+  			},200);
+  		});
   		
   		var valuediv = jQuery('<div />').css({ // Valeur de la question
   			'position':'absolute',
@@ -1099,8 +1495,7 @@ YDKJMode.prototype.start = function() {
     
     jQuery('#screen').css('background-color','#000').html(''); // Je vide manuellement l'écran.
     this.strjs.ready(function(){
-    	eval(thisMode.strjs.res);
-    	thisMode.STR = STR;
+    	thisMode.STR = thisMode.strjs.res['STR'];
     	thisMode.JingleQuestion.playResource();
   	});
   }
@@ -1131,7 +1526,7 @@ function YDKJGame() {
 YDKJGame.prototype.start = function() {
   var gamemode = new YDKJMode(this, 'Intro');
   //var gamemode = new YDKJMode(this, 'Category');
-  //var gamemode = new YDKJMode(this, 'Question', {res:'QFold1/AJM'});
+  //var gamemode = new YDKJMode(this, 'Question', {res:'QFold1/AJM',correctanswer:4});
   gamemode.start();
 }
 

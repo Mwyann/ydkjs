@@ -72,6 +72,8 @@ function waitForAudio(selector,callback) {
 /********** YDKJFile **********/
 
 var preloadpool = new Array();
+var preloadfifo = new Array();
+var preloadprocesses = 0;
 var fileID = 0;
 function YDKJFile(filetype,url) {
   this.id = fileID++;
@@ -82,29 +84,41 @@ function YDKJFile(filetype,url) {
   this.preloaded = 0;
   this.readyFunctions = [];
   
+  if (preloadprocesses < 2) {
+    preloadprocesses++;
+    this.preload();
+  } else preloadfifo.push(this);
+}
+
+YDKJFile.prototype.preload = function(f) {
   var thisFile = this;
   var preload = jQuery('#preload');
   
   var isready = function() {
     thisFile.preloaded = 1;
+    
+    var nextfile = preloadfifo.shift();
+    if (nextfile) setTimeout(function(){nextfile.preload()},80); else preloadprocesses--;
+    
     for(var i = 0; i < thisFile.readyFunctions.length; i++) {
       thisFile.readyFunctions[i].call(thisFile);
     }
   }
   
-  if (filetype == 'gif') {
+  if (this.filetype == 'gif') {
     this.res = preload.append('<img />').children().last().attr('id','file'+this.id).attr('src',this.url)
     this.res.imagesLoaded(isready);
   }
   
-  if (filetype == 'js') {
+  if (this.filetype == 'js') {
     jQuery.ajax({
       url: this.url,
       type: 'get',
       dataType: 'text',
       success: function(html, status, xhr) {
-        //eval(html);
-        thisFile.res = html;
+        var res = new Array();
+        eval(html);
+        thisFile.res = res;
         isready();
       },
       error: function (xhr, ajaxOptions, thrownError){
@@ -113,7 +127,7 @@ function YDKJFile(filetype,url) {
     });
   }
   
-  if (filetype == 'audio') {
+  if (this.filetype == 'audio') {
     this.res = preload.append('<audio />').children().last().attr('id','file'+this.id);
     var a = this.res.get(0);
     if (a.canPlayType('audio/ogg')) this.res.append('<source />').children().last().attr('type','audio/ogg').attr('src',this.url+'.ogg');
@@ -211,9 +225,8 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
   
   var jsready = function() {
     if (thisAnim.js) {
-      eval(thisAnim.js.res);
-      thisAnim.tiles = tiles;
-      thisAnim.frames = frames;
+      thisAnim.tiles = thisAnim.js.res['tiles'];
+      thisAnim.frames = thisAnim.js.res['frames'];
     }
     if (thisAnim.audio) thisAnim.audio.ready(audioready); else audioready();
   }
@@ -456,7 +469,7 @@ YDKJAnimation.prototype.setAnimCallback = function(callback) {
 
 jQuery(document).ready(function() {
   
-  anim = new YDKJAnimation('res/5QDemo/off4/14930.gif','res/5QDemo/off4/14930.js','',0,0);
+  anim = new YDKJAnimation('res/5QDemo/off4/8018.gif','res/5QDemo/off4/8018.js','',0,0);
   anim.ready(function() {
     var select = jQuery('<select onchange="playAnim(this);" />');
     var opt = jQuery('<option />').attr('value',0).html(0);
@@ -489,7 +502,7 @@ jQuery(document).ready(function() {
 
 function playAnim(t) {
   var jt = jQuery(t);
-  anim = new YDKJAnimation('res/5QDemo/off4/14930.gif','res/5QDemo/off4/14930.js','',jt.val(),0);
+  anim = new YDKJAnimation('res/5QDemo/off4/8018.gif','res/5QDemo/off4/8018.js','',jt.val(),0);
   anim.ended(function() {
     this.free();
   });

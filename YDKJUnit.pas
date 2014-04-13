@@ -293,7 +293,7 @@ begin
   pic.Bitmap.Canvas.Brush.Color:=$FF80FF; // Remplir l'image de la couleur transparente
   pic.Bitmap.Canvas.FillRect(pic.Bitmap.Canvas.ClipRect);
 
-  js:=js+'var tiles=new Array();';
+  js:=js+'res[''tiles'']=new Array();';
   realx:=0;
   realy:=0;
   for off4pos:=0 to si^.nbimages-1 do begin
@@ -302,7 +302,7 @@ begin
     h:=si^.images[off4pos].height;
     blockread(SRFhandler,graphic,307200,graphlen);
     decodeImageBuffer(graphic,picture,w*h);
-    js:=js+'tiles['+inttostr(off4pos)+']={x:'+inttostr(realx)+',y:'+inttostr(realy)+',w:'+inttostr(w)+',h:'+inttostr(h)+'};';
+    js:=js+'res[''tiles'']['+inttostr(off4pos)+']={x:'+inttostr(realx)+',y:'+inttostr(realy)+',w:'+inttostr(w)+',h:'+inttostr(h)+'};';
     x:=0;
     y:=0;
     pos:=0;
@@ -349,7 +349,7 @@ begin
 
   // Add frames to JS
 
-  js:=js+#13#10'var frames=[';
+  js:=js+#13#10'res[''frames'']=[';
   for i:=0 to si^.nbframes-1 do begin
     js:=js+'{nbimg:'+inttostr(si^.frames[i].nbimages);
     if (si^.frames[i].nbimages > 0) then begin
@@ -581,11 +581,13 @@ begin
   if (ord(c) = $D5) then result:=chr($E2)+chr($80)+chr($99) // ’
   else if (ord(c) = $7B) then result:=chr($C2)+chr($A0) // Espace insécable
   else if (ord(c) = $88) then result:=chr($C3)+chr($A0) // à
+  else if (ord(c) = $89) then result:=chr($C3)+chr($A2) // â
   else if (ord(c) = $8E) then result:=chr($C3)+chr($A9) // é
   else if (ord(c) = $8F) then result:=chr($C3)+chr($A8) // è
   else if (ord(c) = $90) then result:=chr($C3)+chr($AA) // ê
   else if (ord(c) = $9D) then result:=chr($C3)+chr($B9) // ù
   else if (ord(c) = $AA) then result:=chr($E2)+chr($84)+chr($A2) // ™
+  else if (ord(c) = $C9) then result:=chr($E2)+chr($80)+chr($A6) // …
   else result:=c;
 end;
 
@@ -612,7 +614,7 @@ var f:system.text;
 begin
   assignfile(f,filename+'.js');
   rewrite(f);
-  writeln(f,'var string='''+readString(ssf)+''';');
+  writeln(f,'res[''string'']='''+readString(ssf)+'''};');
   closefile(f);
 end;
 
@@ -628,7 +630,7 @@ begin
   assignfile(f,filename+'.js');
   rewrite(f);
 
-  js:='var stringlist=[';
+  js:='res[''stringlist'']=[';
   seek(SRFhandler,ssf.fileoffset);
   blockread(SRFhandler,data,ssf.filesize);
   s:='';

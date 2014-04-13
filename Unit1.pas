@@ -204,7 +204,7 @@ begin
     fullname:=fullname+'\STR.js';
     assignfile(f,fullname);
     rewrite(f);
-    write(f,'var STR = ['+strings+'];');
+    write(f,'res[''STR'']=['+strings+'];');
     closefile(f);
   end;
 
