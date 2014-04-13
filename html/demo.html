@@ -932,6 +932,41 @@ YDKJMode.prototype.start = function() {
       },100);
     });
     
+    this.ChooseCategoryText.ended(function(){
+      jQuery('<div />').css({
+        'position':'absolute',
+        'width':'320px',
+        'left':'270px',
+        'top':'67px',
+        'font-family':'JackRoman',
+        'font-size':'32px',
+        'color':'#000',
+        'text-align':'center',
+        'opacity':'0.15'
+      }).html(thisMode.game.players[thisMode.chooseplayer-1].name).appendTo('#screen');
+      jQuery('<div />').css({
+        'position':'absolute',
+        'width':'320px',
+        'left':'288px',
+        'top':'85px',
+        'font-family':'JackRoman',
+        'font-size':'32px',
+        'color':'#000',
+        'text-align':'center',
+        'opacity':'0.40'
+      }).html(thisMode.game.players[thisMode.chooseplayer-1].name).appendTo('#screen');
+      jQuery('<div />').css({
+        'position':'absolute',
+        'width':'320px',
+        'left':'280px',
+        'top':'75px',
+        'font-family':'JackRoman',
+        'font-size':'32px',
+        'color':'#FFF',
+        'text-align':'center',
+      }).html(thisMode.game.players[thisMode.chooseplayer-1].name).appendTo('#screen');
+    });
+    
     this.ShowCategories.ended(function(){
       thisMode.SFXChoiceCategory.delay(function(){
         this.playResource();
@@ -1699,8 +1734,8 @@ function YDKJGame() {
 }
 
 YDKJGame.prototype.start = function() {
-  var gamemode = new YDKJMode(this, 'Intro');
-  //var gamemode = new YDKJMode(this, 'Category', {category:1,questionnumber: 1});
+  //var gamemode = new YDKJMode(this, 'Intro');
+  var gamemode = new YDKJMode(this, 'Category', {category:1,questionnumber: 1});
   //var gamemode = new YDKJMode(this, 'Question', {questionnumber:1,res:'QFold1/AJM',correctanswer:4});
   gamemode.start();
 }
