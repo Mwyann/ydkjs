@@ -1147,7 +1147,7 @@ YDKJMode.prototype.start = function() {
       thisMode.JingleTimer.delay(function(){
         thisMode.availPlayers[thisMode.currentPlayer].css({'color':'#F00'});
         thisMode.availPlayers[thisMode.currentPlayer] = 0;
-        if (thisMode.currentAns) thisMode.availAnswers[thisMode.currentAns] = 0;
+        if (thisMode.currentAns > 0) thisMode.availAnswers[thisMode.currentAns] = 0;
         thisMode.currentPlayer = 0;
         thisMode.currentAns = 0;
         
@@ -1223,6 +1223,7 @@ YDKJMode.prototype.start = function() {
 
     this.JingleTimer.ended(function(){
       this.delay(function(){
+        thisMode.currentAns = -1;
         thisMode.SFXTimeOut.playResource();
       },200);
     });
@@ -1734,8 +1735,8 @@ function YDKJGame() {
 }
 
 YDKJGame.prototype.start = function() {
-  //var gamemode = new YDKJMode(this, 'Intro');
-  var gamemode = new YDKJMode(this, 'Category', {category:1,questionnumber: 1});
+  var gamemode = new YDKJMode(this, 'Intro');
+  //var gamemode = new YDKJMode(this, 'Category', {category:1,questionnumber: 1});
   //var gamemode = new YDKJMode(this, 'Question', {questionnumber:1,res:'QFold1/AJM',correctanswer:4});
   gamemode.start();
 }
