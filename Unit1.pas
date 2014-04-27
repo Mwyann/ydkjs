@@ -138,7 +138,7 @@ end;
 procedure TForm1.FormShow(Sender: TObject);
 begin
   resbasedir:=IncludeTrailingBackSlash2('html\res');
-  SRFbasedir:=IncludeTrailingBackSlash2('R:\JACKDemo\JACK Demo\Riviera');
+  SRFbasedir:=IncludeTrailingBackSlash2('archives\JACK Demo\FR\Riviera');
   //SRFbasedir:=IncludeTrailingBackSlash2('.');
   FileSearch(SRFbasedir);
   //FileSearch('.');

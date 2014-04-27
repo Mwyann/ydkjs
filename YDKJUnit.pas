@@ -586,6 +586,7 @@ begin
   else if (ord(c) = $8F) then result:=chr($C3)+chr($A8) // è
   else if (ord(c) = $90) then result:=chr($C3)+chr($AA) // ê
   else if (ord(c) = $9D) then result:=chr($C3)+chr($B9) // ù
+  else if (ord(c) = $99) then result:=chr($C3)+chr($B4) // ô
   else if (ord(c) = $AA) then result:=chr($E2)+chr($84)+chr($A2) // ™
   else if (ord(c) = $C9) then result:=chr($E2)+chr($80)+chr($A6) // …
   else result:=c;
