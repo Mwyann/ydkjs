@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <title>Test YDKJ</title>
-<script src="jquery-1.11.0.min.js" type="text/javascript"></script>
-<script src="SeamlessLoop.js" type="text/javascript"></script>
+<script src="js/jquery-1.11.0.min.js" type="text/javascript"></script>
+<script src="js/SeamlessLoop.js" type="text/javascript"></script>
 <script type="text/javascript">
 
 /********** Quelques fonctions pour le son **********/
@@ -374,7 +374,7 @@ YDKJAnimation.prototype.playAnim = function() {
     }
   
     //runanim();
-    intervaltimer = setInterval(runanim,66); // Pourrait être calculé depuis frames[x].fps1/frames[x].fps2
+    intervaltimer = setInterval(runanim,660); // Pourrait être calculé depuis frames[x].fps1/frames[x].fps2
     this.intervalTimer = intervaltimer;
   }
 
@@ -469,7 +469,7 @@ YDKJAnimation.prototype.setAnimCallback = function(callback) {
 
 jQuery(document).ready(function() {
   
-  anim = new YDKJAnimation('res/5QDemo/off4/14690.gif','res/5QDemo/off4/14690.js','',0,0);
+  anim = new YDKJAnimation('res/5QDemo/off4/8017.gif','res/5QDemo/off4/8017.js','',0,0);
   anim.ready(function() {
     var select = jQuery('<select onchange="playAnim(this);" />');
     var opt = jQuery('<option />').attr('value',0).html(0);
@@ -502,7 +502,7 @@ jQuery(document).ready(function() {
 
 function playAnim(t) {
   var jt = jQuery(t);
-  anim = new YDKJAnimation('res/5QDemo/off4/14690.gif','res/5QDemo/off4/14690.js','',jt.val(),0);
+  anim = new YDKJAnimation('res/5QDemo/off4/8017.gif','res/5QDemo/off4/8017.js','',jt.val(),0);
   anim.ended(function() {
     this.free();
   });

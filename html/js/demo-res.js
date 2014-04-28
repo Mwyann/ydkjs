@@ -227,7 +227,7 @@ var YDKJanim = {
 		'BGQuestion3':{res:'5QDemo',name:'off4/-2030',framestart:55,loop:0},
 	},
 	'Question':{
-	  'TimerComesIn':{res:'5QDemo',name:'off4/8017',framestart:0,loop:0},
+	  'TimerComesIn':{res:'5QDemo',name:'off4/8017',framestart:2,loop:0},
 	  'Round1':{res:'5QDemo',name:'off4/8014',framestart:0,loop:0},
 	  'AnnounceValue2000F':{res:'5QDemo',name:'off4/11020',framestart:16,loop:0},
 	  'HideValue2000F':{res:'5QDemo',name:'off4/11020',framestart:35,loop:0},
@@ -274,6 +274,6 @@ var YDKJanim = {
 	'DisOrDat':{
 	  'Intro':{res:'5QDemo',name:'off4/14690',framestart:2,loop:0},
 	  'IntroStill':{res:'5QDemo',name:'off4/14690',framestart:74,loop:0},
-	  'TimerComesIn':{res:'5QDemo',name:'off4/8041',framestart:0,loop:0},
+	  'TimerComesIn':{res:'5QDemo',name:'off4/8041',framestart:2,loop:0},
 	}
 };

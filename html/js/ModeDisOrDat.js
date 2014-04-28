@@ -99,7 +99,7 @@ ModeDisOrDat.prototype.start = function() {
       thisMode.Intro.delay(function(){
         jQuery('#screen').css('background-color','#000').html(''); // Je vide manuellement l'écran.
         this.playResource();
-      },1700);
+      },2500);
     },500);
 	});
   
