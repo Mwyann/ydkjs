@@ -907,6 +907,9 @@ YDKJMode.prototype.start = function() {
   
   if (this.modename == 'Category') {
     if (!this.chooseplayer) this.chooseplayer = 3; // Déterminer un joueur qui pourra choisir la catégorie
+    this.question1.chooseplayer = this.chooseplayer;
+    this.question2.chooseplayer = this.chooseplayer;
+    this.question3.chooseplayer = this.chooseplayer;
     
     if (this.chooseplayer == 1) this.ChooseCategoryPlayer = this.ChooseCategoryPlayer1;
     if (this.chooseplayer == 2) this.ChooseCategoryPlayer = this.ChooseCategoryPlayer2;
@@ -1748,6 +1751,10 @@ YDKJMode.prototype.start = function() {
   if (this.modename == 'DisOrDat') {
     var nextcategory = 0;
     
+    if (this.chooseplayer == 1) this.ChoicePlayer = this.ChoicePlayer1on3;
+    if (this.chooseplayer == 2) this.ChoicePlayer = this.ChoicePlayer2on3;
+    if (this.chooseplayer == 3) this.ChoicePlayer = this.ChoicePlayer3on3;
+    
     this.QuestionIntro1.ended(function() {
       thisMode.Intro.delay(function() {
         thisMode.QuestionIntro2.playAnim();
@@ -1804,7 +1811,7 @@ YDKJMode.prototype.start = function() {
     
     this.strjs.ready(function(){
     	thisMode.STR = thisMode.strjs.res['STR'];
-      thisMode.ChoicePlayer3on3.delay(function(){
+      thisMode.ChoicePlayer.delay(function(){
         this.playResource();
         thisMode.Intro.delay(function(){
           jQuery('#screen').css('background-color','#000').html(''); // Je vide manuellement l'écran.
@@ -1814,6 +1821,7 @@ YDKJMode.prototype.start = function() {
   	});
     
     nextcategory = new YDKJMode(this.game, 'Category', {category:1,questionnumber:this.options.questionnumber+1});
+    nextcategory.chooseplayer = this.chooseplayer;
   }
 }
 
