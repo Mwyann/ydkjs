@@ -1,0 +1,29 @@
+@font-face {
+font-family:"JackCondensed";
+src: url("fonts/JAC_____.TTF") format('truetype') /* TTF file for CSS3 browsers */
+}
+
+@font-face {
+font-family:"JackExtraCond";
+src: url("fonts/JAeC____.TTF") format('truetype') /* TTF file for CSS3 browsers */
+}
+
+@font-face {
+font-family:"JackInput";
+src: url("fonts/JAi_____.TTF") format('truetype') /* TTF file for CSS3 browsers */
+}
+
+@font-face {
+font-family:"JackRoman";
+src: url("fonts/JAr_____.TTF") format('truetype') /* TTF file for CSS3 browsers */
+}
+
+span, div {
+  cursor:default;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

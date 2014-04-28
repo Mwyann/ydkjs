@@ -72,7 +72,7 @@ var YDKJsnd = {
 		'SFXRevealAnswer':{res:'5QDemo',name:'Mc95',min:1,max:1},
 		'SFXRevealFreeAnswer':{res:'5QDemo',name:'Mc79',min:1,max:1},
 		'SFXShowQuestion':{res:'5QDemo',name:'Mc80',min:1,max:1},
-		'SFXTimerComesIn1':{res:'5QDemo',name:'Mc98',min:1,max:1},
+		'SFXTimerComesIn':{res:'5QDemo',name:'Mc98',min:1,max:1},
 		'SFXTimeOut':{res:'5QDemo',name:'Mc06',min:1,max:1},
 		'SFXTypingBack':{res:'5QDemo',name:'Mc91',min:1,max:1},
 		'SFXTypingHeartBeat':{res:'5QDemo',name:'Mc90',min:1,max:1},
