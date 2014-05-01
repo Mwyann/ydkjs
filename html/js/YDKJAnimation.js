@@ -23,8 +23,8 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
     ms:0,
     endTimeout:0,
     functions:[function(){
+      thisAnim.played = 1;
       if (!thisAnim.loop) {
-        thisAnim.played = 1;
         thisAnim.isplaying = 0;
       }
     }]

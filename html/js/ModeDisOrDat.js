@@ -39,6 +39,15 @@ ModeDisOrDat.prototype.start = function() {
   if (this.chooseplayer == 2) this.ChoicePlayer = this.ChoicePlayer2on3;
   if (this.chooseplayer == 3) this.ChoicePlayer = this.ChoicePlayer3on3;
   
+  this.QuestionIntro2.ended(function() {
+    this.delay(function(){
+      nextcategory.modeObj.MusicChooseCategoryLoop.free();
+      nextcategory.modeObj.MusicChooseCategoryLoop = thisMode.MusicLoopRules1;
+      thisMode.MusicLoopRules1 = false; // Pour ne pas être détruite au passage à la catégorie suivante
+      nextcategory.start();
+    },500);
+  });
+  
   this.QuestionIntro1.ended(function() {
     thisMode.Intro.delay(function() {
       thisMode.QuestionIntro2.play();
@@ -68,7 +77,7 @@ ModeDisOrDat.prototype.start = function() {
     		textdiv.appendTo(div);
     		
     		div.appendTo('#screen').animate({'left':'40px'},300,function(){textdiv.css({'font-style':'normal'})});
-    	},200);
+    	},100);
     },100);
   });
   
@@ -169,5 +178,5 @@ ModeDisOrDat.prototype.start = function() {
 	});
   
   nextcategory = new YDKJMode(this.game, 'Category', {category:1,questionnumber:this.options.questionnumber+1});
-  nextcategory.chooseplayer = this.chooseplayer;
+  nextcategory.modeObj.chooseplayer = this.chooseplayer;
 }

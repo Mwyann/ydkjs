@@ -34,7 +34,7 @@ ModeCategory.prototype.preload = function() {
   this.ChoiceCategory3 = new YDKJResource('Category/ChoiceCategory3');
   
   // Précharger les questions avec l'interface de catégorie
-  if (this.options.questionnumber != 2) { // Questions normales
+  if ((this.options.questionnumber % 2) == 1) { // Questions normales
     this.questiontitles = ['Keuf you !', 'Ma meilleure boum', 'C’est dur vraiment plus longtemps'];
     this.question1 = new YDKJMode(this.game, 'Question', {category:this.options.category,questionnumber:this.options.questionnumber,res:'QFold1/ABB', correctanswer:3}); // Preload des questions suivantes
     this.question2 = new YDKJMode(this.game, 'Question', {category:this.options.category,questionnumber:this.options.questionnumber,res:'QFold1/ABE', correctanswer:3});

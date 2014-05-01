@@ -37,8 +37,8 @@ function YDKJResource(resourceName) {
   this.animation = new YDKJAnimation(resGif,resJS,resAudio,resFramestart,resLoop,resFramestop);
 
   this.animation.ended(function() {
-    thisResource.isplaying = 0;
-    thisResource.played = 1;
+    thisResource.played = thisResource.animation.played;
+    thisResource.isplaying = thisResource.animation.isplaying;
   });
   
   this.animation.ready(function(){
