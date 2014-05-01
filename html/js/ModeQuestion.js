@@ -138,7 +138,7 @@ ModeQuestion.prototype.start = function() {
       this.delay(function(){
         answer.playAnim();
       },200);
-      nextcategory.MusicChooseCategoryStart.playResource();
+      nextcategory.modeObj.MusicChooseCategoryStart.playResource();
     },300);
   });
   

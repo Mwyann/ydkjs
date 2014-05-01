@@ -11,8 +11,8 @@ function YDKJGame() {
 }
 
 YDKJGame.prototype.start = function() {
-  var gamemode = new YDKJMode(this, 'Intro');
-  //var gamemode = new YDKJMode(this, 'Category', {category:1,questionnumber:2});
+  //var gamemode = new YDKJMode(this, 'Intro');
+  var gamemode = new YDKJMode(this, 'Category', {category:1,questionnumber:1});
   //var gamemode = new YDKJMode(this, 'Question', {questionnumber:1,res:'QFold1/AJM',correctanswer:4});
   gamemode.start();
 }
