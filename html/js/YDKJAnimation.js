@@ -14,9 +14,21 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
   this.framestop = framestop;
   this.seamlessLoop = 0;
   
+  var thisAnim = this;
+  
   this.isplaying = 0;
-  this.end = 0;
-  this.endedFunctions = [];
+  this.played = 0;
+  this.endedFunctions = new Array();
+  this.endedFunctions.push({
+    ms:0,
+    endTimeout:0,
+    functions:[function(){
+      if (!thisAnim.loop) {
+        thisAnim.played = 1;
+        thisAnim.isplaying = 0;
+      }
+    }]
+  });
 
   this.tiles = 0;
   this.frames = 0;
@@ -37,8 +49,6 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
 
   // Vérifier le statut du preload, dans l'ordre inverse, soit : gif -> js -> audio -> seamlessloop
 
-  var thisAnim = this;
-  
   var seamlessloopready = function() {
     thisAnim.preloaded = 1;
     for(var i = 0; i < thisAnim.readyFunctions.length; i++) {
@@ -155,18 +165,9 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
     this.newScreen();
   }
   
-  this.endTrigger = function(e) {
-    if (this.end == 255) return false;
-    // e = 1 : animation, e = 2 : audio
-    this.end = this.end | e;
-    if (((this.urlGif == '') && (this.urlAudio != '') && (this.end == 2)) 
-     || ((this.urlGif != '') && (this.urlAudio == '') && (this.end == 1)) 
-     || ((this.urlGif != '') && (this.urlAudio != '') && (this.end == 3))) {
-      this.isplaying = 0;
-      this.end = 255; // Pour éviter de relancer le trigger
-      for(var i = 0; i < this.endedFunctions.length; i++) {
-        this.endedFunctions[i].call(this);
-      }
+  this.triggerEnd = function(idx) {
+    for(var i = 0; i < this.endedFunctions[idx].functions.length; i++) {
+      this.endedFunctions[idx].functions[i].call(this);
     }
   }
 }
@@ -175,15 +176,29 @@ YDKJAnimation.prototype.ready = function(f) {
   if (!this.preloaded) this.readyFunctions.push(f); else f.call(this);
 };
 
-YDKJAnimation.prototype.ended = function(f) {
-  if (this.end != 255) this.endedFunctions.push(f); else f.call(this);
+YDKJAnimation.prototype.ended = function(f,msbeforeend) {
+  if (!msbeforeend) msbeforeend = 0;
+  if (!this.played) {
+    var idx = -1;
+    var i;
+    for(i = 0; i < this.endedFunctions.length; i++) if (this.endedFunctions[i].ms == msbeforeend) idx = i;
+    if (idx == -1) {
+      idx = i;
+      this.endedFunctions[i] = {ms:msbeforeend, functions:[]};
+    }
+    this.endedFunctions[idx].functions.push(f);
+  } else f.call(this);
+}
+
+YDKJAnimation.prototype.delay = function(f,delay) {
+  var thisAnim = this;
+  if (delay) setTimeout(function(){f.call(thisAnim)},delay); else f.call(this);
 }
 
 YDKJAnimation.prototype.play = function() {
   if (!this.preloaded) return false; // Ou bien attendre le preload ?
   
   this.isplaying = 1;
-  this.end = 0;
   var thisAnim = this;
   
   if (this.urlGif != '') {
@@ -203,7 +218,6 @@ YDKJAnimation.prototype.play = function() {
       framenum++;
       if ((framenum > framestop) || ((val & 16) != 0)) {
         if (thisAnim.loop) framenum = thisAnim.framestart; else {
-          thisAnim.endTrigger(1);
           clearInterval(intervaltimer);
           thisAnim.intervalTimer = 0;
         }
@@ -230,7 +244,6 @@ YDKJAnimation.prototype.play = function() {
               audioelem.pause();
               audioelem.currentTime = 0;
             }, audiospecs.stopDelay);
-            thisAnim.endTrigger(2);
           }
         }
         thisAnim.audiostopTimer = setTimeout(ended, audioelem.duration*1000+audiospecs.playDelay);
@@ -240,10 +253,22 @@ YDKJAnimation.prototype.play = function() {
       }
     }
   }
+  
+  // this.triggerEnd lorsque l'animation est terminée, basée sur this.length()
+  var lth = this.length();
+  for(var i = 0; i < this.endedFunctions.length; i++) {
+    (function(i){
+      thisAnim.endedFunctions[i].endTimeout = setTimeout(function(){thisAnim.triggerEnd(i);},lth-thisAnim.endedFunctions[i].ms);
+    })(i);
+  }
 }
 
 YDKJAnimation.prototype.stop = function() {
   this.isplaying = 0;
+  for(var i = 0; i < this.endedFunctions.length; i++){
+    if (this.endedFunctions[i].endTimeout) clearTimeout(this.endedFunctions[i].endTimeout);
+    this.endedFunctions[i].endTimeout = 0;
+  }
   
   if (this.urlGif != '') {
     if (this.intervalTimer) {
@@ -304,4 +329,37 @@ YDKJAnimation.prototype.setVolume = function(vol) {
 
 YDKJAnimation.prototype.setAnimCallback = function(callback) {
   this.animCallback = callback;
+}
+
+YDKJAnimation.prototype.length = function() {
+  var maxlength = 0;
+  if (this.urlGif != '') {
+    var framestart = this.framestart;
+    var framestop = this.frames.length-1;
+    if (this.framestop) framestop = this.framestop;
+    var val = 0;
+    for(var frameid = framestart; ((frameid<framestop) && ((val & 16) == 0)); frameid++) {
+      var ourframe = this.frames[frameid];
+      val = 0;
+      if (ourframe.nbimg > 0) {
+        val = ourframe.img[0].val;
+        for(var i = 1; i <= ourframe.nbimg; i++) {
+          val = val | ourframe.img[i].val;
+        }
+      }
+    }
+    var length = (frameid-framestart)*66;
+    if (length > maxlength) maxlength = length;
+  }
+  
+  if (this.audio) {
+    var audiofile = this.audio.res;
+    if (audiofile) {
+      var audioelem = audiofile.get(0);
+      var length = audioelem.duration*1000;
+      if (length > maxlength) maxlength = length;
+    }
+  }
+  
+  return maxlength;
 }

@@ -6,9 +6,10 @@ function YDKJResource(resourceName) {
   this.preloaded = 0;
   this.readyFunctions = [];
   
+  var thisResource = this;
+
   this.isplaying = 0;
-  this.end = 0;
-  this.endedFunctions = [];
+  this.played = 0;
   
   var sp = resourceName.split('/');
   var resGif = '';
@@ -35,14 +36,9 @@ function YDKJResource(resourceName) {
   
   this.animation = new YDKJAnimation(resGif,resJS,resAudio,resFramestart,resLoop,resFramestop);
 
-  var thisResource = this;
-
   this.animation.ended(function() {
     thisResource.isplaying = 0;
-    thisResource.end = 1;
-    for(var i = 0; i < thisResource.endedFunctions.length; i++) {
-      thisResource.endedFunctions[i].call(thisResource);
-    }
+    thisResource.played = 1;
   });
   
   this.animation.ready(function(){
@@ -57,8 +53,8 @@ YDKJResource.prototype.ready = function(f) {
   if (!this.preloaded) this.readyFunctions.push(f); else f.call(this);
 };
 
-YDKJResource.prototype.ended = function(f) {
-  if (!this.end) this.endedFunctions.push(f); else f.call(this);
+YDKJResource.prototype.ended = function(f,msbeforeend) {
+  this.animation.ended(f,msbeforeend);
 };
 
 YDKJResource.prototype.delay = function(f,delay) {
@@ -68,7 +64,7 @@ YDKJResource.prototype.delay = function(f,delay) {
 
 YDKJResource.prototype.play = function() {
   var thisResource = this;
-  this.end = 0;
+  this.played = 0;
   this.animation.ready(function(){
     thisResource.isplaying = 1;
     thisResource.animation.play();
@@ -92,4 +88,8 @@ YDKJResource.prototype.setAnimCallback = function(callback) {
 YDKJResource.prototype.free = function() {
   this.isplaying = 0;
   this.animation.free();
+}
+
+YDKJResource.prototype.length = function() {
+  return this.animation.length();
 }

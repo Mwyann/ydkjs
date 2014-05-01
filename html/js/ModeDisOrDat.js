@@ -47,13 +47,22 @@ ModeDisOrDat.prototype.start = function() {
   this.QuestionTitle.ended(function() {
     thisMode.Intro.delay(function() {
       thisMode.QuestionIntro1.play();
-      jQuery('#screen #QuestionTitle').css('font-style','italic').delay(100).animate({'left':'-500px'},500,function(){
-	  		jQuery('#screen #QuestionTitle').remove();
-	  		thisMode.TimerComesIn.delay(function(){
-	  			this.play();
-	  		},300);
-  		});
+  		thisMode.TimerComesIn.delay(function(){
+  			this.play();
+  		},200);
   	},200);
+  });
+
+  this.QuestionTitle.ended(function() {
+    jQuery('#screen #QuestionTitle').css('font-style','italic').delay(100).animate({'left':'-500px'},500,function(){
+  		jQuery('#screen #QuestionTitle').remove();
+		});
+  },400);
+  
+  this.AnnounceCategory.ended(function() {
+		thisMode.AnnounceCategory.delay(function(){
+		  thisMode.QuestionTitle.play();
+		},100);
   });
   
   this.AnnounceCategory.ended(function() {
@@ -78,10 +87,7 @@ ModeDisOrDat.prototype.start = function() {
 			'opacity':'1',
 			'display':'none'}
 		,250);
-		thisMode.AnnounceCategory.delay(function(){
-		  thisMode.QuestionTitle.play();
-		},100);
-  });
+  },400);
   
   this.Intro.ended(function() {
     this.free();
