@@ -709,7 +709,8 @@ ModeQuestion.prototype.start = function() {
 	});
 	
 	this.AnnounceCategory.ended(function(){
-		var textsize = 70;
+		var textsize = 50;
+		if (getSTRfromID(thisMode.STR,1).length < 35) textsize = 70;
 		if (getSTRfromID(thisMode.STR,1).length < 15) textsize = 120;
 		
 		jQuery('<div />').attr('id','QuestionTitle').css({ // Titre de la catégorie

@@ -258,7 +258,7 @@ YDKJAnimation.prototype.play = function() {
   var lth = this.length();
   for(var i = 0; i < this.endedFunctions.length; i++) {
     (function(i){
-      thisAnim.endedFunctions[i].endTimeout = setTimeout(function(){thisAnim.triggerEnd(i);},lth-thisAnim.endedFunctions[i].ms);
+      thisAnim.endedFunctions[i].endTimeout = setTimeout(function(){thisAnim.triggerEnd(i);},Math.max(0,lth-thisAnim.endedFunctions[i].ms));
     })(i);
   }
 }

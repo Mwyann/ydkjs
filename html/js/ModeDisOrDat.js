@@ -18,6 +18,7 @@ ModeDisOrDat.prototype.preload = function() {
   this.IntroStill = new YDKJResource('DisOrDat/IntroStill');
   this.MusicLoopRules1 = new YDKJResource('DisOrDat/MusicLoopRules1');
   this.MusicLoopRules2 = new YDKJResource('DisOrDat/MusicLoopRules2');
+  this.ShowQuestion = new YDKJResource('DisOrDat/ShowQuestion');
   
   this.MusicLoopPlay1 = new YDKJResource('DisOrDat/MusicLoopPlay1');
   this.MusicLoopPlay2 = new YDKJResource('DisOrDat/MusicLoopPlay2');
@@ -41,6 +42,33 @@ ModeDisOrDat.prototype.start = function() {
   this.QuestionIntro1.ended(function() {
     thisMode.Intro.delay(function() {
       thisMode.QuestionIntro2.play();
+      thisMode.QuestionIntro2.delay(function(){
+        thisMode.ShowQuestion.play();
+        var div = jQuery('<div />').css({ // Texte de la question
+    			'position':'absolute',
+    			'height':'150px',
+    			'line-height':'150px',
+    			'left':'-560px',
+    			'top':'70px'
+    		});
+    		
+    		var textdiv = jQuery('<div />').css({
+    			'position':'relative',
+    			'width':'560px',
+    			'vertical-align':'top',
+  				'display':'inline-block',
+    			'font-size':'29px',
+    			'line-height':'34px',
+    			'color':'#FF0',
+    			'font-family':'JackRoman',
+    			'font-style':'italic',
+    			'text-align':'center'
+    		}).html(getSTRfromID(thisMode.STR,2));
+    		
+    		textdiv.appendTo(div);
+    		
+    		div.appendTo('#screen').animate({'left':'40px'},300,function(){textdiv.css({'font-style':'normal'})});
+    	},200);
     },100);
   });
   
@@ -48,6 +76,36 @@ ModeDisOrDat.prototype.start = function() {
     thisMode.Intro.delay(function() {
       thisMode.QuestionIntro1.play();
   		thisMode.TimerComesIn.delay(function(){
+  		  this.ended(function(){
+	    		var div = jQuery('<div />').css({ // Titre de la catégorie
+      			'position':'absolute',
+      			'height':'70px',
+      			'line-height':'70px',
+      			'left':'70px',
+      			'top':'0'
+      		});
+      		
+      		var titlediv = jQuery('<div />').css({
+      			'position':'relative',
+      			'left':'-150px',
+      			'width':'300px',
+      			'vertical-align':'middle',
+      			'display':'inline-block',
+      			'font-size':'20px',
+      			'line-height':'24px',
+      			'color':'#33F',
+      			'font-family':'JackRoman',
+      			'-webkit-transform':'scale(0.0, 1.0)',
+        		'-moz-transform':'scale(0.0, 1.0)',
+        		'-ms-transform':'scale(0.0, 1.0)',
+        		'-o-transform':'scale(0.0, 1.0)',
+        		'transform':'scale(0.0,1.0)',
+      		}).html(getSTRfromID(thisMode.STR,1)).appendTo(div);
+      		
+      		div.appendTo('#screen');
+      		
+      		animTransform(titlediv,0,1,1,1,0.15,300,0);
+      	},500);
   			this.play();
   		},200);
   	},200);
@@ -66,7 +124,8 @@ ModeDisOrDat.prototype.start = function() {
   });
   
   this.AnnounceCategory.ended(function() {
-		var textsize = 70;
+		var textsize = 50;
+		if (getSTRfromID(thisMode.STR,1).length < 35) textsize = 70;
 		if (getSTRfromID(thisMode.STR,1).length < 15) textsize = 120;
 		
 		jQuery('<div />').attr('id','QuestionTitle').css({ // Titre de la catégorie
@@ -78,10 +137,10 @@ ModeDisOrDat.prototype.start = function() {
 			'position':'absolute',
 			'width':'450px',
 			'left':'95px',
-			'top':Math.round(125+textsize*0.05)+'px',
+			'top':Math.round(155+textsize*0.05)+'px', // Plus bas que les catégories des questions
 			'opacity':'0'
 		}).html(getSTRfromID(thisMode.STR,1)).appendTo('#screen').animate({
-			'top':'125px',
+			'top':'155px', // Plus bas que les catégories des questions
 			'font-size':textsize+'px',
 			'line-height':Math.round(textsize*1.10)+'px',
 			'opacity':'1',
