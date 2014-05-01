@@ -12,7 +12,7 @@ ModeCategory.prototype.preload = function() {
   this.ShowCategories = new YDKJResource('Category/ShowCategories');
   
   this.MusicChooseCategoryStart.ended(function(){
-    thisMode.MusicChooseCategoryLoop.playResource();
+    thisMode.MusicChooseCategoryLoop.play();
   });
   
   if (this.options.category == 1) this.ChooseCategory = new YDKJResource('Category/ChooseCategory1');
@@ -63,7 +63,7 @@ ModeCategory.prototype.start = function() {
     thisMode.SFXChoiceCategory.free();
     thisMode.SFXChoiceCategory = new YDKJResource('Category/SFXChoiceCategory');
     thisMode.ChooseCategoryPlayer.delay(function(){
-      this.playResource();
+      this.play();
       var thisChooseCategory = this;
       
       var listener = bindKeyListener(function(choice) {
@@ -106,8 +106,8 @@ ModeCategory.prototype.start = function() {
             nextquestion.start(); // On démarre la question choisie
           });
           
-          thisMode.SFXChoiceCategory.playResource();
-          choice.playResource();
+          thisMode.SFXChoiceCategory.play();
+          choice.play();
         }
       },10000); // 10 secondes de timeout
     },100);
@@ -150,11 +150,11 @@ ModeCategory.prototype.start = function() {
   
   this.ShowCategories.ended(function(){
     thisMode.SFXChoiceCategory.delay(function(){
-      this.playResource();
-      thisMode.ChooseCategoryText.playResource();
-      thisMode.LoopCategory1.playResource();
-      thisMode.LoopCategory2.playResource();
-      thisMode.LoopCategory3.playResource();
+      this.play();
+      thisMode.ChooseCategoryText.play();
+      thisMode.LoopCategory1.play();
+      thisMode.LoopCategory2.play();
+      thisMode.LoopCategory3.play();
       thisMode.ShowCategories.free();
     },300);
   });
@@ -191,15 +191,15 @@ ModeCategory.prototype.start = function() {
   
   this.ChooseCategory.ended(function(){
     thisMode.ShowCategories.delay(function(){
-      this.playResource();
+      this.play();
     },300);
   });
   
   this.SFXShowCategoryScreen.ended(function(){
-    if ((!thisMode.MusicChooseCategoryStart.isplaying) && (!thisMode.MusicChooseCategoryLoop.isplaying)) thisMode.MusicChooseCategoryStart.playResource();
+    if ((!thisMode.MusicChooseCategoryStart.isplaying) && (!thisMode.MusicChooseCategoryLoop.isplaying)) thisMode.MusicChooseCategoryStart.play();
   });
   
-  this.SFXShowCategoryScreen.playResource();
+  this.SFXShowCategoryScreen.play();
   // Jouer l'animation du zoom bleu
   
   var blueZoom = function() {
@@ -230,7 +230,7 @@ ModeCategory.prototype.start = function() {
       } else {
         clearInterval(interval);
         jQuery('#screen').css('background-color','#00C').html('');
-        thisMode.ChooseCategory.playResource();
+        thisMode.ChooseCategory.play();
       }
     }
     interval=setInterval(nextStep,40);

@@ -66,23 +66,23 @@ YDKJResource.prototype.delay = function(f,delay) {
   if (delay) setTimeout(function(){f.call(thisResource)},delay); else f.call(this);
 }
 
-YDKJResource.prototype.playResource = function() {
+YDKJResource.prototype.play = function() {
   var thisResource = this;
   this.end = 0;
   this.animation.ready(function(){
     thisResource.isplaying = 1;
-    thisResource.animation.playAnim();
+    thisResource.animation.play();
   });
 }
 
-YDKJResource.prototype.stopResource = function() {
+YDKJResource.prototype.stop = function() {
   this.isplaying = 0;
-  this.animation.stopAnim();
+  this.animation.stop();
 }
 
-YDKJResource.prototype.resetResource = function() {
+YDKJResource.prototype.reset = function() {
   this.isplaying = 0;
-  this.animation.resetAnim();
+  this.animation.reset();
 }
 
 YDKJResource.prototype.setAnimCallback = function(callback) {

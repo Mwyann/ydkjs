@@ -179,7 +179,7 @@ YDKJAnimation.prototype.ended = function(f) {
   if (this.end != 255) this.endedFunctions.push(f); else f.call(this);
 }
 
-YDKJAnimation.prototype.playAnim = function() {
+YDKJAnimation.prototype.play = function() {
   if (!this.preloaded) return false; // Ou bien attendre le preload ?
   
   this.isplaying = 1;
@@ -242,7 +242,7 @@ YDKJAnimation.prototype.playAnim = function() {
   }
 }
 
-YDKJAnimation.prototype.stopAnim = function() {
+YDKJAnimation.prototype.stop = function() {
   this.isplaying = 0;
   
   if (this.urlGif != '') {
@@ -268,8 +268,8 @@ YDKJAnimation.prototype.stopAnim = function() {
   }
 }
 
-YDKJAnimation.prototype.resetAnim = function() {
-  this.stopAnim();
+YDKJAnimation.prototype.reset = function() {
+  this.stop();
   if (this.urlGif != '') {
     this.newScreen();
     this.nextScreen();
@@ -277,7 +277,7 @@ YDKJAnimation.prototype.resetAnim = function() {
 }
 
 YDKJAnimation.prototype.free = function() {
-  this.stopAnim();
+  this.stop();
   if (this.gif) this.gif.free();
   if (this.js) this.js.free();
   if (this.audio) this.audio.free();

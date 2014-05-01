@@ -116,9 +116,9 @@ ModeQuestion.prototype.start = function() {
     thisMode.availPlayers[thisMode.currentPlayer].css({'color':'#0F0'});
     this.delay(function(){
       nextcategory.modeObj.chooseplayer = thisMode.currentPlayer; // On donne le choix au joueur qui a bien répondu
-      nextcategory.modeObj.MusicChooseCategoryStart.playResource();
+      nextcategory.modeObj.MusicChooseCategoryStart.play();
       this.delay(function(){
-        thisMode.EndQuestion.playAnim();
+        thisMode.EndQuestion.play();
       },300);
     },300);
   });
@@ -132,13 +132,13 @@ ModeQuestion.prototype.start = function() {
       if (thisMode.correctanswer == 4) answer = thisMode.Answer4;
       answer.ended(function(){
         thisMode.SFXRevealAnswer.delay(function(){
-          thisMode.EndQuestion.playAnim();
+          thisMode.EndQuestion.play();
         },200);
       });
       this.delay(function(){
-        answer.playAnim();
+        answer.play();
       },200);
-      nextcategory.modeObj.MusicChooseCategoryStart.playResource();
+      nextcategory.modeObj.MusicChooseCategoryStart.play();
     },300);
   });
   
@@ -181,11 +181,11 @@ ModeQuestion.prototype.start = function() {
           'line-height':'44px'
         }).html(getSTRfromID(thisMode.STR,thisMode.correctanswer+2)).appendTo(div);
         
-        thisMode.SFXRevealAnswer.playResource();
+        thisMode.SFXRevealAnswer.play();
       },300);
     });
     
-    revealAnswer.playResource();
+    revealAnswer.play();
   }
   
   this.SFXPlayerWrong2.ended(function(){
@@ -212,8 +212,8 @@ ModeQuestion.prototype.start = function() {
       }
       
       if (thisMode.LastPlayers)  {
-        this.playResource();
-        thisMode.LastPlayers.playResource();
+        this.play();
+        thisMode.LastPlayers.play();
       }
     },200);
   });
@@ -244,9 +244,9 @@ ModeQuestion.prototype.start = function() {
         if (thisMode.availPlayers[currentPlayer]) thisMode.availPlayers[currentPlayer].css({'color':'#F00'});
       });
       
-      PlayerWrong.playResource();
+      PlayerWrong.play();
       PlayerAnswerLoop.free();
-      this.playResource();
+      this.play();
     },100);
   }
   
@@ -259,7 +259,7 @@ ModeQuestion.prototype.start = function() {
   this.SFXTimeOut.ended(function(){
     this.delay(function(){
       if (thisMode.currentPlayer) {
-        thisMode.TimeOut.playResource();
+        thisMode.TimeOut.play();
       } else {
         gameover();
       }
@@ -269,7 +269,7 @@ ModeQuestion.prototype.start = function() {
   this.JingleTimer.ended(function(){
     this.delay(function(){
       thisMode.currentAns = -1;
-      thisMode.SFXTimeOut.playResource();
+      thisMode.SFXTimeOut.play();
     },200);
   });
   
@@ -278,54 +278,54 @@ ModeQuestion.prototype.start = function() {
     if (thisMode.currentAns != thisMode.correctanswer) { // Mauvaise réponse
       switch(thisMode.currentAns){
         case 1:
-          thisMode.WrongAnswer1.playResource();
+          thisMode.WrongAnswer1.play();
           thisMode.LoopAnswer1.free();
         break;
         case 2:
-          thisMode.WrongAnswer2.playResource();
+          thisMode.WrongAnswer2.play();
           thisMode.LoopAnswer2.free();
         break;
         case 3:
-          thisMode.WrongAnswer3.playResource();
+          thisMode.WrongAnswer3.play();
           thisMode.LoopAnswer3.free();
         break;
         case 4:
-          thisMode.WrongAnswer4.playResource();
+          thisMode.WrongAnswer4.play();
           thisMode.LoopAnswer4.free();
         break;
       }
       animTransform(thisMode.availAnswers[thisMode.currentAns],1,0,1,1,0.18,thisMode.availAnswers[thisMode.currentAns].width(),0);
-      thisMode.SFXPlayerWrong1.playResource();
+      thisMode.SFXPlayerWrong1.play();
     } else { // Bonne réponse
       switch(thisMode.currentAns){
         case 1:
-          thisMode.CorrectAnswer1.playResource();
+          thisMode.CorrectAnswer1.play();
           thisMode.LoopAnswer1.free();
         break;
         case 2:
-          thisMode.CorrectAnswer2.playResource();
+          thisMode.CorrectAnswer2.play();
           thisMode.LoopAnswer2.free();
         break;
         case 3:
-          thisMode.CorrectAnswer3.playResource();
+          thisMode.CorrectAnswer3.play();
           thisMode.LoopAnswer3.free();
         break;
         case 4:
-          thisMode.CorrectAnswer4.playResource();
+          thisMode.CorrectAnswer4.play();
           thisMode.LoopAnswer4.free();
         break;
       }
       switch (thisMode.currentPlayer) {
         case 1:
-          thisMode.Player1Correct.playResource();
+          thisMode.Player1Correct.play();
           thisMode.Player1AnswerLoop.free();
         break;
         case 2:
-          thisMode.Player2Correct.playResource();
+          thisMode.Player2Correct.play();
           thisMode.Player2AnswerLoop.free();
         break;
         case 3:
-          thisMode.Player3Correct.playResource();
+          thisMode.Player3Correct.play();
           thisMode.Player3AnswerLoop.free();
         break;
       }
@@ -333,7 +333,7 @@ ModeQuestion.prototype.start = function() {
       thisMode.game.players[thisMode.currentPlayer-1].score += thisMode.value;
       thisMode.availPlayers[thisMode.currentPlayer].find('.score').html(thisMode.game.players[thisMode.currentPlayer-1].score+' F');
 
-      thisMode.SFXPlayerCorrect.playResource();
+      thisMode.SFXPlayerCorrect.play();
       unbindKeyListener(thisMode.listener);
     }
   };
@@ -344,32 +344,32 @@ ModeQuestion.prototype.start = function() {
   this.Answer4.ended(checkAnswer);
   
   this.Player1Answer.ended(function(){
-    thisMode.Player1AnswerLoop.playResource();
+    thisMode.Player1AnswerLoop.play();
     this.free();
   });
   this.Player2Answer.ended(function(){
-    thisMode.Player2AnswerLoop.playResource();
+    thisMode.Player2AnswerLoop.play();
     this.free();
   });
   this.Player3Answer.ended(function(){
-    thisMode.Player3AnswerLoop.playResource();
+    thisMode.Player3AnswerLoop.play();
     this.free();
   });
   
   this.SFXPlayerBuzz.ended(function(){
     this.delay(function(){
       // Remise du compteur à 10
-      thisMode.JingleTimer.playResource();
+      thisMode.JingleTimer.play();
       
       // Vas-y joueur X
       if (thisMode.currentPlayer == 1) {
-        thisMode.PlayerBuzzedPlayer1.playResource();
+        thisMode.PlayerBuzzedPlayer1.play();
       }
       if (thisMode.currentPlayer == 2) {
-        thisMode.PlayerBuzzedPlayer2.playResource();
+        thisMode.PlayerBuzzedPlayer2.play();
       }
       if (thisMode.currentPlayer == 3) {
-        thisMode.PlayerBuzzedPlayer3.playResource();
+        thisMode.PlayerBuzzedPlayer3.play();
       }
     },150);
   });
@@ -378,23 +378,23 @@ ModeQuestion.prototype.start = function() {
     this.free();
     thisMode.JingleReadQuestion.delay(function(){
       thisMode.JingleReadQuestion.free();
-      thisMode.JingleTimer.playResource();
+      thisMode.JingleTimer.play();
     },100);
   });
   
   this.Question.ended(function(){
     this.free();
     thisMode.JingleReadQuestion.delay(function(){
-      thisMode.Answers.playAnim();
+      thisMode.Answers.play();
     },100);
   });
   
   thisMode.PrepareTimer.ended(function(){
     this.delay(function(){
-      thisMode.NumberAnswer1.playResource();
-      thisMode.NumberAnswer2.playResource();
-      thisMode.NumberAnswer3.playResource();
-      thisMode.NumberAnswer4.playResource();
+      thisMode.NumberAnswer1.play();
+      thisMode.NumberAnswer2.play();
+      thisMode.NumberAnswer3.play();
+      thisMode.NumberAnswer4.play();
       
       var div1 = jQuery('<div />').css({ // Réponse 1
   			'position':'absolute',
@@ -498,19 +498,19 @@ ModeQuestion.prototype.start = function() {
             thisMode.Answers.free();
             thisMode.JingleReadQuestion.free();
             if (thisMode.LastPlayers) thisMode.LastPlayers.free();
-            thisMode.JingleTimer.stopResource();
-            thisMode.SFXPlayerBuzz.playResource();
+            thisMode.JingleTimer.stop();
+            thisMode.SFXPlayerBuzz.play();
             switch (thisMode.currentPlayer) {
               case 1:
-                thisMode.Player1Answer.playResource();
+                thisMode.Player1Answer.play();
                 thisMode.ShowPlayer1Key.free();
               break;
               case 2:
-                thisMode.Player2Answer.playResource();
+                thisMode.Player2Answer.play();
                 thisMode.ShowPlayer2Key.free();
               break;
               case 3:
-                thisMode.Player3Answer.playResource();
+                thisMode.Player3Answer.play();
                 thisMode.ShowPlayer3Key.free();
               break;
             }
@@ -529,16 +529,16 @@ ModeQuestion.prototype.start = function() {
                 this.free();
                 switch(thisMode.currentAns){
                   case 1:
-                    thisMode.Answer1.playAnim();
+                    thisMode.Answer1.play();
                   break;
                   case 2:
-                    thisMode.Answer2.playAnim();
+                    thisMode.Answer2.play();
                   break;
                   case 3:
-                    thisMode.Answer3.playAnim();
+                    thisMode.Answer3.play();
                   break;
                   case 4:
-                    thisMode.Answer4.playAnim();
+                    thisMode.Answer4.play();
                   break;
                 }
               },150);
@@ -556,24 +556,24 @@ ModeQuestion.prototype.start = function() {
             }
             switch(thisMode.currentAns){
               case 1:
-                thisMode.LoopAnswer1.playResource();
+                thisMode.LoopAnswer1.play();
                 thisMode.NumberAnswer1.free();
               break;
               case 2:
-                thisMode.LoopAnswer2.playResource();
+                thisMode.LoopAnswer2.play();
                 thisMode.NumberAnswer2.free();
               break;
               case 3:
-                thisMode.LoopAnswer3.playResource();
+                thisMode.LoopAnswer3.play();
                 thisMode.NumberAnswer3.free();
               break;
               case 4:
-                thisMode.LoopAnswer4.playResource();
+                thisMode.LoopAnswer4.play();
                 thisMode.NumberAnswer4.free();
               break;
             }
-            thisMode.JingleTimer.stopResource();
-            thisMode.SFXPlayerKey.playResource();
+            thisMode.JingleTimer.stop();
+            thisMode.SFXPlayerKey.play();
           }
         }
       });
@@ -584,7 +584,7 @@ ModeQuestion.prototype.start = function() {
   this.SFXShowQuestion.ended(function(){
     this.delay(function(){
       thisMode.TimerComesIn.free();
-      thisMode.PrepareTimer.playResource();
+      thisMode.PrepareTimer.play();
     },500);
   });
   
@@ -645,10 +645,10 @@ ModeQuestion.prototype.start = function() {
     		
     		div.appendTo('#screen').animate({'left':'40px'},300,function(){textdiv.css({'font-style':'normal'})});
 	
-        thisMode.SFXShowQuestion.playResource();
-        thisMode.JingleReadQuestion.playResource();
+        thisMode.SFXShowQuestion.play();
+        thisMode.JingleReadQuestion.play();
         thisMode.JingleReadQuestion.delay(function() {
-          thisMode.Question.playAnim();
+          thisMode.Question.play();
         },300);
 			});
 
@@ -665,11 +665,11 @@ ModeQuestion.prototype.start = function() {
 			});
 			
 			thisMode.ShowPlayer1Key.delay(function(){
-				this.playResource();
+				this.play();
 			  if (thisMode.game.players.length >= 2) thisMode.ShowPlayer2Key.delay(function(){
-			    this.playResource();
+			    this.play();
 			    if (thisMode.game.players.length == 3) thisMode.ShowPlayer3Key.delay(function(){
-			      this.playResource();
+			      this.play();
           },100);
 			  },100);
 			},200);
@@ -692,19 +692,19 @@ ModeQuestion.prototype.start = function() {
 		jQuery('#screen #QuestionTitle').css('font-style','italic').delay(100).animate({'left':'-500px'},500,function(){
   		jQuery('#screen #QuestionTitle').remove();
   		thisMode.TimerComesIn.delay(function(){
-  			this.playResource();
+  			this.play();
   		},300);
 		});
-		thisMode.HideValue.playResource();
+		thisMode.HideValue.play();
 		thisMode.VoiceAnnounceValue.delay(function(){
-		  thisMode.PreQuestion.playAnim();
+		  thisMode.PreQuestion.play();
 		},150);
 	});
 	
 	this.QuestionTitle.ended(function(){
 		this.free();
 		thisMode.VoiceAnnounceValue.delay(function() {
-		  this.playResource();
+		  this.play();
 		},100);
 	});
 	
@@ -731,26 +731,26 @@ ModeQuestion.prototype.start = function() {
 			'display':'none'}
 		,250,function(){
 		  thisMode.AnnounceValue.delay(function(){
-		    this.playResource();
+		    this.play();
 		  },150);
 		});
 		thisMode.AnnounceCategory.delay(function(){
-		  thisMode.QuestionTitle.playAnim();
+		  thisMode.QuestionTitle.play();
 		},100);
 	});
 	
   this.JingleQuestion.ended(function(){
     thisMode.JingleQuestion.free();
     thisMode.BGQuestion.delay(function(){
-      this.playResource();
-      thisMode.AnnounceCategory.playResource();
+      this.play();
+      thisMode.AnnounceCategory.play();
     },100);
   });
   
   jQuery('#screen').css('background-color','#000').html(''); // Je vide manuellement l'écran.
   this.strjs.ready(function(){
   	thisMode.STR = thisMode.strjs.res['STR'];
-  	thisMode.JingleQuestion.playResource();
+  	thisMode.JingleQuestion.play();
 	});
 	
 	nextcategory = new YDKJMode(this.game, 'Category', {category:1,questionnumber:this.options.questionnumber+1});

@@ -29,7 +29,7 @@ ModeIntro.prototype.start = function() {
   this.IntroJackTitle.ended(function(){
     this.free();
     thisMode.IntroJackDemo.delay(function(){
-      this.playResource();
+      this.play();
       thisMode.category = new YDKJMode(thisMode.game, 'Category', {category:1,questionnumber:1}); // Preload des catégories pendant le speech
       this.skiplistener = bindKeyListener(function(choice) {
         unbindKeyListener(thisMode.skiplistener);
@@ -42,13 +42,13 @@ ModeIntro.prototype.start = function() {
     this.free();
     thisMode.IntroJackTitle.delay(function(){
       thisMode.MusicJack.animation.setVolume(50); // On baisse le volume de la musique de fond
-      this.playResource();
+      this.play();
     },300);
   });
   
   this.SFXBang.ended(function(){
     this.free();
-    thisMode.SFXJackTitle.delay(function(){this.playResource()},300);
+    thisMode.SFXJackTitle.delay(function(){this.play()},300);
   });
   
   var playerNamesPos = 0;
@@ -65,11 +65,11 @@ ModeIntro.prototype.start = function() {
   });
   
   this.IntroPreTitle.ended(function(){
-    thisMode.IntroJack.playResource();
+    thisMode.IntroJack.play();
     this.free();
-    thisMode.MusicJack.playResource();
-    thisMode.SFXBang.delay(function(){this.playResource()},300);
+    thisMode.MusicJack.play();
+    thisMode.SFXBang.delay(function(){this.play()},300);
   });
   
-  this.IntroPreTitle.playResource();
+  this.IntroPreTitle.play();
 }

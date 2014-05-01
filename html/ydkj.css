@@ -15,7 +15,7 @@ src: url("fonts/JAi_____.TTF") format('truetype') /* TTF file for CSS3 browsers 
 
 @font-face {
 font-family:"JackRoman";
-src: url("fonts/JAr_____.TTF") format('truetype') /* TTF file for CSS3 browsers */
+src: url("fonts/JAr_____fixed.TTF") format('truetype') /* TTF file for CSS3 browsers */
 }
 
 span, div {

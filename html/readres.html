@@ -343,7 +343,7 @@ YDKJAnimation.prototype.ended = function(f) {
   if (this.end != 255) this.endedFunctions.push(f); else f.call(this);
 }
 
-YDKJAnimation.prototype.playAnim = function() {
+YDKJAnimation.prototype.play = function() {
   if (!this.preloaded) return false; // Ou bien attendre le preload ?
   
   this.end = 0;
@@ -405,7 +405,7 @@ YDKJAnimation.prototype.playAnim = function() {
   }
 }
 
-YDKJAnimation.prototype.stopAnim = function() {
+YDKJAnimation.prototype.stop = function() {
   if (this.urlGif != '') {
     if (this.intervalTimer) {
       clearInterval(this.intervalTimer);
@@ -429,8 +429,8 @@ YDKJAnimation.prototype.stopAnim = function() {
   }
 }
 
-YDKJAnimation.prototype.resetAnim = function() {
-  this.stopAnim();
+YDKJAnimation.prototype.reset = function() {
+  this.stop();
   if (this.urlGif != '') {
     this.newScreen();
     this.nextScreen();
@@ -438,7 +438,7 @@ YDKJAnimation.prototype.resetAnim = function() {
 }
 
 YDKJAnimation.prototype.free = function() {
-  this.stopAnim();
+  this.stop();
   if (this.gif) this.gif.free();
   if (this.js) this.js.free();
   if (this.audio) this.audio.free();
@@ -471,7 +471,7 @@ jQuery(document).ready(function() {
   
   anim = new YDKJAnimation('res/5QDemo/off4/8017.gif','res/5QDemo/off4/8017.js','',0,0);
   anim.ready(function() {
-    var select = jQuery('<select onchange="playAnim(this);" />');
+    var select = jQuery('<select onchange="play(this);" />');
     var opt = jQuery('<option />').attr('value',0).html(0);
         opt.appendTo(select);
     var opt = jQuery('<option />').attr('value',0).html(0);
@@ -495,19 +495,19 @@ jQuery(document).ready(function() {
     
     select.appendTo(jQuery('#debug'));
     
-    //anim.playAnim();
+    //anim.play();
   });
 
 });
 
-function playAnim(t) {
+function play(t) {
   var jt = jQuery(t);
   anim = new YDKJAnimation('res/5QDemo/off4/8017.gif','res/5QDemo/off4/8017.js','',jt.val(),0);
   anim.ended(function() {
     this.free();
   });
   anim.ready(function() {
-    this.playAnim();
+    this.play();
   });
 }
 
@@ -518,7 +518,7 @@ function playAnim(t) {
   <div id="screen" style="background-color:#000;position:relative;width:640px;height:480px;overflow:hidden;margin-left:auto;margin-right:auto;margin-top:30px"></div> <!-- Couleur #EEE pour l'intro -->
   <div id="debuglive" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;"><br/></div>
   <div id="debug" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;height:150px;overflow-y:scroll">
-    <input type="text" onblur="playAnim(this);" />
+    <input type="text" onblur="play(this);" />
 
   </div>
   <div id="tmpscreen" style="display:none"></div>

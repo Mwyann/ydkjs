@@ -40,17 +40,17 @@ ModeDisOrDat.prototype.start = function() {
   
   this.QuestionIntro1.ended(function() {
     thisMode.Intro.delay(function() {
-      thisMode.QuestionIntro2.playAnim();
+      thisMode.QuestionIntro2.play();
     },100);
   });
   
   this.QuestionTitle.ended(function() {
     thisMode.Intro.delay(function() {
-      thisMode.QuestionIntro1.playAnim();
+      thisMode.QuestionIntro1.play();
       jQuery('#screen #QuestionTitle').css('font-style','italic').delay(100).animate({'left':'-500px'},500,function(){
 	  		jQuery('#screen #QuestionTitle').remove();
 	  		thisMode.TimerComesIn.delay(function(){
-	  			this.playResource();
+	  			this.play();
 	  		},300);
   		});
   	},200);
@@ -79,26 +79,26 @@ ModeDisOrDat.prototype.start = function() {
 			'display':'none'}
 		,250);
 		thisMode.AnnounceCategory.delay(function(){
-		  thisMode.QuestionTitle.playAnim();
+		  thisMode.QuestionTitle.play();
 		},100);
   });
   
   this.Intro.ended(function() {
     this.free();
-    thisMode.IntroStill.playResource();
-    thisMode.MusicLoopRules1.playResource();
+    thisMode.IntroStill.play();
+    thisMode.MusicLoopRules1.play();
     thisMode.AnnounceCategory.delay(function(){
-      this.playResource();
+      this.play();
     },500);
   });
   
   this.strjs.ready(function(){
   	thisMode.STR = thisMode.strjs.res['STR'];
     thisMode.ChoicePlayer.delay(function(){
-      this.playResource();
+      this.play();
       thisMode.Intro.delay(function(){
         jQuery('#screen').css('background-color','#000').html(''); // Je vide manuellement l'écran.
-        this.playResource();
+        this.play();
       },2500);
     },500);
 	});
