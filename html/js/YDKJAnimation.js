@@ -100,7 +100,7 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
     var ourdiv = $('<div />');
     ourdiv.css({
       'background-image':'url("'+this.urlGif+'")',
-      'background-repeat':'none',
+      'background-repeat':'no-repeat',
       'background-position':(0-ourtile.x)+'px '+(0-ourtile.y)+'px',
       'width':(ourtile.w)+'px',
       'height':(ourtile.h)+'px',

@@ -148,7 +148,7 @@ ModeQuestion.prototype.start = function() {
     
     var revealAnswer;
     var nbAns = 0;
-    for(i=1;i<=4;i++) if (thisMode.availAnswers[i]) nbAns++;
+    for(var i=1;i<=4;i++) if (thisMode.availAnswers[i]) nbAns++;
     if (nbAns == 1) revealAnswer = thisMode.DefaultRevealLastAnswer;
     else revealAnswer = thisMode.DefaultRevealAnswer;
     
@@ -159,7 +159,7 @@ ModeQuestion.prototype.start = function() {
         thisMode.NumberAnswer3.free();
         thisMode.NumberAnswer4.free();
         jQuery('#screen .markedAsRemoved').remove();
-        for(i=1;i<=4;i++) if (thisMode.availAnswers[i]) thisMode.availAnswers[i].remove();
+        for(var i=1;i<=4;i++) if (thisMode.availAnswers[i]) thisMode.availAnswers[i].remove();
         
     		var div = jQuery('<div />').css({ // Réponse
     			'position':'absolute',
@@ -525,7 +525,10 @@ ModeQuestion.prototype.start = function() {
           if (thisMode.currentAns) {
             thisMode.SFXPlayerKey.ended(function(){
               this.delay(function(){
+                // Pas moyen de faire un "simple" thisMode.SFXPlayerKey.reset(); ça fait bugguer le reste...
+                var oldkey = thisMode.SFXPlayerKey;
                 thisMode.SFXPlayerKey = new YDKJResource('Question/SFXPlayerKey');
+                oldkey.free();
                 this.free();
                 switch(thisMode.currentAns){
                   case 1:

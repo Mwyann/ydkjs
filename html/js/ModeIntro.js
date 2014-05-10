@@ -32,8 +32,10 @@ ModeIntro.prototype.start = function() {
       this.play();
       thisMode.category = new YDKJMode(thisMode.game, 'Category', {category:1,questionnumber:1}); // Preload des catégories pendant le speech
       this.skiplistener = bindKeyListener(function(choice) {
-        unbindKeyListener(thisMode.skiplistener);
-        if (choice == 32) thisMode.category.start(); // Barre espace = on passe au choix de la catégorie
+        if (choice == 32) {
+          unbindKeyListener(thisMode.skiplistener);
+          thisMode.category.start(); // Barre espace = on passe au choix de la catégorie
+        }
       });
     },300);
   });
