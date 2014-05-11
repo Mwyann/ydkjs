@@ -43,7 +43,7 @@ ModeIntro.prototype.start = function() {
   this.SFXJackTitle.ended(function(){
     this.free();
     thisMode.IntroJackTitle.delay(function(){
-      thisMode.MusicJack.animation.setVolume(50); // On baisse le volume de la musique de fond
+      thisMode.MusicJack.animation.volume(50); // On baisse le volume de la musique de fond
       this.play();
     },300);
   });
@@ -67,8 +67,8 @@ ModeIntro.prototype.start = function() {
   });
 
   this.IntroPreTitle.ended(function(){
-    thisMode.IntroJack.play();
     this.free();
+    thisMode.IntroJack.play();
     thisMode.MusicJack.play();
     thisMode.SFXBang.delay(function(){this.play()},300);
   });

@@ -237,7 +237,7 @@ YDKJAnimation.prototype.play = function() {
 
   if (this.audio) {
     if ((this.loop) && (this.seamlessLoop)) {
-      this.seamlessLoop.volume=audiospecs.maxVolume;
+      this.seamlessLoop.volume(audiospecs.maxVolume);
       this.seamlessLoop.start('loop'+this.id);
     } else {
       var audiofile = this.audio.res;
@@ -320,13 +320,13 @@ YDKJAnimation.prototype.free = function() {
   jQuery('#tmpscreen').find('#anim'+this.id).remove();
 };
 
-YDKJAnimation.prototype.setVolume = function(vol) {
+YDKJAnimation.prototype.volume = function(vol) {
   if (vol > 1) vol = vol/100;
   vol = vol*audiospecs.maxVolume;
 
   if (this.audio) {
     if ((this.loop) && (this.seamlessLoop)) {
-      this.seamlessLoop.setVolume(vol);
+      this.seamlessLoop.volume(vol);
     } else {
       var audiofile = this.audio.res;
       if (audiofile) {
@@ -353,7 +353,6 @@ YDKJAnimation.prototype.length = function() {
     if (this.framestop >= 0) framestop = this.framestop;
     var val = 0;
     for(var frameid = framestart; ((frameid<framestop) && ((val & 16) == 0)); frameid++) {
-      var ourframe = this.frames[frameid];
       val = this.getFrameVal(frameid);
     }
     length = (frameid-framestart)*speed;

@@ -1,41 +1,41 @@
 /**
  * SeamlessLoop.js 2.0 - Reproduces seamless loops on HTML5/Javascript
  * https://github.com/Hivenfour/SeamlessLoop
- * 
+ *
  * Copyright (c) 2012 Main Software,
  * Written by Darío Tejedor Rico. Contact mail: hivenfour@gmail.com
  * The source code is freely distributable under the terms of LGPL license.
  * License details at http://www.gnu.org/licenses/lgpl-3.0.txt
- * 
+ *
  * USAGE:
  * - Create the Seamlessloop object
  * 		var loop = new SeamlessLoop();
- * 
+ *
  * - Add as many sounds as you will use, providing duration in miliseconds
  * (sounds must be pre-loaded if you want to update the loop without gaps)
  * 		loop.addUri(uri, length, "sound1");
  * 		loop.addUri(uri, length, "sound2");
  * ...
- * 
+ *
  * - Establish your callback function that will be called when all sounds are pre-loaded
  * 		loop.callback(soundsLoaded);
- * 
+ *
  * - Start reproducing the seamless loop:
  * 		function soundsLoaded() {
  * 			var n = 1;
  * 			loop.start("sound" + n);
  * 		};
- * 
+ *
  * - Update the looping sound, you can do this
  * synchronously (waiting the loop to finish)
  * or asynchronously (change sound immediately):
  * 		n++;
  * 		loop.update("sound" + n, false);
- * 
+ *
  * - Modify the seamless loop volume:
  * 		loop.volume(0.5);
  * 		loop.volume(loop.volume() + 0.1);
- * 
+ *
  * - Stop the seamless loop:
  * 		loop.stop();
  */
@@ -74,8 +74,8 @@ function SeamlessLoop() {
 	this.actual = new Array();
 	this.dropOld = new Boolean();
 	this.old;
-	this.volume = 1;
-	
+	this._volume = 1;
+
 	var t = this;
 	this._eventCanplaythrough = function(audBool) {
 		if(audBool == false) {
@@ -90,7 +90,7 @@ function SeamlessLoop() {
 			}
 		}
 	};
-	
+
 	this._eventPlaying = function(audMute) {
 		setTimeout(function() {
 			audMute.pause();
@@ -98,7 +98,7 @@ function SeamlessLoop() {
 				audMute.currentTime = 0;
 			} catch (e){console.debug(e.message);};
 		}, t.stopDelay);
-		
+
 		if(t.dropOld == true) {
 			setTimeout(function() {
 				if(t.old.paused == false) {
@@ -113,22 +113,22 @@ function SeamlessLoop() {
 	};
 
 	this._eventEnded = function(aud) {
-		aud.volume = this.volume;
+		aud.volume = this._volume;
 	};
 
 	this.doLoop = function() {
 		var key = (this.next == 1 ? "_1" : "_2");
 		var antikey = (this.next == 1 ? "_2" : "_1");
-		
+
 		var t = this;
 		this.timeout = setTimeout(function() {t.doLoop();}, this.actual._length + this.playDelay);
-		
+
 		if(this.is.opera) this.actual[antikey].pause();
-		
+
 		this.actual[key].play();
 		this.next *= -1;
 	};
-	
+
 	this.isLoaded = function() {
 		return Boolean(this._load == this._total);
 	};
@@ -141,13 +141,13 @@ SeamlessLoop.prototype.start = function(id) {
 	this.doLoop();
 };
 
-SeamlessLoop.prototype.setVolume = function(vol) {
+SeamlessLoop.prototype.volume = function(vol) {
 	if(typeof vol != "undefined") {
-		this.actual._1.volume = vol;
-		this.actual._2.volume = vol;
-		this.volume = vol;
+        if (this.actual._1) this.actual._1.volume = vol;
+        if (this.actual._2) this.actual._2.volume = vol;
+		this._volume = vol;
 	}
-	
+
 	return vol;
 };
 
@@ -155,11 +155,11 @@ SeamlessLoop.prototype.stop = function() {
 	clearTimeout(this.timeout);
 	if (this.actual._1) {
 	  if (this.actual._1.currentTime) this.actual._1.currentTime = 0;
-	  this.actual._1.pause();
+	this.actual._1.pause();
 	}
 	if (this.actual._2) {
 	  if (this.actual._2.currentTime) this.actual._2.currentTime = 0;
-	  this.actual._2.pause();
+	this.actual._2.pause();
 	}
 };
 
@@ -204,6 +204,6 @@ SeamlessLoop.prototype.addUri = function(uri, length, id) {
 	this.audios[id]._2.addEventListener("ended", function() {t._eventEnded(t.audios[id]._2);});
 	this.audios[id]._1.load();
 	this.audios[id]._2.load();
-	this.audios[id]._1.volume = this.volume;
-	this.audios[id]._2.volume = this.volume;
+	this.audios[id]._1.volume = this._volume;
+	this.audios[id]._2.volume = this._volume;
 };

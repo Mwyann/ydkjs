@@ -433,7 +433,7 @@ ModeQuestion.prototype.start = function() {
     		'-moz-transform':'scale(1.0, 0.0)',
     		'-ms-transform':'scale(1.0, 0.0)',
     		'-o-transform':'scale(1.0, 0.0)',
-    		'transform':'scale(1.0, 0.0)',
+    		'transform':'scale(1.0, 0.0)'
   		}).html(getSTRfromID(thisMode.STR,4)).appendTo(div2);
       animTransform(ans2,1,1,0,1,0.10,0,26);
 
@@ -453,7 +453,7 @@ ModeQuestion.prototype.start = function() {
     		'-moz-transform':'scale(1.0, 0.0)',
     		'-ms-transform':'scale(1.0, 0.0)',
     		'-o-transform':'scale(1.0, 0.0)',
-    		'transform':'scale(1.0, 0.0)',
+    		'transform':'scale(1.0, 0.0)'
   		}).html(getSTRfromID(thisMode.STR,5)).appendTo(div3);
       animTransform(ans3,1,1,0,1,0.10,0,26);
 

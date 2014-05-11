@@ -1,6 +1,7 @@
 /********** YDKJMode **********/
 
 function YDKJMode(game, modename, options) {
+  if (!options) options = {};
   this.modeObj = false;
 
   // preload
@@ -9,12 +10,11 @@ function YDKJMode(game, modename, options) {
   if (modename == 'Question') this.modeObj = new ModeQuestion();
   if (modename == 'DisOrDat') this.modeObj = new ModeDisOrDat();
 
-  if (!this.modeObj) return false;
+  if (!this.modeObj) return;
 
   this.modeObj.game = game;
   this.modeObj.options = options;
   this.modeObj.preload();
-  return true;
 }
 
 YDKJMode.prototype.start = function() {
