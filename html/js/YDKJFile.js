@@ -3,9 +3,8 @@
 var preloadpool = [];
 var preloadfifo = [];
 var preloadprocesses = 0;
-var fileID = 0;
+
 function YDKJFile(filetype,url) {
-  this.id = fileID++;
   this.filetype = filetype;
   this.url = url;
   this.res = 0;
@@ -35,7 +34,8 @@ YDKJFile.prototype.preload = function(f) {
   };
 
   if (this.filetype == 'gif') {
-    this.res = preload.append('<img />').children().last().attr('id','file'+this.id).attr('src',this.url)
+    this.res = jQuery('<img />').attr('src',this.url);
+    preload.append(this.res);
     this.res.imagesLoaded(isready);
   }
 
@@ -57,7 +57,8 @@ YDKJFile.prototype.preload = function(f) {
   }
 
   if (this.filetype == 'audio') {
-    this.res = preload.append('<audio />').children().last().attr('id','file'+this.id);
+    this.res = jQuery('<audio />');
+    preload.append(this.res);
     var a = this.res.get(0);
     if (a.canPlayType('audio/ogg')) this.res.append('<source />').children().last().attr('type','audio/ogg').attr('src',this.url+'.ogg');
     else if (a.canPlayType('audio/mpeg')) this.res.append('<source />').children().last().attr('type','audio/mpeg').attr('src',this.url+'.mp3');
@@ -76,8 +77,8 @@ YDKJFile.prototype.ready = function(f) {
 YDKJFile.prototype.free = function() {
   preloadpool[this.url].used--;
   if (preloadpool[this.url].used <= 0) {
-    jQuery('#preload').find('#file'+this.id).remove();
-    this.res = undefined;
+    if ((this.res) && ((this.filetype == 'gif') || (this.filetype == 'audio'))) this.res.remove();
+    this.res = 0;
     preloadpool[this.url] = 0;
   }
 };
@@ -90,4 +91,4 @@ function getYDKJFile(filetype,url) {
   var f = new YDKJFile(filetype,url);
   preloadpool[url] = {file:f,used:1};
   return f;
-};
+}

@@ -158,7 +158,7 @@ ModeQuestion.prototype.start = function() {
         thisMode.NumberAnswer2.free();
         thisMode.NumberAnswer3.free();
         thisMode.NumberAnswer4.free();
-        jQuery('#screen .markedAsRemoved').remove();
+        jQuery('#screen').find('.markedAsRemoved').remove();
         for(var i=1;i<=4;i++) if (thisMode.availAnswers[i]) thisMode.availAnswers[i].remove();
 
     		var div = jQuery('<div />').css({ // Réponse
@@ -244,8 +244,8 @@ ModeQuestion.prototype.start = function() {
         if (thisMode.availPlayers[currentPlayer]) thisMode.availPlayers[currentPlayer].css({'color':'#F00'});
       });
 
-      PlayerWrong.play();
       PlayerAnswerLoop.free();
+      PlayerWrong.play();
       this.play();
     },100);
   };
@@ -278,20 +278,20 @@ ModeQuestion.prototype.start = function() {
     if (thisMode.currentAns != thisMode.correctanswer) { // Mauvaise réponse
       switch(thisMode.currentAns){
         case 1:
-          thisMode.WrongAnswer1.play();
           thisMode.LoopAnswer1.free();
+          thisMode.WrongAnswer1.play();
         break;
         case 2:
-          thisMode.WrongAnswer2.play();
           thisMode.LoopAnswer2.free();
+          thisMode.WrongAnswer2.play();
         break;
         case 3:
-          thisMode.WrongAnswer3.play();
           thisMode.LoopAnswer3.free();
+          thisMode.WrongAnswer3.play();
         break;
         case 4:
-          thisMode.WrongAnswer4.play();
           thisMode.LoopAnswer4.free();
+          thisMode.WrongAnswer4.play();
         break;
       }
       animTransform(thisMode.availAnswers[thisMode.currentAns],1,0,1,1,0.18,thisMode.availAnswers[thisMode.currentAns].width(),0);
@@ -299,34 +299,34 @@ ModeQuestion.prototype.start = function() {
     } else { // Bonne réponse
       switch(thisMode.currentAns){
         case 1:
-          thisMode.CorrectAnswer1.play();
           thisMode.LoopAnswer1.free();
+          thisMode.CorrectAnswer1.play();
         break;
         case 2:
-          thisMode.CorrectAnswer2.play();
           thisMode.LoopAnswer2.free();
+          thisMode.CorrectAnswer2.play();
         break;
         case 3:
-          thisMode.CorrectAnswer3.play();
           thisMode.LoopAnswer3.free();
+          thisMode.CorrectAnswer3.play();
         break;
         case 4:
-          thisMode.CorrectAnswer4.play();
           thisMode.LoopAnswer4.free();
+          thisMode.CorrectAnswer4.play();
         break;
       }
       switch (thisMode.currentPlayer) {
         case 1:
-          thisMode.Player1Correct.play();
           thisMode.Player1AnswerLoop.free();
+          thisMode.Player1Correct.play();
         break;
         case 2:
-          thisMode.Player2Correct.play();
           thisMode.Player2AnswerLoop.free();
+          thisMode.Player2Correct.play();
         break;
         case 3:
-          thisMode.Player3Correct.play();
           thisMode.Player3AnswerLoop.free();
+          thisMode.Player3Correct.play();
         break;
       }
 
@@ -345,16 +345,16 @@ ModeQuestion.prototype.start = function() {
   this.Answer4.ended(checkAnswer);
 
   this.Player1Answer.ended(function(){
-    thisMode.Player1AnswerLoop.play();
     this.free();
+    thisMode.Player1AnswerLoop.play();
   });
   this.Player2Answer.ended(function(){
-    thisMode.Player2AnswerLoop.play();
     this.free();
+    thisMode.Player2AnswerLoop.play();
   });
   this.Player3Answer.ended(function(){
-    thisMode.Player3AnswerLoop.play();
     this.free();
+    thisMode.Player3AnswerLoop.play();
   });
 
   this.SFXPlayerBuzz.ended(function(){
@@ -409,7 +409,7 @@ ModeQuestion.prototype.start = function() {
   			'font-size':'26px',
   			'color':'#FC0',
   			'font-family':'JackCondensed',
-				'-webkit-transform':'scale(1.0, 0.0)',
+			'-webkit-transform':'scale(1.0, 0.0)',
     		'-moz-transform':'scale(1.0, 0.0)',
     		'-ms-transform':'scale(1.0, 0.0)',
     		'-o-transform':'scale(1.0, 0.0)',
@@ -429,7 +429,7 @@ ModeQuestion.prototype.start = function() {
   			'font-size':'26px',
   			'color':'#FC0',
   			'font-family':'JackCondensed',
-				'-webkit-transform':'scale(1.0, 0.0)',
+			'-webkit-transform':'scale(1.0, 0.0)',
     		'-moz-transform':'scale(1.0, 0.0)',
     		'-ms-transform':'scale(1.0, 0.0)',
     		'-o-transform':'scale(1.0, 0.0)',
@@ -622,7 +622,7 @@ ModeQuestion.prototype.start = function() {
 
 		animTransform(titlediv,0,1,1,1,0.15,300,0,function(){
 		  thisMode.PreQuestion.ended(function(){
-			  this.free();
+			this.free();
 
     		var div = jQuery('<div />').css({ // Texte de la question
     			'position':'absolute',
@@ -693,11 +693,11 @@ ModeQuestion.prototype.start = function() {
 	this.VoiceAnnounceValue.ended(function(){
 		this.free();
 		thisMode.AnnounceValue.free();
-		jQuery('#screen #QuestionTitle').css('font-style','italic').delay(100).animate({'left':'-500px'},500,function(){
-  		jQuery('#screen #QuestionTitle').remove();
-  		thisMode.TimerComesIn.delay(function(){
-  			this.play();
-  		},300);
+		jQuery('#screen').find('#QuestionTitle').css('font-style','italic').delay(100).animate({'left':'-500px'},500,function(){
+  		    jQuery('#screen').find('#QuestionTitle').remove();
+  		    thisMode.TimerComesIn.delay(function(){
+  			    this.play();
+  		    },300);
 		});
 		thisMode.HideValue.play();
 		thisMode.VoiceAnnounceValue.delay(function(){

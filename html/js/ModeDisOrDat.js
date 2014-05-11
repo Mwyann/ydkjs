@@ -121,8 +121,8 @@ ModeDisOrDat.prototype.start = function() {
   });
 
   this.QuestionTitle.ended(function() {
-    jQuery('#screen #QuestionTitle').css('font-style','italic').delay(100).animate({'left':'-500px'},500,function(){
-  		jQuery('#screen #QuestionTitle').remove();
+    jQuery('#screen').find('#QuestionTitle').css('font-style','italic').delay(100).animate({'left':'-500px'},500,function(){
+  		jQuery('#screen').find('#QuestionTitle').remove();
 		});
   },400);
 

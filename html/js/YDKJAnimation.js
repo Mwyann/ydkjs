@@ -1,8 +1,8 @@
 /********** YDKJAnimation **********/
 
-var animID=0;
 function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
-  this.id = animID++;
+  this.div = 0;
+  this.tmpdiv = 0;
   this.urlGif = urlGif;
   this.urlJS = urlJS;
   this.urlAudio = urlAudio;
@@ -62,7 +62,7 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
       if (audiofile) {
         var audioelem = audiofile.get(0);
         thisAnim.seamlessLoop = new SeamlessLoop();
-        thisAnim.seamlessLoop.addUri(thisAnim.urlAudio,audioelem.duration*1000,'loop'+thisAnim.id);
+        thisAnim.seamlessLoop.addUri(thisAnim.urlAudio,audioelem.duration*1000,1);
         seamlessloopready();
       }
     } else seamlessloopready();
@@ -85,17 +85,15 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
   // Méthodes privées
 
   this.newScreen = function() {
-    var tmpscreen = jQuery('#tmpscreen');
-    var thisdiv = tmpscreen.find('#anim'+this.id);
-    if (thisdiv.length == 0) {
-      thisdiv = jQuery('<div />').attr('id','anim'+this.id);
-      thisdiv.appendTo(tmpscreen);
+    if (!this.tmpdiv) {
+      var tmpscreen = jQuery('#tmpscreen');
+      this.tmpdiv = jQuery('<div />');
+      this.tmpdiv.appendTo(tmpscreen);
     }
-    thisdiv.html('');
+    this.tmpdiv.html('');
   };
 
   this.addTile = function(tileid, x, y) {
-    var tmpscreen = jQuery('#tmpscreen').find('#anim'+this.id);
     var ourtile = this.tiles[tileid];
     if (!ourtile) return false;
     var ourdiv = jQuery('<div />');
@@ -109,7 +107,7 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
       'left':x+'px',
       'top':y+'px'
     });
-    ourdiv.appendTo(tmpscreen);
+    ourdiv.appendTo(this.tmpdiv);
     return true;
   };
 
@@ -147,16 +145,14 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
   this.nextScreen = function() {
     // Ne pas remplacer tout le screen (uniquement supprimer lorsqu'on destroy l'animation (pas stop, on peut vouloir stopper sans supprimer))
     var screen = jQuery('#screen');
-    var thisdiv = screen.find('#anim'+this.id);
-    var tmpscreen = jQuery('#tmpscreen').find('#anim'+this.id);
-    if (thisdiv.length == 0) {
-      thisdiv = jQuery('<div />').attr('id','anim'+this.id).css({
+    if (!this.div) {
+      this.div = jQuery('<div />').css({
         'position':'absolute'
       });
-      thisdiv.appendTo(screen);
+      this.div.appendTo(screen);
     }
     screen.find('.markedAsRemoved').remove(); // Supprimer les éléments marqués
-    thisdiv.html(tmpscreen.html()); // Meilleure façon de déplacer les éléments ?
+    this.div.html(this.tmpdiv.html()); // Meilleure façon de déplacer les éléments ?
 
     /*
     // Chrome n'aime pas cette façon non plus (en fait il aime pas en local uniquement... il gère le cache des images différemment il faut croire ?)
@@ -199,6 +195,7 @@ YDKJAnimation.prototype.delay = function(f,delay) {
 };
 
 YDKJAnimation.prototype.play = function() {
+  this.stop();
   if (!this.preloaded) return false; // Ou bien attendre le preload ?
 
   this.isplaying = 1;
@@ -238,7 +235,7 @@ YDKJAnimation.prototype.play = function() {
   if (this.audio) {
     if ((this.loop) && (this.seamlessLoop)) {
       this.seamlessLoop.volume(audiospecs.maxVolume);
-      this.seamlessLoop.start('loop'+this.id);
+      this.seamlessLoop.start(1);
     } else {
       var audiofile = this.audio.res;
       if (audiofile) {
@@ -316,8 +313,8 @@ YDKJAnimation.prototype.free = function() {
   if (this.gif) this.gif.free();
   if (this.js) this.js.free();
   if (this.audio) this.audio.free();
-  jQuery('#screen').find('#anim'+this.id).addClass('markedAsRemoved'); // Sera retiré réellement à la prochaine animation (pour éviter les écrans noirs entre animations)
-  jQuery('#tmpscreen').find('#anim'+this.id).remove();
+  if (this.div) this.div.addClass('markedAsRemoved'); // Sera retiré réellement à la prochaine animation (pour éviter les écrans noirs entre animations)
+  if (this.tmpdiv) this.tmpdiv.remove();
 };
 
 YDKJAnimation.prototype.volume = function(vol) {

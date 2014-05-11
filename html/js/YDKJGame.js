@@ -1,7 +1,7 @@
 /********** YDKJGame **********/
 
 function YDKJGame() {
-	jQuery.fx.interval = 66;
+  jQuery.fx.interval = 66;
   this.players = [
     {name:'Jeff',score:0},
     {name:'David',score:0},
