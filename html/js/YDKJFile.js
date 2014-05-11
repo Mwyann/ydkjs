@@ -1,7 +1,7 @@
 /********** YDKJFile **********/
 
-var preloadpool = new Array();
-var preloadfifo = new Array();
+var preloadpool = [];
+var preloadfifo = [];
 var preloadprocesses = 0;
 var fileID = 0;
 function YDKJFile(filetype,url) {
@@ -9,10 +9,10 @@ function YDKJFile(filetype,url) {
   this.filetype = filetype;
   this.url = url;
   this.res = 0;
-  
+
   this.preloaded = 0;
   this.readyFunctions = [];
-  
+
   if (preloadprocesses < 2) {
     preloadprocesses++;
     this.preload();
@@ -22,30 +22,30 @@ function YDKJFile(filetype,url) {
 YDKJFile.prototype.preload = function(f) {
   var thisFile = this;
   var preload = jQuery('#preload');
-  
+
   var isready = function() {
     thisFile.preloaded = 1;
-    
+
     var nextfile = preloadfifo.shift();
     if (nextfile) nextfile.preload(); else preloadprocesses--;
-    
+
     for(var i = 0; i < thisFile.readyFunctions.length; i++) {
       thisFile.readyFunctions[i].call(thisFile);
     }
-  }
-  
+  };
+
   if (this.filetype == 'gif') {
     this.res = preload.append('<img />').children().last().attr('id','file'+this.id).attr('src',this.url)
     this.res.imagesLoaded(isready);
   }
-  
+
   if (this.filetype == 'js') {
     jQuery.ajax({
       url: this.url,
       type: 'get',
       dataType: 'text',
       success: function(html, status, xhr) {
-        var res = new Array();
+        var res = [];
         eval(html);
         thisFile.res = res;
         isready();
@@ -55,7 +55,7 @@ YDKJFile.prototype.preload = function(f) {
       }
     });
   }
-  
+
   if (this.filetype == 'audio') {
     this.res = preload.append('<audio />').children().last().attr('id','file'+this.id);
     var a = this.res.get(0);
@@ -67,11 +67,11 @@ YDKJFile.prototype.preload = function(f) {
     }
     waitForAudio(this.res,isready);
   }
-}
+};
 
 YDKJFile.prototype.ready = function(f) {
   if (!this.preloaded) this.readyFunctions.push(f); else f.call(this);
-}
+};
 
 YDKJFile.prototype.free = function() {
   preloadpool[this.url].used--;
@@ -80,7 +80,7 @@ YDKJFile.prototype.free = function() {
     this.res = undefined;
     preloadpool[this.url] = 0;
   }
-}
+};
 
 function getYDKJFile(filetype,url) {
   if (preloadpool[url]) {
@@ -90,4 +90,4 @@ function getYDKJFile(filetype,url) {
   var f = new YDKJFile(filetype,url);
   preloadpool[url] = {file:f,used:1};
   return f;
-}
+};

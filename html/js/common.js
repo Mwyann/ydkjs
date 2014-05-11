@@ -48,7 +48,7 @@ jQuery.fn.imagesLoaded = function(callback, fireOne) {
             if (jQuery(this).hasClass('alreadyLoaded')) jQuery(this).trigger('load'); else this.src = this.src;
         }
     });
-}
+};
 
 function waitForAudio(selector,callback) {
   var waitloop = function() {
@@ -56,7 +56,7 @@ function waitForAudio(selector,callback) {
     var totalAudio = elems.length;
     elems.each(function(){if (this.duration) totalAudio--;});
     if (totalAudio) window.setTimeout(function(){waitloop()},50); else callback.call();
-  }
+  };
   waitloop();
 }
 
@@ -82,15 +82,15 @@ function animTransform(elem,fromx,tox,fromy,toy,speed,w,h,callback) {
 	var expand = function() {
 		expandValX += (tox-fromx)*speed;
 		expandValY += (toy-fromy)*speed;
-		
+
 		if (tox > fromx) {if (expandValX >= tox) expandValX = tox;} else {if (expandValX <= tox) expandValX = tox;}
 		if (toy > fromy) {if (expandValY >= toy) expandValY = toy;} else {if (expandValY <= toy) expandValY = toy;}
-		
+
 		if ((expandValX == tox) && (expandValY == toy)) {
 			clearInterval(expandInterval);
 			if (callback) callback();
 		}
-	  
+
 		elem.css({
 			'left':(0-((w/2)*(1-expandValX)))+'px',
 			'top':(0-((h/2)*(1-expandValY)))+'px',
@@ -98,9 +98,9 @@ function animTransform(elem,fromx,tox,fromy,toy,speed,w,h,callback) {
   		'-moz-transform':'scale('+expandValX+', '+expandValY+')',
   		'-ms-transform':'scale('+expandValX+', '+expandValY+')',
   		'-o-transform':'scale('+expandValX+', '+expandValY+')',
-  		'transform':'scale('+expandValX+', '+expandValY+')',
+  		'transform':'scale('+expandValX+', '+expandValY+')'
 		});
-	}
+	};
 	expandInterval = setInterval(expand,66);
 }
 

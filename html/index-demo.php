@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <title>Demo YDKJ FR</title>
-<link href="ydkj.css" rel="stylesheet"/>
+<link href="css/ydkj.css" rel="stylesheet"/>
 <script src="js/jquery-1.11.0.min.js" type="text/javascript"></script>
 <script src="js/SeamlessLoop.js" type="text/javascript"></script>
 
@@ -28,7 +28,7 @@ jQuery(document).ready(function() {
 function startgame() {
   jQuery('#warning').hide();
   jQuery('#screen').show();
-  
+
   jQuery(document).ready(function() {
     var game = new YDKJGame();
     game.start();

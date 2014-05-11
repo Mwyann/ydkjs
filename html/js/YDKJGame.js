@@ -12,7 +12,7 @@ function YDKJGame() {
 
 YDKJGame.prototype.start = function() {
   var gamemode = new YDKJMode(this, 'Intro');
-  //var gamemode = new YDKJMode(this, 'Category', {category:1,questionnumber:2});
+  //var gamemode = new YDKJMode(this, 'Category', {category:1,questionnumber:1});
   //var gamemode = new YDKJMode(this, 'Question', {questionnumber:1,res:'QFold1/AJM',correctanswer:4});
   gamemode.start();
 }
@@ -22,7 +22,7 @@ YDKJGame.prototype.displayPlayer = function(playernumber) {
   if (this.players.length == 3) {
     x=[106,320,533];
   }
-  
+
   var playerdiv = jQuery('<div />').css({
     'position':'absolute',
     'z-index':'1000',
@@ -35,9 +35,9 @@ YDKJGame.prototype.displayPlayer = function(playernumber) {
     'font-size':'20px',
     'line-height':'30px'
   }).appendTo('#screen');
-  
+
   jQuery('<div />').addClass('name').css({'position':'relative'}).html(this.players[playernumber-1].name).appendTo(playerdiv);
   jQuery('<div />').addClass('score').css({'position':'relative'}).html(this.players[playernumber-1].score+' F').appendTo(playerdiv);
-  
+
   return playerdiv;
 }

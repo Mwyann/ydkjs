@@ -2,18 +2,19 @@
 
 function YDKJMode(game, modename, options) {
   this.modeObj = false;
-  
+
   // preload
   if (modename == 'Intro') this.modeObj = new ModeIntro();
   if (modename == 'Category') this.modeObj = new ModeCategory();
   if (modename == 'Question') this.modeObj = new ModeQuestion();
   if (modename == 'DisOrDat') this.modeObj = new ModeDisOrDat();
-  
+
   if (!this.modeObj) return false;
-  
+
   this.modeObj.game = game;
   this.modeObj.options = options;
   this.modeObj.preload();
+  return true;
 }
 
 YDKJMode.prototype.start = function() {
@@ -22,7 +23,8 @@ YDKJMode.prototype.start = function() {
   this.modeObj.game.currentmode = this;
   this.modeObj.skiplistener = 0;
   this.modeObj.start();
-}
+  return true;
+};
 
 YDKJMode.prototype.free = function() {
   for (var i in this.modeObj) {
@@ -32,4 +34,4 @@ YDKJMode.prototype.free = function() {
       delete this.modeObj[i];
     }
   }
-}
+};

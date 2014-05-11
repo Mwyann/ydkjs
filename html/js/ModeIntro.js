@@ -5,13 +5,13 @@ function ModeIntro() {}
 ModeIntro.prototype.preload = function() {
   this.IntroPreTitle = new YDKJResource('Intro/IntroPreTitle');
   this.IntroJack = new YDKJResource('Intro/IntroJack');
-  
+
   this.MusicJack = new YDKJResource('Intro/MusicJack');
   this.SFXBang = new YDKJResource('Intro/SFXBang');
   this.SFXJackTitle = new YDKJResource('Intro/SFXJackTitle');
   this.IntroJackTitle = new YDKJResource('Intro/IntroJackTitle');
   this.IntroJackDemo = new YDKJResource('Intro/IntroJackDemo');
-}
+};
 
 ModeIntro.prototype.start = function() {
   var thisMode = this;
@@ -25,7 +25,7 @@ ModeIntro.prototype.start = function() {
       thisMode.category.start(); // On passe au choix de la catégorie
     },300);
   });
-  
+
   this.IntroJackTitle.ended(function(){
     this.free();
     thisMode.IntroJackDemo.delay(function(){
@@ -39,7 +39,7 @@ ModeIntro.prototype.start = function() {
       });
     },300);
   });
-  
+
   this.SFXJackTitle.ended(function(){
     this.free();
     thisMode.IntroJackTitle.delay(function(){
@@ -47,12 +47,12 @@ ModeIntro.prototype.start = function() {
       this.play();
     },300);
   });
-  
+
   this.SFXBang.ended(function(){
     this.free();
     thisMode.SFXJackTitle.delay(function(){this.play()},300);
   });
-  
+
   var playerNamesPos = 0;
   var actualPlayer = 0;
   this.IntroJack.setAnimCallback(function(){
@@ -65,13 +65,13 @@ ModeIntro.prototype.start = function() {
     }
     playerNamesPos++;
   });
-  
+
   this.IntroPreTitle.ended(function(){
     thisMode.IntroJack.play();
     this.free();
     thisMode.MusicJack.play();
     thisMode.SFXBang.delay(function(){this.play()},300);
   });
-  
+
   this.IntroPreTitle.play();
-}
+};

@@ -8,17 +8,17 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
   this.urlAudio = urlAudio;
   if (typeof(framestart) === 'undefined') framestart = 0;
   if (typeof(loop) === 'undefined') loop = 0;
-  if (typeof(framestop) === 'undefined') framestop = 0;
+  if (typeof(framestop) === 'undefined') framestop = -1;
   this.framestart = framestart;
   this.loop = loop;
   this.framestop = framestop;
   this.seamlessLoop = 0;
-  
+
   var thisAnim = this;
-  
+
   this.isplaying = 0;
   this.played = 0;
-  this.endedFunctions = new Array();
+  this.endedFunctions = [];
   this.endedFunctions.push({
     ms:0,
     endTimeout:0,
@@ -54,8 +54,8 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
     for(var i = 0; i < thisAnim.readyFunctions.length; i++) {
       thisAnim.readyFunctions[i].call(thisAnim);
     }
-  }
-  
+  };
+
   var audioready = function() {
     if ((thisAnim.audio) && (thisAnim.loop)) {
       var audiofile = thisAnim.audio.res;
@@ -66,38 +66,39 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
         seamlessloopready();
       }
     } else seamlessloopready();
-  }
-  
+  };
+
   var jsready = function() {
     if (thisAnim.js) {
       thisAnim.tiles = thisAnim.js.res['tiles'];
       thisAnim.frames = thisAnim.js.res['frames'];
     }
     if (thisAnim.audio) thisAnim.audio.ready(audioready); else audioready();
-  }
-  
+  };
+
   var gifready = function() {
     if (thisAnim.js) thisAnim.js.ready(jsready); else jsready();
-  }
-  
+  };
+
   if (this.gif) this.gif.ready(gifready); else gifready();
-  
+
   // Méthodes privées
-    
+
   this.newScreen = function() {
-    var thisdiv = $('#tmpscreen').find('#anim'+this.id);
+    var tmpscreen = jQuery('#tmpscreen');
+    var thisdiv = tmpscreen.find('#anim'+this.id);
     if (thisdiv.length == 0) {
       thisdiv = jQuery('<div />').attr('id','anim'+this.id);
-      thisdiv.appendTo($('#tmpscreen'));
+      thisdiv.appendTo(tmpscreen);
     }
     thisdiv.html('');
-  }
-  
+  };
+
   this.addTile = function(tileid, x, y) {
-    var tmpscreen = $('#tmpscreen').find('#anim'+this.id);
+    var tmpscreen = jQuery('#tmpscreen').find('#anim'+this.id);
     var ourtile = this.tiles[tileid];
     if (!ourtile) return false;
-    var ourdiv = $('<div />');
+    var ourdiv = jQuery('<div />');
     ourdiv.css({
       'background-image':'url("'+this.urlGif+'")',
       'background-repeat':'no-repeat',
@@ -106,11 +107,12 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
       'height':(ourtile.h)+'px',
       'position':'absolute',
       'left':x+'px',
-      'top':y+'px',
+      'top':y+'px'
     });
     ourdiv.appendTo(tmpscreen);
-  }
-  
+    return true;
+  };
+
   this.addFrame = function(frameid) {
     var ourframe = this.frames[frameid];
     var val = 0;
@@ -127,8 +129,8 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
       return val;
     }
     return val;
-  }
-  
+  };
+
   this.getFrameVal = function(frameid) {
     var ourframe = this.frames[frameid];
     var val = 0;
@@ -140,31 +142,32 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
       return val;
     }
     return val;
-  }
-  
+  };
+
   this.nextScreen = function() {
     // Ne pas remplacer tout le screen (uniquement supprimer lorsqu'on destroy l'animation (pas stop, on peut vouloir stopper sans supprimer))
-    var thisdiv = $('#screen').find('#anim'+this.id);
-    var tmpscreen = $('#tmpscreen').find('#anim'+this.id);
+    var screen = jQuery('#screen');
+    var thisdiv = screen.find('#anim'+this.id);
+    var tmpscreen = jQuery('#tmpscreen').find('#anim'+this.id);
     if (thisdiv.length == 0) {
       thisdiv = jQuery('<div />').attr('id','anim'+this.id).css({
-        'position':'absolute',
+        'position':'absolute'
       });
-      thisdiv.appendTo($('#screen'));
+      thisdiv.appendTo(screen);
     }
-    $('#screen').find('.markedAsRemoved').remove(); // Supprimer les éléments marqués
+    screen.find('.markedAsRemoved').remove(); // Supprimer les éléments marqués
     thisdiv.html(tmpscreen.html()); // Meilleure façon de déplacer les éléments ?
-    
+
     /*
     // Chrome n'aime pas cette façon non plus (en fait il aime pas en local uniquement... il gère le cache des images différemment il faut croire ?)
-    var newscreen = $('#tmpscreen').clone(true);
-    newscreen.attr('id','screen').attr('style',$('#screen').attr('style'));
-    $('#screen').replaceWith(newscreen);
+    var newscreen = jQuery('#tmpscreen').clone(true);
+    newscreen.attr('id','screen').attr('style',jQuery('#screen').attr('style'));
+     jQuery('#screen').replaceWith(newscreen);
     */
-  
+
     this.newScreen();
-  }
-  
+  };
+
   this.triggerEnd = function(idx) {
     for(var i = 0; i < this.endedFunctions[idx].functions.length; i++) {
       this.endedFunctions[idx].functions[i].call(this);
@@ -188,25 +191,28 @@ YDKJAnimation.prototype.ended = function(f,msbeforeend) {
     }
     this.endedFunctions[idx].functions.push(f);
   } else f.call(this);
-}
+};
 
 YDKJAnimation.prototype.delay = function(f,delay) {
   var thisAnim = this;
   if (delay) setTimeout(function(){f.call(thisAnim)},delay); else f.call(this);
-}
+};
 
 YDKJAnimation.prototype.play = function() {
   if (!this.preloaded) return false; // Ou bien attendre le preload ?
-  
+
   this.isplaying = 1;
   var thisAnim = this;
-  
+
   if (this.urlGif != '') {
     this.newScreen();
 
+    var speed;
+    if (typeof animationSpeed == 'undefined') speed = 66; else speed = animationSpeed;
+
     var framenum = this.framestart;
     var framestop = this.frames.length-1;
-    if (this.framestop) framestop = this.framestop;
+    if (this.framestop >= 0) framestop = this.framestop;
     this.intervalTimer = 0;
     var intervaltimer = 0;
     var runanim = function() {
@@ -222,10 +228,10 @@ YDKJAnimation.prototype.play = function() {
           thisAnim.intervalTimer = 0;
         }
       }
-    }
-  
-    //runanim();
-    intervaltimer = setInterval(runanim,66); // Pourrait être calculé depuis frames[x].fps1/frames[x].fps2
+    };
+
+    intervaltimer = setInterval(runanim,speed); // Pourrait être calculé depuis frames[x].fps1/frames[x].fps2
+    runanim();
     this.intervalTimer = intervaltimer;
   }
 
@@ -245,7 +251,7 @@ YDKJAnimation.prototype.play = function() {
               audioelem.currentTime = 0;
             }, audiospecs.stopDelay);
           }
-        }
+        };
         thisAnim.audiostopTimer = setTimeout(ended, audioelem.duration*1000+audiospecs.playDelay);
         if (audioelem.currentTime) audioelem.currentTime = 0;
         audioelem.volume=audiospecs.maxVolume;
@@ -253,15 +259,19 @@ YDKJAnimation.prototype.play = function() {
       }
     }
   }
-  
+
   // this.triggerEnd lorsque l'animation est terminée, basée sur this.length()
-  var lth = this.length();
-  for(var i = 0; i < this.endedFunctions.length; i++) {
-    (function(i){
-      thisAnim.endedFunctions[i].endTimeout = setTimeout(function(){thisAnim.triggerEnd(i);},Math.max(0,lth-thisAnim.endedFunctions[i].ms));
-    })(i);
+  // Dans le cas d'une boucle, il faudrait exécuter le "end" à la fin de chaque boucle ?
+  if (!thisAnim.loop) {
+      var lth = this.length();
+      for(var i = 0; i < this.endedFunctions.length; i++) {
+        (function(i){
+          thisAnim.endedFunctions[i].endTimeout = setTimeout(function(){thisAnim.triggerEnd(i);},Math.max(0,lth-thisAnim.endedFunctions[i].ms));
+        })(i);
+      }
   }
-}
+  return true;
+};
 
 YDKJAnimation.prototype.stop = function() {
   this.isplaying = 0;
@@ -269,14 +279,14 @@ YDKJAnimation.prototype.stop = function() {
     if (this.endedFunctions[i].endTimeout) clearTimeout(this.endedFunctions[i].endTimeout);
     this.endedFunctions[i].endTimeout = 0;
   }
-  
+
   if (this.urlGif != '') {
     if (this.intervalTimer) {
       clearInterval(this.intervalTimer);
       this.intervalTimer = 0;
     }
   }
-  
+
   if (this.audio) {
     if ((this.loop) && (this.seamlessLoop)) {
       this.seamlessLoop.stop();
@@ -291,7 +301,7 @@ YDKJAnimation.prototype.stop = function() {
       }
     }
   }
-}
+};
 
 YDKJAnimation.prototype.reset = function() {
   this.stop();
@@ -299,7 +309,7 @@ YDKJAnimation.prototype.reset = function() {
     this.newScreen();
     this.nextScreen();
   }
-}
+};
 
 YDKJAnimation.prototype.free = function() {
   this.stop();
@@ -308,12 +318,12 @@ YDKJAnimation.prototype.free = function() {
   if (this.audio) this.audio.free();
   jQuery('#screen').find('#anim'+this.id).addClass('markedAsRemoved'); // Sera retiré réellement à la prochaine animation (pour éviter les écrans noirs entre animations)
   jQuery('#tmpscreen').find('#anim'+this.id).remove();
-}
+};
 
 YDKJAnimation.prototype.setVolume = function(vol) {
   if (vol > 1) vol = vol/100;
   vol = vol*audiospecs.maxVolume;
-  
+
   if (this.audio) {
     if ((this.loop) && (this.seamlessLoop)) {
       this.seamlessLoop.setVolume(vol);
@@ -325,41 +335,39 @@ YDKJAnimation.prototype.setVolume = function(vol) {
       }
     }
   }
-}
+};
 
 YDKJAnimation.prototype.setAnimCallback = function(callback) {
   this.animCallback = callback;
-}
+};
 
 YDKJAnimation.prototype.length = function() {
   var maxlength = 0;
+  var length;
   if (this.urlGif != '') {
+    var speed;
+    if (typeof animationSpeed == 'undefined') speed = 66; else speed = animationSpeed;
+
     var framestart = this.framestart;
     var framestop = this.frames.length-1;
-    if (this.framestop) framestop = this.framestop;
+    if (this.framestop >= 0) framestop = this.framestop;
     var val = 0;
     for(var frameid = framestart; ((frameid<framestop) && ((val & 16) == 0)); frameid++) {
       var ourframe = this.frames[frameid];
-      val = 0;
-      if (ourframe.nbimg > 0) {
-        val = ourframe.img[0].val;
-        for(var i = 1; i <= ourframe.nbimg; i++) {
-          val = val | ourframe.img[i].val;
-        }
-      }
+      val = this.getFrameVal(frameid);
     }
-    var length = (frameid-framestart)*66;
+    length = (frameid-framestart)*speed;
     if (length > maxlength) maxlength = length;
   }
-  
+
   if (this.audio) {
     var audiofile = this.audio.res;
     if (audiofile) {
       var audioelem = audiofile.get(0);
-      var length = audioelem.duration*1000;
+      length = audioelem.duration*1000;
       if (length > maxlength) maxlength = length;
     }
   }
-  
+
   return maxlength;
-}
+};

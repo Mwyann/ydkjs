@@ -4,17 +4,17 @@ function ModeCategory() {}
 
 ModeCategory.prototype.preload = function() {
   var thisMode = this;
-  
+
   this.SFXShowCategoryScreen = new YDKJResource('Category/SFXShowCategoryScreen');
-  
+
   this.MusicChooseCategoryStart = new YDKJResource('Category/MusicChooseCategoryStart');
   this.MusicChooseCategoryLoop = new YDKJResource('Category/MusicChooseCategoryLoop');
   this.ShowCategories = new YDKJResource('Category/ShowCategories');
-  
+
   this.MusicChooseCategoryStart.ended(function(){
     thisMode.MusicChooseCategoryLoop.play();
   });
-  
+
   if (this.options.category == 1) this.ChooseCategory = new YDKJResource('Category/ChooseCategory1');
   if (this.options.category == 2) this.ChooseCategory = new YDKJResource('Category/ChooseCategory2');
   if (this.options.category == 3) this.ChooseCategory = new YDKJResource('Category/ChooseCategory3');
@@ -23,16 +23,16 @@ ModeCategory.prototype.preload = function() {
   this.ChooseCategoryPlayer1 = new YDKJResource('Category/ChooseCategoryPlayer1');
   this.ChooseCategoryPlayer2 = new YDKJResource('Category/ChooseCategoryPlayer2');
   this.ChooseCategoryPlayer3 = new YDKJResource('Category/ChooseCategoryPlayer3');
-  
+
   this.SFXChoiceCategory = new YDKJResource('Category/SFXChoiceCategory');
-  
+
   this.LoopCategory1 = new YDKJResource('Category/LoopCategory1');
   this.LoopCategory2 = new YDKJResource('Category/LoopCategory2');
   this.LoopCategory3 = new YDKJResource('Category/LoopCategory3');
   this.ChoiceCategory1 = new YDKJResource('Category/ChoiceCategory1');
   this.ChoiceCategory2 = new YDKJResource('Category/ChoiceCategory2');
   this.ChoiceCategory3 = new YDKJResource('Category/ChoiceCategory3');
-  
+
   // Précharger les questions avec l'interface de catégorie
   if ((this.options.questionnumber % 2) == 1) { // Questions normales
     this.questiontitles = ['Keuf you !', 'Ma meilleure boum', 'C’est dur vraiment plus longtemps'];
@@ -45,27 +45,27 @@ ModeCategory.prototype.preload = function() {
     this.question2 = new YDKJMode(this.game, 'DisOrDat', {category:this.options.category,questionnumber:this.options.questionnumber,res:'QFold1/DAL'});
     this.question3 = new YDKJMode(this.game, 'DisOrDat', {category:this.options.category,questionnumber:this.options.questionnumber,res:'QFold1/DAP'});
   }
-}
+};
 
 ModeCategory.prototype.start = function() {
   var thisMode = this;
-  
+
   if (!this.chooseplayer) this.chooseplayer = 3; // Déterminer un joueur qui pourra choisir la catégorie
   this.question1.modeObj.chooseplayer = this.chooseplayer;
   this.question2.modeObj.chooseplayer = this.chooseplayer;
   this.question3.modeObj.chooseplayer = this.chooseplayer;
-  
+
   if (this.chooseplayer == 1) this.ChooseCategoryPlayer = this.ChooseCategoryPlayer1;
   if (this.chooseplayer == 2) this.ChooseCategoryPlayer = this.ChooseCategoryPlayer2;
   if (this.chooseplayer == 3) this.ChooseCategoryPlayer = this.ChooseCategoryPlayer3;
-  
+
   this.SFXChoiceCategory.ended(function(){
     thisMode.SFXChoiceCategory.free();
     thisMode.SFXChoiceCategory = new YDKJResource('Category/SFXChoiceCategory');
     thisMode.ChooseCategoryPlayer.delay(function(){
       this.play();
       var thisChooseCategory = this;
-      
+
       var listener = bindKeyListener(function(choice) {
         var chosed = 0;
         var nextquestion = 0;
@@ -76,7 +76,6 @@ ModeCategory.prototype.start = function() {
           // A gérer
         } else chosed = 0;
         if (chosed) {
-        	var choice, nextquestion;
         	switch(chosed) {
         		case 1:
         			choice = thisMode.ChoiceCategory1;
@@ -98,21 +97,21 @@ ModeCategory.prototype.start = function() {
           thisMode.LoopCategory1.free();
           thisMode.LoopCategory2.free();
           thisMode.LoopCategory3.free();
-          
+
           thisMode.SFXChoiceCategory.ended(function(){
             thisMode.ChooseCategory.free();
             thisMode.ChooseCategoryText.free();
             choice.free();
             nextquestion.start(); // On démarre la question choisie
           });
-          
+
           thisMode.SFXChoiceCategory.play();
           choice.play();
         }
       },10000); // 10 secondes de timeout
     },100);
   });
-  
+
   this.ChooseCategoryText.ended(function(){
     jQuery('<div />').css({
       'position':'absolute',
@@ -144,10 +143,10 @@ ModeCategory.prototype.start = function() {
       'font-family':'JackRoman',
       'font-size':'32px',
       'color':'#FFF',
-      'text-align':'center',
+      'text-align':'center'
     }).html(thisMode.game.players[thisMode.chooseplayer-1].name).appendTo('#screen');
   });
-  
+
   this.ShowCategories.ended(function(){
     thisMode.SFXChoiceCategory.delay(function(){
       this.play();
@@ -158,7 +157,7 @@ ModeCategory.prototype.start = function() {
       thisMode.ShowCategories.free();
     },300);
   });
-  
+
   var ShowCategoryNum = 0;
   this.ShowCategories.setAnimCallback(function(){
   	if (ShowCategoryNum < 3) {
@@ -172,7 +171,7 @@ ModeCategory.prototype.start = function() {
   			'top':(163+100*ShowCategoryNum)+'px',
   			'overflow':'hidden'
   		});
-  		
+
   		jQuery('<div />').css({
   			'width':'500px',
   			'vertical-align':'middle',
@@ -182,26 +181,26 @@ ModeCategory.prototype.start = function() {
   			'color':'#FC0',
   			'font-family':'JackRoman'
   		}).html(title).appendTo(div);
-  		
+
   		div.appendTo('#screen').animate({'width':'500px'},150);
-      
+
   		ShowCategoryNum++;
   	}
   });
-  
+
   this.ChooseCategory.ended(function(){
     thisMode.ShowCategories.delay(function(){
       this.play();
     },300);
   });
-  
+
   this.SFXShowCategoryScreen.ended(function(){
     if ((!thisMode.MusicChooseCategoryStart.isplaying) && (!thisMode.MusicChooseCategoryLoop.isplaying)) thisMode.MusicChooseCategoryStart.play();
   });
-  
+
   this.SFXShowCategoryScreen.play();
   // Jouer l'animation du zoom bleu
-  
+
   var blueZoom = function() {
     var step=0;
     var sizes=[{x:40,y:30}, // Tailles d'origine du jeu, svp
@@ -224,7 +223,7 @@ ModeCategory.prototype.start = function() {
           'height':(sizes[step].y)+'px',
           'position':'absolute',
           'left':Math.round((640-sizes[step].x)/2)+'px',
-          'top':Math.round((480-sizes[step].y)/2)+'px',
+          'top':Math.round((480-sizes[step].y)/2)+'px'
         });
         step++;
       } else {
@@ -232,9 +231,9 @@ ModeCategory.prototype.start = function() {
         jQuery('#screen').css('background-color','#00C').html('');
         thisMode.ChooseCategory.play();
       }
-    }
+    };
     interval=setInterval(nextStep,40);
-  }
-  
+  };
+
   blueZoom();
-}
+};
