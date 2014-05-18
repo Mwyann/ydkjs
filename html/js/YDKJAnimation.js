@@ -244,13 +244,15 @@ YDKJAnimation.prototype.play = function() {
                     thisAnim.audiostopTimer = 0;
                     if (!thisAnim.loop) {
                         setTimeout(function() {
-                            audioelem.pause();
-                            audioelem.currentTime = 0;
+                            if (audioelem.readyState) {
+                                audioelem.pause();
+                                audioelem.currentTime = 0;
+                            }
                         }, audiospecs.stopDelay);
                     }
                 };
                 thisAnim.audiostopTimer = setTimeout(ended, audioelem.duration*1000+audiospecs.playDelay);
-                if (audioelem.currentTime) audioelem.currentTime = 0;
+                if ((audioelem.readyState) && (audioelem.currentTime)) audioelem.currentTime = 0;
                 audioelem.volume=audiospecs.maxVolume;
                 audioelem.play();
             }
@@ -293,8 +295,10 @@ YDKJAnimation.prototype.stop = function() {
             var audiofile = this.audio.res;
             if (audiofile) {
                 var audioelem = audiofile.get(0);
-                audioelem.pause();
-                audioelem.currentTime = 0;
+                if (audioelem.readyState) {
+                    audioelem.pause();
+                    audioelem.currentTime = 0;
+                }
             }
         }
     }
