@@ -28,7 +28,7 @@ YDKJMode.prototype.start = function() {
 
 YDKJMode.prototype.free = function() {
   for (var i in this.modeObj) {
-    if (this.modeObj[i] instanceof YDKJResource) {
+    if ((this.modeObj[i] instanceof YDKJAnimation) || (this.modeObj[i] instanceof YDKJResource) || (this.modeObj[i] instanceof YDKJTimer10)) {
       this.modeObj[i].free();
       this.modeObj[i] = undefined;
       delete this.modeObj[i];

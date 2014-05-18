@@ -80,11 +80,11 @@ ModeQuestion.prototype.preload = function() {
   this.WrongAnswer4 = new YDKJResource('Question/WrongAnswer4');
 
   this.LastPlayer1 = new YDKJResource('Question/LastPlayer1');
-	this.LastPlayer2 = new YDKJResource('Question/LastPlayer2');
-	this.LastPlayer3 = new YDKJResource('Question/LastPlayer3');
-	this.LastPlayers12 = new YDKJResource('Question/LastPlayers12');
-	this.LastPlayers13 = new YDKJResource('Question/LastPlayers13');
-	this.LastPlayers23 = new YDKJResource('Question/LastPlayers23');
+  this.LastPlayer2 = new YDKJResource('Question/LastPlayer2');
+  this.LastPlayer3 = new YDKJResource('Question/LastPlayer3');
+  this.LastPlayers12 = new YDKJResource('Question/LastPlayers12');
+  this.LastPlayers13 = new YDKJResource('Question/LastPlayers13');
+  this.LastPlayers23 = new YDKJResource('Question/LastPlayers23');
 
   this.strjs = getYDKJFile('js','res/'+this.options.res+'/STR.js');
   this.correctanswer = this.options.correctanswer;
@@ -99,6 +99,9 @@ ModeQuestion.prototype.preload = function() {
   this.Answer3 = new YDKJAnimation('','','res/'+this.options.res+'/snd/9');
   this.Answer4 = new YDKJAnimation('','','res/'+this.options.res+'/snd/10');
   this.RevealAnswer = new YDKJAnimation('','','res/'+this.options.res+'/snd/11');
+
+  this.Timer = new YDKJTimer10();
+  this.timerTimeout = 0;
 };
 
 ModeQuestion.prototype.start = function() {
@@ -188,7 +191,12 @@ ModeQuestion.prototype.start = function() {
     revealAnswer.play();
   };
 
-  this.SFXPlayerWrong2.ended(function(){
+    var timerRunning = function(){
+        thisMode.Timer.playTimer();
+        thisMode.timerTimeout = setTimeout(timerRunning,1100); // C'est pas exactement une seconde en fait...
+    };
+
+    this.SFXPlayerWrong2.ended(function(){
     thisMode.JingleTimer.delay(function(){
       thisMode.availPlayers[thisMode.currentPlayer].css({'color':'#F00'});
       thisMode.availPlayers[thisMode.currentPlayer] = 0;
@@ -212,7 +220,10 @@ ModeQuestion.prototype.start = function() {
       }
 
       if (thisMode.LastPlayers)  {
+        // Remise du compteur à 10
+        thisMode.Timer.playTimer(10);
         this.play();
+        thisMode.timerTimeout = setTimeout(timerRunning,800);
         thisMode.LastPlayers.play();
       }
     },200);
@@ -267,6 +278,7 @@ ModeQuestion.prototype.start = function() {
   });
 
   this.JingleTimer.ended(function(){
+    clearTimeout(thisMode.timerTimeout);
     this.delay(function(){
       thisMode.currentAns = -1;
       thisMode.SFXTimeOut.play();
@@ -360,7 +372,9 @@ ModeQuestion.prototype.start = function() {
   this.SFXPlayerBuzz.ended(function(){
     this.delay(function(){
       // Remise du compteur à 10
+      thisMode.Timer.playTimer(10);
       thisMode.JingleTimer.play();
+      thisMode.timerTimeout = setTimeout(timerRunning,800);
 
       // Vas-y joueur X
       if (thisMode.currentPlayer == 1) {
@@ -380,6 +394,8 @@ ModeQuestion.prototype.start = function() {
     thisMode.JingleReadQuestion.delay(function(){
       thisMode.JingleReadQuestion.free();
       thisMode.JingleTimer.play();
+      thisMode.PrepareTimer.free();
+      thisMode.timerTimeout = setTimeout(timerRunning,500);
     },100);
   });
 
@@ -390,7 +406,30 @@ ModeQuestion.prototype.start = function() {
     },100);
   });
 
-  thisMode.PrepareTimer.ended(function(){
+  var SFXPlayerKeyEnded = function(){
+      this.delay(function(){
+          thisMode.SFXPlayerKey = new YDKJResource('Question/SFXPlayerKey');
+          thisMode.SFXPlayerKey.ended(SFXPlayerKeyEnded);
+          this.free();
+          switch(thisMode.currentAns){
+              case 1:
+                  thisMode.Answer1.play();
+                  break;
+              case 2:
+                  thisMode.Answer2.play();
+                  break;
+              case 3:
+                  thisMode.Answer3.play();
+                  break;
+              case 4:
+                  thisMode.Answer4.play();
+                  break;
+          }
+      },150);
+  };
+  this.SFXPlayerKey.ended(SFXPlayerKeyEnded);
+
+  this.PrepareTimer.ended(function(){
     this.delay(function(){
       thisMode.NumberAnswer1.play();
       thisMode.NumberAnswer2.play();
@@ -495,6 +534,7 @@ ModeQuestion.prototype.start = function() {
           // Si réponses 1 à 4 : 1 seul joueur = réponse directe, 2 ou 3 joueurs : "On appuie d'abord sur la lettre !"
 
           if (thisMode.currentPlayer) {
+            clearTimeout(thisMode.timerTimeout);
             thisMode.Question.free();
             thisMode.Answers.free();
             thisMode.JingleReadQuestion.free();
@@ -524,29 +564,7 @@ ModeQuestion.prototype.start = function() {
           if (!thisMode.availAnswers[thisMode.currentAns]) thisMode.currentAns = 0;
 
           if (thisMode.currentAns) {
-            thisMode.SFXPlayerKey.ended(function(){
-              this.delay(function(){
-                // Pas moyen de faire un "simple" thisMode.SFXPlayerKey.reset(); ça fait bugguer le reste...
-                var oldkey = thisMode.SFXPlayerKey;
-                thisMode.SFXPlayerKey = new YDKJResource('Question/SFXPlayerKey');
-                oldkey.free();
-                this.free();
-                switch(thisMode.currentAns){
-                  case 1:
-                    thisMode.Answer1.play();
-                  break;
-                  case 2:
-                    thisMode.Answer2.play();
-                  break;
-                  case 3:
-                    thisMode.Answer3.play();
-                  break;
-                  case 4:
-                    thisMode.Answer4.play();
-                  break;
-                }
-              },150);
-            });
+            clearTimeout(thisMode.timerTimeout);
             switch (thisMode.currentPlayer) {
               case 1:
                 thisMode.PlayerBuzzedPlayer1.free();
@@ -581,7 +599,6 @@ ModeQuestion.prototype.start = function() {
           }
         }
       });
-
     },1000);
   });
 

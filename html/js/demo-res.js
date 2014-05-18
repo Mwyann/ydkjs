@@ -203,10 +203,10 @@ var YDKJsnd = {
 };
 
 var YDKJanim = {
-	'Intro':{
+  'Intro':{
 		'IntroPreTitle':{res:'5QDemo',name:'off4/3540',framestart:0,loop:0},
 		'IntroJack':{res:'5QDemo',name:'off4/3540',framestart:58,loop:0},
-	},
+  },
   'Category':{
 		'ChooseCategory1':{res:'5QDemo',name:'off4/10000',framestart:7,loop:0},
 		'ChooseCategory2':{res:'5QDemo',name:'off4/10001',framestart:7,loop:0},
@@ -232,28 +232,28 @@ var YDKJanim = {
 	  'AnnounceValue2000F':{res:'5QDemo',name:'off4/11020',framestart:16,loop:0},
 	  'HideValue2000F':{res:'5QDemo',name:'off4/11020',framestart:35,loop:0},
 	  'PrepareTimer':{res:'5QDemo',name:'off4/8018',framestart:8,loop:0},
-	  
+
 	  'ShowPlayer1Key':{res:'5QDemo',name:'off4/3000',framestart:298,loop:0},
 	  'Player1Answer':{res:'5QDemo',name:'off4/3000',framestart:307,framestop:319,loop:0},
 	  'Player1AnswerLoop':{res:'5QDemo',name:'off4/3000',framestart:321,framestop:326,loop:1},
 	  'Player1Correct':{res:'5QDemo',name:'off4/3000',framestart:328,loop:0},
 	  'Player1Wrong':{res:'5QDemo',name:'off4/3000',framestart:354,loop:0},
 	  'Player1Cancel':{res:'5QDemo',name:'off4/3000',framestart:368,loop:0},
-	  
+
 	  'ShowPlayer2Key':{res:'5QDemo',name:'off4/3000',framestart:691,loop:0}, // 686 pour le plus long
 	  'Player2Answer':{res:'5QDemo',name:'off4/3000',framestart:701,framestop:713,loop:0},
 	  'Player2AnswerLoop':{res:'5QDemo',name:'off4/3000',framestart:715,framestop:720,loop:1},
 	  'Player2Correct':{res:'5QDemo',name:'off4/3000',framestart:722,loop:0},
 	  'Player2Wrong':{res:'5QDemo',name:'off4/3000',framestart:748,loop:0},
 	  'Player2Cancel':{res:'5QDemo',name:'off4/3000',framestart:763,loop:0},
-	  
+
 	  'ShowPlayer3Key':{res:'5QDemo',name:'off4/3000',framestart:1099,loop:0},
 	  'Player3Answer':{res:'5QDemo',name:'off4/3000',framestart:1108,framestop:1120,loop:0},
 	  'Player3AnswerLoop':{res:'5QDemo',name:'off4/3000',framestart:1122,framestop:1127,loop:1},
 	  'Player3Correct':{res:'5QDemo',name:'off4/3000',framestart:1129,loop:0},
 	  'Player3Wrong':{res:'5QDemo',name:'off4/3000',framestart:1156,loop:0},
 	  'Player3Cancel':{res:'5QDemo',name:'off4/3000',framestart:1172,loop:0},
-	  
+
 	  'NumberAnswer1':{res:'5QDemo',name:'off4/12000',framestart:188,loop:0},
 	  'NumberAnswer2':{res:'5QDemo',name:'off4/12000',framestart:194,loop:0},
 	  'NumberAnswer3':{res:'5QDemo',name:'off4/12000',framestart:200,loop:0},

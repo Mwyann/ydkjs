@@ -217,7 +217,7 @@ YDKJAnimation.prototype.play = function() {
       var val = thisAnim.addFrame(framenum);
       if (((val & 4) == 0) || ((val & 8) != 0)) thisAnim.nextScreen();
       if (((val & 32) != 0) && ((val & 8) != 0) && (thisAnim.animCallback)) thisAnim.animCallback();
-      jQuery('#debuglive').html('frame '+framenum+'/'+(thisAnim.frames.length-1)+' ; val:'+val);
+      jQuery('#debuglive').html('frame '+framenum+'/'+(thisAnim.frames.length-1)+' ; val:'+val+' ; nbimg: '+thisAnim.frames[framenum].nbimg);
       framenum++;
       if ((framenum > framestop) || ((val & 16) != 0)) {
         if (thisAnim.loop) framenum = thisAnim.framestart; else {
@@ -352,7 +352,7 @@ YDKJAnimation.prototype.length = function() {
     for(var frameid = framestart; ((frameid<framestop) && ((val & 16) == 0)); frameid++) {
       val = this.getFrameVal(frameid);
     }
-    length = (frameid-framestart)*speed;
+    length = (frameid-framestart+1)*speed;
     if (length > maxlength) maxlength = length;
   }
 
