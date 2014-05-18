@@ -223,7 +223,7 @@ ModeQuestion.prototype.start = function() {
         // Remise du compteur à 10
         thisMode.Timer.playTimer(10);
         this.play();
-        thisMode.timerTimeout = setTimeout(timerRunning,800);
+        thisMode.timerTimeout = setTimeout(timerRunning,500);
         thisMode.LastPlayers.play();
       }
     },200);
@@ -254,6 +254,10 @@ ModeQuestion.prototype.start = function() {
       PlayerWrong.ended(function(){
         if (thisMode.availPlayers[currentPlayer]) thisMode.availPlayers[currentPlayer].css({'color':'#F00'});
       });
+
+      PlayerWrong.ended(function(){
+        thisMode.Timer.playTimer(10);
+      },400);
 
       PlayerAnswerLoop.free();
       PlayerWrong.play();
@@ -374,6 +378,7 @@ ModeQuestion.prototype.start = function() {
       // Remise du compteur à 10
       thisMode.Timer.playTimer(10);
       thisMode.JingleTimer.play();
+      thisMode.PrepareTimer.free();
       thisMode.timerTimeout = setTimeout(timerRunning,800);
 
       // Vas-y joueur X

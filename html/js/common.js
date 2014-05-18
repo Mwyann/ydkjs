@@ -188,12 +188,20 @@ YDKJTimer10.prototype.playTimer = function(next) {
     if ((next < 0) || (next > 10)) return false;
     var thisTimer = this;
     this.animation.ready(function() {
-        thisTimer.animation.framestart = thisTimer.frames.Hide[thisTimer.current].framestart;
-        thisTimer.animation.framestop = thisTimer.frames.Hide[thisTimer.current].framestop;
-        thisTimer.step = 1;
-        thisTimer.next = next;
-        thisTimer.animation.reset();
-        thisTimer.animation.play();
+        if (next == thisTimer.current) {
+            thisTimer.animation.framestart = thisTimer.frames.Still[thisTimer.current].framestart;
+            thisTimer.animation.framestop = thisTimer.frames.Still[thisTimer.current].framestart;
+            thisTimer.step = 0;
+            thisTimer.animation.reset();
+            thisTimer.animation.play();
+        } else {
+            thisTimer.animation.framestart = thisTimer.frames.Hide[thisTimer.current].framestart;
+            thisTimer.animation.framestop = thisTimer.frames.Hide[thisTimer.current].framestop;
+            thisTimer.step = 1;
+            thisTimer.next = next;
+            thisTimer.animation.reset();
+            thisTimer.animation.play();
+        }
     });
     return next;
 };
