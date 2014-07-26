@@ -27,7 +27,7 @@ type subsound=record
        aifc:boolean; // si false, c'est du wav normal
        offset,size:longword;
        samples:longword;
-       frames,rate:word;
+       bitrate,frames,rate:word;
      end;
 
 type subsubfile=record
@@ -519,11 +519,10 @@ begin
     data[4]:=(size and $FF);data[5]:=(size and $FF00) shr 8;data[6]:=(size and $FF0000) shr 16;data[7]:=(size and $FF000000) shr 24;
     data[8]:=ord('W');data[9]:=ord('A');data[10]:=ord('V');data[11]:=ord('E');data[12]:=ord('f');data[13]:=ord('m');data[14]:=ord('t');data[15]:=ord(' ');
     data[16]:=$10;data[17]:=$00;data[18]:=$00;data[19]:=$00;data[20]:=$01;data[21]:=$00;data[22]:=$01;data[23]:=$00;
-    data[24]:=$E4;data[25]:=$57;data[26]:=$00;data[27]:=$00;data[28]:=$C8;data[29]:=$AF;data[30]:=$00;data[31]:=$00;
+    data[24]:=(ss.bitrate and $FF);data[25]:=(ss.bitrate and $FF00) shr 8;data[26]:=$00;data[27]:=$00;data[28]:=$C8;data[29]:=$AF;data[30]:=$00;data[31]:=$00;
 
     data[32]:=$02;data[33]:=$00;data[34]:=$10;data[35]:=$00;data[36]:=ord('d');data[37]:=ord('a');data[38]:=ord('t');data[39]:=ord('a');
-    size:=ss.size;
-    data[40]:=(size and $FF);data[41]:=(size and $FF00) shr 8;data[42]:=(size and $FF0000) shr 16;data[43]:=(size and $FF000000) shr 24;
+    data[40]:=(ss.size and $FF);data[41]:=(ss.size and $FF00) shr 8;data[42]:=(ss.size and $FF0000) shr 16;data[43]:=(ss.size and $FF000000) shr 24;
 
     blockwrite(f,data,44);
 
@@ -557,7 +556,9 @@ var ss:^subsound;
 begin
   getmem(ss,sizeof(subsound));
 
-  blockread(SRFhandler,data,42); // Infos inutiles a priori
+  blockread(SRFhandler,data,28); // Infos inutiles a priori
+  ss.bitrate:=readw;
+  blockread(SRFhandler,data,12); // Infos inutiles a priori
   ss.samples:=readlw;
   ss.frames:=readw;
   ss.rate:=readw;

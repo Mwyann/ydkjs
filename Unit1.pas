@@ -16,10 +16,19 @@ type
     Label6: TLabel;
     Button4: TButton;
     SRFList: TComboBox;
+    Bevel1: TBevel;
+    Label2: TLabel;
+    Label4: TLabel;
+    Label5: TLabel;
+    Edit1: TEdit;
+    Edit2: TEdit;
+    Button1: TButton;
+    Memo1: TMemo;
     procedure Button3Click(Sender: TObject);
     procedure ComboBox1Change(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Button4Click(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
   private
     { Déclarations privées }
   public
@@ -138,8 +147,8 @@ end;
 procedure TForm1.FormShow(Sender: TObject);
 begin
   resbasedir:=IncludeTrailingBackSlash2('html\res');
-  SRFbasedir:=IncludeTrailingBackSlash2('archives\JACK Demo\FR\Riviera');
-  //SRFbasedir:=IncludeTrailingBackSlash2('.');
+  //SRFbasedir:=IncludeTrailingBackSlash2('archives\JACK Demo\FR\Riviera');
+  SRFbasedir:=IncludeTrailingBackSlash2('.');
   FileSearch(SRFbasedir);
   //FileSearch('.');
   SRFList.ItemIndex:=0;
@@ -209,6 +218,74 @@ begin
   end;
 
   Label1.Caption:='Conversion complete.';
+end;
+
+procedure convertSRF(filefrom:string);
+var filepos,subpos:word;
+    fullname,ftype:string;
+    strings:string;
+//    f:system.text;
+begin
+  try
+  openSRF(filefrom);
+  if SRFdata.nbfiles > 0 then for filepos:=0 to SRFdata.nbfiles-1 do begin
+    ftype:=SRFdata.filelist[filepos].ftype;
+    // if (filetype(ftype)='string') then // Considérer que c'est une liste de chaines, à exporter en un seul fichier JS
+
+    if SRFdata.filelist[filepos].nbsub > 0 then for subpos:=0 to SRFdata.filelist[filepos].nbsub-1 do begin
+      if (filetype(ftype)<>'string') then begin
+        fullname:=RemoveExt(SafeFileName(Form1.Edit2.Text+'\'+RemoveBaseDir(Form1.Edit1.Text,filefrom)))+'\'+removespaces(ftype);
+        ForceDirectories(fullname);
+        fullname:=fullname+'\'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname);
+        if (filetype(ftype)='subimages') then begin
+          exportSubimagesToGif(SRFdata.filelist[filepos].subfile[subpos],fullname);
+        end else if (filetype(ftype)='subsound') then begin
+          exportSubsoundToFile(SRFdata.filelist[filepos].subfile[subpos],fullname);
+        end else if (filetype(ftype)='string') then begin
+          //exportStringToFile(SRFdata.filelist[filepos].subfile[subpos],fullname);
+        end else if (filetype(ftype)='stringlist') then begin
+          exportStringlistToFile(SRFdata.filelist[filepos].subfile[subpos],fullname);
+        end;
+      end else begin
+        strings:=strings+'{id:'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname)+',str:'''+readString(SRFdata.filelist[filepos].subfile[subpos])+'''},';
+      end;
+    end;
+  end;
+  except
+    Form1.Memo1.Lines.Add('Couldn''t open.');
+  end;
+  try
+    closeSRF;
+  except
+  end;
+end;
+
+procedure convertRecursive(const dirName:string);
+var
+  searchResult: TSearchRec;
+begin
+  if FindFirst(dirName+'\*', faAnyFile, searchResult)=0 then begin
+    try
+      repeat
+        if (searchResult.Attr and faDirectory)=0 then begin
+          if SameText(ExtractFileExt(searchResult.Name), '.SRF') then begin
+            Form1.Memo1.Lines.Add(IncludeTrailingBackSlash2(dirName)+searchResult.Name);
+            convertSRF(IncludeTrailingBackSlash2(dirName)+searchResult.Name);
+          end;
+        end else if (searchResult.Name<>'.') and (searchResult.Name<>'..') then begin
+          convertRecursive(IncludeTrailingBackSlash2(dirName)+searchResult.Name);
+        end;
+      until FindNext(searchResult)<>0
+    finally
+      FindClose(searchResult);
+    end;
+  end;
+end;
+
+procedure TForm1.Button1Click(Sender: TObject);
+begin
+   Memo1.Clear;
+   convertRecursive(Edit1.Text);
 end;
 
 end.
