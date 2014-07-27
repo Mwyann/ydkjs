@@ -39,7 +39,7 @@ type subsubfile=record
 type subfile=record
        ftype:string[4]; // off4, snd....
        nbsub:word;
-       subfile:array[0..255] of subsubfile;
+       subfile:array[0..1000] of subsubfile;
      end;
 
 var SRFhandler:file;
@@ -440,7 +440,8 @@ begin
     //form1.Label1.caption:='Alert nbimage different';
   end;
   si^.nbimages:=nbimages;
-  if nbimages > 0 then begin // On peut n'avoir aucune image, mais des frames... exemple avec 5QDemo.srf, premier bloc
+  if nbimages > 0 then begin // On peut n'avoir aucune image, mais des frames... exemple avec 5QDemo.srf, premier bloc (42)
+    if (nbimages > 1000) then raise Exception.Create('Too many images');
     for i:=0 to nbimages-1 do begin
       si^.images[i].offset:=fileoffset+readlw;
       si^.images[i].width:=readw;
@@ -658,7 +659,7 @@ begin
   result:='';
   if (ftype='off4') then result:='subimages';
   if (ftype='snd ') then result:='subsound';
-  if (ftype[1]='M') then result:='subsound';
+  if (ftype[1]='M') and (ftype <> 'Mtch') then result:='subsound';
   if (ftype='STR ') then result:='string';
   if (ftype='STRL') then result:='stringlist';
   // Utilisés pour le Couci-Couça, entre autres
@@ -692,6 +693,7 @@ begin
     subcount:=readlw;
     ftype:=chr(buf[0])+chr(buf[1])+chr(buf[2])+chr(buf[3]);
     nbsub:=subcount;
+    if (nbsub > 1000) then raise Exception.create('Too many subfiles');
     if (subcount > 0) then for i:=0 to subcount-1 do begin
       subfile[i].subname:=readlw;
       subfile[i].fileoffset:=readlw;
@@ -708,6 +710,7 @@ begin
       seek(SRFhandler,currentpos);
     end;
     inc(SRFdata.nbfiles);
+    if (SRFdata.nbfiles > 255) then raise Exception.Create('Too many nbfiles'); 
   end;
   result:=0;
 end;

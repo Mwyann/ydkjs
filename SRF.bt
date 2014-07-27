@@ -138,7 +138,7 @@ typedef struct {
     SetBackColor( cLtBlue );
     if (filename[0] == 'o' && filename[1] == 'f' && filename[2] == 'f' && filename[3] == '4') IMAGEFILE images <optimize=false>;
     else if (filename[0] == 's' && filename[1] == 'n' && filename[2] == 'd' && filename[3] == ' ') SOUNDFILE sound <optimize=false>;
-    else if (filename[0] == 'M') SOUNDFILE sound <optimize=false>;
+    else if (filename[0] == 'M' && filename[1] != 't' && filename[2] != 'c' && filename[3] == 'h') SOUNDFILE sound <optimize=false>;
     else if (filename[0] == 'S' && filename[1] == 'T' && filename[2] == 'R' && filename[3] == ' ') STRING str <optimize=false>;
     else if (filename[0] == 'S' && filename[1] == 'T' && filename[2] == 'R' && filename[3] == 'L') STRINGLIST strl <optimize=false>;
     else if (filename[0] == 'A' && filename[1] == 'N' && filename[2] == 'S' && filename[3] == '#') ANSLIST strl <optimize=false>;

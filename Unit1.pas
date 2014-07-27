@@ -251,8 +251,9 @@ begin
       end;
     end;
   end;
-  except
-    Form1.Memo1.Lines.Add('Couldn''t open.');
+  except on E : Exception do begin
+      Form1.Memo1.Lines.Add('Couldn''t open ('+E.ClassName+': '+E.Message+')');
+    end;
   end;
   try
     closeSRF;
