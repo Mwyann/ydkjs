@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>You Don't Know Jack™ DEMO FR</title>
+<title>You Don't Know Jack® DEMO FR</title>
 <link href="css/ydkj.css" rel="stylesheet"/>
 <script src="js/jquery-1.11.0.min.js" type="text/javascript"></script>
 <script src="js/SeamlessLoop.js" type="text/javascript"></script>
@@ -40,7 +40,7 @@ function startgame() {
 
 <body style="background-color:#000;margin:0;padding:0;border:0">
   <div id="warning" style="border:#F00 1px solid; background-color:#300;color:#FFF;margin:50px;padding:20px;font-family:JackCondensed;font-size:18px">
-    <div style="text-align:center;font-size:42px;font-weight:bold">You Don't Know Jack™ DEMO FR</div>
+    <div style="text-align:center;font-size:42px;font-weight:bold">You Don't Know Jack® DEMO FR</div>
     <p style="text-align:center;font-size:24px;font-weight:bold">ATTENTION : A LIRE AVANT DE JOUER ! <span style="font-size:20px">(Si si, vraiment, au moins ce qui est <u>souligné</u>)</span></p>
     <p>
      <u>Ce jeu est sous copyright <a style="color:#F00" href="http://www.jellyvision.com/">JellyVision Games</a></u>. Il est sorti à l'origine en 1995 sur PC et Mac et en 1998 pour la version française (pour en savoir plus, voir la fiche du jeu sur <a style="color:#F00" href="http://fr.wikipedia.org/wiki/You_Don%27t_Know_Jack_%28s%C3%A9rie_de_jeux_vid%C3%A9o%29">Wikipedia</a>), et j'ai décidé d'en faire une version jouable dans un navigateur en extrayant les éléments graphiques et sonores des fichiers du jeu et en réécrivant (comprenez en simulant) le moteur en Javascript.<br/>
