@@ -3,14 +3,14 @@
 function ModeIntro() {}
 
 ModeIntro.prototype.preload = function() {
-    this.IntroPreTitle = new YDKJResource('Intro/IntroPreTitle');
-    this.IntroJack = new YDKJResource('Intro/IntroJack');
+    this.IntroPreTitle = new YDKJAnimation(YDKJResource('Intro/IntroPreTitle'));
+    this.IntroJack = new YDKJAnimation(YDKJResource('Intro/IntroJack'));
 
-    this.MusicJack = new YDKJResource('Intro/MusicJack');
-    this.SFXBang = new YDKJResource('Intro/SFXBang');
-    this.SFXJackTitle = new YDKJResource('Intro/SFXJackTitle');
-    this.IntroJackTitle = new YDKJResource('Intro/IntroJackTitle');
-    this.IntroJackDemo = new YDKJResource('Intro/IntroJackDemo');
+    this.MusicJack = new YDKJAnimation(YDKJResource('Intro/MusicJack'));
+    this.SFXBang = new YDKJAnimation(YDKJResource('Intro/SFXBang'));
+    this.SFXJackTitle = new YDKJAnimation(YDKJResource('Intro/SFXJackTitle'));
+    this.IntroJackTitle = new YDKJAnimation(YDKJResource('Intro/IntroJackTitle'));
+    this.IntroJackDemo = new YDKJAnimation(YDKJResource('Intro/IntroJackDemo'));
 };
 
 ModeIntro.prototype.start = function() {
@@ -30,7 +30,7 @@ ModeIntro.prototype.start = function() {
         this.free();
         thisMode.IntroJackDemo.delay(function(){
             this.play();
-            thisMode.category = new YDKJMode(thisMode.game, 'Category', {category:1,questionnumber:1}); // Preload des catégories pendant le speech
+            thisMode.category = new YDKJMode(thisMode.game, 'Category', {category:1,questionnumber:1}, []); // Preload des catégories pendant le speech
             this.skiplistener = bindKeyListener(function(choice) {
                 if (choice == 32) {
                     unbindKeyListener(thisMode.skiplistener);
@@ -43,7 +43,7 @@ ModeIntro.prototype.start = function() {
     this.SFXJackTitle.ended(function(){
         this.free();
         thisMode.IntroJackTitle.delay(function(){
-            thisMode.MusicJack.animation.volume(50); // On baisse le volume de la musique de fond
+            thisMode.MusicJack.volume(50); // On baisse le volume de la musique de fond
             this.play();
         },300);
     });

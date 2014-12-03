@@ -13,7 +13,7 @@ function AudioSpecs() {
     this.maxVolume = 1;
     if(this.is.chrome) this.playDelay = -25;
     if(this.is.chrome) this.stopDelay = 25;
-    if(this.is.chrome) this.maxVolume = 0.8;
+    if(this.is.chrome) this.maxVolume = 0.5;
     if(this.is.ff) this.playDelay = -25;
     if(this.is.ff) this.stopDelay = 85;
     if(this.is.opera) this.playDelay = 5;
@@ -155,7 +155,7 @@ function YDKJTimer10() {
     };
 
     var resName = 'res/5QDemo/off4/8018';
-    this.animation = new YDKJAnimation(resName+'.gif',resName+'.js','',73,0,75);
+    this.animation = new YDKJAnimation({urlGif: resName+'.gif', urlJS: resName+'.js', urlAudio: '',framestart: 73, loop: 0,framestop: 75});
     var thisTimer = this;
     this.step = 0; // 0 = Still, 1 = Hiding, 2 = Showing
     this.current = 10;
@@ -177,6 +177,10 @@ function YDKJTimer10() {
         }
     });
 }
+
+YDKJTimer10.prototype.ready = function(f) {
+    this.animation.ready(f);
+};
 
 YDKJTimer10.prototype.free = function() {
     if (this.animation) this.animation.free();

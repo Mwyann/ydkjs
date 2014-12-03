@@ -1,17 +1,16 @@
 /********** YDKJAnimation **********/
 
-function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop,framestop) {
+function YDKJAnimation(resource) {
+    this.resource = resource; // Type YDKJResource
+    // Anciens paramètres : urlGif,urlJS,urlAudio,framestart,loop,framestop
     this.div = 0;
     this.tmpdiv = 0;
-    this.urlGif = urlGif;
-    this.urlJS = urlJS;
-    this.urlAudio = urlAudio;
-    if (typeof(framestart) === 'undefined') framestart = 0;
-    if (typeof(loop) === 'undefined') loop = 0;
-    if (typeof(framestop) === 'undefined') framestop = -1;
-    this.framestart = framestart;
-    this.loop = loop;
-    this.framestop = framestop;
+    this.urlGif = this.resource.urlGif;
+    this.urlJS = this.resource.urlJS;
+    this.urlAudio = this.resource.urlAudio;
+    this.framestart = this.resource.framestart;
+    this.loop = this.resource.loop;
+    this.framestop = this.resource.framestop;
     this.seamlessLoop = 0;
 
     var thisAnim = this;
@@ -176,6 +175,10 @@ YDKJAnimation.prototype.ready = function(f) {
 };
 
 YDKJAnimation.prototype.ended = function(f,msbeforeend) {
+    if (f === false) {
+        this.endedFunctions = [];
+        return true;
+    }
     if (!msbeforeend) msbeforeend = 0;
     if (!this.played) {
         var idx = -1;
@@ -196,7 +199,10 @@ YDKJAnimation.prototype.delay = function(f,delay) {
 
 YDKJAnimation.prototype.play = function() {
     this.stop();
-    if (!this.preloaded) return false; // Ou bien attendre le preload ?
+    if (!this.preloaded) {
+        //this.ready(function(){this.play();});  // Ne pas attendre le preload (normalement tout est déjà préloadé)
+        return true; // Retourne immédiatement, même si l'animation n'a pas encore joué...
+    }
 
     this.isplaying = 1;
     var thisAnim = this;
@@ -304,12 +310,14 @@ YDKJAnimation.prototype.stop = function() {
     }
 };
 
-YDKJAnimation.prototype.reset = function() {
+YDKJAnimation.prototype.reset = function(fullreset) {
     this.stop();
+    this.played = 0;
     if (this.urlGif != '') {
         this.newScreen();
         this.nextScreen();
     }
+    if (fullreset) this.endedFunctions = [];
 };
 
 YDKJAnimation.prototype.free = function() {
@@ -324,6 +332,7 @@ YDKJAnimation.prototype.free = function() {
 YDKJAnimation.prototype.volume = function(vol) {
     if (vol > 1) vol = vol/100;
     vol = vol*audiospecs.maxVolume;
+    vol = Math.log(vol*9+1)/Math.LN10;
 
     if (this.audio) {
         if ((this.loop) && (this.seamlessLoop)) {

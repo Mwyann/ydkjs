@@ -1,6 +1,6 @@
 /********** YDKJMode **********/
 
-function YDKJMode(game, modename, options) {
+function YDKJMode(game, modename, options, resources) {
     if (!options) options = {};
     this.modeObj = false;
 
@@ -14,15 +14,32 @@ function YDKJMode(game, modename, options) {
 
     this.modeObj.game = game;
     this.modeObj.options = options;
-    this.modeObj.preload();
+    this.modeObj.preload(resources);
 }
 
 YDKJMode.prototype.start = function() {
+    var thisMode = this;
     if (!this.modeObj) return false;
     if (this.modeObj.game.currentmode) this.modeObj.game.currentmode.free();
     this.modeObj.game.currentmode = this;
     this.modeObj.skiplistener = 0;
-    this.modeObj.start();
+
+    // S'assurer que toutes les ressources sont préchargées avant de démarrer.
+    var numobj = 1;
+    var readyfunction = function() {
+        numobj--;
+        if (numobj == 0) thisMode.modeObj.start();
+    };
+
+    for (var i in this.modeObj) {
+        if ((this.modeObj[i] instanceof YDKJAnimation) || (this.modeObj[i] instanceof YDKJResource) || (this.modeObj[i] instanceof YDKJTimer10)) {
+            numobj++;
+            this.modeObj[i].ready(readyfunction);
+        }
+    }
+
+    readyfunction();
+
     return true;
 };
 

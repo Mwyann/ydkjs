@@ -4,101 +4,101 @@ function ModeQuestion() {}
 
 ModeQuestion.prototype.preload = function() {
     if (this.options.questionnumber == 1) {
-        this.JingleQuestion = new YDKJResource('Category/JingleQuestion1'); // Charger les bonnes ressources en fonction du n° de la question
-        this.BGQuestion = new YDKJResource('Category/BGQuestion1');
+        this.JingleQuestion = new YDKJAnimation(YDKJResource('Category/JingleQuestion1')); // Charger les bonnes ressources en fonction du n° de la question
+        this.BGQuestion = new YDKJAnimation(YDKJResource('Category/BGQuestion1'));
     }
     if (this.options.questionnumber == 2) {
-        this.JingleQuestion = new YDKJResource('Category/JingleQuestion2');
-        this.BGQuestion = new YDKJResource('Category/BGQuestion2');
+        this.JingleQuestion = new YDKJAnimation(YDKJResource('Category/JingleQuestion2'));
+        this.BGQuestion = new YDKJAnimation(YDKJResource('Category/BGQuestion2'));
     }
     if (this.options.questionnumber >= 3) {
-        this.JingleQuestion = new YDKJResource('Category/JingleQuestion3');
-        this.BGQuestion = new YDKJResource('Category/BGQuestion3');
+        this.JingleQuestion = new YDKJAnimation(YDKJResource('Category/JingleQuestion3'));
+        this.BGQuestion = new YDKJAnimation(YDKJResource('Category/BGQuestion3'));
     }
 
     this.value = 2000;
 
-    this.AnnounceCategory = new YDKJResource('Question/AnnounceCategory');
-    this.AnnounceValue = new YDKJResource('Question/AnnounceValue'+this.value+'F');
-    this.VoiceAnnounceValue = new YDKJResource('Question/VoiceAnnounceValue'+this.value+'F');
-    this.HideValue = new YDKJResource('Question/HideValue2000F');
-    this.TimerComesIn = new YDKJResource('Question/TimerComesIn');
-    this.PrepareTimer = new YDKJResource('Question/PrepareTimer');
-    this.SFXShowQuestion = new YDKJResource('Question/SFXShowQuestion');
-    this.JingleReadQuestion = new YDKJResource('Question/JingleReadQuestion');
-    this.JingleTimer = new YDKJResource('Question/JingleTimer');
-    this.TimeOut = new YDKJResource('Question/TimeOut');
-    this.SFXTimeOut = new YDKJResource('Question/SFXTimeOut');
-    this.SFXPlayerBuzz = new YDKJResource('Question/SFXPlayerBuzz');
-    this.SFXPlayerKey = new YDKJResource('Question/SFXPlayerKey');
-    this.SFXPlayerWrong1 = new YDKJResource('Question/SFXPlayerWrong1'); // On efface la réponse
-    this.SFXPlayerWrong2 = new YDKJResource('Question/SFXPlayerWrong2'); // On fait tomber le joueur
-    this.SFXPlayerCorrect = new YDKJResource('Question/SFXPlayerCorrect');
-    this.SFXRevealAnswer = new YDKJResource('Question/SFXRevealAnswer');
-    this.DefaultRevealAnswer = new YDKJResource('Question/DefaultRevealAnswer');
-    this.DefaultRevealLastAnswer = new YDKJResource('Question/DefaultRevealLastAnswer');
+    this.AnnounceCategory = new YDKJAnimation(YDKJResource('Question/AnnounceCategory'));
+    this.AnnounceValue = new YDKJAnimation(YDKJResource('Question/AnnounceValue'+this.value+'F'));
+    this.VoiceAnnounceValue = new YDKJAnimation(YDKJResource('Question/VoiceAnnounceValue'+this.value+'F'));
+    this.HideValue = new YDKJAnimation(YDKJResource('Question/HideValue2000F'));
+    this.TimerComesIn = new YDKJAnimation(YDKJResource('Question/TimerComesIn'));
+    this.PrepareTimer = new YDKJAnimation(YDKJResource('Question/PrepareTimer'));
+    this.SFXShowQuestion = new YDKJAnimation(YDKJResource('Question/SFXShowQuestion'));
+    this.JingleReadQuestion = new YDKJAnimation(YDKJResource('Question/JingleReadQuestion'));
+    this.JingleTimer = new YDKJAnimation(YDKJResource('Question/JingleTimer'));
+    this.TimeOut = new YDKJAnimation(YDKJResource('Question/TimeOut'));
+    this.SFXTimeOut = new YDKJAnimation(YDKJResource('Question/SFXTimeOut'));
+    this.SFXPlayerBuzz = new YDKJAnimation(YDKJResource('Question/SFXPlayerBuzz'));
+    this.SFXPlayerKey = new YDKJAnimation(YDKJResource('Question/SFXPlayerKey'));
+    this.SFXPlayerWrong1 = new YDKJAnimation(YDKJResource('Question/SFXPlayerWrong1')); // On efface la réponse
+    this.SFXPlayerWrong2 = new YDKJAnimation(YDKJResource('Question/SFXPlayerWrong2')); // On fait tomber le joueur
+    this.SFXPlayerCorrect = new YDKJAnimation(YDKJResource('Question/SFXPlayerCorrect'));
+    this.SFXRevealAnswer = new YDKJAnimation(YDKJResource('Question/SFXRevealAnswer'));
+    this.DefaultRevealAnswer = new YDKJAnimation(YDKJResource('Question/DefaultRevealAnswer'));
+    this.DefaultRevealLastAnswer = new YDKJAnimation(YDKJResource('Question/DefaultRevealLastAnswer'));
 
-    this.ShowPlayer1Key = new YDKJResource('Question/ShowPlayer1Key');
-    this.Player1Answer = new YDKJResource('Question/Player1Answer');
-    this.Player1AnswerLoop = new YDKJResource('Question/Player1AnswerLoop');
-    this.PlayerBuzzedPlayer1 = new YDKJResource('Question/PlayerBuzzedPlayer1');
-    this.Player1Correct = new YDKJResource('Question/Player1Correct');
-    this.Player1Wrong = new YDKJResource('Question/Player1Wrong');
-    this.Player1Cancel = new YDKJResource('Question/Player1Cancel');
+    this.ShowPlayer1Key = new YDKJAnimation(YDKJResource('Question/ShowPlayer1Key'));
+    this.Player1Answer = new YDKJAnimation(YDKJResource('Question/Player1Answer'));
+    this.Player1AnswerLoop = new YDKJAnimation(YDKJResource('Question/Player1AnswerLoop'));
+    this.PlayerBuzzedPlayer1 = new YDKJAnimation(YDKJResource('Question/PlayerBuzzedPlayer1'));
+    this.Player1Correct = new YDKJAnimation(YDKJResource('Question/Player1Correct'));
+    this.Player1Wrong = new YDKJAnimation(YDKJResource('Question/Player1Wrong'));
+    this.Player1Cancel = new YDKJAnimation(YDKJResource('Question/Player1Cancel'));
 
-    this.ShowPlayer2Key = new YDKJResource('Question/ShowPlayer2Key');
-    this.Player2Answer = new YDKJResource('Question/Player2Answer');
-    this.Player2AnswerLoop = new YDKJResource('Question/Player2AnswerLoop');
-    this.PlayerBuzzedPlayer2 = new YDKJResource('Question/PlayerBuzzedPlayer2');
-    this.Player2Correct = new YDKJResource('Question/Player2Correct');
-    this.Player2Wrong = new YDKJResource('Question/Player2Wrong');
-    this.Player2Cancel = new YDKJResource('Question/Player2Cancel');
+    this.ShowPlayer2Key = new YDKJAnimation(YDKJResource('Question/ShowPlayer2Key'));
+    this.Player2Answer = new YDKJAnimation(YDKJResource('Question/Player2Answer'));
+    this.Player2AnswerLoop = new YDKJAnimation(YDKJResource('Question/Player2AnswerLoop'));
+    this.PlayerBuzzedPlayer2 = new YDKJAnimation(YDKJResource('Question/PlayerBuzzedPlayer2'));
+    this.Player2Correct = new YDKJAnimation(YDKJResource('Question/Player2Correct'));
+    this.Player2Wrong = new YDKJAnimation(YDKJResource('Question/Player2Wrong'));
+    this.Player2Cancel = new YDKJAnimation(YDKJResource('Question/Player2Cancel'));
 
-    this.ShowPlayer3Key = new YDKJResource('Question/ShowPlayer3Key');
-    this.Player3Answer = new YDKJResource('Question/Player3Answer');
-    this.Player3AnswerLoop = new YDKJResource('Question/Player3AnswerLoop');
-    this.PlayerBuzzedPlayer3 = new YDKJResource('Question/PlayerBuzzedPlayer3');
-    this.Player3Correct = new YDKJResource('Question/Player3Correct');
-    this.Player3Wrong = new YDKJResource('Question/Player3Wrong');
-    this.Player3Cancel = new YDKJResource('Question/Player3Cancel');
+    this.ShowPlayer3Key = new YDKJAnimation(YDKJResource('Question/ShowPlayer3Key'));
+    this.Player3Answer = new YDKJAnimation(YDKJResource('Question/Player3Answer'));
+    this.Player3AnswerLoop = new YDKJAnimation(YDKJResource('Question/Player3AnswerLoop'));
+    this.PlayerBuzzedPlayer3 = new YDKJAnimation(YDKJResource('Question/PlayerBuzzedPlayer3'));
+    this.Player3Correct = new YDKJAnimation(YDKJResource('Question/Player3Correct'));
+    this.Player3Wrong = new YDKJAnimation(YDKJResource('Question/Player3Wrong'));
+    this.Player3Cancel = new YDKJAnimation(YDKJResource('Question/Player3Cancel'));
 
-    this.NumberAnswer1 = new YDKJResource('Question/NumberAnswer1');
-    this.NumberAnswer2 = new YDKJResource('Question/NumberAnswer2');
-    this.NumberAnswer3 = new YDKJResource('Question/NumberAnswer3');
-    this.NumberAnswer4 = new YDKJResource('Question/NumberAnswer4');
-    this.LoopAnswer1 = new YDKJResource('Question/LoopAnswer1');
-    this.LoopAnswer2 = new YDKJResource('Question/LoopAnswer2');
-    this.LoopAnswer3 = new YDKJResource('Question/LoopAnswer3');
-    this.LoopAnswer4 = new YDKJResource('Question/LoopAnswer4');
-    this.CorrectAnswer1 = new YDKJResource('Question/CorrectAnswer1');
-    this.CorrectAnswer2 = new YDKJResource('Question/CorrectAnswer2');
-    this.CorrectAnswer3 = new YDKJResource('Question/CorrectAnswer3');
-    this.CorrectAnswer4 = new YDKJResource('Question/CorrectAnswer4');
-    this.WrongAnswer1 = new YDKJResource('Question/WrongAnswer1');
-    this.WrongAnswer2 = new YDKJResource('Question/WrongAnswer2');
-    this.WrongAnswer3 = new YDKJResource('Question/WrongAnswer3');
-    this.WrongAnswer4 = new YDKJResource('Question/WrongAnswer4');
+    this.NumberAnswer1 = new YDKJAnimation(YDKJResource('Question/NumberAnswer1'));
+    this.NumberAnswer2 = new YDKJAnimation(YDKJResource('Question/NumberAnswer2'));
+    this.NumberAnswer3 = new YDKJAnimation(YDKJResource('Question/NumberAnswer3'));
+    this.NumberAnswer4 = new YDKJAnimation(YDKJResource('Question/NumberAnswer4'));
+    this.LoopAnswer1 = new YDKJAnimation(YDKJResource('Question/LoopAnswer1'));
+    this.LoopAnswer2 = new YDKJAnimation(YDKJResource('Question/LoopAnswer2'));
+    this.LoopAnswer3 = new YDKJAnimation(YDKJResource('Question/LoopAnswer3'));
+    this.LoopAnswer4 = new YDKJAnimation(YDKJResource('Question/LoopAnswer4'));
+    this.CorrectAnswer1 = new YDKJAnimation(YDKJResource('Question/CorrectAnswer1'));
+    this.CorrectAnswer2 = new YDKJAnimation(YDKJResource('Question/CorrectAnswer2'));
+    this.CorrectAnswer3 = new YDKJAnimation(YDKJResource('Question/CorrectAnswer3'));
+    this.CorrectAnswer4 = new YDKJAnimation(YDKJResource('Question/CorrectAnswer4'));
+    this.WrongAnswer1 = new YDKJAnimation(YDKJResource('Question/WrongAnswer1'));
+    this.WrongAnswer2 = new YDKJAnimation(YDKJResource('Question/WrongAnswer2'));
+    this.WrongAnswer3 = new YDKJAnimation(YDKJResource('Question/WrongAnswer3'));
+    this.WrongAnswer4 = new YDKJAnimation(YDKJResource('Question/WrongAnswer4'));
 
-    this.LastPlayer1 = new YDKJResource('Question/LastPlayer1');
-    this.LastPlayer2 = new YDKJResource('Question/LastPlayer2');
-    this.LastPlayer3 = new YDKJResource('Question/LastPlayer3');
-    this.LastPlayers12 = new YDKJResource('Question/LastPlayers12');
-    this.LastPlayers13 = new YDKJResource('Question/LastPlayers13');
-    this.LastPlayers23 = new YDKJResource('Question/LastPlayers23');
+    this.LastPlayer1 = new YDKJAnimation(YDKJResource('Question/LastPlayer1'));
+    this.LastPlayer2 = new YDKJAnimation(YDKJResource('Question/LastPlayer2'));
+    this.LastPlayer3 = new YDKJAnimation(YDKJResource('Question/LastPlayer3'));
+    this.LastPlayers12 = new YDKJAnimation(YDKJResource('Question/LastPlayers12'));
+    this.LastPlayers13 = new YDKJAnimation(YDKJResource('Question/LastPlayers13'));
+    this.LastPlayers23 = new YDKJAnimation(YDKJResource('Question/LastPlayers23'));
 
     this.strjs = getYDKJFile('js','res/'+this.options.res+'/STR.js');
     this.correctanswer = this.options.correctanswer;
 
-    this.QuestionTitle = new YDKJAnimation('','','res/'+this.options.res+'/snd/1');
-    this.PreQuestion = new YDKJAnimation('','','res/'+this.options.res+'/snd/2');
-    this.Question = new YDKJAnimation('','','res/'+this.options.res+'/snd/3');
-    this.Answers = new YDKJAnimation('','','res/'+this.options.res+'/snd/5');
-    this.EndQuestion = new YDKJAnimation('','','res/'+this.options.res+'/snd/6');
-    this.Answer1 = new YDKJAnimation('','','res/'+this.options.res+'/snd/7');
-    this.Answer2 = new YDKJAnimation('','','res/'+this.options.res+'/snd/8');
-    this.Answer3 = new YDKJAnimation('','','res/'+this.options.res+'/snd/9');
-    this.Answer4 = new YDKJAnimation('','','res/'+this.options.res+'/snd/10');
-    this.RevealAnswer = new YDKJAnimation('','','res/'+this.options.res+'/snd/11');
+    this.QuestionTitle = new YDKJAnimation({urlGif: '', urlJS: '', urlAudio: 'res/'+this.options.res+'/snd/1', framestart:0, loop:0, framestop:0});
+    this.PreQuestion = new YDKJAnimation({urlGif: '', urlJS: '', urlAudio: 'res/'+this.options.res+'/snd/2', framestart:0, loop:0, framestop:0});
+    this.Question = new YDKJAnimation({urlGif: '', urlJS: '', urlAudio: 'res/'+this.options.res+'/snd/3', framestart:0, loop:0, framestop:0});
+    this.Answers = new YDKJAnimation({urlGif: '', urlJS: '', urlAudio: 'res/'+this.options.res+'/snd/5', framestart:0, loop:0, framestop:0});
+    this.EndQuestion = new YDKJAnimation({urlGif: '', urlJS: '', urlAudio: 'res/'+this.options.res+'/snd/6', framestart:0, loop:0, framestop:0});
+    this.Answer1 = new YDKJAnimation({urlGif: '', urlJS: '', urlAudio: 'res/'+this.options.res+'/snd/7', framestart:0, loop:0, framestop:0});
+    this.Answer2 = new YDKJAnimation({urlGif: '', urlJS: '', urlAudio: 'res/'+this.options.res+'/snd/8', framestart:0, loop:0, framestop:0});
+    this.Answer3 = new YDKJAnimation({urlGif: '', urlJS: '', urlAudio: 'res/'+this.options.res+'/snd/9', framestart:0, loop:0, framestop:0});
+    this.Answer4 = new YDKJAnimation({urlGif: '', urlJS: '', urlAudio: 'res/'+this.options.res+'/snd/10', framestart:0, loop:0, framestop:0});
+    //this.RevealAnswer = new YDKJAnimation({urlGif: '', urlJS: '', urlAudio: 'res/'+this.options.res+'/snd/11', framestart:0, loop:0, framestop:0});
 
     this.Timer = new YDKJTimer10();
     this.timerTimeout = 0;
@@ -411,11 +411,9 @@ ModeQuestion.prototype.start = function() {
         },100);
     });
 
-    var SFXPlayerKeyEnded = function(){
+    this.SFXPlayerKey.ended(function(){
         this.delay(function(){
-            thisMode.SFXPlayerKey = new YDKJResource('Question/SFXPlayerKey');
-            thisMode.SFXPlayerKey.ended(SFXPlayerKeyEnded);
-            this.free();
+            this.reset();
             switch(thisMode.currentAns){
                 case 1:
                     thisMode.Answer1.play();
@@ -431,8 +429,7 @@ ModeQuestion.prototype.start = function() {
                     break;
             }
         },150);
-    };
-    this.SFXPlayerKey.ended(SFXPlayerKeyEnded);
+    });
 
     this.PrepareTimer.ended(function(){
         this.delay(function(){

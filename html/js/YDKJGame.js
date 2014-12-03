@@ -1,19 +1,14 @@
 /********** YDKJGame **********/
 
-function YDKJGame() {
+function YDKJGame(demomode) {
+    this.api = new YDKJAPI(this, demomode);
     jQuery.fx.interval = 66;
-    this.players = [
-        {name:'Jeff',score:0},
-        {name:'David',score:0},
-        {name:'Alicia',score:0}
-    ];
+    this.players = this.api.players();
     this.currentmode = 0;
 }
 
 YDKJGame.prototype.start = function() {
-    var gamemode = new YDKJMode(this, 'Intro');
-    //var gamemode = new YDKJMode(this, 'Category', {category:1,questionnumber:1});
-    //var gamemode = new YDKJMode(this, 'Question', {questionnumber:1,res:'QFold1/AJM',correctanswer:4});
+    var gamemode = this.api.gamemode();
     gamemode.start();
 };
 

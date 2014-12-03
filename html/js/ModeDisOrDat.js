@@ -3,31 +3,31 @@
 function ModeDisOrDat() {}
 
 ModeDisOrDat.prototype.preload = function() {
-    this.ChoicePlayer1on3 = new YDKJResource('DisOrDat/ChoicePlayer1on3');
-    this.ChoicePlayer2on3 = new YDKJResource('DisOrDat/ChoicePlayer2on3');
-    this.ChoicePlayer3on3 = new YDKJResource('DisOrDat/ChoicePlayer3on3');
+    this.ChoicePlayer1on3 = new YDKJAnimation(YDKJResource('DisOrDat/ChoicePlayer1on3'));
+    this.ChoicePlayer2on3 = new YDKJAnimation(YDKJResource('DisOrDat/ChoicePlayer2on3'));
+    this.ChoicePlayer3on3 = new YDKJAnimation(YDKJResource('DisOrDat/ChoicePlayer3on3'));
 
-    this.AnnounceCategory = new YDKJResource('DisOrDat/AnnounceCategory');
-    this.TimerComesIn = new YDKJResource('DisOrDat/TimerComesIn');
+    this.AnnounceCategory = new YDKJAnimation(YDKJResource('DisOrDat/AnnounceCategory'));
+    this.TimerComesIn = new YDKJAnimation(YDKJResource('DisOrDat/TimerComesIn'));
 
     this.strjs = getYDKJFile('js','res/'+this.options.res+'/STR.js');
 
-    this.GameStart = new YDKJResource('DisOrDat/GameStart');
+    this.GameStart = new YDKJAnimation(YDKJResource('DisOrDat/GameStart'));
 
-    this.Intro = new YDKJResource('DisOrDat/Intro');
-    this.IntroStill = new YDKJResource('DisOrDat/IntroStill');
-    this.MusicLoopRules1 = new YDKJResource('DisOrDat/MusicLoopRules1');
-    this.MusicLoopRules2 = new YDKJResource('DisOrDat/MusicLoopRules2');
-    this.ShowQuestion = new YDKJResource('DisOrDat/ShowQuestion');
+    this.Intro = new YDKJAnimation(YDKJResource('DisOrDat/Intro'));
+    this.IntroStill = new YDKJAnimation(YDKJResource('DisOrDat/IntroStill'));
+    this.MusicLoopRules1 = new YDKJAnimation(YDKJResource('DisOrDat/MusicLoopRules1'));
+    this.MusicLoopRules2 = new YDKJAnimation(YDKJResource('DisOrDat/MusicLoopRules2'));
+    this.ShowQuestion = new YDKJAnimation(YDKJResource('DisOrDat/ShowQuestion'));
 
-    this.MusicLoopPlay1 = new YDKJResource('DisOrDat/MusicLoopPlay1');
-    this.MusicLoopPlay2 = new YDKJResource('DisOrDat/MusicLoopPlay2');
-    this.MusicLoopPlay3 = new YDKJResource('DisOrDat/MusicLoopPlay3');
-    this.MusicLoopPlay4 = new YDKJResource('DisOrDat/MusicLoopPlay4');
+    this.MusicLoopPlay1 = new YDKJAnimation(YDKJResource('DisOrDat/MusicLoopPlay1'));
+    this.MusicLoopPlay2 = new YDKJAnimation(YDKJResource('DisOrDat/MusicLoopPlay2'));
+    this.MusicLoopPlay3 = new YDKJAnimation(YDKJResource('DisOrDat/MusicLoopPlay3'));
+    this.MusicLoopPlay4 = new YDKJAnimation(YDKJResource('DisOrDat/MusicLoopPlay4'));
 
-    this.QuestionTitle = new YDKJAnimation('','','res/'+this.options.res+'/snd/1');
-    this.QuestionIntro1 = new YDKJAnimation('','','res/'+this.options.res+'/snd/2');
-    this.QuestionIntro2 = new YDKJAnimation('','','res/'+this.options.res+'/snd/3');
+    this.QuestionTitle = new YDKJAnimation({urlGif: '', urlJS: '', urlAudio: 'res/'+this.options.res+'/snd/1', framestart:0, loop:0, framestop:0});
+    this.QuestionIntro1 = new YDKJAnimation({urlGif: '', urlJS: '', urlAudio: 'res/'+this.options.res+'/snd/2', framestart:0, loop:0, framestop:0});
+    this.QuestionIntro2 = new YDKJAnimation({urlGif: '', urlJS: '', urlAudio: 'res/'+this.options.res+'/snd/3', framestart:0, loop:0, framestop:0});
 };
 
 ModeDisOrDat.prototype.start = function() {
