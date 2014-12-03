@@ -286,6 +286,8 @@ begin
     end;
   end;
 
+  if (verticalGIF = 1) then inc(maxheight,si^.nbimages) else inc(maxwidth,si^.nbimages);
+
   // Dessin à partir de longbitmap
   pic:=TPicture.Create;
   pic.Bitmap.Width:=maxwidth;
@@ -315,7 +317,7 @@ begin
         inc(y);
       end;
     end;
-    if (verticalGIF = 1) then inc(realy,h) else inc(realx,w);
+    if (verticalGIF = 1) then inc(realy,h+1) else inc(realx,w+1);
   end;
 
   // Create GIF
