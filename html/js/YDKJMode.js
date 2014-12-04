@@ -1,6 +1,6 @@
 /********** YDKJMode **********/
 
-function YDKJMode(game, modename, options, resources) {
+function YDKJMode(game, modename, options) {
     if (!options) options = {};
     this.modeObj = false;
 
@@ -14,7 +14,7 @@ function YDKJMode(game, modename, options, resources) {
 
     this.modeObj.game = game;
     this.modeObj.options = options;
-    this.modeObj.preload(resources);
+    this.modeObj.preload(game.api.resources(this.modeObj));
 }
 
 YDKJMode.prototype.start = function() {
@@ -32,7 +32,7 @@ YDKJMode.prototype.start = function() {
     };
 
     for (var i in this.modeObj) {
-        if ((this.modeObj[i] instanceof YDKJAnimation) || (this.modeObj[i] instanceof YDKJResource) || (this.modeObj[i] instanceof YDKJTimer10)) {
+        if ((this.modeObj[i] instanceof YDKJAnimation) || (this.modeObj[i] instanceof YDKJTimer10)) {
             numobj++;
             this.modeObj[i].ready(readyfunction);
         }
@@ -45,7 +45,7 @@ YDKJMode.prototype.start = function() {
 
 YDKJMode.prototype.free = function() {
     for (var i in this.modeObj) {
-        if ((this.modeObj[i] instanceof YDKJAnimation) || (this.modeObj[i] instanceof YDKJResource) || (this.modeObj[i] instanceof YDKJTimer10)) {
+        if ((this.modeObj[i] instanceof YDKJAnimation) || (this.modeObj[i] instanceof YDKJTimer10)) {
             this.modeObj[i].free();
             this.modeObj[i] = undefined;
             delete this.modeObj[i];

@@ -2,15 +2,15 @@
 
 function ModeIntro() {}
 
-ModeIntro.prototype.preload = function() {
-    this.IntroPreTitle = new YDKJAnimation(YDKJResource('Intro/IntroPreTitle'));
-    this.IntroJack = new YDKJAnimation(YDKJResource('Intro/IntroJack'));
+ModeIntro.prototype.preload = function(resources) {
+    this.IntroPreTitle = new YDKJAnimation(resources['Intro/IntroPreTitle']);
+    this.IntroJack = new YDKJAnimation(resources['Intro/IntroJack']);
 
-    this.MusicJack = new YDKJAnimation(YDKJResource('Intro/MusicJack'));
-    this.SFXBang = new YDKJAnimation(YDKJResource('Intro/SFXBang'));
-    this.SFXJackTitle = new YDKJAnimation(YDKJResource('Intro/SFXJackTitle'));
-    this.IntroJackTitle = new YDKJAnimation(YDKJResource('Intro/IntroJackTitle'));
-    this.IntroJackDemo = new YDKJAnimation(YDKJResource('Intro/IntroJackDemo'));
+    this.MusicJack = new YDKJAnimation(resources['Intro/MusicJack']);
+    this.SFXBang = new YDKJAnimation(resources['Intro/SFXBang']);
+    this.SFXJackTitle = new YDKJAnimation(resources['Intro/SFXJackTitle']);
+    this.IntroJackTitle = new YDKJAnimation(resources['Intro/IntroJackTitle']);
+    this.IntroJackDemo = new YDKJAnimation(resources['Intro/IntroJackDemo']);
 };
 
 ModeIntro.prototype.start = function() {

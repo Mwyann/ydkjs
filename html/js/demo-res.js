@@ -1,4 +1,4 @@
-var YDKJsnd = {
+var YDKJDemoSnd = {
     'Intro':{
         'IntroJackDemo':{res:'5QDemo',name:'Mz01',min:1,max:1},
         'IntroJackTitle':{res:'5QDemo',name:'Mh50',min:1,max:1},
@@ -202,7 +202,7 @@ var YDKJsnd = {
     },
 };
 
-var YDKJanim = {
+var YDKJDemoAnim = {
     'Intro':{
         'IntroPreTitle':{res:'5QDemo',name:'off4/3540',framestart:0,loop:0},
         'IntroJack':{res:'5QDemo',name:'off4/3540',framestart:58,loop:0},

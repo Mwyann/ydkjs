@@ -1,8 +1,7 @@
 /********** YDKJAnimation **********/
 
 function YDKJAnimation(resource) {
-    this.resource = resource; // Type YDKJResource
-    // Anciens paramètres : urlGif,urlJS,urlAudio,framestart,loop,framestop
+    this.resource = resource;// Paramètres : urlGif,urlJS,urlAudio,framestart,loop,framestop
     this.div = 0;
     this.tmpdiv = 0;
     this.urlGif = this.resource.urlGif;
@@ -332,7 +331,7 @@ YDKJAnimation.prototype.free = function() {
 YDKJAnimation.prototype.volume = function(vol) {
     if (vol > 1) vol = vol/100;
     vol = vol*audiospecs.maxVolume;
-    vol = Math.log(vol*9+1)/Math.LN10;
+    //vol = Math.log(vol*9+1)/Math.LN10; // Volume logarithmique ?
 
     if (this.audio) {
         if ((this.loop) && (this.seamlessLoop)) {

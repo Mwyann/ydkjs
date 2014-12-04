@@ -111,51 +111,11 @@ function getSTRfromID(STR,id) {
 
 /********** Timer **********/
 
-function YDKJTimer10() {
-    this.frames = {
-        'Still':{
-            10:{framestart:69},
-            9:{framestart:88},
-            8:{framestart:107},
-            7:{framestart:125},
-            6:{framestart:144},
-            5:{framestart:163},
-            4:{framestart:182},
-            3:{framestart:200},
-            2:{framestart:218},
-            1:{framestart:236},
-            0:{framestart:261}
-        },
-        'Hide':{
-            10:{framestart:73,framestop:75},
-            9:{framestart:92,framestop:94},
-            8:{framestart:110,framestop:112},
-            7:{framestart:129,framestop:131},
-            6:{framestart:148,framestop:150},
-            5:{framestart:167,framestop:169},
-            4:{framestart:185,framestop:187},
-            3:{framestart:203,framestop:205},
-            2:{framestart:221,framestop:223},
-            1:{framestart:239,framestop:241},
-            0:{framestart:264,framestop:266}
-        },
-        'Show':{
-            10:{framestart:59,framestop:65},
-            9:{framestart:79,framestop:85},
-            8:{framestart:98,framestop:104},
-            7:{framestart:116,framestop:122},
-            6:{framestart:135,framestop:141},
-            5:{framestart:154,framestop:160},
-            4:{framestart:173,framestop:179},
-            3:{framestart:191,framestop:197},
-            2:{framestart:209,framestop:215},
-            1:{framestart:227,framestop:233},
-            0:{framestart:245,framestop:251}
-        }
-    };
+function YDKJTimer10() {}
 
-    var resName = 'res/5QDemo/off4/8018';
-    this.animation = new YDKJAnimation({urlGif: resName+'.gif', urlJS: resName+'.js', urlAudio: '',framestart: 73, loop: 0,framestop: 75});
+YDKJTimer10.prototype.preload = function(resources) {
+    this.frames = resources['Common/Timer10/Frames'];
+    this.animation = new YDKJAnimation(resources['Common/Timer10']);
     var thisTimer = this;
     this.step = 0; // 0 = Still, 1 = Hiding, 2 = Showing
     this.current = 10;
@@ -176,7 +136,7 @@ function YDKJTimer10() {
             thisTimer.animation.play();
         }
     });
-}
+};
 
 YDKJTimer10.prototype.ready = function(f) {
     this.animation.ready(f);

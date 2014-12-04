@@ -11,7 +11,6 @@
 <script src="js/common.js" type="text/javascript"></script>
 <script src="js/YDKJFile.js" type="text/javascript"></script>
 <script src="js/YDKJAnimation.js" type="text/javascript"></script>
-<script src="js/YDKJResource.js" type="text/javascript"></script>
 <script src="js/ModeIntro.js" type="text/javascript"></script>
 <script src="js/ModeCategory.js" type="text/javascript"></script>
 <script src="js/ModeQuestion.js" type="text/javascript"></script>
@@ -30,7 +29,7 @@ function startgame() {
   jQuery('#screen').show();
 
   jQuery(document).ready(function() {
-    var game = new YDKJGame();
+    var game = new YDKJGame(true);
     game.start();
   });
 }

@@ -2,49 +2,39 @@
 
 function ModeCategory() {}
 
-ModeCategory.prototype.preload = function() {
+ModeCategory.prototype.preload = function(resources) {
     var thisMode = this;
 
-    this.SFXShowCategoryScreen = new YDKJAnimation(YDKJResource('Category/SFXShowCategoryScreen'));
+    this.SFXShowCategoryScreen = new YDKJAnimation(resources['Category/SFXShowCategoryScreen']);
 
-    this.MusicChooseCategoryStart = new YDKJAnimation(YDKJResource('Category/MusicChooseCategoryStart'));
-    this.MusicChooseCategoryLoop = new YDKJAnimation(YDKJResource('Category/MusicChooseCategoryLoop'));
-    this.ShowCategories = new YDKJAnimation(YDKJResource('Category/ShowCategories'));
+    this.MusicChooseCategoryStart = new YDKJAnimation(resources['Category/MusicChooseCategoryStart']);
+    this.MusicChooseCategoryLoop = new YDKJAnimation(resources['Category/MusicChooseCategoryLoop']);
+    this.ShowCategories = new YDKJAnimation(resources['Category/ShowCategories']);
 
     this.MusicChooseCategoryStart.ended(function(){
         thisMode.MusicChooseCategoryLoop.play();
     });
 
-    if (this.options.category == 1) this.ChooseCategory = new YDKJAnimation(YDKJResource('Category/ChooseCategory1'));
-    if (this.options.category == 2) this.ChooseCategory = new YDKJAnimation(YDKJResource('Category/ChooseCategory2'));
-    if (this.options.category == 3) this.ChooseCategory = new YDKJAnimation(YDKJResource('Category/ChooseCategory3'));
-    this.ChooseCategoryText = new YDKJAnimation(YDKJResource('Category/ChooseCategoryText'));
+    this.ChooseCategory = new YDKJAnimation(resources['Category/ChooseCategory']);
+    this.ChooseCategoryText = new YDKJAnimation(resources['Category/ChooseCategoryText']);
 
-    this.ChooseCategoryPlayer1 = new YDKJAnimation(YDKJResource('Category/ChooseCategoryPlayer1'));
-    this.ChooseCategoryPlayer2 = new YDKJAnimation(YDKJResource('Category/ChooseCategoryPlayer2'));
-    this.ChooseCategoryPlayer3 = new YDKJAnimation(YDKJResource('Category/ChooseCategoryPlayer3'));
+    this.ChooseCategoryPlayer1 = new YDKJAnimation(resources['Category/ChooseCategoryPlayer1']);
+    this.ChooseCategoryPlayer2 = new YDKJAnimation(resources['Category/ChooseCategoryPlayer2']);
+    this.ChooseCategoryPlayer3 = new YDKJAnimation(resources['Category/ChooseCategoryPlayer3']);
 
-    this.SFXChoiceCategory = new YDKJAnimation(YDKJResource('Category/SFXChoiceCategory'));
+    this.SFXChoiceCategory = new YDKJAnimation(resources['Category/SFXChoiceCategory']);
 
-    this.LoopCategory1 = new YDKJAnimation(YDKJResource('Category/LoopCategory1'));
-    this.LoopCategory2 = new YDKJAnimation(YDKJResource('Category/LoopCategory2'));
-    this.LoopCategory3 = new YDKJAnimation(YDKJResource('Category/LoopCategory3'));
-    this.ChoiceCategory1 = new YDKJAnimation(YDKJResource('Category/ChoiceCategory1'));
-    this.ChoiceCategory2 = new YDKJAnimation(YDKJResource('Category/ChoiceCategory2'));
-    this.ChoiceCategory3 = new YDKJAnimation(YDKJResource('Category/ChoiceCategory3'));
+    this.LoopCategory1 = new YDKJAnimation(resources['Category/LoopCategory1']);
+    this.LoopCategory2 = new YDKJAnimation(resources['Category/LoopCategory2']);
+    this.LoopCategory3 = new YDKJAnimation(resources['Category/LoopCategory3']);
+    this.ChoiceCategory1 = new YDKJAnimation(resources['Category/ChoiceCategory1']);
+    this.ChoiceCategory2 = new YDKJAnimation(resources['Category/ChoiceCategory2']);
+    this.ChoiceCategory3 = new YDKJAnimation(resources['Category/ChoiceCategory3']);
 
-    // Précharger les questions avec l'interface de catégorie
-    if ((this.options.questionnumber % 2) == 1) { // Questions normales
-        this.questiontitles = ['Keuf you !', 'Ma meilleure boum', 'C’est dur vraiment plus longtemps'];
-        this.question1 = new YDKJMode(this.game, 'Question', {category:this.options.category,questionnumber:this.options.questionnumber,res:'QFold1/ABB', correctanswer:3}, []); // Preload des questions suivantes
-        this.question2 = new YDKJMode(this.game, 'Question', {category:this.options.category,questionnumber:this.options.questionnumber,res:'QFold1/ABE', correctanswer:3}, []);
-        this.question3 = new YDKJMode(this.game, 'Question', {category:this.options.category,questionnumber:this.options.questionnumber,res:'QFold1/AJM', correctanswer:4}, []);
-    } else { // Couci-Couça
-        this.questiontitles = ['Du travail bien fait', 'L’envers de la médaille, c’est l’autre côté', 'La tête dans le bol'];
-        this.question1 = new YDKJMode(this.game, 'DisOrDat', {category:this.options.category,questionnumber:this.options.questionnumber,res:'QFold1/DAC'}, []); // Preload des questions suivantes
-        this.question2 = new YDKJMode(this.game, 'DisOrDat', {category:this.options.category,questionnumber:this.options.questionnumber,res:'QFold1/DAL'}, []);
-        this.question3 = new YDKJMode(this.game, 'DisOrDat', {category:this.options.category,questionnumber:this.options.questionnumber,res:'QFold1/DAP'}, []);
-    }
+    this.questiontitles = resources['questiontitles'];
+    this.question1 = resources['question1'];
+    this.question2 = resources['question2'];
+    this.question3 = resources['question3'];
 };
 
 ModeCategory.prototype.start = function() {

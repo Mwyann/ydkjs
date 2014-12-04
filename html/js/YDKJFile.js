@@ -12,7 +12,7 @@ function YDKJFile(filetype,url) {
     this.preloaded = 0;
     this.readyFunctions = [];
 
-    if (preloadprocesses < 2) {
+    if (preloadprocesses < 10) {
         preloadprocesses++;
         this.preload();
     } else preloadfifo.push(this);
