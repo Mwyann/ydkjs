@@ -9,6 +9,7 @@
 
 <script src="js/demo-res.js" type="text/javascript"></script>
 <script src="js/common.js" type="text/javascript"></script>
+<script src="js/YDKJAPI.js" type="text/javascript"></script>
 <script src="js/YDKJFile.js" type="text/javascript"></script>
 <script src="js/YDKJAnimation.js" type="text/javascript"></script>
 <script src="js/ModeIntro.js" type="text/javascript"></script>
