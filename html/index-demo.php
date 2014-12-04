@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8" />
-<title>You Don't Know Jack® DEMO FR</title>
+<title>You Don't Know Jack® DEMO FR</title>
 <link href="css/ydkj.css" rel="stylesheet"/>
 <script src="js/jquery-1.11.0.min.js" type="text/javascript"></script>
 <script src="js/SeamlessLoop.js" type="text/javascript"></script>
@@ -47,7 +47,7 @@ function startgame() {
      <br/>
      <u>Ceci n'est que la démo du jeu original, et elle est loin d'être finie</u>, beaucoup de choses ne sont pas fonctionnelles. J'ajouterai les éléments au fur et à mesure. Vous pouvez télécharger la démo d'origine en cliquant sur <a style="color:#F00" href="JACKDemo.zip">ce lien</a>.<br/>
      <br/>
-     <u>Le jeu fonctionne le mieux dans Firefox et Chrome</u>. Chrome pose quelques problèmes de bugs graphiques et de ralentissements lorsqu'on zoom la page pour avoir l'image en plein écran (mais Firefox le fait très bien). Internet Explorer ne gère pas les polices CSS3 et il a des soucis avec les sons qui s'arrêtent trop tôt. Les navigateurs mobiles quant à eux ont des problèmes avec la gestion des fichiers audio (permission de jouer un seul fichier audio à la fois, et uniquement suite à une action de l'utilisateur...).<br/>
+     <u>Le jeu fonctionne le mieux dans Firefox et Chrome</u>. Il est possible et recommandé de zoomer la page avec Ctrl-+ ou Ctrl-molette pour profiter du jeu en "plein écran". Internet Explorer ne gère pas les polices CSS3 et il a des soucis avec les sons qui s'arrêtent trop tôt. Les navigateurs mobiles quant à eux ont des problèmes avec la gestion des fichiers audio (permission de jouer un seul fichier audio à la fois, et uniquement suite à une action de l'utilisateur...).<br/>
      <br/>
      <u>Le but de ce projet est de transformer le jeu complet et d'y ajouter des fonctionnalités multi-joueurs en ligne</u>. Etant donné mon temps libre et le travail que cela va demander, ce n'est pas pour tout de suite, ni pour demain... mais à suivre ! Si vous ne connaissez pas déjà le jeu, je vous laisse le découvrir.<br/>
      <br/>
