@@ -30,7 +30,7 @@ ModeIntro.prototype.start = function() {
         this.free();
         thisMode.IntroJackDemo.delay(function(){
             this.play();
-            thisMode.category = new YDKJMode(thisMode.game, 'Category', {category:1,questionnumber:1}, []); // Preload des catégories pendant le speech
+            thisMode.category = thisMode.game.api.gamemode(thisMode); // Preload des catégories pendant le speech
             this.skiplistener = bindKeyListener(function(choice) {
                 if (choice == 32) {
                     unbindKeyListener(thisMode.skiplistener);

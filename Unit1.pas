@@ -224,7 +224,7 @@ procedure convertSRF(filefrom:string);
 var filepos,subpos:word;
     fullname,ftype:string;
     strings:string;
-//    f:system.text;
+    f:system.text;
 begin
   try
   openSRF(filefrom);
@@ -258,6 +258,16 @@ begin
   try
     closeSRF;
   except
+  end;
+
+  if (strings <> '') then begin
+    fullname:=RemoveExt(SafeFileName(Form1.Edit2.Text+'\'+RemoveBaseDir(Form1.Edit1.Text,filefrom)));
+    ForceDirectories(fullname);
+    fullname:=fullname+'\STR.js';
+    assignfile(f,fullname);
+    rewrite(f);
+    write(f,'res[''STR'']=['+strings+'];');
+    closefile(f);
   end;
 end;
 

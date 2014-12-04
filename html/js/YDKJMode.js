@@ -31,7 +31,7 @@ YDKJMode.prototype.start = function() {
         if (numobj == 0) thisMode.modeObj.start();
     };
 
-    for (var i in this.modeObj) {
+    for (var i in this.modeObj) if (this.modeObj.hasOwnProperty(i)) {
         if ((this.modeObj[i] instanceof YDKJAnimation) || (this.modeObj[i] instanceof YDKJTimer10)) {
             numobj++;
             this.modeObj[i].ready(readyfunction);
@@ -44,7 +44,7 @@ YDKJMode.prototype.start = function() {
 };
 
 YDKJMode.prototype.free = function() {
-    for (var i in this.modeObj) {
+    for (var i in this.modeObj) if (this.modeObj.hasOwnProperty(i)) {
         if ((this.modeObj[i] instanceof YDKJAnimation) || (this.modeObj[i] instanceof YDKJTimer10)) {
             this.modeObj[i].free();
             this.modeObj[i] = undefined;

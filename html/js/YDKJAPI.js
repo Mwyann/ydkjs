@@ -8,10 +8,11 @@ function YDKJAPI(game, demomode) {
 YDKJAPI.prototype.initdemo = function() {
     var thisAPI = this;
 
-    YDKJAPI.prototype.gamemode = function() {
-        return new YDKJMode(thisAPI.game, 'Intro', {});
-        //return new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1});
-        //return new YDKJMode(thisAPI.game, 'Question', {questionnumber:1,res:'QFold1/AJM',correctanswer:4});
+    YDKJAPI.prototype.gamemode = function(mode) {
+        //if (mode === undefined) return new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1}); // Ligne DEBUG
+        if (mode === undefined) return new YDKJMode(thisAPI.game, 'Intro', {});
+        if (mode instanceof ModeIntro) return new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1});
+        if (mode instanceof ModeQuestion) return new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: mode.options.questionnumber+1});
     };
 
     var demores = function(resourceName) {

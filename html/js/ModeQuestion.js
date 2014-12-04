@@ -765,5 +765,5 @@ ModeQuestion.prototype.start = function() {
         thisMode.JingleQuestion.play();
     });
 
-    nextcategory = new YDKJMode(this.game, 'Category', {category:1,questionnumber:this.options.questionnumber+1}); // Préchargement de la prochaine catégorie
+    nextcategory = this.game.api.gamemode(thisMode); // Préchargement de la prochaine catégorie
 };
