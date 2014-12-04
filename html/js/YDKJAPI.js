@@ -9,8 +9,8 @@ YDKJAPI.prototype.initdemo = function() {
     var thisAPI = this;
 
     YDKJAPI.prototype.gamemode = function() {
-        //return new YDKJMode(thisAPI.game, 'Intro', {});
-        return new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1});
+        return new YDKJMode(thisAPI.game, 'Intro', {});
+        //return new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1});
         //return new YDKJMode(thisAPI.game, 'Question', {questionnumber:1,res:'QFold1/AJM',correctanswer:4});
     };
 
@@ -316,10 +316,11 @@ YDKJAPI.prototype.initdemo = function() {
     };
 
     YDKJAPI.prototype.players = function() {
+        var playernames = shuffle(['David','Marité','Marjorie','Frédéric','Olivier','Mathieu','Alicia','Fabrice','Jackqueline','Bruno','Natacha','Jeff','Henri','Barbara','Christophe','Luc','Danièle','Serge','Anita','Alain','Denise','Marcel','Lucette','Gilles','Julien','Adrienne','Camille','Anna','Laurel','Diane','Michelle']);
         return [
-            {name:'Jeff',score:0},
-            {name:'David',score:0},
-            {name:'Alicia',score:0}
+            {name:playernames[0],score:0},
+            {name:playernames[1],score:0},
+            {name:playernames[2],score:0}
         ];
     };
 };
@@ -333,12 +334,8 @@ YDKJAPI.prototype.initgame = function() {
         //return new YDKJMode(thisAPI.game, 'Question', {questionnumber:1,res:'QFold1/AJM',correctanswer:4});
     };
 
-    YDKJAPI.prototype.questions = function() {
-        return [
-            {name:'Jeff',score:0},
-            {name:'David',score:0},
-            {name:'Alicia',score:0}
-        ];
+    YDKJAPI.prototype.resources = function() {
+        return {};
     };
 
     YDKJAPI.prototype.players = function() {
