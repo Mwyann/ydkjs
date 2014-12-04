@@ -48,6 +48,8 @@ var SRFhandler:file;
       nbfiles:word;
       filelist:array[0..255] of subfile;
     end;
+    qhdrCSV:string;
+    stringsCSV:string;
 
 function openSRF(filename:string):shortint;
 procedure closeSRF;
@@ -57,6 +59,7 @@ procedure exportSubsoundToFile(ssf:subsubfile;filename:string);
 function readString(ssf:subsubfile):string;
 procedure exportStringToFile(ssf:subsubfile;filename:string);
 procedure exportStringlistToFile(ssf:subsubfile;filename:string);
+procedure exportQHeadersToFile(ssf:subsubfile);
 
 procedure decodeImageBuffer(buf:array of byte; var bufresult:array of longint; buflen:longint);
 
@@ -580,19 +583,137 @@ begin
   result:=ss;
 end;
 
-function MactoUTF8(c:char):string; // Caractère MAC vers UTF8, est-ce une bonne idée si on doit utiliser les glyph inclus dans les .SRF de toutes façons ?
+function MactoUTF8(c:char):string; // Caractères MAC vers UTF8
 begin
-  if (ord(c) = $D5) then result:=chr($E2)+chr($80)+chr($99) // ’
-  else if (ord(c) = $7B) then result:=chr($C2)+chr($A0) // Espace insécable
+  if (ord(c) = $7B) then result:=chr($C2)+chr($A0) // Espace insécable
+  else if (ord(c) = $80) then result:=chr($C3)+chr($84) // Ä
+  else if (ord(c) = $81) then result:=chr($C3)+chr($85) // Å
+  else if (ord(c) = $82) then result:=chr($C3)+chr($87) // Ç
+  else if (ord(c) = $83) then result:=chr($C3)+chr($89) // É
+  else if (ord(c) = $84) then result:=chr($C3)+chr($91) // Ñ
+  else if (ord(c) = $85) then result:=chr($C3)+chr($96) // Ö
+  else if (ord(c) = $86) then result:=chr($C3)+chr($9C) // Ü
+  else if (ord(c) = $87) then result:=chr($C3)+chr($A1) // á
   else if (ord(c) = $88) then result:=chr($C3)+chr($A0) // à
   else if (ord(c) = $89) then result:=chr($C3)+chr($A2) // â
+  else if (ord(c) = $8A) then result:=chr($C3)+chr($A4) // ä
+  else if (ord(c) = $8B) then result:=chr($C3)+chr($A3) // ã
+  else if (ord(c) = $8C) then result:=chr($C3)+chr($A5) // å
+  else if (ord(c) = $8D) then result:=chr($C3)+chr($A7) // ç
   else if (ord(c) = $8E) then result:=chr($C3)+chr($A9) // é
   else if (ord(c) = $8F) then result:=chr($C3)+chr($A8) // è
   else if (ord(c) = $90) then result:=chr($C3)+chr($AA) // ê
-  else if (ord(c) = $9D) then result:=chr($C3)+chr($B9) // ù
+  else if (ord(c) = $91) then result:=chr($C3)+chr($AB) // ë
+  else if (ord(c) = $92) then result:=chr($C3)+chr($AD) // í
+  else if (ord(c) = $93) then result:=chr($C3)+chr($AC) // ì
+  else if (ord(c) = $94) then result:=chr($C3)+chr($AE) // î
+  else if (ord(c) = $95) then result:=chr($C3)+chr($AF) // ï
+  else if (ord(c) = $96) then result:=chr($C3)+chr($B1) // ñ
+  else if (ord(c) = $97) then result:=chr($C3)+chr($B3) // ó
+  else if (ord(c) = $98) then result:=chr($C3)+chr($B2) // ò
   else if (ord(c) = $99) then result:=chr($C3)+chr($B4) // ô
+  else if (ord(c) = $9A) then result:=chr($C3)+chr($B6) // ö
+  else if (ord(c) = $9B) then result:=chr($C3)+chr($B5) // õ
+  else if (ord(c) = $9C) then result:=chr($C3)+chr($BA) // ú
+  else if (ord(c) = $9D) then result:=chr($C3)+chr($B9) // ù
+  else if (ord(c) = $9E) then result:=chr($C3)+chr($BB) // û
+  else if (ord(c) = $9F) then result:=chr($C3)+chr($BC) // ü
+  else if (ord(c) = $A0) then result:=chr($E2)+chr($80)+chr($A0) // †
+  else if (ord(c) = $A1) then result:=chr($C2)+chr($B0) // °
+  else if (ord(c) = $A2) then result:=chr($C2)+chr($A2) // ¢
+  else if (ord(c) = $A3) then result:=chr($C2)+chr($A3) // £
+  else if (ord(c) = $A4) then result:=chr($C2)+chr($A7) // §
+  else if (ord(c) = $A5) then result:=chr($E2)+chr($80)+chr($A2) // •
+  else if (ord(c) = $A6) then result:=chr($C2)+chr($B6) // ¶
+  else if (ord(c) = $A7) then result:=chr($C3)+chr($9F) // ß
+  else if (ord(c) = $A8) then result:=chr($C2)+chr($AE) // ®
+  else if (ord(c) = $A9) then result:=chr($C2)+chr($A9) // ©
   else if (ord(c) = $AA) then result:=chr($E2)+chr($84)+chr($A2) // ™
+  else if (ord(c) = $AB) then result:=chr($C2)+chr($B4) // ´
+  else if (ord(c) = $AC) then result:=chr($C2)+chr($A8) // ¨
+  else if (ord(c) = $AD) then result:=chr($E2)+chr($89)+chr($A0) // ?
+  else if (ord(c) = $AE) then result:=chr($C3)+chr($86) // Æ
+  else if (ord(c) = $AF) then result:=chr($C3)+chr($98) // Ø
+  else if (ord(c) = $B0) then result:=chr($E2)+chr($88)+chr($9E) // 8
+  else if (ord(c) = $B1) then result:=chr($C2)+chr($B1) // ±
+  else if (ord(c) = $B2) then result:=chr($E2)+chr($89)+chr($A4) // =
+  else if (ord(c) = $B3) then result:=chr($E2)+chr($89)+chr($A5) // =
+  else if (ord(c) = $B4) then result:=chr($C2)+chr($A5) // ¥
+  else if (ord(c) = $B5) then result:=chr($C2)+chr($B5) // µ
+  else if (ord(c) = $B6) then result:=chr($E2)+chr($88)+chr($82) // ?
+  else if (ord(c) = $B7) then result:=chr($E2)+chr($88)+chr($91) // ?
+  else if (ord(c) = $B8) then result:=chr($E2)+chr($88)+chr($8F) // ?
+  else if (ord(c) = $B9) then result:=chr($CF)+chr($80) // p
+  else if (ord(c) = $BA) then result:=chr($E2)+chr($88)+chr($AB) // ?
+  else if (ord(c) = $BB) then result:=chr($C2)+chr($AA) // ª
+  else if (ord(c) = $BC) then result:=chr($C2)+chr($BA) // º
+  else if (ord(c) = $BD) then result:=chr($CE)+chr($A9) // O
+  else if (ord(c) = $BE) then result:=chr($C3)+chr($A6) // æ
+  else if (ord(c) = $BF) then result:=chr($C3)+chr($B8) // ø
+  else if (ord(c) = $C0) then result:=chr($C2)+chr($BF) // ¿
+  else if (ord(c) = $C1) then result:=chr($C2)+chr($A1) // ¡
+  else if (ord(c) = $C2) then result:=chr($C2)+chr($AC) // ¬
+  else if (ord(c) = $C3) then result:=chr($E2)+chr($88)+chr($9A) // v
+  else if (ord(c) = $C4) then result:=chr($C6)+chr($92) // ƒ
+  else if (ord(c) = $C5) then result:=chr($E2)+chr($89)+chr($88) // ˜
+  else if (ord(c) = $C6) then result:=chr($CE)+chr($94) // ?
+  else if (ord(c) = $C7) then result:=chr($C2)+chr($AB) // «
+  else if (ord(c) = $C8) then result:=chr($C2)+chr($BB) // »
   else if (ord(c) = $C9) then result:=chr($E2)+chr($80)+chr($A6) // …
+  else if (ord(c) = $CA) then result:=chr($C2)+chr($A0) //  
+  else if (ord(c) = $CB) then result:=chr($C3)+chr($80) // À
+  else if (ord(c) = $CC) then result:=chr($C3)+chr($83) // Ã
+  else if (ord(c) = $CD) then result:=chr($C3)+chr($95) // Õ
+  else if (ord(c) = $CE) then result:=chr($C5)+chr($92) // Œ
+  else if (ord(c) = $CF) then result:=chr($C5)+chr($93) // œ
+  else if (ord(c) = $D0) then result:=chr($E2)+chr($80)+chr($93) // –
+  else if (ord(c) = $D1) then result:=chr($E2)+chr($80)+chr($94) // —
+  else if (ord(c) = $D2) then result:=chr($E2)+chr($80)+chr($9C) // “
+  else if (ord(c) = $D3) then result:=chr($E2)+chr($80)+chr($9D) // ”
+  else if (ord(c) = $D4) then result:=chr($E2)+chr($80)+chr($98) // ‘
+  else if (ord(c) = $D5) then result:=chr($E2)+chr($80)+chr($99) // ’
+  else if (ord(c) = $D6) then result:=chr($C3)+chr($B7) // ÷
+  else if (ord(c) = $D7) then result:=chr($E2)+chr($97)+chr($8A) // ?
+  else if (ord(c) = $D8) then result:=chr($C3)+chr($BF) // ÿ
+  else if (ord(c) = $D9) then result:=chr($C5)+chr($B8) // Ÿ
+  else if (ord(c) = $DA) then result:=chr($E2)+chr($81)+chr($84) // /
+  else if (ord(c) = $DB) then result:=chr($E2)+chr($82)+chr($AC) // €
+  else if (ord(c) = $DC) then result:=chr($E2)+chr($80)+chr($B9) // ‹
+  else if (ord(c) = $DD) then result:=chr($E2)+chr($80)+chr($BA) // ›
+  else if (ord(c) = $DE) then result:=chr($EF)+chr($AC)+chr($81) // ?
+  else if (ord(c) = $DF) then result:=chr($EF)+chr($AC)+chr($82) // ?
+  else if (ord(c) = $E0) then result:=chr($E2)+chr($80)+chr($A1) // ‡
+  else if (ord(c) = $E1) then result:=chr($C2)+chr($B7) // ·
+  else if (ord(c) = $E2) then result:=chr($E2)+chr($80)+chr($9A) // ‚
+  else if (ord(c) = $E3) then result:=chr($E2)+chr($80)+chr($9E) // „
+  else if (ord(c) = $E4) then result:=chr($E2)+chr($80)+chr($B0) // ‰
+  else if (ord(c) = $E5) then result:=chr($C3)+chr($82) // Â
+  else if (ord(c) = $E6) then result:=chr($C3)+chr($8A) // Ê
+  else if (ord(c) = $E7) then result:=chr($C3)+chr($81) // Á
+  else if (ord(c) = $E8) then result:=chr($C3)+chr($8B) // Ë
+  else if (ord(c) = $E9) then result:=chr($C3)+chr($88) // È
+  else if (ord(c) = $EA) then result:=chr($C3)+chr($8D) // Í
+  else if (ord(c) = $EB) then result:=chr($C3)+chr($8E) // Î
+  else if (ord(c) = $EC) then result:=chr($C3)+chr($8F) // Ï
+  else if (ord(c) = $ED) then result:=chr($C3)+chr($8C) // Ì
+  else if (ord(c) = $EE) then result:=chr($C3)+chr($93) // Ó
+  else if (ord(c) = $EF) then result:=chr($C3)+chr($94) // Ô
+  else if (ord(c) = $F0) then result:=chr($EE)+chr($80)+chr($9E) // ?
+  else if (ord(c) = $F1) then result:=chr($C3)+chr($92) // Ò
+  else if (ord(c) = $F2) then result:=chr($C3)+chr($9A) // Ú
+  else if (ord(c) = $F3) then result:=chr($C3)+chr($9B) // Û
+  else if (ord(c) = $F4) then result:=chr($C3)+chr($99) // Ù
+  else if (ord(c) = $F5) then result:=chr($C4)+chr($B1) // i
+  else if (ord(c) = $F6) then result:=chr($CB)+chr($86) // ˆ
+  else if (ord(c) = $F7) then result:=chr($CB)+chr($9C) // ˜
+  else if (ord(c) = $F8) then result:=chr($C2)+chr($AF) // ¯
+  else if (ord(c) = $F9) then result:=chr($CB)+chr($98) // ?
+  else if (ord(c) = $FA) then result:=chr($CB)+chr($99) // ?
+  else if (ord(c) = $FB) then result:=chr($CB)+chr($9A) // °
+  else if (ord(c) = $FC) then result:=chr($C2)+chr($B8) // ¸
+  else if (ord(c) = $FD) then result:=chr($CB)+chr($9D) // ?
+  else if (ord(c) = $FE) then result:=chr($CB)+chr($9B) // ?
+  else if (ord(c) = $FF) then result:=chr($CB)+chr($87) // ?
   else result:=c;
 end;
 
@@ -656,6 +777,40 @@ begin
   closefile(f);
 end;
 
+// Export des QHDR
+
+procedure exportQHeadersToFile(ssf:subsubfile);
+var data:array[0..65535] of char;
+    id,title,filename:string;
+    i:word;
+    value,qtype,qsubtype,answer:byte;
+
+begin
+  seek(SRFhandler,ssf.fileoffset);
+  blockread(SRFhandler,data,ssf.filesize);
+  id:='';
+  for i:=2 to 5 do begin
+    id:=id+MactoUTF8(data[i]);
+  end;
+  value:=ord(data[8]);
+  qtype:=ord(data[9]);
+  qsubtype:=ord(data[11]);
+  title:='';
+  for i:=16 to 80 do begin
+    if (data[i] <> #00) then begin
+      title:=title+MactoUTF8(data[i]);
+    end else break;
+  end;
+  filename:='';
+  for i:=81 to 145 do begin
+    if (data[i] <> #00) then begin
+      filename:=filename+MactoUTF8(data[i]);
+    end else break;
+  end;
+  answer:=ord(data[146]);
+  qhdrCSV:=qhdrCSV+id+'¤'+title+'¤'+filename+'¤'+inttostr(qtype)+'¤'+inttostr(qsubtype)+'¤'+inttostr(value)+'¤'+inttostr(answer)+#10;
+end;
+
 function filetype(ftype:string):string;
 begin
   result:='';
@@ -667,6 +822,7 @@ begin
   // Utilisés pour le Couci-Couça, entre autres
   if (ftype='ANS#') then result:='answers';
   if (ftype='STR#') then result:='stringlist2';
+  if (ftype='qhdr') then result:='qheaders'; 
 end;
 
 // Lecture du fichier SRF

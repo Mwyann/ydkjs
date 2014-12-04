@@ -130,6 +130,25 @@ typedef struct {
 
 typedef struct {
     SetBackColor( cLtGreen );
+    ushort filelength;
+    char id[3] <optimize=false>;
+    ubyte u2;
+    char u3;
+    ubyte u4;
+    ubyte QuestionValue; // 1 = 1000F, 2 = 2000F, 3 = 3000F
+    ubyte QuestionType; // 0 = Question normale, (1 inutilisé), 2 = Giberrish, 3 = DisOrDat, 4 = JackAttack, 5 = Fiber (Drelin-Drelin)
+    ubyte u5;
+    ubyte SubQuestionType; // 0 = pas une question normale, 1 = question normale, 2 = bouche-trou, 3 = qui c'est celui là, 4 = ouvrez les yeux
+    ubyte u6[4] <optimize=false>;
+    char title[64] <optimize=false>;
+    char file[64] <optimize=false>;
+    ushort u7;
+    ubyte answer;
+    if (filelength > 147) ubyte u8[filelength-147] <optimize=false>;
+} QHDR;
+
+typedef struct {
+    SetBackColor( cLtGreen );
     long subname;
     ulong fileoffset;
     ulong filesize;
@@ -143,6 +162,7 @@ typedef struct {
     else if (filename[0] == 'S' && filename[1] == 'T' && filename[2] == 'R' && filename[3] == 'L') STRINGLIST strl <optimize=false>;
     else if (filename[0] == 'A' && filename[1] == 'N' && filename[2] == 'S' && filename[3] == '#') ANSLIST strl <optimize=false>;
     else if (filename[0] == 'S' && filename[1] == 'T' && filename[2] == 'R' && filename[3] == '#') STRINGLIST2 strl <optimize=false>;
+    else if (filename[0] == 'q' && filename[1] == 'h' && filename[2] == 'd' && filename[3] == 'r') QHDR qhdr <optimize=false>;
     else char data[filesize] <optimize=false,open=suppress>;
     SetBackColor( cLtGreen );
     FSeek(currentpos);

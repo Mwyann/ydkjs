@@ -20,12 +20,13 @@ var animationSpeed = 66;
 <script src="js/YDKJAnimation.js" type="text/javascript"></script>
 <script type="text/javascript">
 
+var animationFile = '';
+
 jQuery(document).ready(function() {
     var anim = 0;
-    var animationFile = '';
     var loadAnim = function() {
       if (anim) anim.free();
-      anim = new YDKJAnimation(animationFile+'.gif',animationFile+'.js','',0,0);
+      anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js'});
       anim.ready(function() {
         var thisAnim = this;
 
@@ -36,7 +37,7 @@ jQuery(document).ready(function() {
           step: 1,
           slide: function( event, ui ) {
             if (anim) anim.free();
-            anim = new YDKJAnimation(animationFile+'.gif',animationFile+'.js','',ui.value,0,ui.value);
+            anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js', framestart: ui.value, framestop: ui.value});
             anim.ready(function() {
               this.play();
             });
@@ -47,10 +48,10 @@ jQuery(document).ready(function() {
     };
 
     var filename = $('#filename');
-    animationFile = 'res/5QDemo/off4/'+filename.val();
+    animationFile = filename.val();
     loadAnim();
     filename.on('change',function() {
-      animationFile = 'res/5QDemo/off4/'+$(this).val();
+      animationFile = $(this).val();
       loadAnim();
     });
 
@@ -71,7 +72,7 @@ jQuery(document).ready(function() {
         }
 
         if ((framefrom >= 0) && (animationFile != '')) {
-          anim = new YDKJAnimation(animationFile+'.gif',animationFile+'.js','',framefrom,animloop,frameto);
+          anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js', framestart: framefrom, loop: animloop, framestop: frameto});
           anim.ready(function() {
             this.play();
           });
@@ -88,7 +89,7 @@ jQuery(document).ready(function() {
 
 function play(t) {
   var jt = jQuery(t);
-  anim = new YDKJAnimation(animationFile+'.gif',animationFile+'.js','',jt.val(),0);
+  anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js', framestart: jt.val()});
   anim.ended(function() {
     this.free();
   });
@@ -107,31 +108,107 @@ function play(t) {
   <div id="debug" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;height:150px;overflow-y:scroll">
      Select a file:
      <select id="filename">
-         <option value="3000">3000 - Player Numbers</option>
-         <option value="3540">3540 - Intro & Outro</option>
-         <option value="8009">8009 - Timer 1</option>
-         <option value="8014">8014 - Timer 2</option>
-         <option value="8017">8017 - Timer 3</option>
-         <option value="8018">8018 - Timer 10 seconds</option>
-         <option value="8021">8021 - Timer 30 seconds</option>
-         <option value="8041">8041 - Timer 4</option>
-         <option value="10000">10000 - Categories 1</option>
-         <option value="10001">10001 - Categories 2</option>
-         <option value="10002">10002 - Categories 3</option>
-         <option value="11000">11000 - 1000 F</option>
-         <option value="11020">11020 - 2000 F</option>
-         <option value="11030">11030 - 3000 F</option>
-         <option value="12000">12000 - Questions</option>
-         <option value="14000">14000 - DisOrDat</option>
-         <option value="14900">14900 - DOD Player 1</option>
-         <option value="14930">14930 - DOD Player 2</option>
-         <option value="14950">14950 - DOD Player 3</option>
-         <option value="17000">17000 - Options Menu</option>
-         <option value="18000">18000 - Outro Menu</option>
-         <option value="19000">19000 - Fill In The Blanks</option>
-         <option value="20000">20000 - Who is this</option>
-         <option value="21000">21000 - Open Your Eyes</option>
-         <option value="23000">23000 - Hiscores</option>
+         <option value="res-full/JACKART/off4/3000">3000 - Player Numbers (3 players)</option>
+         <option value="res-full/R1WRAPUP/off4/3100">3100 - Round 1 Ended Screws</option>
+         <option value="res-full/JACKART/off4/3200">3200 - Player Numbers (2 players)</option>
+         <option value="res-full/JACKART/off4/3300">3300 - Player Numbers (1 player)</option>
+         <option value="res-full/TITLE/off4/3500">3500 - Ads & Title</option>
+         <option value="res-full/JACKART/off4/8009">8009 - Timer 1</option>
+         <option value="res-full/JACKART/off4/8012">8012 - Round 2</option>
+         <option value="res-full/JACKART/off4/8013">8013 - Drelin To Timer 10</option>
+         <option value="res-full/JACKART/off4/8014">8014 - Round 1</option>
+         <option value="res-full/JACKART/off4/8015">8015 - Round 2</option>
+         <option value="res-full/JACKART/off4/8016">8016 - Drelin</option>
+         <option value="res-full/JACKART/off4/8017">8017 - Round 1 Animation</option>
+         <option value="res-full/10TIMER/off4/8018">8018 - Timer 10 seconds</option>
+         <option value="res-full/JACKART/off4/8019">8019 - Round 2 Animation</option>
+         <option value="res-full/JACKART/off4/8020">8020 - Timer 10 Animation Star</option>
+         <option value="res-full/30TIMER/off4/8021">8021 - Timer 30 seconds</option>
+         <option value="res-full/GIBBER/off4/8031">8031 - Gibberish Round 1</option>
+         <option value="res-full/GIBBER/off4/8032">8032 - Gibberish Round 2</option>
+         <option value="res-full/DISORDAT/off4/8041">8041 - DisOrDat Round 1</option>
+         <option value="res-full/DISORDAT/off4/8042">8042 - DisOrDat Round 2</option>
+         <option value="res-full/TITLE/off4/8100">8100 - Welcome Round 1 (1)</option>
+         <option value="res-full/TITLE/off4/8101">8101 - Welcome Round 1 (2)</option>
+         <option value="res-full/TITLE/off4/8102">8102 - Welcome Round 1 (3)</option>
+         <option value="res-full/R1WRAPUP/off4/8200">8200 - Welcome Round 2 (1)</option>
+         <option value="res-full/R1WRAPUP/off4/8201">8201 - Welcome Round 2 (2)</option>
+         <option value="res-full/R1WRAPUP/off4/8202">8202 - Welcome Round 2 (3)</option>
+         <option value="res-full/JATTACK2/off4/8300">8300 - JackAttack Intro Round 1 (1)</option>
+         <option value="res-full/JATTACK2/off4/8301">8301 - JackAttack Intro Round 3 (1)</option>
+         <option value="res-full/JATTACK2/off4/8310">8310 - JackAttack Intro Round 1 (2)</option>
+         <option value="res-full/JATTACK2/off4/8311">8311 - JackAttack Intro Round 3 (2)</option>
+         <option value="res-full/JATTACK2/off4/8320">8320 - JackAttack Intro Round 1 (3)</option>
+         <option value="res-full/JATTACK2/off4/8321">8321 - JackAttack Intro Round 3 (3)</option>
+         <option value="res-full/TITLE/off4/8400">8400 - Logo Disappearing (1)</option>
+         <option value="res-full/TITLE/off4/8401">8401 - Logo Disappearing (2)</option>
+         <option value="res-full/TITLE/off4/8402">8402 - Logo Disappearing (3)</option>
+         <option value="res-full/TITLE/off4/8403">8403 - Logo Disappearing (4)</option>
+         <option value="res-full/TITLE/off4/8410">8410 - Slogans</option>
+         <option value="res-full/INTRO1/off4/9000">9000 - Intro</option>
+         <option value="res-full/INTRO1/off4/9001">9001 - Intro Panel Jokes</option>
+         <option value="res-full/INTRO1/off4/9002">9002 - Intro Panel Text</option>
+         <option value="res-full/JACKART/off4/10000">10000 - Categories 1</option>
+         <option value="res-full/JACKART/off4/10001">10001 - Categories 2</option>
+         <option value="res-full/JACKART/off4/10002">10002 - Categories 3</option>
+         <option value="res-full/JACKART/off4/10500">10500 - Drelin 1</option>
+         <option value="res-full/JACKART/off4/10501">10501 - Drelin 2</option>
+         <option value="res-full/JACKART/off4/11000">11000 - 1000 F</option>
+         <option value="res-full/JACKART/off4/11020">11020 - 2000 F</option>
+         <option value="res-full/JACKART/off4/11030">11030 - 3000 F</option>
+         <option value="res-full/JACKART/off4/11040">11040 - 4000 F</option>
+         <option value="res-full/JACKART/off4/11050">11050 - 5000 F</option>
+         <option value="res-full/JACKART/off4/11060">11060 - 6000 F</option>
+         <option value="res-full/JACKART/off4/11100">11100 - 10000 F</option>
+         <option value="res-full/JACKART/off4/12000">12000 - Questions</option>
+         <option value="res-full/GIBBER/off4/12905">12905 - Gibberish Round 1 Dancing</option>
+         <option value="res-full/GIBBER/off4/12906">12906 - Gibberish Round 2 Dancing</option>
+         <option value="res-full/GIBBER/off4/12910">12910 - Gibberish Intro (1)</option>
+         <option value="res-full/GIBBER/off4/12920">12920 - Gibberish Intro (2)</option>
+         <option value="res-full/GIBBER/off4/12930">12930 - Gibberish Intro (3)</option>
+         <option value="res-full/GIBBER/off4/12940">12940 - Gibberish Intro (4)</option>
+         <option value="res-full/GIBBER/off4/13000">13000 - Gibberish</option>
+         <option value="res-full/DISORDAT/off4/14000">14000 - DisOrDat</option>
+         <option value="res-full/DDBUMPER/off4/14690">14690 - DisOrDat Title</option>
+         <option value="res-full/DISORDAT/off4/14900">14900 - DOD Player 1</option>
+         <option value="res-full/DISORDAT/off4/14930">14930 - DOD Player 2</option>
+         <option value="res-full/DISORDAT/off4/14950">14950 - DOD Player 3</option>
+         <option value="res-full/JATTACK2/off4/15000">15000 - JackAttack Disappear</option>
+         <option value="res-full/ENDGAME/off4/16000">16000 - Final Score</option>
+         <option value="res-full/JACKART/off4/17000">17000 - Options Menu</option>
+         <option value="res-full/JATTACK1/off4/17010">17010 - JackAttack Space Bar Text</option>
+         <option value="res-full/CREDITS/off4/18000">18000 - Credits & Outro Menu</option>
+         <option value="res-full/SHORTVAR/off4/19000">19000 - Fill In The Blanks</option>
+         <option value="res-full/JATTACK2/off4/19001">19001 - JackAttack</option>
+         <option value="res-full/SHORTVAR/off4/20000">20000 - Who is this</option>
+         <option value="res-full/SHORTVAR/off4/21000">21000 - Open Your Eyes</option>
+         <option value="res-full/HISCORES/off4/23000">23000 - Hiscores</option>
+         <option disabled> - DEMO -</option>
+         <option value="res/5QDemo/off4/53000">3000 - Player Numbers</option>
+         <option value="res/5QDemo/off4/3540">3540 - Intro & Outro</option>
+         <option value="res/5QDemo/off4/8009">8009 - Timer 1</option>
+         <option value="res/5QDemo/off4/8014">8014 - Timer 2</option>
+         <option value="res/5QDemo/off4/8017">8017 - Timer 3</option>
+         <option value="res/5QDemo/off4/8018">8018 - Timer 10 seconds</option>
+         <option value="res/5QDemo/off4/8021">8021 - Timer 30 seconds</option>
+         <option value="res/5QDemo/off4/8041">8041 - Timer 4</option>
+         <option value="res/5QDemo/off4/10000">10000 - Categories 1</option>
+         <option value="res/5QDemo/off4/10001">10001 - Categories 2</option>
+         <option value="res/5QDemo/off4/10002">10002 - Categories 3</option>
+         <option value="res/5QDemo/off4/11000">11000 - 1000 F</option>
+         <option value="res/5QDemo/off4/11020">11020 - 2000 F</option>
+         <option value="res/5QDemo/off4/11030">11030 - 3000 F</option>
+         <option value="res/5QDemo/off4/12000">12000 - Questions</option>
+         <option value="res/5QDemo/off4/14000">14000 - DisOrDat</option>
+         <option value="res/5QDemo/off4/14900">14900 - DOD Player 1</option>
+         <option value="res/5QDemo/off4/14930">14930 - DOD Player 2</option>
+         <option value="res/5QDemo/off4/14950">14950 - DOD Player 3</option>
+         <option value="res/5QDemo/off4/17000">17000 - Options Menu</option>
+         <option value="res/5QDemo/off4/18000">18000 - Outro Menu</option>
+         <option value="res/5QDemo/off4/19000">19000 - Fill In The Blanks</option>
+         <option value="res/5QDemo/off4/20000">20000 - Who is this</option>
+         <option value="res/5QDemo/off4/21000">21000 - Open Your Eyes</option>
+         <option value="res/5QDemo/off4/23000">23000 - Hiscores</option>
      </select><br/><br/>
      Play from <input type="text" id="framefrom" style="width:50px"/> to <input type="text" id="frameto" style="width:50px"/> loop <input type="checkbox" id="animloop" /> slow <input type="checkbox" id="animslow" /> <input type="button" id="animplay" value="Play" /> <input type="button" id="animstop" value="Stop" /><br/><br/>
 

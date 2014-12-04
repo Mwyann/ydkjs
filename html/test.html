@@ -29,6 +29,36 @@ function play() {
     if (num == 0) num = 10;
 }
 
+function sql() {
+    var sql = 'INSERT INTO ressnd (grp, name, resfolder) VALUES<br>';
+    var virgule = '';
+
+    for (var i in YDKJDemoSnd) if (YDKJDemoSnd.hasOwnProperty(i)) {
+        for (var j in YDKJDemoSnd[i]) if (YDKJDemoSnd[i].hasOwnProperty(j)) {
+            sql = sql + virgule + ' (\''+i+'\',\''+j+'\',\''+YDKJDemoSnd[i][j]['res']+'/'+YDKJDemoSnd[i][j]['name']+'\')';
+            virgule = ',<br/>';
+        }
+    }
+    sql = sql + ';<br/>';
+
+    sql = sql + 'INSERT INTO resani (grp, name, resid, framestart, framestop, loopani) VALUES<br>';
+    virgule = '';
+
+    for (var i in YDKJDemoAnim) if (YDKJDemoAnim.hasOwnProperty(i)) {
+        for (var j in YDKJDemoAnim[i]) if (YDKJDemoAnim[i].hasOwnProperty(j)) {
+            var loop = YDKJDemoAnim[i][j]['loop'];
+            if (loop === undefined) loop = 0;
+            var framestop = YDKJDemoAnim[i][j]['framestop'];
+            if ((framestop === undefined) ||(framestop == -1)) framestop = 'NULL';
+            sql = sql + virgule + ' (\''+i+'\',\''+j+'\',REPLACE(\''+YDKJDemoAnim[i][j]['res']+'/'+YDKJDemoAnim[i][j]['name']+'\',\'5QDemo/off4/\',\'\'),'+YDKJDemoAnim[i][j]['framestart']+','+framestop+','+loop+')';
+            virgule = ',<br/>';
+        }
+    }
+    sql = sql + ';<br/>';
+
+    document.getElementById('debug').innerHTML = sql;
+}
+
 </script>
 </head>
 
@@ -37,7 +67,7 @@ function play() {
   <div id="slider" style="width:90%;margin: 10px auto"></div>
   <div id="debuglive" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;"><br/></div>
   <div id="debug" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;height:150px;overflow-y:scroll">
-    <input type="button" value="Run" onclick="play()"/>
+    <input type="button" value="Run" onclick="play()"/><input type="button" value="SQL" onclick="sql()"/>
   </div>
   <div id="tmpscreen" style="display:none"></div>
   <div id="preload" style="display:none"></div>

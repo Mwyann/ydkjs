@@ -224,8 +224,9 @@ procedure convertSRF(filefrom:string);
 var filepos,subpos:word;
     fullname,ftype:string;
     strings:string;
-    f:system.text;
+    //f:system.text;
 begin
+  strings:='';
   try
   openSRF(filefrom);
   if SRFdata.nbfiles > 0 then for filepos:=0 to SRFdata.nbfiles-1 do begin
@@ -245,9 +246,12 @@ begin
           //exportStringToFile(SRFdata.filelist[filepos].subfile[subpos],fullname);
         end else if (filetype(ftype)='stringlist') then begin
           exportStringlistToFile(SRFdata.filelist[filepos].subfile[subpos],fullname);
+        end else if (filetype(ftype)='qheaders') then begin
+          exportQHeadersToFile(SRFdata.filelist[filepos].subfile[subpos]);
         end;
       end else begin
-        strings:=strings+'{id:'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname)+',str:'''+readString(SRFdata.filelist[filepos].subfile[subpos])+'''},';
+        if (strings<>'') then strings:=strings+',';
+        strings:=strings+'{id:'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname)+',str:'''+readString(SRFdata.filelist[filepos].subfile[subpos])+'''}';
       end;
     end;
   end;
@@ -261,13 +265,14 @@ begin
   end;
 
   if (strings <> '') then begin
-    fullname:=RemoveExt(SafeFileName(Form1.Edit2.Text+'\'+RemoveBaseDir(Form1.Edit1.Text,filefrom)));
+    {fullname:=RemoveExt(SafeFileName(Form1.Edit2.Text+'\'+RemoveBaseDir(Form1.Edit1.Text,filefrom)));
     ForceDirectories(fullname);
     fullname:=fullname+'\STR.js';
     assignfile(f,fullname);
     rewrite(f);
     write(f,'res[''STR'']=['+strings+'];');
-    closefile(f);
+    closefile(f);}
+    stringsCSV:=stringsCSV+RemoveExt(RemoveBaseDir(Form1.Edit1.Text,filefrom))+'¤['+strings+']'#10;
   end;
 end;
 
@@ -294,9 +299,27 @@ begin
 end;
 
 procedure TForm1.Button1Click(Sender: TObject);
+var fullname:string;
+    f:system.text;
 begin
-   Memo1.Clear;
-   convertRecursive(Edit1.Text);
+  Memo1.Clear;
+  qhdrCSV:='';
+  stringsCSV:='';
+  convertRecursive(Edit1.Text);
+  if (qhdrCSV <> '') then begin
+    fullname:=SafeFileName(Form1.Edit2.Text)+'\qhdr.csv';
+    assignfile(f,fullname);
+    rewrite(f);
+    write(f,qhdrCSV);
+    closefile(f);
+  end;
+  if (stringsCSV <> '') then begin
+    fullname:=SafeFileName(Form1.Edit2.Text)+'\strings.csv';
+    assignfile(f,fullname);
+    rewrite(f);
+    write(f,stringsCSV);
+    closefile(f);
+  end;
 end;
 
 end.

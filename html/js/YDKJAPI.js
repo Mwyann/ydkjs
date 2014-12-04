@@ -225,16 +225,16 @@ YDKJAPI.prototype.initdemo = function() {
             reslist['Question/VoiceAnnounceValue'] = demores('Question/VoiceAnnounceValue'+mode.options.value+'F');
             reslist['Question/HideValue'] = demores('Question/HideValue'+mode.options.value+'F');
 
-            reslist['Question/QuestionTitle'] = {urlGif: '', urlJS: '', urlAudio: 'res/'+mode.options.res+'/snd/1', framestart:0, loop:0, framestop:0};
-            reslist['Question/PreQuestion'] = {urlGif: '', urlJS: '', urlAudio: 'res/'+mode.options.res+'/snd/2', framestart:0, loop:0, framestop:0};
-            reslist['Question/Question'] = {urlGif: '', urlJS: '', urlAudio: 'res/'+mode.options.res+'/snd/3', framestart:0, loop:0, framestop:0};
-            reslist['Question/Answers'] = {urlGif: '', urlJS: '', urlAudio: 'res/'+mode.options.res+'/snd/5', framestart:0, loop:0, framestop:0};
-            reslist['Question/EndQuestion'] = {urlGif: '', urlJS: '', urlAudio: 'res/'+mode.options.res+'/snd/6', framestart:0, loop:0, framestop:0};
-            reslist['Question/Answer1'] = {urlGif: '', urlJS: '', urlAudio: 'res/'+mode.options.res+'/snd/7', framestart:0, loop:0, framestop:0};
-            reslist['Question/Answer2'] = {urlGif: '', urlJS: '', urlAudio: 'res/'+mode.options.res+'/snd/8', framestart:0, loop:0, framestop:0};
-            reslist['Question/Answer3'] = {urlGif: '', urlJS: '', urlAudio: 'res/'+mode.options.res+'/snd/9', framestart:0, loop:0, framestop:0};
-            reslist['Question/Answer4'] = {urlGif: '', urlJS: '', urlAudio: 'res/'+mode.options.res+'/snd/10', framestart:0, loop:0, framestop:0};
-            //reslist['Question/RevealAnswer'] = {urlGif: '', urlJS: '', urlAudio: 'res/'+mode.options.res+'/snd/11', framestart:0, loop:0, framestop:0};
+            reslist['Question/QuestionTitle'] = {urlAudio: 'res/'+mode.options.res+'/snd/1'};
+            reslist['Question/PreQuestion'] = {urlAudio: 'res/'+mode.options.res+'/snd/2'};
+            reslist['Question/Question'] = {urlAudio: 'res/'+mode.options.res+'/snd/3'};
+            reslist['Question/Answers'] = {urlAudio: 'res/'+mode.options.res+'/snd/5'};
+            reslist['Question/EndQuestion'] = {urlAudio: 'res/'+mode.options.res+'/snd/6'};
+            reslist['Question/Answer1'] = {urlAudio: 'res/'+mode.options.res+'/snd/7'};
+            reslist['Question/Answer2'] = {urlAudio: 'res/'+mode.options.res+'/snd/8'};
+            reslist['Question/Answer3'] = {urlAudio: 'res/'+mode.options.res+'/snd/9'};
+            reslist['Question/Answer4'] = {urlAudio: 'res/'+mode.options.res+'/snd/10'};
+            //reslist['Question/RevealAnswer'] = {urlAudio: 'res/'+mode.options.res+'/snd/11'};
 
             mode.options.strjs = getYDKJFile('js','res/'+mode.options.res+'/STR.js');
             mode.options.timer = new YDKJTimer10();
@@ -262,15 +262,15 @@ YDKJAPI.prototype.initdemo = function() {
             };
             for(r in reslist) if (reslist.hasOwnProperty(r)) reslist[r] = demores(r);
 
-            reslist['DisOrDat/QuestionTitle'] = {urlGif: '', urlJS: '', urlAudio: 'res/'+mode.options.res+'/snd/1', framestart:0, loop:0, framestop:0};
-            reslist['DisOrDat/QuestionIntro1'] = {urlGif: '', urlJS: '', urlAudio: 'res/'+mode.options.res+'/snd/2', framestart:0, loop:0, framestop:0};
-            reslist['DisOrDat/QuestionIntro2'] = {urlGif: '', urlJS: '', urlAudio: 'res/'+mode.options.res+'/snd/3', framestart:0, loop:0, framestop:0};
+            reslist['DisOrDat/QuestionTitle'] = {urlAudio: 'res/'+mode.options.res+'/snd/1'};
+            reslist['DisOrDat/QuestionIntro1'] = {urlAudio: 'res/'+mode.options.res+'/snd/2'};
+            reslist['DisOrDat/QuestionIntro2'] = {urlAudio: 'res/'+mode.options.res+'/snd/3'};
 
             return reslist;
         }
         if (mode instanceof YDKJTimer10) {
             var resName = 'res/5QDemo/off4/8018';
-            return {'Common/Timer10': {urlGif: resName+'.gif', urlJS: resName+'.js', urlAudio: '',framestart: 73, loop: 0,framestop: 75},
+            return {'Common/Timer10': {urlGif: resName+'.gif', urlJS: resName+'.js', framestart: 73, loop: 0, framestop: 75},
                     'Common/Timer10/Frames': {
                         'Still':{
                             10:{framestart:69},

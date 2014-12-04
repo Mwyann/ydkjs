@@ -4,12 +4,21 @@ function YDKJAnimation(resource) {
     this.resource = resource;// Paramètres : urlGif,urlJS,urlAudio,framestart,loop,framestop
     this.div = 0;
     this.tmpdiv = 0;
-    this.urlGif = this.resource.urlGif;
-    this.urlJS = this.resource.urlJS;
-    this.urlAudio = this.resource.urlAudio;
-    this.framestart = this.resource.framestart;
-    this.loop = this.resource.loop;
-    this.framestop = this.resource.framestop;
+    if (resource) {
+        if (this.resource.urlGif !== undefined) this.urlGif = this.resource.urlGif; else this.urlGif = '';
+        if (this.resource.urlJS !== undefined) this.urlJS = this.resource.urlJS; else this.urlJS = '';
+        if (this.resource.urlAudio !== undefined) this.urlAudio = this.resource.urlAudio; else this.urlAudio = '';
+        if (this.resource.framestart !== undefined) this.framestart = this.resource.framestart; else this.framestart = 0;
+        if (this.resource.loop !== undefined) this.loop = this.resource.loop; else this.loop = 0;
+        if (this.resource.framestop !== undefined) this.framestop = this.resource.framestop; else this.framestop = -1;
+    } else {
+        this.urlGif = '';
+        this.urlJS = '';
+        this.urlAudio = '';
+        this.framestart = 0;
+        this.loop = 0;
+        this.framestop = -1;
+    }
     this.seamlessLoop = 0;
 
     var thisAnim = this;
