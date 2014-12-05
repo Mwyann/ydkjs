@@ -2,7 +2,7 @@
 
 session_start();
 
-//if (!isset($_SESSION['login'])) die('Not logged in');
+if (!isset($_SESSION['id'])) die('Not logged in');
 if (!isset($_GET['uid'])) die('No uid');
 
 session_write_close();
