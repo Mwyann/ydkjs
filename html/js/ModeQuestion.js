@@ -176,7 +176,7 @@ ModeQuestion.prototype.start = function() {
                     'width':'540px',
                     'font-size':'44px',
                     'line-height':'44px'
-                }).html(getSTRfromID(thisMode.STR,thisMode.correctanswer+2)).appendTo(div);
+                }).html(getSTRfromID(thisMode.STR,parseInt(thisMode.correctanswer)+2)).appendTo(div);
 
                 thisMode.SFXRevealAnswer.play();
             },300);
@@ -374,6 +374,8 @@ ModeQuestion.prototype.start = function() {
             thisMode.JingleTimer.play();
             thisMode.PrepareTimer.free();
             thisMode.timerTimeout = setTimeout(timerRunning,800);
+            thisMode.currentPlayer = thisMode.buzzPlayer; // Le joueur peut enfin répondre
+            thisMode.buzzPlayer = 0;
 
             // Vas-y joueur X
             if (thisMode.currentPlayer == 1) {
@@ -518,18 +520,20 @@ ModeQuestion.prototype.start = function() {
             thisMode.availAnswers[3] = ans3;
             thisMode.availAnswers[4] = ans4;
 
+            thisMode.buzzPlayer = 0;
             thisMode.currentPlayer = 0;
             thisMode.currentAns = 0;
             thisMode.listener = bindKeyListener(function(choice) {
                 if (thisMode.currentPlayer == 0) {
-                    if (choice == 113) thisMode.currentPlayer = 1; // Joueur 1
-                    if (choice == 98) thisMode.currentPlayer = 2; // Joueur 2
-                    if (choice == 112) thisMode.currentPlayer = 3; // Joueur 3
-                    if (!thisMode.availPlayers[thisMode.currentPlayer]) thisMode.currentPlayer = 0;
+                    if (thisMode.buzzPlayer != 0) return false; // On a déjà un joueur en attente
+                    if (choice == 113) thisMode.buzzPlayer = 1; // Joueur 1
+                    if (choice == 98) thisMode.buzzPlayer = 2; // Joueur 2
+                    if (choice == 112) thisMode.buzzPlayer = 3; // Joueur 3
+                    if (!thisMode.availPlayers[thisMode.buzzPlayer]) thisMode.buzzPlayer = 0;
 
                     // Si réponses 1 à 4 : 1 seul joueur = réponse directe, 2 ou 3 joueurs : "On appuie d'abord sur la lettre !"
 
-                    if (thisMode.currentPlayer) {
+                    if (thisMode.buzzPlayer) {
                         clearTimeout(thisMode.timerTimeout);
                         thisMode.Question.free();
                         thisMode.Answers.free();
@@ -537,7 +541,7 @@ ModeQuestion.prototype.start = function() {
                         if (thisMode.LastPlayers) thisMode.LastPlayers.free();
                         thisMode.JingleTimer.stop();
                         thisMode.SFXPlayerBuzz.play();
-                        switch (thisMode.currentPlayer) {
+                        switch (thisMode.buzzPlayer) {
                             case 1:
                                 thisMode.Player1Answer.play();
                                 thisMode.ShowPlayer1Key.free();
@@ -706,7 +710,7 @@ ModeQuestion.prototype.start = function() {
     this.VoiceAnnounceValue.ended(function(){
         this.free();
         thisMode.AnnounceValue.free();
-        jQuery('#screen').find('#QuestionTitle').css('font-style','italic').delay(100).animate({'left':'-500px'},500,function(){
+        jQuery('#screen').find('#QuestionTitle').css('font-style','italic').delay(100).animate({'left':'-550px'},500,function(){
             jQuery('#screen').find('#QuestionTitle').remove();
             thisMode.TimerComesIn.delay(function(){
                 this.play();
