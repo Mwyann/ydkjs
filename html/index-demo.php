@@ -5,33 +5,21 @@
 <title>You Don't Know Jack® DEMO FR</title>
 <link href="css/ydkj.css" rel="stylesheet"/>
 <script src="js/jquery-1.11.0.min.js" type="text/javascript"></script>
-<script src="js/SeamlessLoop.js" type="text/javascript"></script>
-
-<script src="js/demo-res.js" type="text/javascript"></script>
-<script src="js/common.js" type="text/javascript"></script>
-<script src="js/YDKJAPI.js" type="text/javascript"></script>
-<script src="js/YDKJFile.js" type="text/javascript"></script>
-<script src="js/YDKJAnimation.js" type="text/javascript"></script>
-<script src="js/ModeIntro.js" type="text/javascript"></script>
-<script src="js/ModeCategory.js" type="text/javascript"></script>
-<script src="js/ModeQuestion.js" type="text/javascript"></script>
-<script src="js/ModeDisOrDat.js" type="text/javascript"></script>
-<script src="js/YDKJMode.js" type="text/javascript"></script>
-<script src="js/YDKJGame.js" type="text/javascript"></script>
+<script src="js/YDKJ.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 
 jQuery(document).ready(function() {
   jQuery('#startbutton').val("J'ai compris, commencer le jeu");
-})
+});
 
 function startgame() {
   jQuery('#warning').hide();
   jQuery('#screen').show();
 
   jQuery(document).ready(function() {
-    var game = new YDKJGame(true);
-    game.start();
+    var game = new YDKJ();
+    game.demo();
   });
 }
 
