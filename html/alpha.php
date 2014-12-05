@@ -18,7 +18,7 @@ jQuery(document).ready(function() {
 </head>
 
 <body style="background-color:#000;margin:0;padding:0;border:0">
-  <div style="text-align:center;font-size:20px;margin:5px;font-family:JackCondensed, sans-serif"><a href="/" style="color:#FFF">Retour à l'accueil</a></div>
+  <div style="text-align:center;font-size:20px;margin:5px;font-family:JackCondensed, sans-serif"><a href="/" style="color:#666">Retour à l'accueil</a></div>
   <div id="screen" style="background-color:#000;position:relative;width:640px;height:480px;overflow:hidden;margin-left:auto;margin-right:auto">
     <img src="ajax-loader.gif" style="position:absolute;left:293px;top:212px" class="markedAsRemoved"/>
   </div> <!-- Couleur #EEE pour l'intro -->

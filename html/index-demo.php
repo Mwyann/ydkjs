@@ -40,6 +40,8 @@ function startgame() {
      <u>Le but de ce projet est de transformer le jeu complet et d'y ajouter des fonctionnalités multi-joueurs en ligne</u>. Etant donné mon temps libre et le travail que cela va demander, ce n'est pas pour tout de suite, ni pour demain... mais à suivre ! Si vous ne connaissez pas déjà le jeu, je vous laisse le découvrir.<br/>
      <br/>
      Contact : <a style="color:#F00" href="mailto:demo@ydkj.fr">demo@ydkj.fr</a>
+     <br/>
+     <u>Alpha disponible</u> ! Plus d'infos ici : <a style="color:#F00" href="http://play.ydkj.fr/">play.ydkj.fr</a>
     </p>
     <p style="text-align:center"><br/><input type="button" onclick="startgame()" value="Chargement..." id="startbutton" /><br/>
         <span style="font-size:12px">Super, <span style="color:#FF0"><?php include 'count.txt'; ?></span> personnes ont osé essayer !</span></p>

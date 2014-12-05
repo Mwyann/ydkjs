@@ -132,7 +132,7 @@ if (!isset($_SESSION['id'])) {
         displaylogin();
     } else {
         ?>
-        <div style="text-align:center;font-size:28px">Apha-test disponible ! Inscription : <a href="mailto:alpha@ydkj.fr">alpha@ydkj.fr</a></div>
+        <div style="text-align:center;font-size:28px">Alpha-test disponible ! Inscription : <a href="mailto:alpha@ydkj.fr">alpha@ydkj.fr</a></div>
         <div style="text-align:center;font-size:20px;margin:20px">Vous possédez déjà un compte ? <a href="?login=1">Connectez-vous !</a></div>
     <?php
     }

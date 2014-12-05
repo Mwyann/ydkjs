@@ -284,9 +284,9 @@ function resources() {
 
 function players() {
     $players = array(
-        array('name' => 'Player1','score' => 0,'keycode' => 113),
-        array('name' => 'Player2','score' => 0,'keycode' => 98),
-        array('name' => 'Player3','score' => 0,'keycode' => 112)
+        array('name' => 'Joueur 1','score' => 0,'keycode' => 113),
+        array('name' => 'Joueur 2','score' => 0,'keycode' => 98),
+        array('name' => 'Joueur 3','score' => 0,'keycode' => 112)
     );
     header('X-JSON: '.json_encode(array(
             'players' => $players
