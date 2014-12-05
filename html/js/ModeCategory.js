@@ -51,55 +51,59 @@ ModeCategory.prototype.start = function() {
     if (this.chooseplayer == 2) this.ChooseCategoryPlayer = this.ChooseCategoryPlayer2;
     if (this.chooseplayer == 3) this.ChooseCategoryPlayer = this.ChooseCategoryPlayer3;
 
+    var listener;
+    var chooseCategory = function(chosed) {
+        var choice;
+        var nextquestion = 0;
+        if (chosed == -1) { // Timeout
+            // A gérer
+        }
+        if (chosed) {
+            switch (chosed) {
+                case 1:
+                    choice = thisMode.ChoiceCategory1;
+                    nextquestion = thisMode.question1;
+                    break;
+                case 2:
+                    choice = thisMode.ChoiceCategory2;
+                    nextquestion = thisMode.question2;
+                    break;
+                case 3:
+                    choice = thisMode.ChoiceCategory3;
+                    nextquestion = thisMode.question3;
+                    break;
+            }
+            unbindKeyListener(listener);
+            jQuery('#screen').find('.QuestionTitle:not(#QuestionTitle' + (chosed - 1) + ')').remove();
+            thisMode.ChooseCategoryPlayer.free();
+            thisMode.MusicChooseCategoryLoop.free();
+            thisMode.LoopCategory1.free();
+            thisMode.LoopCategory2.free();
+            thisMode.LoopCategory3.free();
+
+            thisMode.SFXChoiceCategory.ended(function () {
+                this.free();
+                thisMode.ChooseCategory.free();
+                thisMode.ChooseCategoryText.free();
+                choice.free();
+                nextquestion.start(); // On démarre la question choisie
+            });
+
+            thisMode.SFXChoiceCategory.play();
+            choice.play();
+        }
+    };
+
     this.SFXChoiceCategory.ended(function(){
         thisMode.SFXChoiceCategory.reset(true);
         thisMode.ChooseCategoryPlayer.delay(function(){
             this.play();
-            var thisChooseCategory = this;
-
-            var listener = bindKeyListener(function(choice) {
+            listener = bindKeyListener(function(choice) {
                 var chosed = 0;
-                var nextquestion = 0;
                 if (choice == 49) chosed = 1;
                 else if (choice == 50) chosed = 2;
                 else if (choice == 51) chosed = 3;
-                else if (choice == -1) { // Timeout
-                    // A gérer
-                } else chosed = 0;
-                if (chosed) {
-                    switch(chosed) {
-                        case 1:
-                            choice = thisMode.ChoiceCategory1;
-                            nextquestion = thisMode.question1;
-                            break;
-                        case 2:
-                            choice = thisMode.ChoiceCategory2;
-                            nextquestion = thisMode.question2;
-                            break;
-                        case 3:
-                            choice = thisMode.ChoiceCategory3;
-                            nextquestion = thisMode.question3;
-                            break;
-                    }
-                    unbindKeyListener(listener);
-                    jQuery('#screen').find('.QuestionTitle:not(#QuestionTitle'+(chosed-1)+')').remove();
-                    thisChooseCategory.free();
-                    thisMode.MusicChooseCategoryLoop.free();
-                    thisMode.LoopCategory1.free();
-                    thisMode.LoopCategory2.free();
-                    thisMode.LoopCategory3.free();
-
-                    thisMode.SFXChoiceCategory.ended(function(){
-                        this.free();
-                        thisMode.ChooseCategory.free();
-                        thisMode.ChooseCategoryText.free();
-                        choice.free();
-                        nextquestion.start(); // On démarre la question choisie
-                    });
-
-                    thisMode.SFXChoiceCategory.play();
-                    choice.play();
-                }
+                chooseCategory(chosed);
             },10000); // 10 secondes de timeout
         },100);
     });
@@ -146,6 +150,9 @@ ModeCategory.prototype.start = function() {
             thisMode.LoopCategory1.play();
             thisMode.LoopCategory2.play();
             thisMode.LoopCategory3.play();
+            thisMode.LoopCategory1.click(function(){chooseCategory(1)});
+            thisMode.LoopCategory2.click(function(){chooseCategory(2)});
+            thisMode.LoopCategory3.click(function(){chooseCategory(3)});
             thisMode.ShowCategories.free();
         },300);
     });
@@ -153,29 +160,31 @@ ModeCategory.prototype.start = function() {
     var ShowCategoryNum = 0;
     this.ShowCategories.setAnimCallback(function(){
         if (ShowCategoryNum < 3) {
-            var title = thisMode.questiontitles[ShowCategoryNum];
-            var div = jQuery('<div />').addClass('QuestionTitle').attr('id','QuestionTitle'+ShowCategoryNum).css({ // Titre de la catégorie
-                'position':'absolute',
-                'width':'0px',
-                'height':'100px',
-                'line-height':'100px',
-                'left':'130px',
-                'top':(163+100*ShowCategoryNum)+'px',
-                'overflow':'hidden'
-            });
+            (function(){
+                var thisCatNum = ShowCategoryNum;
+                var title = thisMode.questiontitles[ShowCategoryNum];
+                var div = jQuery('<div />').addClass('QuestionTitle').attr('id','QuestionTitle'+ShowCategoryNum).css({ // Titre de la catégorie
+                    'position':'absolute',
+                    'width':'0px',
+                    'height':'100px',
+                    'line-height':'100px',
+                    'left':'130px',
+                    'top':(163+100*ShowCategoryNum)+'px',
+                    'overflow':'hidden'
+                }).click(function(){chooseCategory(thisCatNum+1)});
 
-            jQuery('<div />').css({
-                'width':'500px',
-                'vertical-align':'middle',
-                'display':'inline-block',
-                'font-size':'32px',
-                'line-height':'32px',
-                'color':'#FC0',
-                'font-family':'JackRoman'
-            }).html(title).appendTo(div);
+                jQuery('<div />').css({
+                    'width':'500px',
+                    'vertical-align':'middle',
+                    'display':'inline-block',
+                    'font-size':'32px',
+                    'line-height':'32px',
+                    'color':'#FC0',
+                    'font-family':'JackRoman'
+                }).html(title).appendTo(div);
 
-            div.appendTo('#screen').animate({'width':'500px'},150);
-
+                div.appendTo('#screen').animate({'width':'500px'},150);
+            })();
             ShowCategoryNum++;
         }
     });

@@ -10,8 +10,6 @@ ModeDisOrDat.prototype.preload = function(resources) {
     this.AnnounceCategory = new YDKJAnimation(resources['DisOrDat/AnnounceCategory']);
     this.TimerComesIn = new YDKJAnimation(resources['DisOrDat/TimerComesIn']);
 
-    this.strjs = this.options.strjs;
-
     this.GameStart = new YDKJAnimation(resources['DisOrDat/GameStart']);
 
     this.Intro = new YDKJAnimation(resources['DisOrDat/Intro']);
@@ -166,16 +164,13 @@ ModeDisOrDat.prototype.start = function() {
         },500);
     });
 
-    this.strjs.ready(function(){
-        thisMode.STR = thisMode.strjs.res['STR'];
-        thisMode.ChoicePlayer.delay(function(){
+    this.ChoicePlayer.delay(function(){
+        this.play();
+        thisMode.Intro.delay(function(){
+            jQuery('#screen').css('background-color','#000').html(''); // Je vide manuellement l'écran.
             this.play();
-            thisMode.Intro.delay(function(){
-                jQuery('#screen').css('background-color','#000').html(''); // Je vide manuellement l'écran.
-                this.play();
-            },2500);
-        },500);
-    });
+        },2500);
+    },500);
 
     nextcategory = new YDKJMode(this.game, 'Category', {category:1,questionnumber:this.options.questionnumber+1});
     nextcategory.modeObj.chooseplayer = this.chooseplayer;

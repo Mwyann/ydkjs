@@ -48,6 +48,7 @@ function YDKJAnimation(resource) {
 
     this.preloaded = 0;
     this.readyFunctions = [];
+    this.clickFunctions = [];
 
     // Lancement du preload
 
@@ -119,7 +120,11 @@ function YDKJAnimation(resource) {
             'position':'absolute',
             'left':x+'px',
             'top':y+'px'
-        });
+        }).on('mousedown',(function() {
+            for(var i = 0; i < thisAnim.clickFunctions.length; i++) {
+                thisAnim.clickFunctions[i].call(thisAnim);
+            }
+        }));
         ourdiv.appendTo(this.tmpdiv);
         return true;
     };
@@ -165,14 +170,19 @@ function YDKJAnimation(resource) {
             this.div.appendTo(screen);
         }
         screen.find('.markedAsRemoved').remove(); // Supprimer les éléments marqués
-        this.div.html(this.tmpdiv.html()); // Meilleure façon de déplacer les éléments ?
+
+        //this.div.html(this.tmpdiv.html()); // Méthode simple et rapide mais ne gère pas les évènements javascript on...
 
         /*
-         // Chrome n'aime pas cette façon non plus (en fait il aime pas en local uniquement... il gère le cache des images différemment il faut croire ?)
-         var newscreen = jQuery('#tmpscreen').clone(true);
-         newscreen.attr('id','screen').attr('style',jQuery('#screen').attr('style'));
-         jQuery('#screen').replaceWith(newscreen);
-         */
+        var newdiv = this.tmpdiv.clone(true);
+        newdiv.attr('style',this.div.attr('style'));
+        this.div.replaceWith(newdiv);
+        this.div = newdiv;
+        */
+
+        this.div.replaceWith(this.tmpdiv);
+        this.div = this.tmpdiv;
+        this.tmpdiv = 0;
 
         this.newScreen();
     };
@@ -186,6 +196,11 @@ function YDKJAnimation(resource) {
 
 YDKJAnimation.prototype.ready = function(f) {
     if (!this.preloaded) this.readyFunctions.push(f); else f.call(this);
+};
+
+YDKJAnimation.prototype.click = function(f) {
+    if (f === false) this.clickFunctions = [];
+    else this.clickFunctions.push(f);
 };
 
 YDKJAnimation.prototype.ended = function(f,msbeforeend) {

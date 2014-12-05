@@ -11,7 +11,7 @@ YDKJAPI.prototype.initdemo = function() {
     YDKJAPI.prototype.gamemode = function(currentmode) {
         var newmode;
         if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Intro', {});
-        //if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1}); // Ligne DEBUG
+        if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1}); // Ligne DEBUG
         if (currentmode instanceof ModeIntro) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1});
         if (currentmode instanceof ModeQuestion) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: currentmode.options.questionnumber+1});
 
@@ -84,6 +84,7 @@ YDKJAPI.prototype.initdemo = function() {
                 'Intro/IntroJackDemo': 0
             };
             for(r in reslist) if (reslist.hasOwnProperty(r)) reslist[r] = demores(r);
+            return function(f) {f(reslist)}
         }
         else if (mode instanceof ModeCategory) {
             reslist = {
@@ -130,6 +131,7 @@ YDKJAPI.prototype.initdemo = function() {
                     reslist['question'+i] = new YDKJMode(thisAPI.game, 'DisOrDat', {category:mode.options.category,questionnumber:mode.options.questionnumber,id:questions[i-1]}); // Preload des questions suivantes
                 }
             }
+            return function(f) {f(reslist)}
         }
         else if (mode instanceof ModeQuestion) {
             reslist = {
@@ -139,12 +141,10 @@ YDKJAPI.prototype.initdemo = function() {
                 'Question/SFXShowQuestion': 0,
                 'Question/JingleReadQuestion': 0,
                 'Question/JingleTimer': 0,
-                'Question/TimeOut': 0,
                 'Question/SFXTimeOut': 0,
                 'Question/SFXPlayerBuzz': 0,
                 'Question/SFXPlayerKey': 0,
-                'Question/SFXPlayerWrong1': 0,
-                'Question/SFXPlayerWrong2': 0,
+                'Question/SFXPlayerLose': 0,
                 'Question/SFXPlayerCorrect': 0,
                 'Question/SFXRevealAnswer': 0,
                 'Question/DefaultRevealLastAnswer': 0,
@@ -193,6 +193,15 @@ YDKJAPI.prototype.initdemo = function() {
                 'Question/LastPlayers23': 0
             };
             for(r in reslist) if (reslist.hasOwnProperty(r)) reslist[r] = demores(r);
+
+            var SFXWrongAnswer = demores('Question/SFXWrongAnswer');
+            reslist['Question/WrongAnswer1']['urlAudio'] = SFXWrongAnswer['urlAudio'];
+            reslist['Question/WrongAnswer2']['urlAudio'] = SFXWrongAnswer['urlAudio'];
+            reslist['Question/WrongAnswer3']['urlAudio'] = SFXWrongAnswer['urlAudio'];
+            reslist['Question/WrongAnswer4']['urlAudio'] = SFXWrongAnswer['urlAudio'];
+            reslist['Question/TimeOut1'] = demores('Question/TimeOut');
+            reslist['Question/TimeOut2'] = demores('Question/TimeOut');
+            reslist['Question/TimeOut3'] = demores('Question/TimeOut');
 
             // Valeurs spécifiques à la question
             if (mode.options.questionnumber == 1) { // Charger les bonnes ressources en fonction du n° de la question
@@ -245,6 +254,14 @@ YDKJAPI.prototype.initdemo = function() {
             timerready(function(resources) {
                 mode.options.timer.preload(resources);
             });
+
+            var strjs = getYDKJFile('js',res+'/STR.js');
+            return function(f) {
+                strjs.ready(function() {
+                    mode.STR = strjs.res['STR'];
+                    f(reslist);
+                });
+            };
         }
         else if (mode instanceof ModeDisOrDat) {
             reslist = {
@@ -272,7 +289,13 @@ YDKJAPI.prototype.initdemo = function() {
             reslist['DisOrDat/QuestionIntro1'] = {urlAudio: resDD+'/snd/2'};
             reslist['DisOrDat/QuestionIntro2'] = {urlAudio: resDD+'/snd/3'};
 
-            mode.options.strjs = getYDKJFile('js',resDD+'/STR.js');
+            var strjsDD = getYDKJFile('js',resDD+'/STR.js');
+            return function(f) {
+                strjsDD.ready(function() {
+                    mode.STR = strjsDD.res['STR'];
+                    f(reslist);
+                });
+            };
         }
         else if (mode instanceof YDKJTimer10) {
             var resName = 'res/5QDemo/off4/8018';
@@ -319,6 +342,7 @@ YDKJAPI.prototype.initdemo = function() {
                             }
                        }
             };
+            return function(f) {f(reslist)}
         }
 
         return function(f) {f(reslist)}
@@ -327,9 +351,9 @@ YDKJAPI.prototype.initdemo = function() {
     YDKJAPI.prototype.players = function() {
         var playernames = shuffle(['David','Marité','Marjorie','Frédéric','Olivier','Mathieu','Alicia','Fabrice','Jackqueline','Bruno','Natacha','Jeff','Henri','Barbara','Christophe','Luc','Danièle','Serge','Anita','Alain','Denise','Marcel','Lucette','Gilles','Julien','Adrienne','Camille','Anna','Laurel','Diane','Michelle']);
         var players = [
-            {name:playernames[0],score:0},
-            {name:playernames[1],score:0},
-            {name:playernames[2],score:0}
+            {name:playernames[0],score:0,keycode:113},
+            {name:playernames[1],score:0,keycode:98},
+            {name:playernames[2],score:0,keycode:112}
         ];
 
         return function(f) {f(players)}
@@ -438,14 +462,9 @@ YDKJAPI.prototype.initgame = function() {
                 }
 
                 if (mode instanceof ModeQuestion) {
-                    var strjs = new function(){}; // On "fake" l'objet YDKJFile. C'est crade je sais, mais ça peut marcher ?
-                    var restmp = [];
-                    eval('restmp = '+reslist['STR']);
-                    strjs.res = {STR: restmp};
-                    strjs.ready = function(f) {f.call(this)};
-                    strjs.free = function(){};
-
-                    mode.options.strjs = strjs;
+                    var strtmp = [];
+                    eval('strtmp = '+reslist['STR']);
+                    mode.STR = strtmp;
                     mode.options.value = reslist['value'];
                     mode.options.correctanswer = reslist['correctanswer'];
                     mode.options.timer = new YDKJTimer10();

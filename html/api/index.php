@@ -118,7 +118,7 @@ function resources() {
         $qhdr = $res->fetch();
         $value = number_format(1000*$qhdr['value']*$category,0,'','');
 
-        $jinglequestion = 1;
+        if ($questionnumber <= 10) $jinglequestion = rand(1,3); else $jinglequestion = rand(1,2);
         $music = rand(1,6);
 
         $reslist = array('value' => $value);
@@ -163,13 +163,19 @@ function resources() {
                 if (sizeof($possiblevalues) > 1) shuffle($possiblevalues);
             }
 
-            $key = $rs['grp'].'/'.$rs['name'];
-            if (!isset($reslist[$key])) {
-                if ((substr($rs['name'],0,3) == 'SFX') && (isset($reslist[$rs['grp'].'/'.substr($rs['name'],3)]))) $key = $rs['grp'].'/'.substr($rs['name'],3);
-                else $reslist[$key] = array();
+            $names = array($rs['name']);
+            if ($rs['name'] == 'SFXWrongAnswer') $names = array($rs['name'].'1', $rs['name'].'2', $rs['name'].'3', $rs['name'].'4');
+            if ($rs['name'] == 'TimeOut') $names = array($rs['name'].'1', $rs['name'].'2', $rs['name'].'3');
+
+            foreach($names as $idname => $name) {
+                $key = $rs['grp'] . '/' . $name;
+                if (!isset($reslist[$key])) {
+                    if ((substr($name, 0, 3) == 'SFX') && (isset($reslist[$rs['grp'] . '/' . substr($name, 3)]))) $key = $rs['grp'] . '/' . substr($name, 3);
+                    else $reslist[$key] = array();
+                }
+                $reslist[$key]['urlAudio'] = 'res-full/' . $rs['resfolder'] . '/' . $possiblevalues[$idname];
+                if ($rs['loopsnd']) $reslist[$key]['loop'] = $rs['loopsnd'];
             }
-            $reslist[$key]['urlAudio'] = 'res-full/'.$rs['resfolder'].'/'.$possiblevalues[0];
-            if ($rs['loopsnd']) $reslist[$key]['loop'] = $rs['loopsnd'];
         }
 
         unset($reslist['Question/DefaultPreQuestion']);
@@ -274,9 +280,9 @@ function resources() {
 
 function players() {
     $players = array(
-        array('name' => 'Player1','score' => 0),
-        array('name' => 'Player2','score' => 0),
-        array('name' => 'Player3','score' => 0)
+        array('name' => 'Player1','score' => 0,'keycode' => 113),
+        array('name' => 'Player2','score' => 0,'keycode' => 98),
+        array('name' => 'Player3','score' => 0,'keycode' => 112)
     );
     header('X-JSON: '.json_encode(array(
             'players' => $players
