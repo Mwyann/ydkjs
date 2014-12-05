@@ -11,7 +11,7 @@ YDKJAPI.prototype.initdemo = function() {
     YDKJAPI.prototype.gamemode = function(currentmode) {
         var newmode;
         if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Intro', {});
-        if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1}); // Ligne DEBUG
+        //if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1}); // Ligne DEBUG
         if (currentmode instanceof ModeIntro) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1});
         if (currentmode instanceof ModeQuestion) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: currentmode.options.questionnumber+1});
 
