@@ -122,7 +122,7 @@ function resources() {
         $qhdr = $res->fetch();
         $value = number_format(1000*$qhdr['value']*$category,0,'','');
 
-        if ($questionnumber <= 10) $jinglequestion = rand(1,3); else $jinglequestion = rand(1,2);
+        if ($questionnumber <= 6) $jinglequestion = rand(1,3); else $jinglequestion = rand(1,2);
         $music = rand(1,6);
 
         $reslist = array('value' => $value);
@@ -131,9 +131,16 @@ function resources() {
                            WHERE a.resid = f.resid
                            AND grp = 'Question'");
         while ($rs = $res->fetch()) {
+            if ((strpos($rs['name'],'.Q10') !== FALSE) && ($questionnumber < 10)) continue; else $rs['name'] = str_replace('.Q10','',$rs['name']);
             if ((strpos($rs['name'],'.Q1') !== FALSE) && ($questionnumber != 1)) continue; else $rs['name'] = str_replace('.Q1','',$rs['name']);
             if ((strpos($rs['name'],'.Q2') !== FALSE) && ($questionnumber != 2)) continue; else $rs['name'] = str_replace('.Q2','',$rs['name']);
-            if ((strpos($rs['name'],'.Q3') !== FALSE) && ($questionnumber < 3)) continue; else $rs['name'] = str_replace('.Q3','',$rs['name']);
+            if ((strpos($rs['name'],'.Q3') !== FALSE) && ($questionnumber != 3)) continue; else $rs['name'] = str_replace('.Q3','',$rs['name']);
+            if ((strpos($rs['name'],'.Q4') !== FALSE) && ($questionnumber != 4)) continue; else $rs['name'] = str_replace('.Q4','',$rs['name']);
+            if ((strpos($rs['name'],'.Q5') !== FALSE) && ($questionnumber != 5)) continue; else $rs['name'] = str_replace('.Q5','',$rs['name']);
+            if ((strpos($rs['name'],'.Q6') !== FALSE) && ($questionnumber != 6)) continue; else $rs['name'] = str_replace('.Q6','',$rs['name']);
+            if ((strpos($rs['name'],'.Q7') !== FALSE) && ($questionnumber != 7)) continue; else $rs['name'] = str_replace('.Q7','',$rs['name']);
+            if ((strpos($rs['name'],'.Q8') !== FALSE) && ($questionnumber != 8)) continue; else $rs['name'] = str_replace('.Q8','',$rs['name']);
+            if ((strpos($rs['name'],'.Q9') !== FALSE) && ($questionnumber != 9)) continue; else $rs['name'] = str_replace('.Q9','',$rs['name']);
             if (strpos($rs['name'], 'JingleQuestion') === 0) if ($rs['name'] != 'JingleQuestion'.$jinglequestion) continue; else $rs['name'] = 'JingleQuestion';
             if (strpos($rs['name'], 'BGQuestion') === 0) if ($rs['name'] != 'BGQuestion'.$jinglequestion) continue; else $rs['name'] = 'BGQuestion';
 
@@ -154,9 +161,16 @@ function resources() {
                            FROM ".$DBsta.".ressnd
                            WHERE grp = 'Question'");
         while ($rs = $res->fetch()) {
+            if ((strpos($rs['name'],'.Q10') !== FALSE) && ($questionnumber < 10)) continue; else $rs['name'] = str_replace('.Q10','',$rs['name']);
             if ((strpos($rs['name'],'.Q1') !== FALSE) && ($questionnumber != 1)) continue; else $rs['name'] = str_replace('.Q1','',$rs['name']);
             if ((strpos($rs['name'],'.Q2') !== FALSE) && ($questionnumber != 2)) continue; else $rs['name'] = str_replace('.Q2','',$rs['name']);
-            if ((strpos($rs['name'],'.Q3') !== FALSE) && ($questionnumber < 3)) continue; else $rs['name'] = str_replace('.Q3','',$rs['name']);
+            if ((strpos($rs['name'],'.Q3') !== FALSE) && ($questionnumber != 3)) continue; else $rs['name'] = str_replace('.Q3','',$rs['name']);
+            if ((strpos($rs['name'],'.Q4') !== FALSE) && ($questionnumber != 4)) continue; else $rs['name'] = str_replace('.Q4','',$rs['name']);
+            if ((strpos($rs['name'],'.Q5') !== FALSE) && ($questionnumber != 5)) continue; else $rs['name'] = str_replace('.Q5','',$rs['name']);
+            if ((strpos($rs['name'],'.Q6') !== FALSE) && ($questionnumber != 6)) continue; else $rs['name'] = str_replace('.Q6','',$rs['name']);
+            if ((strpos($rs['name'],'.Q7') !== FALSE) && ($questionnumber != 7)) continue; else $rs['name'] = str_replace('.Q7','',$rs['name']);
+            if ((strpos($rs['name'],'.Q8') !== FALSE) && ($questionnumber != 8)) continue; else $rs['name'] = str_replace('.Q8','',$rs['name']);
+            if ((strpos($rs['name'],'.Q9') !== FALSE) && ($questionnumber != 9)) continue; else $rs['name'] = str_replace('.Q9','',$rs['name']);
             if (strpos($rs['name'], 'JingleQuestion') === 0) if ($rs['name'] != 'JingleQuestion'.$jinglequestion) continue; else $rs['name'] = 'JingleQuestion';
 
             if (strpos($rs['name'], 'VoiceAnnounceValue') === 0) if ($rs['name'] != 'VoiceAnnounceValue'.$value.'F') continue; else $rs['name'] = 'VoiceAnnounceValue';

@@ -178,7 +178,7 @@ ModeQuestion.prototype.start = function() {
         nextcategoryready(function(nextcategory) {
             nextcategory.modeObj.MusicChooseCategoryStart.delay(function () {
                 nextcategory.start();
-            }, 400);
+            }, Math.max(500,2500-thisMode.EndQuestion.length()));
         });
     });
 

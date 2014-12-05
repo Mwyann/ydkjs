@@ -382,7 +382,7 @@ YDKJAPI.prototype.initgame = function() {
 
         if (currentmode === undefined) data['currentmode'] = 'None';
         if (currentmode instanceof ModeIntro) data['currentmode'] = 'Intro';
-        if (currentmode instanceof ModeQuestion) {data['currentmode'] = 'Category'; data['category'] = 1; data['questionnumber'] = currentmode.options.questionnumber+1;}
+        if (currentmode instanceof ModeQuestion) {data['currentmode'] = 'Category'; data['category'] = 1; data['questionnumber'] = parseInt(currentmode.options.questionnumber)+1;}
 
         var newmode;
         var ready = 0;
