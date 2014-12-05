@@ -266,9 +266,13 @@ YDKJAPI.prototype.initdemo = function() {
             };
             for(r in reslist) if (reslist.hasOwnProperty(r)) reslist[r] = demores(r);
 
-            reslist['DisOrDat/QuestionTitle'] = {urlAudio: 'res/'+mode.options.res+'/snd/1'};
-            reslist['DisOrDat/QuestionIntro1'] = {urlAudio: 'res/'+mode.options.res+'/snd/2'};
-            reslist['DisOrDat/QuestionIntro2'] = {urlAudio: 'res/'+mode.options.res+'/snd/3'};
+            var resDD = 'res/QFold1/'+mode.options.id;
+
+            reslist['DisOrDat/QuestionTitle'] = {urlAudio: resDD+'/snd/1'};
+            reslist['DisOrDat/QuestionIntro1'] = {urlAudio: resDD+'/snd/2'};
+            reslist['DisOrDat/QuestionIntro2'] = {urlAudio: resDD+'/snd/3'};
+
+            mode.options.strjs = getYDKJFile('js',resDD+'/STR.js');
         }
         else if (mode instanceof YDKJTimer10) {
             var resName = 'res/5QDemo/off4/8018';

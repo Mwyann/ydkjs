@@ -10,7 +10,7 @@ ModeDisOrDat.prototype.preload = function(resources) {
     this.AnnounceCategory = new YDKJAnimation(resources['DisOrDat/AnnounceCategory']);
     this.TimerComesIn = new YDKJAnimation(resources['DisOrDat/TimerComesIn']);
 
-    this.strjs = getYDKJFile('js','res/'+this.options.res+'/STR.js');
+    this.strjs = this.options.strjs;
 
     this.GameStart = new YDKJAnimation(resources['DisOrDat/GameStart']);
 
