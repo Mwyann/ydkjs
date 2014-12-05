@@ -40,7 +40,7 @@ function invited() {
         <div style="width:300px; margin-left:auto; margin-right:auto">
             <input type="hidden" name="invitation" value="<?php echo $_GET['invitation']; ?>"/>
             <div style="text-align:right;font-size:20px;margin:10px">Pseudo : <input type="text" name="nickname"/></div>
-            <div style="text-align:right;font-size:20px;margin:10px">Mail/Login : <input type="text" name="login"/></div>
+            <div style="text-align:right;font-size:20px;margin:10px">Login : <input type="text" name="login"/></div>
             <div style="text-align:right;font-size:20px;margin:10px">Pass : <input type="password" name="password"/></div>
             <div style="text-align:right;font-size:20px;margin:10px">Répéter : <input type="password" name="pass2"/></div>
             <div style="text-align:center;font-size:20px;margin:20px"><input type="submit" value="Inscription"/></div>
