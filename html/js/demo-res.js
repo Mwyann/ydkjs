@@ -15,9 +15,6 @@ var YDKJDemoSnd = {
         'ChooseCategoryTimeOut':{res:'5QDemo',name:'Mc05',min:1,max:1},
         'MusicChooseCategoryLoop':{res:'5QDemo',name:'Mj19',min:1,max:1,loop:1},
         'MusicChooseCategoryStart':{res:'5QDemo',name:'Mj18',min:1,max:1},
-        'JingleQuestion1':{res:'5QDemo',name:'snd',min:1003,max:1003},
-        'JingleQuestion2':{res:'5QDemo',name:'snd',min:2003,max:2003},
-        'JingleQuestion3':{res:'5QDemo',name:'snd',min:3003,max:3003},
         'SFXChoiceCategory':{res:'5QDemo',name:'Mj22',min:1,max:1},
         'SFXShowCategories':{res:'5QDemo',name:'Mj21',min:1,max:1},
         'SFXShowCategoryScreen':{res:'5QDemo',name:'Mj23',min:1,max:1},
@@ -25,6 +22,9 @@ var YDKJDemoSnd = {
         'SFXTimeOut':{res:'5QDemo',name:'Mc97',min:1,max:1},
     },
     'Question':{
+        'JingleQuestion1':{res:'5QDemo',name:'snd',min:1003,max:1003},
+        'JingleQuestion2':{res:'5QDemo',name:'snd',min:2003,max:2003},
+        'JingleQuestion3':{res:'5QDemo',name:'snd',min:3003,max:3003},
         'AnnounceCategory':{res:'5QDemo',name:'Mc08',min:1,max:1},
         'AnnounceFreeAnswer':{res:'5QDemo',name:'Mc55',min:1,max:1},
         'VoiceAnnounceValue1000F':{res:'5QDemo',name:'Mc08',min:1,max:1},
@@ -219,14 +219,15 @@ var YDKJDemoAnim = {
         'ChoiceCategory1':{res:'5QDemo',name:'off4/10000',framestart:106,loop:0},
         'ChoiceCategory2':{res:'5QDemo',name:'off4/10000',framestart:111,loop:0},
         'ChoiceCategory3':{res:'5QDemo',name:'off4/10000',framestart:116,loop:0},
+    },
+    'Question':{
         'JingleQuestion1':{res:'5QDemo',name:'off4/-2010',framestart:0,loop:0},
         'JingleQuestion2':{res:'5QDemo',name:'off4/-2020',framestart:0,loop:0},
         'JingleQuestion3':{res:'5QDemo',name:'off4/-2030',framestart:0,loop:0},
         'BGQuestion1':{res:'5QDemo',name:'off4/-2010',framestart:56,loop:0},
         'BGQuestion2':{res:'5QDemo',name:'off4/-2020',framestart:56,loop:0},
         'BGQuestion3':{res:'5QDemo',name:'off4/-2030',framestart:55,loop:0},
-    },
-    'Question':{
+
         'TimerComesIn':{res:'5QDemo',name:'off4/8017',framestart:2,loop:0},
         'Round1':{res:'5QDemo',name:'off4/8014',framestart:0,loop:0},
         'AnnounceValue2000F':{res:'5QDemo',name:'off4/11020',framestart:16,loop:0},

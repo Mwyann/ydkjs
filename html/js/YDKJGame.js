@@ -3,13 +3,19 @@
 function YDKJGame(demomode) {
     this.api = new YDKJAPI(this, demomode);
     jQuery.fx.interval = 66;
-    this.players = this.api.players();
+    this.playersready = this.api.players();
+    this.gamemodeready = this.api.gamemode();
     this.currentmode = 0;
 }
 
 YDKJGame.prototype.start = function() {
-    var gamemode = this.api.gamemode();
-    gamemode.start();
+    var thisGame = this;
+    this.playersready(function(players) {
+        thisGame.players = players;
+        thisGame.gamemodeready(function(gamemode){
+            gamemode.start();
+        });
+    })
 };
 
 YDKJGame.prototype.displayPlayer = function(playernumber) {

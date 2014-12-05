@@ -25,17 +25,21 @@ function YDKJAnimation(resource) {
 
     this.isplaying = 0;
     this.played = 0;
-    this.endedFunctions = [];
-    this.endedFunctions.push({
-        ms:0,
-        endTimeout:0,
-        functions:[function(){
-            thisAnim.played = 1;
-            if (!thisAnim.loop) {
-                thisAnim.isplaying = 0;
-            }
-        }]
-    });
+
+    this.resetEndedFunctions = function() {
+        thisAnim.endedFunctions = [];
+        thisAnim.endedFunctions.push({
+            ms:0,
+            endTimeout:0,
+            functions:[function(){
+                thisAnim.played = 1;
+                if (!thisAnim.loop) {
+                    thisAnim.isplaying = 0;
+                }
+            }]
+        });
+    };
+    this.resetEndedFunctions();
 
     this.tiles = 0;
     this.frames = 0;
@@ -88,6 +92,8 @@ function YDKJAnimation(resource) {
     };
 
     if (this.gif) this.gif.ready(gifready); else gifready();
+    this._volume = audiospecs.maxVolume;
+    if (this.audio) this.volume(1);
 
     // Méthodes privées
 
@@ -184,7 +190,7 @@ YDKJAnimation.prototype.ready = function(f) {
 
 YDKJAnimation.prototype.ended = function(f,msbeforeend) {
     if (f === false) {
-        this.endedFunctions = [];
+        this.resetEndedFunctions();
         return true;
     }
     if (!msbeforeend) msbeforeend = 0;
@@ -248,8 +254,8 @@ YDKJAnimation.prototype.play = function() {
 
     if (this.audio) {
         if ((this.loop) && (this.seamlessLoop)) {
-            this.seamlessLoop.volume(audiospecs.maxVolume);
             this.seamlessLoop.start(1);
+            this.seamlessLoop.volume(this._volume);
         } else {
             var audiofile = this.audio.res;
             if (audiofile) {
@@ -267,8 +273,8 @@ YDKJAnimation.prototype.play = function() {
                 };
                 thisAnim.audiostopTimer = setTimeout(ended, audioelem.duration*1000+audiospecs.playDelay);
                 if ((audioelem.readyState) && (audioelem.currentTime)) audioelem.currentTime = 0;
-                audioelem.volume=audiospecs.maxVolume;
                 audioelem.play();
+                audioelem.volume=this._volume;
             }
         }
     }
@@ -325,7 +331,7 @@ YDKJAnimation.prototype.reset = function(fullreset) {
         this.newScreen();
         this.nextScreen();
     }
-    if (fullreset) this.endedFunctions = [];
+    if (fullreset) this.ended(false);
 };
 
 YDKJAnimation.prototype.free = function() {
@@ -338,21 +344,25 @@ YDKJAnimation.prototype.free = function() {
 };
 
 YDKJAnimation.prototype.volume = function(vol) {
+    var thisAnim = this;
     if (vol > 1) vol = vol/100;
     vol = vol*audiospecs.maxVolume;
+    this._volume = vol;
     //vol = Math.log(vol*9+1)/Math.LN10; // Volume logarithmique ?
 
-    if (this.audio) {
-        if ((this.loop) && (this.seamlessLoop)) {
-            this.seamlessLoop.volume(vol);
-        } else {
-            var audiofile = this.audio.res;
-            if (audiofile) {
-                var audioelem = audiofile.get(0);
-                audioelem.volume = vol;
+    this.ready(function(){
+        if (thisAnim.audio) {
+            if ((thisAnim.loop) && (thisAnim.seamlessLoop)) {
+                thisAnim.seamlessLoop.volume(thisAnim._volume);
+            } else {
+                var audiofile = thisAnim.audio.res;
+                if (audiofile) {
+                    var audioelem = audiofile.get(0);
+                    audioelem.volume = thisAnim._volume;
+                }
             }
         }
-    }
+    });
 };
 
 YDKJAnimation.prototype.setAnimCallback = function(callback) {

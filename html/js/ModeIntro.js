@@ -22,7 +22,9 @@ ModeIntro.prototype.start = function() {
             thisMode.MusicJack.free();
             thisMode.IntroJack.free();
             if (this.skiplistener) unbindKeyListener(this.skiplistener);
-            thisMode.category.start(); // On passe au choix de la catégorie
+            thisMode.categoryready(function(category) {
+                category.start(); // On passe au choix de la catégorie
+            });
         },300);
     });
 
@@ -30,11 +32,13 @@ ModeIntro.prototype.start = function() {
         this.free();
         thisMode.IntroJackDemo.delay(function(){
             this.play();
-            thisMode.category = thisMode.game.api.gamemode(thisMode); // Preload des catégories pendant le speech
+            thisMode.categoryready = thisMode.game.api.gamemode(thisMode); // Preload des catégories pendant le speech
             this.skiplistener = bindKeyListener(function(choice) {
                 if (choice == 32) {
                     unbindKeyListener(thisMode.skiplistener);
-                    thisMode.category.start(); // Barre espace = on passe au choix de la catégorie
+                    thisMode.categoryready(function(category) {
+                        category.start(); // Barre espace = on passe au choix de la catégorie
+                    });
                 }
             });
         },300);

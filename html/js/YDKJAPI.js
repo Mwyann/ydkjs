@@ -8,11 +8,14 @@ function YDKJAPI(game, demomode) {
 YDKJAPI.prototype.initdemo = function() {
     var thisAPI = this;
 
-    YDKJAPI.prototype.gamemode = function(mode) {
-        //if (mode === undefined) return new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1}); // Ligne DEBUG
-        if (mode === undefined) return new YDKJMode(thisAPI.game, 'Intro', {});
-        if (mode instanceof ModeIntro) return new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1});
-        if (mode instanceof ModeQuestion) return new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: mode.options.questionnumber+1});
+    YDKJAPI.prototype.gamemode = function(currentmode) {
+        var newmode;
+        if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Intro', {});
+        //if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1}); // Ligne DEBUG
+        if (currentmode instanceof ModeIntro) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1});
+        if (currentmode instanceof ModeQuestion) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: currentmode.options.questionnumber+1});
+
+        return function(f) {f(newmode)}
     };
 
     var demores = function(resourceName) {
@@ -81,9 +84,8 @@ YDKJAPI.prototype.initdemo = function() {
                 'Intro/IntroJackDemo': 0
             };
             for(r in reslist) if (reslist.hasOwnProperty(r)) reslist[r] = demores(r);
-            return reslist;
         }
-        if (mode instanceof ModeCategory) {
+        else if (mode instanceof ModeCategory) {
             reslist = {
                 'Category/SFXShowCategoryScreen': 0,
                 'Category/MusicChooseCategoryStart': 0,
@@ -116,7 +118,7 @@ YDKJAPI.prototype.initdemo = function() {
 
                 for (i=1; i<=3; i++) {
                     reslist['questiontitles'].push(questiontitles[questions[i-1]]);
-                    reslist['question'+i] = new YDKJMode(thisAPI.game, 'Question', {category:mode.options.category,questionnumber:mode.options.questionnumber,res:'QFold1/'+questions[i-1]}); // Preload des questions suivantes
+                    reslist['question'+i] = new YDKJMode(thisAPI.game, 'Question', {category:mode.options.category,questionnumber:mode.options.questionnumber,id:questions[i-1]}); // Preload des questions suivantes
                 }
             } else { // Couci-Couça
                 questions = shuffle(['DAC', 'DAL', 'DAP']);
@@ -125,12 +127,11 @@ YDKJAPI.prototype.initdemo = function() {
 
                 for (i=1; i<=3; i++) {
                     reslist['questiontitles'].push(questiontitles[questions[i-1]]);
-                    reslist['question'+i] = new YDKJMode(thisAPI.game, 'DisOrDat', {category:mode.options.category,questionnumber:mode.options.questionnumber,res:'QFold1/'+questions[i-1]}); // Preload des questions suivantes
+                    reslist['question'+i] = new YDKJMode(thisAPI.game, 'DisOrDat', {category:mode.options.category,questionnumber:mode.options.questionnumber,id:questions[i-1]}); // Preload des questions suivantes
                 }
             }
-            return reslist;
         }
-        if (mode instanceof ModeQuestion) {
+        else if (mode instanceof ModeQuestion) {
             reslist = {
                 'Question/AnnounceCategory': 0,
                 'Question/TimerComesIn': 0,
@@ -146,7 +147,6 @@ YDKJAPI.prototype.initdemo = function() {
                 'Question/SFXPlayerWrong2': 0,
                 'Question/SFXPlayerCorrect': 0,
                 'Question/SFXRevealAnswer': 0,
-                'Question/DefaultRevealAnswer': 0,
                 'Question/DefaultRevealLastAnswer': 0,
                 'Question/ShowPlayer1Key': 0,
                 'Question/Player1Answer': 0,
@@ -196,53 +196,57 @@ YDKJAPI.prototype.initdemo = function() {
 
             // Valeurs spécifiques à la question
             if (mode.options.questionnumber == 1) { // Charger les bonnes ressources en fonction du n° de la question
-                reslist['Category/JingleQuestion'] = demores('Category/JingleQuestion1');
-                reslist['Category/BGQuestion'] = demores('Category/BGQuestion1');
+                reslist['Question/JingleQuestion'] = demores('Question/JingleQuestion1');
+                reslist['Question/BGQuestion'] = demores('Question/BGQuestion1');
             }
             if (mode.options.questionnumber == 2) {
-                reslist['Category/JingleQuestion'] = demores('Category/JingleQuestion2');
-                reslist['Category/BGQuestion'] = demores('Category/BGQuestion2');
+                reslist['Question/JingleQuestion'] = demores('Question/JingleQuestion2');
+                reslist['Question/BGQuestion'] = demores('Question/BGQuestion2');
             }
             if (mode.options.questionnumber >= 3) {
-                reslist['Category/JingleQuestion'] = demores('Category/JingleQuestion3');
-                reslist['Category/BGQuestion'] = demores('Category/BGQuestion3');
+                reslist['Question/JingleQuestion'] = demores('Question/JingleQuestion3');
+                reslist['Question/BGQuestion'] = demores('Question/BGQuestion3');
             }
 
-            if (mode.options.res == 'QFold1/ABB') {
+            if (mode.options.id == 'ABB') {
                 mode.options.correctanswer = 3;
                 mode.options.value = 2000;
             }
-            if (mode.options.res == 'QFold1/ABE') {
+            else if (mode.options.id == 'ABE') {
                 mode.options.correctanswer = 3;
                 mode.options.value = 2000;
             }
-            if (mode.options.res == 'QFold1/AJM') {
+            else if (mode.options.id == 'AJM') {
                 mode.options.correctanswer = 4;
                 mode.options.value = 2000;
             }
+
+            var res = 'res/QFold1/'+mode.options.id;
 
             reslist['Question/AnnounceValue'] = demores('Question/AnnounceValue'+mode.options.value+'F');
             reslist['Question/VoiceAnnounceValue'] = demores('Question/VoiceAnnounceValue'+mode.options.value+'F');
             reslist['Question/HideValue'] = demores('Question/HideValue'+mode.options.value+'F');
 
-            reslist['Question/QuestionTitle'] = {urlAudio: 'res/'+mode.options.res+'/snd/1'};
-            reslist['Question/PreQuestion'] = {urlAudio: 'res/'+mode.options.res+'/snd/2'};
-            reslist['Question/Question'] = {urlAudio: 'res/'+mode.options.res+'/snd/3'};
-            reslist['Question/Answers'] = {urlAudio: 'res/'+mode.options.res+'/snd/5'};
-            reslist['Question/EndQuestion'] = {urlAudio: 'res/'+mode.options.res+'/snd/6'};
-            reslist['Question/Answer1'] = {urlAudio: 'res/'+mode.options.res+'/snd/7'};
-            reslist['Question/Answer2'] = {urlAudio: 'res/'+mode.options.res+'/snd/8'};
-            reslist['Question/Answer3'] = {urlAudio: 'res/'+mode.options.res+'/snd/9'};
-            reslist['Question/Answer4'] = {urlAudio: 'res/'+mode.options.res+'/snd/10'};
-            //reslist['Question/RevealAnswer'] = {urlAudio: 'res/'+mode.options.res+'/snd/11'};
+            reslist['Question/QuestionTitle'] = {urlAudio: res+'/snd/1'};
+            reslist['Question/PreQuestion'] = {urlAudio: res+'/snd/2'};
+            reslist['Question/Question'] = {urlAudio: res+'/snd/3'};
+            reslist['Question/Answers'] = {urlAudio: res+'/snd/5'};
+            reslist['Question/EndQuestion'] = {urlAudio: res+'/snd/6'};
+            reslist['Question/Answer1'] = {urlAudio: res+'/snd/7'};
+            reslist['Question/Answer2'] = {urlAudio: res+'/snd/8'};
+            reslist['Question/Answer3'] = {urlAudio: res+'/snd/9'};
+            reslist['Question/Answer4'] = {urlAudio: res+'/snd/10'};
+            reslist['Question/RevealAnswer'] = demores('Question/DefaultRevealAnswer');
+            //reslist['Question/RevealAnswer'] = {urlAudio: res+'/snd/11'};
 
-            mode.options.strjs = getYDKJFile('js','res/'+mode.options.res+'/STR.js');
+            mode.options.strjs = getYDKJFile('js',res+'/STR.js');
             mode.options.timer = new YDKJTimer10();
-            mode.options.timer.preload(thisAPI.resources(mode.options.timer));
-
-            return reslist;
+            var timerready = thisAPI.resources(mode.options.timer);
+            timerready(function(resources) {
+                mode.options.timer.preload(resources);
+            });
         }
-        if (mode instanceof ModeDisOrDat) {
+        else if (mode instanceof ModeDisOrDat) {
             reslist = {
                 'DisOrDat/ChoicePlayer1on3': 0,
                 'DisOrDat/ChoicePlayer2on3': 0,
@@ -265,85 +269,231 @@ YDKJAPI.prototype.initdemo = function() {
             reslist['DisOrDat/QuestionTitle'] = {urlAudio: 'res/'+mode.options.res+'/snd/1'};
             reslist['DisOrDat/QuestionIntro1'] = {urlAudio: 'res/'+mode.options.res+'/snd/2'};
             reslist['DisOrDat/QuestionIntro2'] = {urlAudio: 'res/'+mode.options.res+'/snd/3'};
-
-            return reslist;
         }
-        if (mode instanceof YDKJTimer10) {
+        else if (mode instanceof YDKJTimer10) {
             var resName = 'res/5QDemo/off4/8018';
-            return {'Common/Timer10': {urlGif: resName+'.gif', urlJS: resName+'.js', framestart: 73, loop: 0, framestop: 75},
-                    'Common/Timer10/Frames': {
-                        'Still':{
-                            10:{framestart:69},
-                            9:{framestart:88},
-                            8:{framestart:107},
-                            7:{framestart:125},
-                            6:{framestart:144},
-                            5:{framestart:163},
-                            4:{framestart:182},
-                            3:{framestart:200},
-                            2:{framestart:218},
-                            1:{framestart:236},
-                            0:{framestart:261}
-                        },
-                        'Hide':{
-                            10:{framestart:73,framestop:75},
-                            9:{framestart:92,framestop:94},
-                            8:{framestart:110,framestop:112},
-                            7:{framestart:129,framestop:131},
-                            6:{framestart:148,framestop:150},
-                            5:{framestart:167,framestop:169},
-                            4:{framestart:185,framestop:187},
-                            3:{framestart:203,framestop:205},
-                            2:{framestart:221,framestop:223},
-                            1:{framestart:239,framestop:241},
-                            0:{framestart:264,framestop:266}
-                        },
-                        'Show':{
-                            10:{framestart:59,framestop:65},
-                            9:{framestart:79,framestop:85},
-                            8:{framestart:98,framestop:104},
-                            7:{framestart:116,framestop:122},
-                            6:{framestart:135,framestop:141},
-                            5:{framestart:154,framestop:160},
-                            4:{framestart:173,framestop:179},
-                            3:{framestart:191,framestop:197},
-                            2:{framestart:209,framestop:215},
-                            1:{framestart:227,framestop:233},
-                            0:{framestart:245,framestop:251}
-                        }
-                    }
+            reslist = {'Common/Timer10': {urlGif: resName+'.gif', urlJS: resName+'.js', framestart: 73, loop: 0, framestop: 75},
+                       'Common/Timer10/Frames': {
+                            'Still':{
+                                10:{framestart:69},
+                                9:{framestart:88},
+                                8:{framestart:107},
+                                7:{framestart:125},
+                                6:{framestart:144},
+                                5:{framestart:163},
+                                4:{framestart:182},
+                                3:{framestart:200},
+                                2:{framestart:218},
+                                1:{framestart:236},
+                                0:{framestart:261}
+                            },
+                            'Hide':{
+                                10:{framestart:73,framestop:75},
+                                9:{framestart:92,framestop:94},
+                                8:{framestart:110,framestop:112},
+                                7:{framestart:129,framestop:131},
+                                6:{framestart:148,framestop:150},
+                                5:{framestart:167,framestop:169},
+                                4:{framestart:185,framestop:187},
+                                3:{framestart:203,framestop:205},
+                                2:{framestart:221,framestop:223},
+                                1:{framestart:239,framestop:241},
+                                0:{framestart:264,framestop:266}
+                            },
+                            'Show':{
+                                10:{framestart:59,framestop:65},
+                                9:{framestart:79,framestop:85},
+                                8:{framestart:98,framestop:104},
+                                7:{framestart:116,framestop:122},
+                                6:{framestart:135,framestop:141},
+                                5:{framestart:154,framestop:160},
+                                4:{framestart:173,framestop:179},
+                                3:{framestart:191,framestop:197},
+                                2:{framestart:209,framestop:215},
+                                1:{framestart:227,framestop:233},
+                                0:{framestart:245,framestop:251}
+                            }
+                       }
             };
         }
+
+        return function(f) {f(reslist)}
     };
 
     YDKJAPI.prototype.players = function() {
         var playernames = shuffle(['David','Marité','Marjorie','Frédéric','Olivier','Mathieu','Alicia','Fabrice','Jackqueline','Bruno','Natacha','Jeff','Henri','Barbara','Christophe','Luc','Danièle','Serge','Anita','Alain','Denise','Marcel','Lucette','Gilles','Julien','Adrienne','Camille','Anna','Laurel','Diane','Michelle']);
-        return [
+        var players = [
             {name:playernames[0],score:0},
             {name:playernames[1],score:0},
             {name:playernames[2],score:0}
         ];
+
+        return function(f) {f(players)}
     };
 };
 
 YDKJAPI.prototype.initgame = function() {
     var thisAPI = this;
 
-    YDKJAPI.prototype.gamemode = function() {
-        return new YDKJMode(thisAPI.game, 'Intro', {});
-        //return new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1});
-        //return new YDKJMode(thisAPI.game, 'Question', {questionnumber:1,res:'QFold1/AJM',correctanswer:4});
+    // Extrait les valeurs retournées par un appel Ajax
+    var getHeaderJSON = function(xhr) {
+        var json;
+        try { json = xhr.getResponseHeader('X-JSON') }
+        catch(e) {}
+
+        if (json) {
+            return JSON.parse(json);
+            //var data = eval('(' + json + ')'); // or JSON.parse or whatever you like
+            //return data
+        }
+        return [];
     };
 
-    YDKJAPI.prototype.resources = function() {
-        return {};
+    YDKJAPI.prototype.gamemode = function(currentmode) {
+        var data = {call: 'gamemode'};
+
+        if (currentmode === undefined) data['currentmode'] = 'None';
+        if (currentmode instanceof ModeIntro) data['currentmode'] = 'Intro';
+        if (currentmode instanceof ModeQuestion) {data['currentmode'] = 'Category'; data['category'] = 1; data['questionnumber'] = currentmode.options.questionnumber+1;}
+
+        var newmode;
+        var ready = 0;
+        var readyfunctions = [];
+
+        jQuery.ajax({
+            url: 'api/',
+            type: 'post',
+            data: data,
+            success: function(html, status, xhr) {
+                var data = getHeaderJSON(xhr);
+
+                var newmodedata = data['newmode'];
+
+                if (newmodedata['mode'] == 'Intro') newmode = new YDKJMode(thisAPI.game, 'Intro', {});
+                if (newmodedata['mode'] == 'Category') newmode = new YDKJMode(thisAPI.game, 'Category', {category: newmodedata['category'], questionnumber: newmodedata['questionnumber']});
+
+                ready = 1;
+                for(var i = 0; i < readyfunctions.length; i++) {
+                    readyfunctions[i].call(this,newmode);
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError){
+                //displayLoader(false);
+            }
+        });
+
+        return function(f) {
+            if (!ready) readyfunctions.push(f); else f.call(this,newmode);
+        };
+    };
+
+    YDKJAPI.prototype.resources = function(mode) {
+        var data = {call: 'resources'};
+
+        if (mode instanceof ModeIntro) {
+            data['mode'] = 'Intro';
+        }
+        else if (mode instanceof ModeCategory) {
+            data['mode'] = 'Category';
+            data['category'] = mode.options.category;
+            data['questionnumber'] = mode.options.questionnumber;
+        }
+        else if (mode instanceof ModeQuestion) {
+            data['mode'] = 'Question';
+            data['category'] = mode.options.category;
+            data['questionnumber'] = mode.options.questionnumber;
+            data['id'] = mode.options.id;
+        }
+        else if (mode instanceof ModeDisOrDat) {
+            data['mode'] = 'DisOrDat';
+            data['category'] = mode.options.category;
+            data['id'] = mode.options.id;
+        }
+        else if (mode instanceof YDKJTimer10) {
+            data['mode'] = 'Timer10';
+        }
+
+        var reslist;
+        var ready = 0;
+        var readyfunctions = [];
+
+        jQuery.ajax({
+            url: 'api/',
+            type: 'post',
+            data: data,
+            success: function(html, status, xhr) {
+                var data = getHeaderJSON(xhr);
+
+                reslist = data['reslist'];
+
+                if (mode instanceof ModeCategory) {
+                    // Précharger les questions avec l'interface de catégorie
+                    for (i = 1; i <= 3; i++) {
+                        reslist['question'+i] = new YDKJMode(thisAPI.game, 'Question', {category: mode.options.category, questionnumber: mode.options.questionnumber, id: reslist['question'+i]}); // Preload des questions suivantes
+                    }
+                }
+
+                if (mode instanceof ModeQuestion) {
+                    var strjs = new function(){}; // On "fake" l'objet YDKJFile. C'est crade je sais, mais ça peut marcher ?
+                    var restmp = [];
+                    eval('restmp = '+reslist['STR']);
+                    strjs.res = {STR: restmp};
+                    strjs.ready = function(f) {f.call(this)};
+                    strjs.free = function(){};
+
+                    mode.options.strjs = strjs;
+                    mode.options.value = reslist['value'];
+                    mode.options.correctanswer = reslist['correctanswer'];
+                    mode.options.timer = new YDKJTimer10();
+                    var timerready = thisAPI.resources(mode.options.timer);
+                    timerready(function(resources) {
+                        mode.options.timer.preload(resources);
+                    });
+                }
+
+                ready = 1;
+                for(var i = 0; i < readyfunctions.length; i++) {
+                    readyfunctions[i].call(this,reslist);
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError){
+                //displayLoader(false);
+            }
+        });
+
+        return function(f) {
+            if (!ready) readyfunctions.push(f); else f.call(this,reslist);
+        };
     };
 
     YDKJAPI.prototype.players = function() {
-        return [
-            {name:'Player1',score:0},
-            {name:'Player2',score:0},
-            {name:'Player3',score:0}
-        ];
+        var data = {call: 'players'};
+
+        var players;
+        var ready = 0;
+        var readyfunctions = [];
+
+        jQuery.ajax({
+            url: 'api/',
+            type: 'post',
+            data: data,
+            success: function(html, status, xhr) {
+                var data = getHeaderJSON(xhr);
+
+                players = data['players'];
+
+                ready = 1;
+                for(var i = 0; i < readyfunctions.length; i++) {
+                    readyfunctions[i].call(this,players);
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError){
+                //displayLoader(false);
+            }
+        });
+
+        return function(f) {
+            if (!ready) readyfunctions.push(f); else f.call(this,players);
+        };
     };
 };
