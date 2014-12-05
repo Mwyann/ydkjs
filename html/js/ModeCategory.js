@@ -9,6 +9,8 @@ ModeCategory.prototype.preload = function(resources) {
 
     this.MusicChooseCategoryStart = new YDKJAnimation(resources['Category/MusicChooseCategoryStart']);
     this.MusicChooseCategoryLoop = new YDKJAnimation(resources['Category/MusicChooseCategoryLoop']);
+    this.MusicChooseCategoryStart.volume(70);
+    this.MusicChooseCategoryLoop.volume(70);
     this.ShowCategories = new YDKJAnimation(resources['Category/ShowCategories']);
 
     this.MusicChooseCategoryStart.ended(function(){
@@ -226,4 +228,6 @@ ModeCategory.prototype.start = function() {
     };
 
     blueZoom();
+    this.MusicChooseCategoryStart.volume(100);
+    this.MusicChooseCategoryLoop.volume(100);
 };

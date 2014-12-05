@@ -741,11 +741,16 @@ ModeQuestion.prototype.start = function() {
             'font-size':Math.round(textsize*0.90)+'px',
             'line-height':textsize+'px',
             'position':'absolute',
-            'width':'450px',
+            'margin-left':'23px',
+            'margin-right':'23px',
+            'width':'404px',
             'left':'95px',
             'top':Math.round(125+textsize*0.05)+'px',
             'opacity':'0'
         }).html(getSTRfromID(thisMode.STR,1)).appendTo('#screen').animate({
+                'width':'450px',
+                'margin-left':'0px',
+                'margin-right':'0px',
                 'top':'125px',
                 'font-size':textsize+'px',
                 'line-height':Math.round(textsize*1.10)+'px',
