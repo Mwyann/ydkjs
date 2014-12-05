@@ -10,12 +10,12 @@ function YDKJGame(demomode) {
 
 YDKJGame.prototype.start = function() {
     var thisGame = this;
-    this.playersready(function(players) {
+    this.playersready(function (players) {
         thisGame.players = players;
-        thisGame.gamemodeready(function(gamemode){
+        thisGame.gamemodeready(function (gamemode) {
             gamemode.start();
         });
-    })
+    });
 };
 
 YDKJGame.prototype.displayPlayer = function(playernumber) {
