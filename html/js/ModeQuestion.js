@@ -96,6 +96,84 @@ ModeQuestion.prototype.start = function() {
 
     var nextcategoryready = 0;
 
+
+    var pressKey = function(choice) {
+        if (thisMode.currentPlayer == 0) {
+            if (thisMode.buzzPlayer != 0) return false; // On a déjà un joueur en attente
+            if (choice == thisMode.game.players[0].keycode) thisMode.buzzPlayer = 1; // Joueur 1
+            if (choice == thisMode.game.players[1].keycode) thisMode.buzzPlayer = 2; // Joueur 2
+            if (choice == thisMode.game.players[2].keycode) thisMode.buzzPlayer = 3; // Joueur 3
+            if (!thisMode.availPlayers[thisMode.buzzPlayer]) thisMode.buzzPlayer = 0;
+
+            // Si réponses 1 à 4 : 1 seul joueur = réponse directe, 2 ou 3 joueurs : "On appuie d'abord sur la lettre !"
+
+            if (thisMode.buzzPlayer) {
+                clearTimeout(thisMode.timerTimeout);
+                thisMode.Question.free();
+                thisMode.Answers.free();
+                thisMode.JingleReadQuestion.free();
+                if (thisMode.LastPlayers) thisMode.LastPlayers.free();
+                thisMode.JingleTimer.stop();
+                thisMode.SFXPlayerBuzz.play();
+                switch (thisMode.buzzPlayer) {
+                    case 1:
+                        thisMode.Player1Answer.play();
+                        thisMode.ShowPlayer1Key.free();
+                        break;
+                    case 2:
+                        thisMode.Player2Answer.play();
+                        thisMode.ShowPlayer2Key.free();
+                        break;
+                    case 3:
+                        thisMode.Player3Answer.play();
+                        thisMode.ShowPlayer3Key.free();
+                        break;
+                }
+            }
+        } else if (thisMode.currentAns == 0) { // Réponse d'un joueur
+            if (choice == 49) thisMode.currentAns = 1;
+            if (choice == 50) thisMode.currentAns = 2;
+            if (choice == 51) thisMode.currentAns = 3;
+            if (choice == 52) thisMode.currentAns = 4;
+            if (!thisMode.availAnswers[thisMode.currentAns]) thisMode.currentAns = 0;
+
+            if (thisMode.currentAns) {
+                clearTimeout(thisMode.timerTimeout);
+                switch (thisMode.currentPlayer) {
+                    case 1:
+                        thisMode.PlayerBuzzedPlayer1.free();
+                        break;
+                    case 2:
+                        thisMode.PlayerBuzzedPlayer2.free();
+                        break;
+                    case 3:
+                        thisMode.PlayerBuzzedPlayer3.free();
+                        break;
+                }
+                switch(thisMode.currentAns){
+                    case 1:
+                        thisMode.LoopAnswer1.play();
+                        thisMode.NumberAnswer1.free();
+                        break;
+                    case 2:
+                        thisMode.LoopAnswer2.play();
+                        thisMode.NumberAnswer2.free();
+                        break;
+                    case 3:
+                        thisMode.LoopAnswer3.play();
+                        thisMode.NumberAnswer3.free();
+                        break;
+                    case 4:
+                        thisMode.LoopAnswer4.play();
+                        thisMode.NumberAnswer4.free();
+                        break;
+                }
+                thisMode.JingleTimer.stop();
+                thisMode.SFXPlayerKey.play();
+            }
+        }
+    };
+
     this.EndQuestion.ended(function(){
         nextcategoryready(function(nextcategory) {
             nextcategory.modeObj.MusicChooseCategoryStart.delay(function () {
@@ -142,6 +220,7 @@ ModeQuestion.prototype.start = function() {
     var gameover = function() {
         // Plus aucun joueur ne peut jouer (timer ou tous les joueurs ont participé)
         unbindKeyListener(thisMode.listener);
+        pressKey = function(choice){};
 
         var revealAnswer;
         var nbAns = 0;
@@ -261,10 +340,6 @@ ModeQuestion.prototype.start = function() {
         },100);
     };
 
-    /*this.WrongAnswer1.ended(wrong1);
-    this.WrongAnswer2.ended(wrong1);
-    this.WrongAnswer3.ended(wrong1);
-    this.WrongAnswer4.ended(wrong1);*/
     this.TimeOut1.ended(wrong1);
     this.TimeOut2.ended(wrong1);
     this.TimeOut3.ended(wrong1);
@@ -437,83 +512,6 @@ ModeQuestion.prototype.start = function() {
             }
         },150);
     });
-
-    var pressKey = function(choice) {
-        if (thisMode.currentPlayer == 0) {
-            if (thisMode.buzzPlayer != 0) return false; // On a déjà un joueur en attente
-            if (choice == thisMode.game.players[0].keycode) thisMode.buzzPlayer = 1; // Joueur 1
-            if (choice == thisMode.game.players[1].keycode) thisMode.buzzPlayer = 2; // Joueur 2
-            if (choice == thisMode.game.players[2].keycode) thisMode.buzzPlayer = 3; // Joueur 3
-            if (!thisMode.availPlayers[thisMode.buzzPlayer]) thisMode.buzzPlayer = 0;
-
-            // Si réponses 1 à 4 : 1 seul joueur = réponse directe, 2 ou 3 joueurs : "On appuie d'abord sur la lettre !"
-
-            if (thisMode.buzzPlayer) {
-                clearTimeout(thisMode.timerTimeout);
-                thisMode.Question.free();
-                thisMode.Answers.free();
-                thisMode.JingleReadQuestion.free();
-                if (thisMode.LastPlayers) thisMode.LastPlayers.free();
-                thisMode.JingleTimer.stop();
-                thisMode.SFXPlayerBuzz.play();
-                switch (thisMode.buzzPlayer) {
-                    case 1:
-                        thisMode.Player1Answer.play();
-                        thisMode.ShowPlayer1Key.free();
-                        break;
-                    case 2:
-                        thisMode.Player2Answer.play();
-                        thisMode.ShowPlayer2Key.free();
-                        break;
-                    case 3:
-                        thisMode.Player3Answer.play();
-                        thisMode.ShowPlayer3Key.free();
-                        break;
-                }
-            }
-        } else if (thisMode.currentAns == 0) { // Réponse d'un joueur
-            if (choice == 49) thisMode.currentAns = 1;
-            if (choice == 50) thisMode.currentAns = 2;
-            if (choice == 51) thisMode.currentAns = 3;
-            if (choice == 52) thisMode.currentAns = 4;
-            if (!thisMode.availAnswers[thisMode.currentAns]) thisMode.currentAns = 0;
-
-            if (thisMode.currentAns) {
-                clearTimeout(thisMode.timerTimeout);
-                switch (thisMode.currentPlayer) {
-                    case 1:
-                        thisMode.PlayerBuzzedPlayer1.free();
-                        break;
-                    case 2:
-                        thisMode.PlayerBuzzedPlayer2.free();
-                        break;
-                    case 3:
-                        thisMode.PlayerBuzzedPlayer3.free();
-                        break;
-                }
-                switch(thisMode.currentAns){
-                    case 1:
-                        thisMode.LoopAnswer1.play();
-                        thisMode.NumberAnswer1.free();
-                        break;
-                    case 2:
-                        thisMode.LoopAnswer2.play();
-                        thisMode.NumberAnswer2.free();
-                        break;
-                    case 3:
-                        thisMode.LoopAnswer3.play();
-                        thisMode.NumberAnswer3.free();
-                        break;
-                    case 4:
-                        thisMode.LoopAnswer4.play();
-                        thisMode.NumberAnswer4.free();
-                        break;
-                }
-                thisMode.JingleTimer.stop();
-                thisMode.SFXPlayerKey.play();
-            }
-        }
-    };
 
     this.PrepareTimer.ended(function(){
         this.delay(function(){

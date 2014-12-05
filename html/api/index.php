@@ -5,6 +5,10 @@ require_once 'mysql.inc.php';
 if (!isset($_POST['call'])) die('API ready 1');
 $call = $_POST['call'];
 
+function uriToUid($uri) {
+  return 'api/get.php?uid='.base64_encode($uri).'&type=';
+}
+
 function gamemode() {
     if (!isset($_POST['currentmode'])) die('Gamemode 1');
     $currentmode = $_POST['currentmode'];
@@ -47,8 +51,8 @@ function resources() {
             if ((strpos($rs['name'],'.C2') !== FALSE) && ($category != 2)) continue; else $rs['name'] = str_replace('.C2','',$rs['name']);
             if ((strpos($rs['name'],'.C3') !== FALSE) && ($category != 3)) continue; else $rs['name'] = str_replace('.C3','',$rs['name']);
             $r = array(
-                'urlGif' => 'res-full/'.$rs['filename'].'.gif',
-                'urlJS' => 'res-full/'.$rs['filename'].'.js',
+                'urlGif' => uriToUid('res-full/'.$rs['filename'].'.gif'),
+                'urlJS' => uriToUid('res-full/'.$rs['filename'].'.js'),
                 'framestart' => $rs['framestart']
             );
             if ($rs['framestop'] !== null) $r['framestop'] = $rs['framestop'];
@@ -74,7 +78,7 @@ function resources() {
                 if ((substr($rs['name'],0,3) == 'SFX') && (isset($reslist[$rs['grp'].'/'.substr($rs['name'],3)]))) $key = $rs['grp'].'/'.substr($rs['name'],3);
                 else $reslist[$key] = array();
             }
-            $reslist[$key]['urlAudio'] = 'res-full/'.$rs['resfolder'].'/'.$possiblevalues[0];
+            $reslist[$key]['urlAudio'] = uriToUid('res-full/'.$rs['resfolder'].'/'.$possiblevalues[0]);
             if ($rs['loopsnd']) $reslist[$key]['loop'] = $rs['loopsnd'];
         }
 
@@ -137,8 +141,8 @@ function resources() {
             if (strpos($rs['name'], 'HideValue') === 0) if ($rs['name'] != 'HideValue'.$value.'F') continue; else $rs['name'] = 'HideValue';
 
             $r = array(
-                'urlGif' => 'res-full/'.$rs['filename'].'.gif',
-                'urlJS' => 'res-full/'.$rs['filename'].'.js',
+                'urlGif' => uriToUid('res-full/'.$rs['filename'].'.gif'),
+                'urlJS' => uriToUid('res-full/'.$rs['filename'].'.js'),
                 'framestart' => $rs['framestart']
             );
             if ($rs['framestop'] !== null) $r['framestop'] = $rs['framestop'];
@@ -173,7 +177,7 @@ function resources() {
                     if ((substr($name, 0, 3) == 'SFX') && (isset($reslist[$rs['grp'] . '/' . substr($name, 3)]))) $key = $rs['grp'] . '/' . substr($name, 3);
                     else $reslist[$key] = array();
                 }
-                $reslist[$key]['urlAudio'] = 'res-full/' . $rs['resfolder'] . '/' . $possiblevalues[$idname];
+                $reslist[$key]['urlAudio'] = uriToUid('res-full/' . $rs['resfolder'] . '/' . $possiblevalues[$idname]);
                 if ($rs['loopsnd']) $reslist[$key]['loop'] = $rs['loopsnd'];
             }
         }
@@ -194,33 +198,33 @@ function resources() {
                 $possiblevalues = explode(',',$rs['val']);
                 if (sizeof($possiblevalues) > 1) shuffle($possiblevalues);
 
-                $result['urlAudio'] = 'res-full/'.$rs['resfolder'].'/'.$possiblevalues[0];
+                $result['urlAudio'] = uriToUid('res-full/'.$rs['resfolder'].'/'.$possiblevalues[0]);
                 if ($rs['loopsnd']) $result['loop'] = $rs['loopsnd'];
                 return $result;
             }
             return array();
         }
 
-        $reslist['Question/QuestionTitle'] = array('urlAudio' => 'res-full/'.$qhdr['folder'].'/snd/1');
+        $reslist['Question/QuestionTitle'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/1'));
 
         $PreQuestion = 'res-full/'.$qhdr['folder'].'/snd/2';
-        if (file_exists('../'.$PreQuestion.'.ogg')) $reslist['Question/PreQuestion'] = array('urlAudio' => $PreQuestion);
+        if (file_exists('../'.$PreQuestion.'.ogg')) $reslist['Question/PreQuestion'] = array('urlAudio' => uriToUid($PreQuestion));
         else $reslist['Question/PreQuestion'] = PickDefault('DefaultPreQuestion');
 
-        $reslist['Question/Question'] = array('urlAudio' => 'res-full/'.$qhdr['folder'].'/snd/3');
-        $reslist['Question/Answers'] = array('urlAudio' => 'res-full/'.$qhdr['folder'].'/snd/5');
+        $reslist['Question/Question'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/3'));
+        $reslist['Question/Answers'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/5'));
         $EndQuestion = 'res-full/'.$qhdr['folder'].'/snd/6';
-        if (file_exists('../'.$EndQuestion.'.ogg')) $reslist['Question/EndQuestion'] = array('urlAudio' => $EndQuestion);
+        if (file_exists('../'.$EndQuestion.'.ogg')) $reslist['Question/EndQuestion'] = array('urlAudio' => uriToUid($EndQuestion));
         else $reslist['Question/EndQuestion'] = array();
 
         for($i = 1; $i <= 4; $i++) {
             $Answer = 'res-full/'.$qhdr['folder'].'/snd/'.($i+6);
-            if (file_exists('../'.$Answer.'.ogg')) $reslist['Question/Answer'.$i] = array('urlAudio' => $Answer);
+            if (file_exists('../'.$Answer.'.ogg')) $reslist['Question/Answer'.$i] = array('urlAudio' => uriToUid($Answer));
             else $reslist['Question/Answer'.$i] = PickDefault('DefaultWrongAnswer');
         }
 
         $RevealAnswer = 'res-full/'.$qhdr['folder'].'/snd/11';
-        if (file_exists('../'.$RevealAnswer.'.ogg')) $reslist['Question/RevealAnswer'] = array('urlAudio' => $RevealAnswer);
+        if (file_exists('../'.$RevealAnswer.'.ogg')) $reslist['Question/RevealAnswer'] = array('urlAudio' => uriToUid($RevealAnswer));
         else $reslist['Question/RevealAnswer'] = PickDefault('DefaultRevealAnswer');
 
         $reslist['STR'] = $qhdr['strings'];
@@ -229,7 +233,7 @@ function resources() {
 
     if ($mode == 'Timer10') {
         $resName = 'res-full/10TIMER/off4/8018';
-        $reslist = array('Common/Timer10' => array('urlGif' => $resName.'.gif', 'urlJS' => $resName.'.js', 'framestart' => 73, 'loop' => 0, 'framestop' => 75),
+        $reslist = array('Common/Timer10' => array('urlGif' => uriToUid($resName.'.gif'), 'urlJS' => uriToUid($resName.'.js'), 'framestart' => 73, 'loop' => 0, 'framestop' => 75),
                          'Common/Timer10/Frames' => array(
                          'Still' => array(
                             10 => array('framestart' => 69),
