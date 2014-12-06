@@ -74,7 +74,7 @@ function help() {
     ?>
     <div style="text-align:center;font-size:28px">Aide, news, astuces</div>
     <div style="text-align:center;font-size:20px;margin:10px">
-        Astuce : Vous pouvez obtenir le jeu en plein écran !<br/>
+        Astuce : Vous pouvez jouer en "plein écran", en cliquant sur le lien en haut de l'écran et en appuyant sur F11 (F11 et Echap pour revenir en mode normal).<br/>
     <div style="text-align:center;font-size:20px;margin:10px"><a href="/">Retour</a></div>
 <?php
 //        Nouveau : vous pouvez inviter des amis à jouer ! Allez dans "Mon compte" puis dans "Mes invitations".</div>

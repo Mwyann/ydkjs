@@ -15,7 +15,7 @@ jQuery(document).ready(function() {
   (function(){
     var autozoom = function() {
       var zoom = Math.min(jQuery(window).width()/640,jQuery(window).height()/480);
-      var centerup = Math.max(0,(jQuery(window).height()-(zoom*480))/4);
+        var centerup = Math.max(0,Math.round((jQuery(window).height()-(zoom*480))/4));
       jQuery('body').css('padding-top',centerup+'px').css('overflow','hidden').css('zoom',zoom.toFixed(2)).css('zoom',(zoom*100).toFixed(0)+'%').css('-moz-transform-origin','50% 0').css('-moz-transform','scale('+zoom.toFixed(2)+', '+zoom.toFixed(2)+')');
     };
 
@@ -65,7 +65,7 @@ function startgame() {
      <br/>
      <u>Ceci n'est que la démo du jeu original, et elle est loin d'être finie</u>, beaucoup de choses ne sont pas fonctionnelles. J'ajouterai les éléments au fur et à mesure. Vous pouvez télécharger la démo d'origine en cliquant sur <a style="color:#F00" href="JACKDemo.zip">ce lien</a>.<br/>
      <br/>
-     <u>Le jeu fonctionne le mieux dans Firefox et Chrome</u>. Il est possible de profiter du jeu en "plein écran" en cliquant sur le lien en haut de l'écran (Echap pour revenir en mode normal). Internet Explorer ne gère pas les polices CSS3 et il a des soucis avec les sons qui s'arrêtent trop tôt. Les navigateurs mobiles quant à eux ont des problèmes avec la gestion des fichiers audio (permission de jouer un seul fichier audio à la fois, et uniquement suite à une action de l'utilisateur...).<br/>
+     <u>Le jeu fonctionne le mieux dans Firefox et Chrome</u>. Il est possible de profiter du jeu en "plein écran", en cliquant sur le lien en haut de l'écran et en appuyant sur F11 (F11 et Echap pour revenir en mode normal). Internet Explorer ne gère pas les polices CSS3 et il a des soucis avec les sons qui s'arrêtent trop tôt. Les navigateurs mobiles quant à eux ont des problèmes avec la gestion des fichiers audio (permission de jouer un seul fichier audio à la fois, et uniquement suite à une action de l'utilisateur...).<br/>
      <br/>
      <u>Le but de ce projet est de transformer le jeu complet et d'y ajouter des fonctionnalités multi-joueurs en ligne</u>. Etant donné mon temps libre et le travail que cela va demander, ce n'est pas pour tout de suite, ni pour demain... mais à suivre ! Si vous ne connaissez pas déjà le jeu, je vous laisse le découvrir.<br/>
      <br/>
