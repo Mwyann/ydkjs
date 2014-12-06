@@ -198,19 +198,25 @@ ModeQuestion.prototype.start = function() {
 
     this.SFXRevealAnswer.ended(function(){
         this.delay(function(){
-            var answer;
-            if (thisMode.correctanswer == 1) answer = thisMode.Answer1;
-            if (thisMode.correctanswer == 2) answer = thisMode.Answer2;
-            if (thisMode.correctanswer == 3) answer = thisMode.Answer3;
-            if (thisMode.correctanswer == 4) answer = thisMode.Answer4;
-            answer.ended(function(){
-                thisMode.SFXRevealAnswer.delay(function(){
-                    thisMode.EndQuestion.play();
-                },200);
-            });
-            this.delay(function(){
-                answer.play();
-            },200);
+            if (thisMode.options.correctanswerisdefault) {
+                thisMode.EndQuestion.delay(function () {
+                    this.play();
+                }, 200);
+            } else {
+                var answer;
+                if (thisMode.correctanswer == 1) answer = thisMode.Answer1;
+                if (thisMode.correctanswer == 2) answer = thisMode.Answer2;
+                if (thisMode.correctanswer == 3) answer = thisMode.Answer3;
+                if (thisMode.correctanswer == 4) answer = thisMode.Answer4;
+                answer.ended(function () {
+                    thisMode.EndQuestion.delay(function () {
+                        this.play();
+                    }, 200);
+                });
+                this.delay(function () {
+                    answer.play();
+                }, 200);
+            }
             nextcategoryready(function(nextcategory) {
                 nextcategory.modeObj.MusicChooseCategoryStart.play();
             });

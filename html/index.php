@@ -35,7 +35,7 @@ function displaylogin() {
 
 function invited() {
     ?>
-    <div style="text-align:center;font-size:28px">Félicitations, vous avez été invité à tester<br/>la version alpha de You Don't Know Jack® !<br/>Inscrivez-vous via le formulaire ci-dessous :</div>
+    <div style="text-align:center;font-size:28px">Félicitations, vous avez été invité(e) à tester<br/>la version alpha de You Don't Know Jack® !<br/>Inscrivez-vous via le formulaire ci-dessous :</div>
     <form action="/" method="post">
         <div style="width:300px; margin-left:auto; margin-right:auto">
             <input type="hidden" name="invitation" value="<?php echo $_GET['invitation']; ?>"/>

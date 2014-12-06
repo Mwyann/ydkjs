@@ -12,7 +12,7 @@ YDKJAPI.prototype.initdemo = function() {
         var newmode;
         if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Intro', {});
         //if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1}); // Ligne DEBUG
-        if (currentmode instanceof ModeIntro) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1});
+        if (currentmode instanceof ModeIntro) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1, chooseplayer: 3});
         if (currentmode instanceof ModeQuestion) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: currentmode.options.questionnumber+1});
 
         return function(f) {f(newmode)}
@@ -229,6 +229,7 @@ YDKJAPI.prototype.initdemo = function() {
                 mode.options.correctanswer = 4;
                 mode.options.value = 2000;
             }
+            mode.options.correctanswerisdefault = 0;
 
             var res = 'res/QFold1/'+mode.options.id;
 
@@ -398,7 +399,7 @@ YDKJAPI.prototype.initgame = function() {
                 var newmodedata = data['newmode'];
 
                 if (newmodedata['mode'] == 'Intro') newmode = new YDKJMode(thisAPI.game, 'Intro', {});
-                if (newmodedata['mode'] == 'Category') newmode = new YDKJMode(thisAPI.game, 'Category', {category: newmodedata['category'], questionnumber: newmodedata['questionnumber']});
+                if (newmodedata['mode'] == 'Category') newmode = new YDKJMode(thisAPI.game, 'Category', {category: newmodedata['category'], questionnumber: newmodedata['questionnumber'], chooseplayer: newmodedata['chooseplayer']});
 
                 ready = 1;
                 for(var i = 0; i < readyfunctions.length; i++) {
@@ -467,6 +468,7 @@ YDKJAPI.prototype.initgame = function() {
                     mode.STR = strtmp;
                     mode.options.value = reslist['value'];
                     mode.options.correctanswer = reslist['correctanswer'];
+                    mode.options.correctanswerisdefault = reslist['correctanswerisdefault'];
                     mode.options.timer = new YDKJTimer10();
                     var timerready = thisAPI.resources(mode.options.timer);
                     timerready(function(resources) {

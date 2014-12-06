@@ -30,6 +30,7 @@ var YDKJDemoSnd = {
         'VoiceAnnounceValue1000F':{res:'5QDemo',name:'Mc08',min:1,max:1},
         'VoiceAnnounceValue2000F':{res:'5QDemo',name:'Mc10',min:1,max:1},
         'VoiceAnnounceValue3000F':{res:'5QDemo',name:'Mc11',min:1,max:1},
+        'DefaultGoodAnswer':{res:'5QDemo',name:'Mc27',min:1,max:1},
         'DefaultPreQuestion':{res:'5QDemo',name:'Mc15',min:1,max:1},
         'DefaultRevealAnswer':{res:'5QDemo',name:'Mc28',min:1,max:1},
         'DefaultRevealLastAnswer':{res:'5QDemo',name:'Mc57',min:1,max:1},
@@ -80,7 +81,6 @@ var YDKJDemoSnd = {
         'SFXUnknownBoing2':{res:'5QDemo',name:'Mc81',min:1,max:1},
         'SFXWrongAnswer':{res:'5QDemo',name:'Mc92',min:1,max:1},
         'TimeOut':{res:'5QDemo',name:'Mc29',min:1,max:1},
-        'UnknownYo':{res:'5QDemo',name:'Mc27',min:1,max:1},
     },
     'DisOrDat': {
         'AnnounceCategory':{res:'5QDemo',name:'Mb54',min:1,max:1},

@@ -15,7 +15,7 @@ function gamemode() {
     $newmode = array();
     switch ($currentmode) {
         case 'None': //$newmode = array('mode' => 'Intro'); break;
-        case 'Intro': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 1); break;
+        case 'Intro': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 1, 'chooseplayer' => rand(1,3)); break;
         case 'Category':
             if (!isset($_POST['category'])) die('Gamemode 2');
             $category = $_POST['category'];
@@ -202,11 +202,11 @@ function resources() {
         //unset($reslist['Question/DefaultRevealFreeAnswer']);
         unset($reslist['Question/DefaultRevealAnswer']);
 
-        function PickDefault($type) {
+        function PickAnySnd($grp,$type) {
             global $DB, $DBsta;
             $res = $DB->query("SELECT *
                                FROM ".$DBsta.".ressnd
-                               WHERE grp = 'Question'
+                               WHERE grp = '".addslashes($grp)."'
                                AND name = '".addslashes($type)."'");
             while ($rs = $res->fetch()) {
                 $possiblevalues = explode(',',$rs['val']);
@@ -223,7 +223,7 @@ function resources() {
 
         $PreQuestion = 'res-full/'.$qhdr['folder'].'/snd/2';
         if (file_exists('../'.$PreQuestion.'.ogg')) $reslist['Question/PreQuestion'] = array('urlAudio' => uriToUid($PreQuestion));
-        else $reslist['Question/PreQuestion'] = PickDefault('DefaultPreQuestion');
+        else $reslist['Question/PreQuestion'] = PickAnySnd('Question','DefaultPreQuestion');
 
         $reslist['Question/Question'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/3'));
         $reslist['Question/Answers'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/5'));
@@ -231,15 +231,20 @@ function resources() {
         if (file_exists('../'.$EndQuestion.'.ogg')) $reslist['Question/EndQuestion'] = array('urlAudio' => uriToUid($EndQuestion));
         else $reslist['Question/EndQuestion'] = array();
 
+        $reslist['correctanswerisdefault'] = 0;
         for($i = 1; $i <= 4; $i++) {
             $Answer = 'res-full/'.$qhdr['folder'].'/snd/'.($i+6);
             if (file_exists('../'.$Answer.'.ogg')) $reslist['Question/Answer'.$i] = array('urlAudio' => uriToUid($Answer));
-            else $reslist['Question/Answer'.$i] = PickDefault('DefaultWrongAnswer');
+            else if ($i != $qhdr['answer']) $reslist['Question/Answer'.$i] = PickAnySnd('Question','DefaultWrongAnswer');
+            else {
+                $reslist['Question/Answer'.$i] = PickAnySnd('Question','DefaultGoodAnswer');
+                $reslist['correctanswerisdefault'] = 1;
+            }
         }
 
         $RevealAnswer = 'res-full/'.$qhdr['folder'].'/snd/11';
         if (file_exists('../'.$RevealAnswer.'.ogg')) $reslist['Question/RevealAnswer'] = array('urlAudio' => uriToUid($RevealAnswer));
-        else $reslist['Question/RevealAnswer'] = PickDefault('DefaultRevealAnswer');
+        else $reslist['Question/RevealAnswer'] = PickAnySnd('Question','DefaultRevealAnswer');
 
         $reslist['STR'] = $qhdr['strings'];
         $reslist['correctanswer'] = $qhdr['answer'];

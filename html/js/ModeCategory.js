@@ -37,12 +37,14 @@ ModeCategory.prototype.preload = function(resources) {
     this.question1 = resources['question1'];
     this.question2 = resources['question2'];
     this.question3 = resources['question3'];
+
+    if (this.options.chooseplayer) this.chooseplayer = this.options.chooseplayer;
 };
 
 ModeCategory.prototype.start = function() {
     var thisMode = this;
 
-    if (!this.chooseplayer) this.chooseplayer = 3; // Déterminer un joueur qui pourra choisir la catégorie
+    if (!this.chooseplayer) this.chooseplayer = 1; // Déterminer un joueur qui pourra choisir la catégorie
     this.question1.modeObj.chooseplayer = this.chooseplayer;
     this.question2.modeObj.chooseplayer = this.chooseplayer;
     this.question3.modeObj.chooseplayer = this.chooseplayer;
