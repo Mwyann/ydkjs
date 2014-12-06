@@ -11,22 +11,50 @@
 
 jQuery(document).ready(function() {
   jQuery('#startbutton').val("J'ai compris, commencer le jeu");
+
+  (function(){
+    var autozoom = function() {
+      var zoom = $(window).height()/480;
+      jQuery('body').css('overflow','hidden').css('zoom',zoom.toFixed(2)).css('zoom',(zoom*100).toFixed(0)+'%').css('-moz-transform','scale('+zoom.toFixed(2)+', '+zoom.toFixed(2)+')');
+    };
+
+    var onresize = function() {};
+
+    $(window).resize(function() {
+      // This will execute whenever the window is resized
+      onresize();
+    });
+
+    jQuery(window).keyup(function(event) {
+      if (event.keyCode == 27) {
+        onresize = function() {};
+        jQuery('#headerbuttons').show();
+        jQuery('body').css('overflow','').css('zoom','1').css('zoom','100%').css('-moz-transform','scale(1, 1)');
+      }
+    });
+
+    jQuery('#fullscreen').click(function() {
+      jQuery('#headerbuttons').hide();
+      onresize = autozoom;
+      autozoom();
+    });
+  })();
 });
 
 function startgame() {
   jQuery('#warning').hide();
   jQuery('#screen').show();
+  jQuery('#headerbuttons').show();
 
-  jQuery(document).ready(function() {
-    var game = new YDKJ();
-    game.demo();
-  });
+  var game = new YDKJ();
+  game.demo();
 }
 
 </script>
 </head>
 
 <body style="background-color:#000;margin:0;padding:0;border:0">
+  <div style="text-align:center;font-size:20px;margin:5px;font-family:JackCondensed, sans-serif;display:none" id="headerbuttons"><a href="#" id="fullscreen" style="color:#666">Plein écran</a></div>
   <div id="warning" style="border:#F00 1px solid; background-color:#300;color:#FFF;margin:50px;padding:20px;font-family:JackCondensed;font-size:18px">
     <div style="text-align:center;font-size:42px;font-weight:bold">You Don't Know Jack® DEMO FR</div>
     <p style="text-align:center;font-size:24px;font-weight:bold">ATTENTION : A LIRE AVANT DE JOUER ! <span style="font-size:20px">(Si si, vraiment, au moins ce qui est <u>souligné</u>)</span></p>
@@ -35,7 +63,7 @@ function startgame() {
      <br/>
      <u>Ceci n'est que la démo du jeu original, et elle est loin d'être finie</u>, beaucoup de choses ne sont pas fonctionnelles. J'ajouterai les éléments au fur et à mesure. Vous pouvez télécharger la démo d'origine en cliquant sur <a style="color:#F00" href="JACKDemo.zip">ce lien</a>.<br/>
      <br/>
-     <u>Le jeu fonctionne le mieux dans Firefox et Chrome</u>. Il est possible et recommandé de zoomer la page avec Ctrl-+ ou Ctrl-molette pour profiter du jeu en "plein écran". Internet Explorer ne gère pas les polices CSS3 et il a des soucis avec les sons qui s'arrêtent trop tôt. Les navigateurs mobiles quant à eux ont des problèmes avec la gestion des fichiers audio (permission de jouer un seul fichier audio à la fois, et uniquement suite à une action de l'utilisateur...).<br/>
+     <u>Le jeu fonctionne le mieux dans Firefox et Chrome</u>. Il est possible de profiter du jeu en "plein écran" en cliquant sur le lien en haut de l'écran (Echap pour revenir en mode normal). Internet Explorer ne gère pas les polices CSS3 et il a des soucis avec les sons qui s'arrêtent trop tôt. Les navigateurs mobiles quant à eux ont des problèmes avec la gestion des fichiers audio (permission de jouer un seul fichier audio à la fois, et uniquement suite à une action de l'utilisateur...).<br/>
      <br/>
      <u>Le but de ce projet est de transformer le jeu complet et d'y ajouter des fonctionnalités multi-joueurs en ligne</u>. Etant donné mon temps libre et le travail que cela va demander, ce n'est pas pour tout de suite, ni pour demain... mais à suivre ! Si vous ne connaissez pas déjà le jeu, je vous laisse le découvrir.<br/>
      <br/>
@@ -46,7 +74,7 @@ function startgame() {
     <p style="text-align:center"><br/><input type="button" onclick="startgame()" value="Chargement..." id="startbutton" /><br/>
         <span style="font-size:12px">Super, <span style="color:#FF0"><?php include 'count.txt'; ?></span> personnes ont osé essayer !</span></p>
   </div>
-  <div id="screen" style="display:none;background-color:#000;position:relative;width:640px;height:480px;overflow:hidden;margin-left:auto;margin-right:auto;margin-top:15px">
+  <div id="screen" style="display:none;background-color:#000;position:relative;width:640px;height:480px;overflow:hidden;margin-left:auto;margin-right:auto">
     <img src="ajax-loader.gif" style="position:absolute;left:293px;top:212px" class="markedAsRemoved"/>
   </div> <!-- Couleur #EEE pour l'intro -->
   <div id="tmpscreen" style="display:none"></div>
