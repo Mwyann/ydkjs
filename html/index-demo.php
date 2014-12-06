@@ -14,8 +14,9 @@ jQuery(document).ready(function() {
 
   (function(){
     var autozoom = function() {
-      var zoom = $(window).height()/480;
-      jQuery('body').css('overflow','hidden').css('zoom',zoom.toFixed(2)).css('zoom',(zoom*100).toFixed(0)+'%').css('-moz-transform','scale('+zoom.toFixed(2)+', '+zoom.toFixed(2)+')');
+      var zoom = Math.min(jQuery(window).width()/640,jQuery(window).height()/480);
+      var centerup = Math.max(0,(jQuery(window).height()-(zoom*480))/4);
+      jQuery('body').css('padding-top',centerup+'px').css('overflow','hidden').css('zoom',zoom.toFixed(2)).css('zoom',(zoom*100).toFixed(0)+'%').css('-moz-transform-origin','50% 0').css('-moz-transform','scale('+zoom.toFixed(2)+', '+zoom.toFixed(2)+')');
     };
 
     var onresize = function() {};
@@ -29,7 +30,7 @@ jQuery(document).ready(function() {
       if (event.keyCode == 27) {
         onresize = function() {};
         jQuery('#headerbuttons').show();
-        jQuery('body').css('overflow','').css('zoom','1').css('zoom','100%').css('-moz-transform','scale(1, 1)');
+        jQuery('body').css('padding-top','0px').css('overflow','').css('zoom','1').css('zoom','100%').css('-moz-transform','scale(1, 1)');
       }
     });
 
@@ -37,6 +38,7 @@ jQuery(document).ready(function() {
       jQuery('#headerbuttons').hide();
       onresize = autozoom;
       autozoom();
+      return false;
     });
   })();
 });
