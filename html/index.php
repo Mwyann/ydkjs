@@ -53,7 +53,7 @@ function invited() {
 function loggedin() {
 ?>
     <div style="text-align:center;font-size:28px">Bienvenue, <?php echo $_SESSION['nickname']?> !</div>
-    <div style="text-align:center;font-size:24px;margin:10px"><a href="alpha.php">Jouer une partie !</a></div>
+    <div style="text-align:center;font-size:24px;margin:10px"><a href="alpha.php">Jouer à Jack !</a></div>
     <div style="text-align:center;font-size:20px;margin:10px"><a href="?help=1">Aide, news, astuces</a></div>
     <div style="text-align:center;font-size:20px;margin:10px"><a href="?logout=1">Déconnexion</a></div>
 <?php
@@ -184,8 +184,21 @@ if (!isset($_SESSION['id'])) {
         displaylogin();
     } else {
         ?>
-        <div style="text-align:center;font-size:28px">Alpha-test disponible ! Inscription : <a href="mailto:alpha@ydkj.fr">alpha@ydkj.fr</a></div>
+        <div style="text-align:center;font-size:26px">Alpha-test disponible (questions QCM du jeu original) !<br/>Inscription : envoyez un mail à <a href="mailto:alpha@ydkj.fr">alpha@ydkj.fr</a></div>
         <div style="text-align:center;font-size:20px;margin:20px">Vous possédez déjà un compte ? <a href="?login=1">Connectez-vous !</a></div>
+        <div style="text-align:center;font-size:20px;margin:20px">Testez la démo du jeu (3 questions) : <a href="http://demo.ydkj.fr/">demo.ydkj.fr</a></div>
+        <div id="warning" style="border:#F00 1px solid; background-color:#300;color:#FFF;margin:50px;padding:20px;font-family:JackCondensed;font-size:18px">
+            <p style="text-align:center;font-size:24px;font-weight:bold">ATTENTION : A LIRE AVANT DE JOUER ! <span style="font-size:20px">(Si si, vraiment, au moins ce qui est <u>souligné</u>)</span></p>
+            <p>
+                <u>Ce jeu est sous copyright <a style="color:#F00" href="http://www.jellyvision.com/">JellyVision Games</a></u>. Il est sorti à l'origine en 1995 sur PC et Mac et en 1998 pour la version française (pour en savoir plus, voir la fiche du jeu sur <a style="color:#F00" href="http://fr.wikipedia.org/wiki/You_Don%27t_Know_Jack_%28s%C3%A9rie_de_jeux_vid%C3%A9o%29">Wikipedia</a>), et j'ai décidé d'en faire une version jouable dans un navigateur en extrayant les éléments graphiques et sonores des fichiers du jeu et en réécrivant (comprenez en simulant) le moteur en Javascript.<br/>
+                <br/>
+                <u>Cette version est loin d'être finie</u>, beaucoup de choses ne sont pas fonctionnelles. J'ajouterai les éléments au fur et à mesure. Pour le moment, seules les questions simples de type QCM sont jouables. Vous pouvez tester la démo du jeu (3 questions) en cliquant sur <a style="color:#F00" href="http://demo.ydkj.fr/">ce lien</a>.<br/>
+                <br/>
+                <u>Le jeu fonctionne le mieux dans Firefox et Chrome</u>. Il est possible de profiter du jeu en "plein écran", en cliquant sur le lien en haut de l'écran et en appuyant sur F11 (F11 et Echap pour revenir en mode normal). Internet Explorer ne gère pas les polices CSS3 et il a des soucis avec les sons qui s'arrêtent trop tôt. Les navigateurs mobiles quant à eux ont des problèmes avec la gestion des fichiers audio (permission de jouer un seul fichier audio à la fois, et uniquement suite à une action de l'utilisateur...).<br/>
+                <br/>
+                <u>Le but de ce projet est de transformer le jeu complet et d'y ajouter des fonctionnalités multi-joueurs en ligne</u>. Etant donné mon temps libre et le travail que cela va demander, ce n'est pas pour tout de suite, ni pour demain... mais à suivre !<br/>
+            </p>
+        </div>
     <?php
     }
 }
