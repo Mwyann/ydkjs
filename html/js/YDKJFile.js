@@ -3,6 +3,7 @@
 var preloadpool = [];
 var preloadfifo = [];
 var preloadprocesses = 0;
+var preloaddiv = jQuery('<div />').css('display','none').appendTo(jQuery('body'));
 
 function YDKJFile(filetype,url) {
     this.filetype = filetype;
@@ -20,7 +21,6 @@ function YDKJFile(filetype,url) {
 
 YDKJFile.prototype.preload = function(f) {
     var thisFile = this;
-    var preload = jQuery('#preload');
 
     var isready = function() {
         thisFile.preloaded = 1;
@@ -35,7 +35,7 @@ YDKJFile.prototype.preload = function(f) {
 
     if (this.filetype == 'gif') {
         this.res = jQuery('<img />').attr('src',this.url);
-        preload.append(this.res);
+        preloaddiv.append(this.res);
         this.res.imagesLoaded(isready);
     }
 
@@ -58,7 +58,7 @@ YDKJFile.prototype.preload = function(f) {
 
     if (this.filetype == 'audio') {
         this.res = jQuery('<audio />');
-        preload.append(this.res);
+        preloaddiv.append(this.res);
         var a = this.res.get(0);
         if (a.canPlayType('audio/ogg')) this.res.append('<source />').children().last().attr('type','audio/ogg').attr('src',this.url+'.ogg');
         else if (a.canPlayType('audio/mpeg')) this.res.append('<source />').children().last().attr('type','audio/mpeg').attr('src',this.url+'.mp3');

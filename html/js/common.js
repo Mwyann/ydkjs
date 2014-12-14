@@ -152,6 +152,7 @@ YDKJTimer10.prototype.playTimer = function(next) {
     if ((next < 0) || (next > 10)) return false;
     var thisTimer = this;
     this.animation.ready(function() {
+        thisTimer.animation.html = thisTimer.html;
         if (next == thisTimer.current) {
             thisTimer.animation.framestart = thisTimer.frames.Still[thisTimer.current].framestart;
             thisTimer.animation.framestop = thisTimer.frames.Still[thisTimer.current].framestart;

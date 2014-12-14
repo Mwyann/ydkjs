@@ -39,6 +39,7 @@ YDKJMode.prototype.start = function() {
         for (var i in thisMode.modeObj) if (thisMode.modeObj.hasOwnProperty(i)) {
             if ((thisMode.modeObj[i] instanceof YDKJAnimation) || (thisMode.modeObj[i] instanceof YDKJTimer10)) {
                 numobj++;
+                thisMode.modeObj[i].html = thisMode.modeObj.game.html;
                 thisMode.modeObj[i].ready(readyfunction);
             }
         }

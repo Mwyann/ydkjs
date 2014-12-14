@@ -5,51 +5,29 @@
 <title>You Don't Know Jack® DEMO FR</title>
 <link href="css/ydkj.css" rel="stylesheet"/>
 <script src="js/jquery-1.11.0.min.js" type="text/javascript"></script>
-<script src="js/YDKJ.js?ver=1" type="text/javascript"></script>
+<script src="js/YDKJ.js?ver=2" type="text/javascript"></script>
 
 <script type="text/javascript">
 
 jQuery(document).ready(function() {
   jQuery('#startbutton').val("J'ai compris, commencer le jeu");
-
-  (function(){
-    var autozoom = function() {
-      var zoom = Math.min(jQuery(window).width()/640,jQuery(window).height()/480);
-        var centerup = Math.max(0,Math.round((jQuery(window).height()-(zoom*480))/4));
-      jQuery('body').css('padding-top',centerup+'px').css('overflow','hidden').css('zoom',zoom.toFixed(2)).css('zoom',(zoom*100).toFixed(0)+'%').css('-moz-transform-origin','50% 0').css('-moz-transform','scale('+zoom.toFixed(2)+', '+zoom.toFixed(2)+')');
-    };
-
-    var onresize = function() {};
-
-    $(window).resize(function() {
-      // This will execute whenever the window is resized
-      onresize();
-    });
-
-    jQuery(window).keyup(function(event) {
-      if (event.keyCode == 27) {
-        onresize = function() {};
-        jQuery('#headerbuttons').show();
-        jQuery('body').css('padding-top','0px').css('overflow','').css('zoom','1').css('zoom','100%').css('-moz-transform','scale(1, 1)');
-      }
-    });
-
-    jQuery('#fullscreen').click(function() {
-      jQuery('#headerbuttons').hide();
-      onresize = autozoom;
-      autozoom();
-      return false;
-    });
-  })();
 });
 
 function startgame() {
-  jQuery('#warning').hide();
-  jQuery('#screen').show();
-  jQuery('#headerbuttons').show();
+    var screen = jQuery('#screen');
+    jQuery('#warning').hide();
+    screen.show();
+    jQuery('#headerbuttons').show();
 
-  var game = new YDKJ();
-  game.demo();
+    var game = new YDKJ(screen,false,true);
+    jQuery('#fullscreen').click(function() {
+        jQuery('#headerbuttons').hide();
+        game.fullscreen(function() {
+            jQuery('#headerbuttons').show();
+        });
+        return false;
+    });
+    game.demo();
 }
 
 </script>
@@ -78,10 +56,8 @@ function startgame() {
     <p style="text-align:center"><br/><input type="button" onclick="startgame()" value="Chargement..." id="startbutton" /><br/>
         <span style="font-size:12px">Super, <span style="color:#FF0"><?php include 'count.txt'; ?></span> personnes ont osé essayer !</span></p>
   </div>
-  <div id="screen" style="display:none;background-color:#000;position:relative;width:640px;height:480px;overflow:hidden;margin-left:auto;margin-right:auto">
+  <div id="screen" style="display:none;margin-left:auto;margin-right:auto">
     <img src="ajax-loader.gif" style="position:absolute;left:293px;top:212px" class="markedAsRemoved"/>
   </div> <!-- Couleur #EEE pour l'intro -->
-  <div id="tmpscreen" style="display:none"></div>
-  <div id="preload" style="display:none"></div>
 </body>
 </html>

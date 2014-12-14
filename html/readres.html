@@ -24,20 +24,24 @@ var animationFile = '';
 
 jQuery(document).ready(function() {
     var anim = 0;
+    var screen = jQuery('#screen');
+    var debug = jQuery('#debuglive');
     var loadAnim = function() {
       if (anim) anim.free();
       anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js'});
+      anim.html = {screen: screen, debug:debug};
       anim.ready(function() {
         var thisAnim = this;
 
         $("#slider").slider({
           value:0,
           min: 0,
-          max: thisAnim.frames.length,
+          max: thisAnim.frames.length-1,
           step: 1,
           slide: function( event, ui ) {
             if (anim) anim.free();
             anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js', framestart: ui.value, framestop: ui.value});
+            anim.html = {screen: screen, debug:debug};
             anim.ready(function() {
               this.play();
             });
@@ -73,6 +77,10 @@ jQuery(document).ready(function() {
 
         if ((framefrom >= 0) && (animationFile != '')) {
           anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js', framestart: framefrom, loop: animloop, framestop: frameto});
+          anim.html = {screen: screen, debug:debug};
+          anim.frame(function(framenum) {
+              $("#slider").slider("value",framenum);
+          });
           anim.ready(function() {
             this.play();
           });
@@ -108,7 +116,7 @@ function play(t) {
   <div id="debug" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;height:150px;overflow-y:scroll">
      Select a file:
      <select id="filename">
-         <option value="res-full/QNUMBERS/off4/-3030">-3030</option>
+         <option value="res-full/QNUMBERS/off4/-1070">-1070 - Question sept</option>
          <option disabled> - FULL -</option>
          <option value="res-full/JACKART/off4/3000">3000 - Player Numbers (3 players)</option>
          <option value="res-full/R1WRAPUP/off4/3100">3100 - Round 1 Ended Screws</option>

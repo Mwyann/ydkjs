@@ -45,10 +45,12 @@ function YDKJAnimation(resource) {
     this.frames = 0;
     this.intervalTimer = 0;
     this.audiostopTimer = 0;
+    this.html = {};
 
     this.preloaded = 0;
     this.readyFunctions = [];
     this.clickFunctions = [];
+    this.frameFunctions = [];
 
     // Lancement du preload
 
@@ -99,11 +101,7 @@ function YDKJAnimation(resource) {
     // Méthodes privées
 
     this.newScreen = function() {
-        if (!this.tmpdiv) {
-            var tmpscreen = jQuery('#tmpscreen');
-            this.tmpdiv = jQuery('<div />');
-            this.tmpdiv.appendTo(tmpscreen);
-        }
+        if (!this.tmpdiv) this.tmpdiv = jQuery('<div />');
         this.tmpdiv.html('');
     };
 
@@ -135,8 +133,8 @@ function YDKJAnimation(resource) {
         if (ourframe.nbimg > 0) {
             var offsetx = ourframe.img[0].ox;
             var offsety = ourframe.img[0].oy;
-            var sizex = ourframe.img[0].sx;
-            var sizey = ourframe.img[0].sy;
+            //var sizex = ourframe.img[0].sx;
+            //var sizey = ourframe.img[0].sy;
             val = ourframe.img[0].val;
             for(var i = 1; i <= ourframe.nbimg; i++) {
                 this.addTile(ourframe.img[i].idx-1, offsetx+ourframe.img[i].ox, offsety+ourframe.img[i].oy);
@@ -162,14 +160,14 @@ function YDKJAnimation(resource) {
 
     this.nextScreen = function() {
         // Ne pas remplacer tout le screen (uniquement supprimer lorsqu'on destroy l'animation (pas stop, on peut vouloir stopper sans supprimer))
-        var screen = jQuery('#screen');
+        //var screen = jQuery('#screen');
         if (!this.div) {
             this.div = jQuery('<div />').css({
                 'position':'absolute'
             });
-            this.div.appendTo(screen);
+            this.div.appendTo(this.html.screen);
         }
-        screen.find('.markedAsRemoved').remove(); // Supprimer les éléments marqués
+        this.html.screen.find('.markedAsRemoved').remove(); // Supprimer les éléments marqués
 
         //this.div.html(this.tmpdiv.html()); // Méthode simple et rapide mais ne gère pas les évènements javascript on...
 
@@ -201,6 +199,11 @@ YDKJAnimation.prototype.ready = function(f) {
 YDKJAnimation.prototype.click = function(f) {
     if (f === false) this.clickFunctions = [];
     else this.clickFunctions.push(f);
+};
+
+YDKJAnimation.prototype.frame = function(f) {
+    if (f === false) this.frameFunctions = [];
+    else this.frameFunctions.push(f);
 };
 
 YDKJAnimation.prototype.ended = function(f,msbeforeend) {
@@ -252,7 +255,11 @@ YDKJAnimation.prototype.play = function() {
             var val = thisAnim.addFrame(framenum);
             if (((val & 4) == 0) || ((val & 8) != 0)) thisAnim.nextScreen();
             if (((val & 32) != 0) && ((val & 8) != 0) && (thisAnim.animCallback)) thisAnim.animCallback();
-            jQuery('#debuglive').html('frame '+framenum+'/'+(thisAnim.frames.length-1)+' ; val:'+val+' ; nbimg: '+thisAnim.frames[framenum].nbimg);
+            if (thisAnim.html.debug)
+                thisAnim.html.debug.html('frame '+framenum+'/'+(thisAnim.frames.length-1)+' ; val:'+val+' ; nbimg: '+thisAnim.frames[framenum].nbimg);
+            for(var i = 0; i < thisAnim.frameFunctions.length; i++) {
+                thisAnim.frameFunctions[i].call(this, framenum);
+            }
             framenum++;
             if ((framenum > framestop) || ((val & 16) != 0)) {
                 if (thisAnim.loop) framenum = thisAnim.framestart; else {

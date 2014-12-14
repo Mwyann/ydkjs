@@ -1,10 +1,14 @@
 /********** YDKJ **********/
 
-function YDKJ() {
+function YDKJ(screen, debug) {
     var thisYDKJ = this;
+    this.screen = screen;
+    this.debug = debug;
+    this.screen.css('position','relative').css('width','640px').css('height','480px').css('overflow','hidden').css('background','#000');
 
     this.preloaded = 0;
     this.readyFunctions = [];
+    this.game = 0;
 
     // Chargement des scripts supplémentaires
     var totalscripts = 1;
@@ -46,14 +50,20 @@ YDKJ.prototype.ready = function(f) {
 
 YDKJ.prototype.start = function() {
     this.ready(function() {
-        var game = new YDKJGame(false);
-        game.start();
+        this.game = new YDKJGame({screen: this.screen, debug: this.debug});
+        this.game.start();
     });
 };
 
 YDKJ.prototype.demo = function() {
     this.ready(function() {
-        var game = new YDKJGame(true);
-        game.start();
+        this.game = new YDKJGame({screen: this.screen, debug: this.debug}, true);
+        this.game.start();
+    });
+};
+
+YDKJ.prototype.fullscreen = function(f) {
+    this.ready(function() {
+        this.game.fullscreen(f);
     });
 };
