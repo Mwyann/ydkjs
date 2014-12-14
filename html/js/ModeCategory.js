@@ -76,7 +76,7 @@ ModeCategory.prototype.start = function() {
                     break;
             }
             unbindKeyListener(listener);
-            jQuery('#screen').find('.QuestionTitle:not(#QuestionTitle' + (chosed - 1) + ')').remove();
+            thisMode.game.html.screen.find('.QuestionTitle:not(#QuestionTitle' + (chosed - 1) + ')').remove();
             thisMode.ChooseCategoryPlayer.free();
             thisMode.MusicChooseCategoryLoop.free();
             thisMode.LoopCategory1.free();
@@ -96,18 +96,16 @@ ModeCategory.prototype.start = function() {
         }
     };
 
-    this.SFXChoiceCategory.ended(function(){
+    this.SFXChoiceCategory.ended(100,function(){
+        thisMode.ChooseCategoryPlayer.play();
         thisMode.SFXChoiceCategory.reset(true);
-        thisMode.ChooseCategoryPlayer.delay(function(){
-            this.play();
-            listener = bindKeyListener(function(choice) {
-                var chosed = 0;
-                if (choice == 49) chosed = 1;
-                else if (choice == 50) chosed = 2;
-                else if (choice == 51) chosed = 3;
-                chooseCategory(chosed);
-            },10000); // 10 secondes de timeout
-        },100);
+        listener = bindKeyListener(function(choice) {
+            var chosed = 0;
+            if (choice == 49) chosed = 1;
+            else if (choice == 50) chosed = 2;
+            else if (choice == 51) chosed = 3;
+            chooseCategory(chosed);
+        },10000); // 10 secondes de timeout
     });
 
     this.ChooseCategoryText.ended(function(){
@@ -121,7 +119,7 @@ ModeCategory.prototype.start = function() {
             'color':'#000',
             'text-align':'center',
             'opacity':'0.15'
-        }).html(thisMode.game.players[thisMode.chooseplayer-1].name).appendTo('#screen');
+        }).html(thisMode.game.players[thisMode.chooseplayer-1].name).appendTo(thisMode.game.html.screen);
         jQuery('<div />').css({
             'position':'absolute',
             'width':'320px',
@@ -132,7 +130,7 @@ ModeCategory.prototype.start = function() {
             'color':'#000',
             'text-align':'center',
             'opacity':'0.40'
-        }).html(thisMode.game.players[thisMode.chooseplayer-1].name).appendTo('#screen');
+        }).html(thisMode.game.players[thisMode.chooseplayer-1].name).appendTo(thisMode.game.html.screen);
         jQuery('<div />').css({
             'position':'absolute',
             'width':'320px',
@@ -142,21 +140,19 @@ ModeCategory.prototype.start = function() {
             'font-size':'32px',
             'color':'#FFF',
             'text-align':'center'
-        }).html(thisMode.game.players[thisMode.chooseplayer-1].name).appendTo('#screen');
+        }).html(thisMode.game.players[thisMode.chooseplayer-1].name).appendTo(thisMode.game.html.screen);
     });
 
-    this.ShowCategories.ended(function(){
-        thisMode.SFXChoiceCategory.delay(function(){
-            this.play();
-            thisMode.ChooseCategoryText.play();
-            thisMode.LoopCategory1.play();
-            thisMode.LoopCategory2.play();
-            thisMode.LoopCategory3.play();
-            thisMode.LoopCategory1.click(function(){chooseCategory(1)});
-            thisMode.LoopCategory2.click(function(){chooseCategory(2)});
-            thisMode.LoopCategory3.click(function(){chooseCategory(3)});
-            thisMode.ShowCategories.free();
-        },300);
+    this.ShowCategories.ended(300,function(){
+        thisMode.SFXChoiceCategory.play();
+        thisMode.ChooseCategoryText.play();
+        thisMode.LoopCategory1.play();
+        thisMode.LoopCategory2.play();
+        thisMode.LoopCategory3.play();
+        thisMode.LoopCategory1.click(function(){chooseCategory(1)});
+        thisMode.LoopCategory2.click(function(){chooseCategory(2)});
+        thisMode.LoopCategory3.click(function(){chooseCategory(3)});
+        this.free();
     });
 
     var ShowCategoryNum = 0;
@@ -185,16 +181,14 @@ ModeCategory.prototype.start = function() {
                     'font-family':'JackRoman'
                 }).html(title).appendTo(div);
 
-                div.appendTo('#screen').animate({'width':'500px'},150);
+                div.appendTo(thisMode.game.html.screen).animate({'width':'500px'},150);
             })();
             ShowCategoryNum++;
         }
     });
 
-    this.ChooseCategory.ended(function(){
-        thisMode.ShowCategories.delay(function(){
-            this.play();
-        },300);
+    this.ChooseCategory.ended(300,function(){
+        thisMode.ShowCategories.play();
     });
 
     this.SFXShowCategoryScreen.ended(function(){
@@ -215,8 +209,8 @@ ModeCategory.prototype.start = function() {
                    {x:480,y:360},
                    {x:560,y:420},
                    {x:640,y:480}];
-        var blueDiv = jQuery('<div />').css('z-index','2000').addClass('markedAsRemoved');
-        blueDiv.appendTo(jQuery('#screen'));
+        var blueDiv = jQuery('<div />').css('z-index','2000');
+        blueDiv.appendTo(thisMode.game.html.screen);
         var interval = 0;
         var nextStep = function() {
             if (step < 9) {
@@ -231,11 +225,12 @@ ModeCategory.prototype.start = function() {
                 step++;
             } else {
                 clearInterval(interval);
-                jQuery('#screen').css('background-color','#00C').html('');
+                var bluehtml = jQuery('<div />').append(blueDiv.css('z-index','')).html();
+                thisMode.game.html.screen.html(bluehtml); // On ne garde que le grand cadre bleu.
                 thisMode.ChooseCategory.play();
             }
         };
-        interval=setInterval(nextStep,40);
+        interval = setInterval(nextStep,40);
     };
 
     blueZoom();

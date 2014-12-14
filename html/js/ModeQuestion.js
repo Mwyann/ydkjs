@@ -176,51 +176,47 @@ ModeQuestion.prototype.start = function() {
 
     this.EndQuestion.ended(function(){
         nextcategoryready(function(nextcategory) {
-            nextcategory.modeObj.MusicChooseCategoryStart.delay(function () {
+            nextcategory.modeObj.MusicChooseCategoryStart.delay(Math.max(500,2500-thisMode.EndQuestion.length()),function () {
                 nextcategory.start();
-            }, Math.max(500,2500-thisMode.EndQuestion.length()));
+            });
         });
     });
 
     this.SFXPlayerCorrect.ended(function(){
         thisMode.availPlayers[thisMode.currentPlayer].css({'color':'#0F0'});
         var thisSFX = this;
-        this.delay(function(){
+        this.delay(300,function(){
             nextcategoryready(function(nextcategory) {
                 nextcategory.modeObj.chooseplayer = thisMode.currentPlayer; // On donne le choix au joueur qui a bien répondu
                 nextcategory.modeObj.MusicChooseCategoryStart.play();
-                thisSFX.delay(function () {
+                thisSFX.delay(300,function () {
                     thisMode.EndQuestion.play();
-                }, 300);
+                });
             });
-        },300);
+        });
     });
 
-    this.SFXRevealAnswer.ended(function(){
-        this.delay(function(){
-            if (thisMode.options.correctanswerisdefault) {
-                thisMode.EndQuestion.delay(function () {
-                    this.play();
-                }, 200);
-            } else {
-                var answer;
-                if (thisMode.correctanswer == 1) answer = thisMode.Answer1;
-                if (thisMode.correctanswer == 2) answer = thisMode.Answer2;
-                if (thisMode.correctanswer == 3) answer = thisMode.Answer3;
-                if (thisMode.correctanswer == 4) answer = thisMode.Answer4;
-                answer.ended(function () {
-                    thisMode.EndQuestion.delay(function () {
-                        this.play();
-                    }, 200);
-                });
-                this.delay(function () {
-                    answer.play();
-                }, 200);
-            }
-            nextcategoryready(function(nextcategory) {
-                nextcategory.modeObj.MusicChooseCategoryStart.play();
+    this.SFXRevealAnswer.ended(300,function(){
+        if (thisMode.options.correctanswerisdefault) {
+            thisMode.EndQuestion.delay(200,function () {
+                this.play();
             });
-        },300);
+        } else {
+            var answer;
+            if (thisMode.correctanswer == 1) answer = thisMode.Answer1;
+            if (thisMode.correctanswer == 2) answer = thisMode.Answer2;
+            if (thisMode.correctanswer == 3) answer = thisMode.Answer3;
+            if (thisMode.correctanswer == 4) answer = thisMode.Answer4;
+            answer.ended(200,function () {
+                thisMode.EndQuestion.play();
+            });
+            this.delay(200,function () {
+                answer.play();
+            });
+        }
+        nextcategoryready(function(nextcategory) {
+            nextcategory.modeObj.MusicChooseCategoryStart.play();
+        });
     });
 
     var gameover = function() {
@@ -234,37 +230,35 @@ ModeQuestion.prototype.start = function() {
         if (nbAns == 1) revealAnswer = thisMode.DefaultRevealLastAnswer;
         else revealAnswer = thisMode.RevealAnswer;
 
-        revealAnswer.ended(function() {
-            this.delay(function(){
-                thisMode.NumberAnswer1.free();
-                thisMode.NumberAnswer2.free();
-                thisMode.NumberAnswer3.free();
-                thisMode.NumberAnswer4.free();
-                jQuery('#screen').find('.markedAsRemoved').remove();
-                for(var i=1;i<=4;i++) if (thisMode.availAnswers[i]) thisMode.availAnswers[i].remove();
+        revealAnswer.ended(300,function() {
+            thisMode.NumberAnswer1.free();
+            thisMode.NumberAnswer2.free();
+            thisMode.NumberAnswer3.free();
+            thisMode.NumberAnswer4.free();
+            thisMode.game.html.screen.find('.markedAsRemoved').remove();
+            for(var i=1;i<=4;i++) if (thisMode.availAnswers[i]) thisMode.availAnswers[i].remove();
 
-                var div = jQuery('<div />').css({ // Réponse
-                    'position':'absolute',
-                    'height':'120px',
-                    'line-height':'120px',
-                    'left':'50px',
-                    'top':'220px'
-                }).appendTo('#screen');
+            var div = jQuery('<div />').css({ // Réponse
+                'position':'absolute',
+                'height':'120px',
+                'line-height':'120px',
+                'left':'50px',
+                'top':'220px'
+            }).appendTo(thisMode.game.html.screen);
 
-                jQuery('<div />').css({
-                    'position':'relative',
-                    'vertical-align':'middle',
-                    'display':'inline-block',
-                    'font-family':'JackRoman',
-                    'color':'#FC0',
-                    'text-align':'center',
-                    'width':'540px',
-                    'font-size':'44px',
-                    'line-height':'44px'
-                }).html(getSTRfromID(thisMode.STR,parseInt(thisMode.correctanswer)+2)).appendTo(div);
+            jQuery('<div />').css({
+                'position':'relative',
+                'vertical-align':'middle',
+                'display':'inline-block',
+                'font-family':'JackRoman',
+                'color':'#FC0',
+                'text-align':'center',
+                'width':'540px',
+                'font-size':'44px',
+                'line-height':'44px'
+            }).html(getSTRfromID(thisMode.STR,parseInt(thisMode.correctanswer)+2)).appendTo(div);
 
-                thisMode.SFXRevealAnswer.play();
-            },300);
+            thisMode.SFXRevealAnswer.play();
         });
 
         revealAnswer.play();
@@ -275,23 +269,21 @@ ModeQuestion.prototype.start = function() {
         thisMode.timerTimeout = setTimeout(timerRunning,(thisMode.JingleTimer.length()-800)/10); // Proportionnel à la durée du jingle !
     };
 
-    this.SFXPlayerLose.ended(function(){
-        thisMode.JingleTimer.delay(function(){
-            thisMode.currentPlayer = 0;
-            thisMode.currentAns = 0;
+    this.SFXPlayerLose.ended(200,function(){
+        thisMode.currentPlayer = 0;
+        thisMode.currentAns = 0;
 
-            if (thisMode.LastPlayers)  {
-                // Remise du compteur à 10
-                thisMode.Timer.playTimer(10);
-                this.play();
-                thisMode.timerTimeout = setTimeout(timerRunning,500);
-                thisMode.LastPlayers.play();
-            } else gameover();
-        },200);
+        if (thisMode.LastPlayers)  {
+            // Remise du compteur à 10
+            thisMode.Timer.playTimer(10);
+            thisMode.JingleTimer.play();
+            thisMode.timerTimeout = setTimeout(timerRunning,500);
+            thisMode.LastPlayers.play();
+        } else gameover();
     });
 
     var wrong1 = function(){
-        thisMode.SFXPlayerLose.delay(function() {
+        thisMode.SFXPlayerLose.delay(100,function() {
             var currentPlayer = thisMode.currentPlayer;
             thisMode.game.players[currentPlayer-1].score = parseInt(thisMode.game.players[currentPlayer-1].score) - parseInt(thisMode.options.value);
             thisMode.availPlayers[currentPlayer].find('.score').html(thisMode.game.players[currentPlayer-1].score+' F');
@@ -335,23 +327,22 @@ ModeQuestion.prototype.start = function() {
             }
 
             if (thisMode.LastPlayers) {
-                PlayerWrong.ended(function () {
+                PlayerWrong.ended(-400, function () {
                     thisMode.Timer.playTimer(10);
-                }, 400);
+                });
             }
 
             PlayerAnswerLoop.free();
             PlayerWrong.play();
             this.play();
-        },100);
+        });
     };
 
     this.TimeOut1.ended(wrong1);
     this.TimeOut2.ended(wrong1);
     this.TimeOut3.ended(wrong1);
 
-    this.SFXTimeOut.ended(function(){
-        this.delay(function(){
+    this.SFXTimeOut.ended(500,function(){
             if (thisMode.currentPlayer == 1) {
                 thisMode.TimeOut1.play();
             } else if (thisMode.currentPlayer == 2) {
@@ -361,15 +352,14 @@ ModeQuestion.prototype.start = function() {
             } else {
                 gameover();
             }
-        },500);
     });
 
     this.JingleTimer.ended(function(){
         clearTimeout(thisMode.timerTimeout);
-        this.delay(function(){
+        this.delay(200,function(){
             thisMode.currentAns = -1;
             thisMode.SFXTimeOut.play();
-        },200);
+        });
     });
 
     var checkAnswer = function(){
@@ -379,22 +369,22 @@ ModeQuestion.prototype.start = function() {
                 case 1:
                     thisMode.LoopAnswer1.free();
                     thisMode.WrongAnswer1.play();
-                    thisMode.WrongAnswer1.delay(function(){wrong1()},400);
+                    thisMode.WrongAnswer1.delay(400,function(){wrong1()});
                     break;
                 case 2:
                     thisMode.LoopAnswer2.free();
                     thisMode.WrongAnswer2.play();
-                    thisMode.WrongAnswer2.delay(function(){wrong1()},400);
+                    thisMode.WrongAnswer2.delay(400,function(){wrong1()});
                     break;
                 case 3:
                     thisMode.LoopAnswer3.free();
                     thisMode.WrongAnswer3.play();
-                    thisMode.WrongAnswer3.delay(function(){wrong1()},400);
+                    thisMode.WrongAnswer3.delay(400,function(){wrong1()});
                     break;
                 case 4:
                     thisMode.LoopAnswer4.free();
                     thisMode.WrongAnswer4.play();
-                    thisMode.WrongAnswer4.delay(function(){wrong1()},400);
+                    thisMode.WrongAnswer4.delay(400,function(){wrong1()});
                     break;
             }
             animTransform(thisMode.availAnswers[thisMode.currentAns],1,0,1,1,0.18,thisMode.availAnswers[thisMode.currentAns].width(),0);
@@ -459,177 +449,169 @@ ModeQuestion.prototype.start = function() {
         thisMode.Player3AnswerLoop.play();
     });
 
-    this.SFXPlayerBuzz.ended(function(){
-        this.delay(function(){
-            // Remise du compteur à 10
-            thisMode.Timer.playTimer(10);
-            thisMode.JingleTimer.play();
-            thisMode.PrepareTimer.free();
-            thisMode.timerTimeout = setTimeout(timerRunning,800);
-            thisMode.currentPlayer = thisMode.buzzPlayer; // Le joueur peut enfin répondre
-            thisMode.buzzPlayer = 0;
+    this.SFXPlayerBuzz.ended(150,function(){
+        // Remise du compteur à 10
+        thisMode.Timer.playTimer(10);
+        thisMode.JingleTimer.play();
+        thisMode.PrepareTimer.free();
+        thisMode.timerTimeout = setTimeout(timerRunning,800);
+        thisMode.currentPlayer = thisMode.buzzPlayer; // Le joueur peut enfin répondre
+        thisMode.buzzPlayer = 0;
 
-            // Vas-y joueur X
-            if (thisMode.currentPlayer == 1) {
-                thisMode.PlayerBuzzedPlayer1.play();
-            }
-            if (thisMode.currentPlayer == 2) {
-                thisMode.PlayerBuzzedPlayer2.play();
-            }
-            if (thisMode.currentPlayer == 3) {
-                thisMode.PlayerBuzzedPlayer3.play();
-            }
-        },150);
+        // Vas-y joueur X
+        if (thisMode.currentPlayer == 1) {
+            thisMode.PlayerBuzzedPlayer1.play();
+        }
+        if (thisMode.currentPlayer == 2) {
+            thisMode.PlayerBuzzedPlayer2.play();
+        }
+        if (thisMode.currentPlayer == 3) {
+            thisMode.PlayerBuzzedPlayer3.play();
+        }
     });
 
     this.Answers.ended(function(){
         this.free();
-        thisMode.JingleReadQuestion.delay(function(){
+        thisMode.JingleReadQuestion.delay(100,function(){
             thisMode.JingleReadQuestion.free();
             thisMode.JingleTimer.play();
             thisMode.PrepareTimer.free();
             thisMode.timerTimeout = setTimeout(timerRunning,500);
-        },100);
+        });
     });
 
     this.Question.ended(function(){
         this.free();
-        thisMode.JingleReadQuestion.delay(function(){
+        thisMode.JingleReadQuestion.delay(100,function(){
             thisMode.Answers.play();
-        },100);
+        });
     });
 
-    this.SFXPlayerKey.ended(function(){
-        this.delay(function(){
-            this.reset();
-            switch(thisMode.currentAns){
-                case 1:
-                    thisMode.Answer1.play();
-                    break;
-                case 2:
-                    thisMode.Answer2.play();
-                    break;
-                case 3:
-                    thisMode.Answer3.play();
-                    break;
-                case 4:
-                    thisMode.Answer4.play();
-                    break;
-            }
-        },150);
+    this.SFXPlayerKey.ended(150,function(){
+        this.reset();
+        switch(thisMode.currentAns){
+            case 1:
+                thisMode.Answer1.play();
+                break;
+            case 2:
+                thisMode.Answer2.play();
+                break;
+            case 3:
+                thisMode.Answer3.play();
+                break;
+            case 4:
+                thisMode.Answer4.play();
+                break;
+        }
     });
 
-    this.PrepareTimer.ended(function(){
-        this.delay(function(){
-            thisMode.NumberAnswer1.play();
-            thisMode.NumberAnswer2.play();
-            thisMode.NumberAnswer3.play();
-            thisMode.NumberAnswer4.play();
-            thisMode.NumberAnswer1.click(function(){pressKey(49)});
-            thisMode.NumberAnswer2.click(function(){pressKey(50)});
-            thisMode.NumberAnswer3.click(function(){pressKey(51)});
-            thisMode.NumberAnswer4.click(function(){pressKey(52)});
+    this.PrepareTimer.ended(1000,function(){
+        thisMode.NumberAnswer1.play();
+        thisMode.NumberAnswer2.play();
+        thisMode.NumberAnswer3.play();
+        thisMode.NumberAnswer4.play();
+        thisMode.NumberAnswer1.click(function(){pressKey(49)});
+        thisMode.NumberAnswer2.click(function(){pressKey(50)});
+        thisMode.NumberAnswer3.click(function(){pressKey(51)});
+        thisMode.NumberAnswer4.click(function(){pressKey(52)});
 
-            var div1 = jQuery('<div />').css({ // Réponse 1
-                'position':'absolute',
-                'left':'138px',
-                'top':'223px',
-                'width':'500px'
-            }).appendTo('#screen');
-            var ans1 = jQuery('<div />').css({
-                'position':'absolute',
-                'left':'150px',
-                'font-size':'26px',
-                'color':'#FC0',
-                'font-family':'JackCondensed',
-                '-webkit-transform':'scale(1.0, 0.0)',
-                '-moz-transform':'scale(1.0, 0.0)',
-                '-ms-transform':'scale(1.0, 0.0)',
-                '-o-transform':'scale(1.0, 0.0)',
-                'transform':'scale(1.0, 0.0)'
-            }).html(getSTRfromID(thisMode.STR,3)).click(function(){pressKey(49)}).appendTo(div1);
-            animTransform(ans1,1,1,0,1,0.10,0,26);
+        var div1 = jQuery('<div />').css({ // Réponse 1
+            'position':'absolute',
+            'left':'138px',
+            'top':'223px',
+            'width':'500px'
+        }).appendTo(thisMode.game.html.screen);
+        var ans1 = jQuery('<div />').css({
+            'position':'absolute',
+            'left':'150px',
+            'font-size':'26px',
+            'color':'#FC0',
+            'font-family':'JackCondensed',
+            '-webkit-transform':'scale(1.0, 0.0)',
+            '-moz-transform':'scale(1.0, 0.0)',
+            '-ms-transform':'scale(1.0, 0.0)',
+            '-o-transform':'scale(1.0, 0.0)',
+            'transform':'scale(1.0, 0.0)'
+        }).html(getSTRfromID(thisMode.STR,3)).click(function(){pressKey(49)}).appendTo(div1);
+        animTransform(ans1,1,1,0,1,0.10,0,26);
 
-            var div2 = jQuery('<div />').css({ // Réponse 2
-                'position':'absolute',
-                'left':'138px',
-                'top':'255px',
-                'width':'500px'
-            }).appendTo('#screen');
-            var ans2 = jQuery('<div />').css({
-                'position':'absolute',
-                'left':'150px',
-                'font-size':'26px',
-                'color':'#FC0',
-                'font-family':'JackCondensed',
-                '-webkit-transform':'scale(1.0, 0.0)',
-                '-moz-transform':'scale(1.0, 0.0)',
-                '-ms-transform':'scale(1.0, 0.0)',
-                '-o-transform':'scale(1.0, 0.0)',
-                'transform':'scale(1.0, 0.0)'
-            }).html(getSTRfromID(thisMode.STR,4)).click(function(){pressKey(50)}).appendTo(div2);
-            animTransform(ans2,1,1,0,1,0.10,0,26);
+        var div2 = jQuery('<div />').css({ // Réponse 2
+            'position':'absolute',
+            'left':'138px',
+            'top':'255px',
+            'width':'500px'
+        }).appendTo(thisMode.game.html.screen);
+        var ans2 = jQuery('<div />').css({
+            'position':'absolute',
+            'left':'150px',
+            'font-size':'26px',
+            'color':'#FC0',
+            'font-family':'JackCondensed',
+            '-webkit-transform':'scale(1.0, 0.0)',
+            '-moz-transform':'scale(1.0, 0.0)',
+            '-ms-transform':'scale(1.0, 0.0)',
+            '-o-transform':'scale(1.0, 0.0)',
+            'transform':'scale(1.0, 0.0)'
+        }).html(getSTRfromID(thisMode.STR,4)).click(function(){pressKey(50)}).appendTo(div2);
+        animTransform(ans2,1,1,0,1,0.10,0,26);
 
-            var div3 = jQuery('<div />').css({ // Réponse 3
-                'position':'absolute',
-                'left':'138px',
-                'top':'286px',
-                'width':'500px'
-            }).appendTo('#screen');
-            var ans3 = jQuery('<div />').css({
-                'position':'absolute',
-                'left':'150px',
-                'font-size':'26px',
-                'color':'#FC0',
-                'font-family':'JackCondensed',
-                '-webkit-transform':'scale(1.0, 0.0)',
-                '-moz-transform':'scale(1.0, 0.0)',
-                '-ms-transform':'scale(1.0, 0.0)',
-                '-o-transform':'scale(1.0, 0.0)',
-                'transform':'scale(1.0, 0.0)'
-            }).html(getSTRfromID(thisMode.STR,5)).click(function(){pressKey(51)}).appendTo(div3);
-            animTransform(ans3,1,1,0,1,0.10,0,26);
+        var div3 = jQuery('<div />').css({ // Réponse 3
+            'position':'absolute',
+            'left':'138px',
+            'top':'286px',
+            'width':'500px'
+        }).appendTo(thisMode.game.html.screen);
+        var ans3 = jQuery('<div />').css({
+            'position':'absolute',
+            'left':'150px',
+            'font-size':'26px',
+            'color':'#FC0',
+            'font-family':'JackCondensed',
+            '-webkit-transform':'scale(1.0, 0.0)',
+            '-moz-transform':'scale(1.0, 0.0)',
+            '-ms-transform':'scale(1.0, 0.0)',
+            '-o-transform':'scale(1.0, 0.0)',
+            'transform':'scale(1.0, 0.0)'
+        }).html(getSTRfromID(thisMode.STR,5)).click(function(){pressKey(51)}).appendTo(div3);
+        animTransform(ans3,1,1,0,1,0.10,0,26);
 
-            var div4 = jQuery('<div />').css({ // Réponse 4
-                'position':'absolute',
-                'left':'138px',
-                'top':'318px',
-                'width':'500px'
-            }).appendTo('#screen');
-            var ans4 = jQuery('<div />').css({
-                'position':'absolute',
-                'left':'150px',
-                'font-size':'26px',
-                'color':'#FC0',
-                'font-family':'JackCondensed',
-                '-webkit-transform':'scale(1.0, 0.0)',
-                '-moz-transform':'scale(1.0, 0.0)',
-                '-ms-transform':'scale(1.0, 0.0)',
-                '-o-transform':'scale(1.0, 0.0)',
-                'transform':'scale(1.0, 0.0)'
-            }).html(getSTRfromID(thisMode.STR,6)).click(function(){pressKey(52)}).appendTo(div4);
-            animTransform(ans4,1,1,0,1,0.10,0,26);
+        var div4 = jQuery('<div />').css({ // Réponse 4
+            'position':'absolute',
+            'left':'138px',
+            'top':'318px',
+            'width':'500px'
+        }).appendTo(thisMode.game.html.screen);
+        var ans4 = jQuery('<div />').css({
+            'position':'absolute',
+            'left':'150px',
+            'font-size':'26px',
+            'color':'#FC0',
+            'font-family':'JackCondensed',
+            '-webkit-transform':'scale(1.0, 0.0)',
+            '-moz-transform':'scale(1.0, 0.0)',
+            '-ms-transform':'scale(1.0, 0.0)',
+            '-o-transform':'scale(1.0, 0.0)',
+            'transform':'scale(1.0, 0.0)'
+        }).html(getSTRfromID(thisMode.STR,6)).click(function(){pressKey(52)}).appendTo(div4);
+        animTransform(ans4,1,1,0,1,0.10,0,26);
 
-            thisMode.availAnswers = [];
-            thisMode.availAnswers[1] = ans1;
-            thisMode.availAnswers[2] = ans2;
-            thisMode.availAnswers[3] = ans3;
-            thisMode.availAnswers[4] = ans4;
+        thisMode.availAnswers = [];
+        thisMode.availAnswers[1] = ans1;
+        thisMode.availAnswers[2] = ans2;
+        thisMode.availAnswers[3] = ans3;
+        thisMode.availAnswers[4] = ans4;
 
-            thisMode.buzzPlayer = 0;
-            thisMode.currentPlayer = 0;
-            thisMode.currentAns = 0;
-            thisMode.listener = bindKeyListener(function(choice) {
-                pressKey(choice);
-            });
-        },1000);
+        thisMode.buzzPlayer = 0;
+        thisMode.currentPlayer = 0;
+        thisMode.currentAns = 0;
+        thisMode.listener = bindKeyListener(function(choice) {
+            pressKey(choice);
+        });
     });
 
-    this.SFXShowQuestion.ended(function(){
-        this.delay(function(){
-            thisMode.TimerComesIn.free();
-            thisMode.PrepareTimer.play();
-        },500);
+    this.SFXShowQuestion.ended(500,function(){
+        thisMode.TimerComesIn.free();
+        thisMode.PrepareTimer.play();
     });
 
     this.TimerComesIn.ended(function(){
@@ -658,7 +640,7 @@ ModeQuestion.prototype.start = function() {
             'transform':'scale(0.0,1.0)'
         }).html(getSTRfromID(thisMode.STR,1)).appendTo(div);
 
-        div.appendTo('#screen');
+        div.appendTo(thisMode.game.html.screen);
 
         animTransform(titlediv,0,1,1,1,0.15,300,0,function(){
             thisMode.PreQuestion.ended(function(){
@@ -687,13 +669,13 @@ ModeQuestion.prototype.start = function() {
 
                 textdiv.appendTo(div);
 
-                div.appendTo('#screen').animate({'left':'40px'},300,function(){textdiv.css({'font-style':'normal'})});
+                div.appendTo(thisMode.game.html.screen).animate({'left':'40px'},300,function(){textdiv.css({'font-style':'normal'})});
 
                 thisMode.SFXShowQuestion.play();
                 thisMode.JingleReadQuestion.play();
-                thisMode.JingleReadQuestion.delay(function() {
+                thisMode.JingleReadQuestion.delay(300,function() {
                     thisMode.Question.play();
-                },300);
+                });
             });
 
             thisMode.availPlayers = [];
@@ -711,18 +693,18 @@ ModeQuestion.prototype.start = function() {
                 thisMode.availPlayers[3].click(function(){pressKey(thisMode.game.players[2].keycode)});
             });
 
-            thisMode.ShowPlayer1Key.delay(function(){
+            thisMode.ShowPlayer1Key.delay(200,function(){
                 this.play();
                 this.click(function(){pressKey(thisMode.game.players[0].keycode)});
-                if (thisMode.game.players.length >= 2) thisMode.ShowPlayer2Key.delay(function(){
+                if (thisMode.game.players.length >= 2) thisMode.ShowPlayer2Key.delay(100,function(){
                     this.play();
                     this.click(function(){pressKey(thisMode.game.players[1].keycode)});
-                    if (thisMode.game.players.length == 3) thisMode.ShowPlayer3Key.delay(function(){
+                    if (thisMode.game.players.length == 3) thisMode.ShowPlayer3Key.delay(100,function(){
                         this.play();
                         this.click(function(){pressKey(thisMode.game.players[2].keycode)});
-                    },100);
-                },100);
-            },200);
+                    });
+                });
+            });
         });
 
         var valuediv = jQuery('<div />').css({ // Valeur de la question
@@ -733,29 +715,29 @@ ModeQuestion.prototype.start = function() {
             'font-family':'JackRoman',
             'right':'-80px',
             'top':'22px'
-        }).html(thisMode.options.value+' F').appendTo('#screen').animate({'right':'20px'}, 500).animate({'right':'15px'}, 200);
+        }).html(thisMode.options.value+' F').appendTo(thisMode.game.html.screen).animate({'right':'20px'}, 500).animate({'right':'15px'}, 200);
     });
 
     this.VoiceAnnounceValue.ended(function(){
         this.free();
         thisMode.AnnounceValue.free();
-        jQuery('#screen').find('#QuestionTitle').css('font-style','italic').delay(100).animate({'left':'-550px'},500,function(){
-            jQuery('#screen').find('#QuestionTitle').remove();
-            thisMode.TimerComesIn.delay(function(){
+        thisMode.game.html.screen.find('#QuestionTitle').css('font-style','italic').delay(100).animate({'left':'-550px'},500,function(){
+            thisMode.game.html.screen.find('#QuestionTitle').remove();
+            thisMode.TimerComesIn.delay(300,function(){
                 this.play();
-            },300);
+            });
         });
         thisMode.HideValue.play();
-        thisMode.VoiceAnnounceValue.delay(function(){
+        thisMode.VoiceAnnounceValue.delay(150,function(){
             thisMode.PreQuestion.play();
-        },150);
+        });
     });
 
     this.QuestionTitle.ended(function(){
         this.free();
-        thisMode.VoiceAnnounceValue.delay(function() {
+        thisMode.VoiceAnnounceValue.delay(100,function() {
             this.play();
-        },100);
+        });
     });
 
     this.AnnounceCategory.ended(function(){
@@ -776,7 +758,7 @@ ModeQuestion.prototype.start = function() {
             'left':'95px',
             'top':Math.round(125+textsize*0.05)+'px',
             'opacity':'0'
-        }).html(getSTRfromID(thisMode.STR,1)).appendTo('#screen').animate({
+        }).html(getSTRfromID(thisMode.STR,1)).appendTo(thisMode.game.html.screen).animate({
                 'width':'450px',
                 'margin-left':'0px',
                 'margin-right':'0px',
@@ -786,24 +768,24 @@ ModeQuestion.prototype.start = function() {
                 'opacity':'1',
                 'display':'none'}
             ,250,function(){
-                thisMode.AnnounceValue.delay(function(){
+                thisMode.AnnounceValue.delay(150,function(){
                     this.play();
-                },150);
+                });
             });
-        thisMode.AnnounceCategory.delay(function(){
+        thisMode.AnnounceCategory.delay(100,function(){
             thisMode.QuestionTitle.play();
-        },100);
+        });
     });
 
     this.JingleQuestion.ended(function(){
-        thisMode.JingleQuestion.free();
-        thisMode.BGQuestion.delay(function(){
+        this.free();
+        thisMode.BGQuestion.delay(100,function(){
             this.play();
             thisMode.AnnounceCategory.play();
-        },100);
+        });
     });
 
-    jQuery('#screen').css('background-color','#000').html(''); // Je vide manuellement l'écran.
+    thisMode.game.html.screen.html(''); // Je vide manuellement l'écran.
 
     this.JingleQuestion.play();
 

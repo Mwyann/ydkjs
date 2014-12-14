@@ -37,100 +37,92 @@ ModeDisOrDat.prototype.start = function() {
     if (this.chooseplayer == 2) this.ChoicePlayer = this.ChoicePlayer2on3;
     if (this.chooseplayer == 3) this.ChoicePlayer = this.ChoicePlayer3on3;
 
-    this.QuestionIntro2.ended(function() {
-        this.delay(function(){
-            nextcategory.modeObj.MusicChooseCategoryLoop.free();
-            nextcategory.modeObj.MusicChooseCategoryLoop = thisMode.MusicLoopRules1;
-            thisMode.MusicLoopRules1 = false; // Pour ne pas être détruite au passage à la catégorie suivante
-            nextcategory.start();
-        },500);
+    this.QuestionIntro2.ended(500,function() {
+        nextcategory.modeObj.MusicChooseCategoryLoop.free();
+        nextcategory.modeObj.MusicChooseCategoryLoop = thisMode.MusicLoopRules1;
+        thisMode.MusicLoopRules1 = false; // Pour ne pas être détruite au passage à la catégorie suivante
+        nextcategory.start();
     });
 
-    this.QuestionIntro1.ended(function() {
-        thisMode.Intro.delay(function() {
-            thisMode.QuestionIntro2.play();
-            thisMode.QuestionIntro2.delay(function(){
-                thisMode.ShowQuestion.play();
-                var div = jQuery('<div />').css({ // Texte de la question
+    this.QuestionIntro1.ended(100,function() {
+        thisMode.QuestionIntro2.play();
+        thisMode.QuestionIntro2.delay(100,function(){
+            thisMode.ShowQuestion.play();
+            var div = jQuery('<div />').css({ // Texte de la question
+                'position':'absolute',
+                'height':'150px',
+                'line-height':'150px',
+                'left':'-560px',
+                'top':'70px'
+            });
+
+            var textdiv = jQuery('<div />').css({
+                'position':'relative',
+                'width':'560px',
+                'vertical-align':'top',
+                'display':'inline-block',
+                'font-size':'29px',
+                'line-height':'34px',
+                'color':'#FF0',
+                'font-family':'JackRoman',
+                'font-style':'italic',
+                'text-align':'center'
+            }).html(getSTRfromID(thisMode.STR,2));
+
+            textdiv.appendTo(div);
+
+            div.appendTo(thisMode.game.html.screen).animate({'left':'40px'},300,function(){textdiv.css({'font-style':'normal'})});
+        });
+    });
+
+    this.QuestionTitle.ended(200,function() {
+        thisMode.QuestionIntro1.play();
+        thisMode.TimerComesIn.delay(200,function(){
+            this.ended(-500,function(){
+                var div = jQuery('<div />').css({ // Titre de la catégorie
                     'position':'absolute',
-                    'height':'150px',
-                    'line-height':'150px',
-                    'left':'-560px',
-                    'top':'70px'
+                    'height':'70px',
+                    'line-height':'70px',
+                    'left':'70px',
+                    'top':'0'
                 });
 
-                var textdiv = jQuery('<div />').css({
+                var titlediv = jQuery('<div />').css({
                     'position':'relative',
-                    'width':'560px',
-                    'vertical-align':'top',
+                    'left':'-150px',
+                    'width':'300px',
+                    'vertical-align':'middle',
                     'display':'inline-block',
-                    'font-size':'29px',
-                    'line-height':'34px',
-                    'color':'#FF0',
+                    'font-size':'20px',
+                    'line-height':'24px',
+                    'color':'#33F',
                     'font-family':'JackRoman',
-                    'font-style':'italic',
-                    'text-align':'center'
-                }).html(getSTRfromID(thisMode.STR,2));
+                    '-webkit-transform':'scale(0.0, 1.0)',
+                    '-moz-transform':'scale(0.0, 1.0)',
+                    '-ms-transform':'scale(0.0, 1.0)',
+                    '-o-transform':'scale(0.0, 1.0)',
+                    'transform':'scale(0.0,1.0)'
+                }).html(getSTRfromID(thisMode.STR,1)).appendTo(div);
 
-                textdiv.appendTo(div);
+                div.appendTo(thisMode.game.html.screen);
 
-                div.appendTo('#screen').animate({'left':'40px'},300,function(){textdiv.css({'font-style':'normal'})});
-            },100);
-        },100);
-    });
-
-    this.QuestionTitle.ended(function() {
-        thisMode.Intro.delay(function() {
-            thisMode.QuestionIntro1.play();
-            thisMode.TimerComesIn.delay(function(){
-                this.ended(function(){
-                    var div = jQuery('<div />').css({ // Titre de la catégorie
-                        'position':'absolute',
-                        'height':'70px',
-                        'line-height':'70px',
-                        'left':'70px',
-                        'top':'0'
-                    });
-
-                    var titlediv = jQuery('<div />').css({
-                        'position':'relative',
-                        'left':'-150px',
-                        'width':'300px',
-                        'vertical-align':'middle',
-                        'display':'inline-block',
-                        'font-size':'20px',
-                        'line-height':'24px',
-                        'color':'#33F',
-                        'font-family':'JackRoman',
-                        '-webkit-transform':'scale(0.0, 1.0)',
-                        '-moz-transform':'scale(0.0, 1.0)',
-                        '-ms-transform':'scale(0.0, 1.0)',
-                        '-o-transform':'scale(0.0, 1.0)',
-                        'transform':'scale(0.0,1.0)'
-                    }).html(getSTRfromID(thisMode.STR,1)).appendTo(div);
-
-                    div.appendTo('#screen');
-
-                    animTransform(titlediv,0,1,1,1,0.15,300,0);
-                },500);
-                this.play();
-            },200);
-        },200);
-    });
-
-    this.QuestionTitle.ended(function() {
-        jQuery('#screen').find('#QuestionTitle').css('font-style','italic').delay(100).animate({'left':'-500px'},500,function(){
-            jQuery('#screen').find('#QuestionTitle').remove();
+                animTransform(titlediv,0,1,1,1,0.15,300,0);
+            });
+            this.play();
         });
-    },400);
-
-    this.AnnounceCategory.ended(function() {
-        thisMode.AnnounceCategory.delay(function(){
-            thisMode.QuestionTitle.play();
-        },100);
     });
 
-    this.AnnounceCategory.ended(function() {
+    this.QuestionTitle.ended(-400,function() {
+        thisMode.game.html.screen.find('#QuestionTitle').css('font-style','italic').delay(100).animate({'left':'-500px'},500,function(){
+            thisMode.game.html.screen.find('#QuestionTitle').remove();
+        });
+    });
+
+    this.AnnounceCategory.ended(100,function() {
+        thisMode.QuestionTitle.play();
+    });
+
+    this.AnnounceCategory.ended(-400,function() {
         var textsize = 50;
         if (getSTRfromID(thisMode.STR,1).length < 35) textsize = 70;
         if (getSTRfromID(thisMode.STR,1).length < 15) textsize = 120;
@@ -146,31 +138,30 @@ ModeDisOrDat.prototype.start = function() {
             'left':'95px',
             'top':Math.round(155+textsize*0.05)+'px', // Plus bas que les catégories des questions
             'opacity':'0'
-        }).html(getSTRfromID(thisMode.STR,1)).appendTo('#screen').animate({
+        }).html(getSTRfromID(thisMode.STR,1)).appendTo(thisMode.game.html.screen).animate({
                 'top':'155px', // Plus bas que les catégories des questions
                 'font-size':textsize+'px',
                 'line-height':Math.round(textsize*1.10)+'px',
                 'opacity':'1',
                 'display':'none'}
             ,250);
-    },400);
-
-    this.Intro.ended(function() {
-        this.free();
-        thisMode.IntroStill.play();
-        thisMode.MusicLoopRules1.play();
-        thisMode.AnnounceCategory.delay(function(){
-            this.play();
-        },500);
     });
 
-    this.ChoicePlayer.delay(function(){
-        this.play();
-        thisMode.Intro.delay(function(){
-            jQuery('#screen').css('background-color','#000').html(''); // Je vide manuellement l'écran.
+    this.Intro.ended(function() {
+        thisMode.IntroStill.play();
+        thisMode.MusicLoopRules1.play();
+        thisMode.AnnounceCategory.delay(500,function(){
             this.play();
-        },2500);
-    },500);
+        });
+    });
+
+    this.ChoicePlayer.delay(500,function(){
+        this.play();
+        thisMode.Intro.delay(2500,function(){
+            thisMode.game.html.screen.html(''); // Je vide manuellement l'écran.
+            this.play();
+        });
+    });
 
     nextcategory = new YDKJMode(this.game, 'Category', {category:1,questionnumber:this.options.questionnumber+1});
     nextcategory.modeObj.chooseplayer = this.chooseplayer;

@@ -37,13 +37,23 @@ function YDKJGame(html, demomode) {
         var autozoom = function() {
             var zoom = Math.min(jQuery(window).width()/640,jQuery(window).height()/480);
             var centerup = Math.max(0,Math.round((jQuery(window).height()-(zoom*480))/4));
-            body.css('padding-top',centerup+'px').css('overflow','hidden').css('zoom',zoom.toFixed(2)).css('zoom',(zoom*100).toFixed(0)+'%').css('-moz-transform-origin','50% 0').css('-moz-transform','scale('+zoom.toFixed(2)+', '+zoom.toFixed(2)+')');
+            body.css({
+                'padding-top': centerup+'px',
+                'overflow': 'hidden',
+                'zoom': zoom.toFixed(2),
+                '-moz-transform-origin': '50% 0',
+                '-moz-transform': 'scale('+zoom.toFixed(2)+', '+zoom.toFixed(2)+')'}).css('zoom',(zoom*100).toFixed(0)+'%');
         };
         onfullscreenoff = f;
         oldcssbody = body.attr('style');
         oldcssscreen = thisGame.html.screen.attr('style');
-        thisGame.html.screen.css('position','absolute').css('top','0').css('left','0').css('right','0').css('margin','0 auto');
-
+        thisGame.html.screen.css({
+            'position': 'absolute',
+            'top': '0',
+            'left': '0',
+            'right': '0',
+            'margin': '0 auto'});
+        
         onresize = autozoom;
         autozoom();
     }
@@ -80,7 +90,7 @@ YDKJGame.prototype.displayPlayer = function(playernumber) {
         'font-family':'JackRoman',
         'font-size':'20px',
         'line-height':'30px'
-    }).appendTo('#screen');
+    }).appendTo(this.html.screen);
 
     jQuery('<div />').addClass('name').css({'position':'relative'}).html(this.players[playernumber-1].name).appendTo(playerdiv);
     jQuery('<div />').addClass('score').css({'position':'relative'}).html(this.players[playernumber-1].score+' F').appendTo(playerdiv);

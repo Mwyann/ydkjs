@@ -186,8 +186,9 @@ function YDKJAnimation(resource) {
     };
 
     this.triggerEnd = function(idx) {
-        for(var i = 0; i < this.endedFunctions[idx].functions.length; i++) {
-            this.endedFunctions[idx].functions[i].call(this);
+        var functions = this.endedFunctions[idx].functions; // On les sauvegarde au cas où qu'elles soient écrasées par l'une des fonctions...
+        for(var i = 0; i < functions.length; i++) {
+            functions[i].call(this);
         }
     }
 }
@@ -206,7 +207,13 @@ YDKJAnimation.prototype.frame = function(f) {
     else this.frameFunctions.push(f);
 };
 
-YDKJAnimation.prototype.ended = function(f,msbeforeend) {
+YDKJAnimation.prototype.ended = function(a,b) { // a = délai OU fonction OU false, b = fonction si a == délai.
+    var f = a;
+    var msbeforeend = 0;
+    if (b !== undefined) {
+        f = b;
+        msbeforeend = a;
+    }
     if (f === false) {
         this.resetEndedFunctions();
         return true;
@@ -224,9 +231,9 @@ YDKJAnimation.prototype.ended = function(f,msbeforeend) {
     } else f.call(this);
 };
 
-YDKJAnimation.prototype.delay = function(f,delay) {
+YDKJAnimation.prototype.delay = function(delay,f) {
     var thisAnim = this;
-    if (delay) setTimeout(function(){f.call(thisAnim)},delay); else f.call(this);
+    if (delay > 0) setTimeout(function(){f.call(thisAnim)},delay); else f.call(this);
 };
 
 YDKJAnimation.prototype.play = function() {
@@ -307,7 +314,7 @@ YDKJAnimation.prototype.play = function() {
         var lth = this.length();
         for(var i = 0; i < this.endedFunctions.length; i++) {
             (function(i){
-                thisAnim.endedFunctions[i].endTimeout = setTimeout(function(){thisAnim.triggerEnd(i);},Math.max(0,lth-thisAnim.endedFunctions[i].ms));
+                thisAnim.endedFunctions[i].endTimeout = setTimeout(function(){thisAnim.triggerEnd(i);},Math.max(0,parseInt(lth)+thisAnim.endedFunctions[i].ms));
             })(i);
         }
     }

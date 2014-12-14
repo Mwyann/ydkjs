@@ -17,6 +17,7 @@ if (file_exists($file)) {
     $offset = 0;
     $length = $filesize;
 
+    // Obligé de gérer le Range pour Chrome. Même en répondant en HTTP/1.0 (qui n'accepte pas le Range), il insiste.
     if (isset($_SERVER['HTTP_RANGE'])) {
         // if the HTTP_RANGE header is set we're dealing with partial content
         $partialContent = true;

@@ -16,45 +16,35 @@ ModeIntro.prototype.preload = function(resources) {
 ModeIntro.prototype.start = function() {
     var thisMode = this;
 
-    this.IntroJackDemo.ended(function(){
-        this.free();
-        thisMode.IntroJackDemo.delay(function(){
-            thisMode.MusicJack.free();
-            thisMode.IntroJack.free();
-            if (this.skiplistener) unbindKeyListener(this.skiplistener);
-            thisMode.categoryready(function(category) {
-                category.start(); // On passe au choix de la catégorie
-            });
-        },300);
+    this.IntroJackDemo.ended(300,function(){
+        thisMode.MusicJack.free();
+        thisMode.IntroJack.free();
+        if (this.skiplistener) unbindKeyListener(this.skiplistener);
+        thisMode.categoryready(function(category) {
+            category.start(); // On passe au choix de la catégorie
+        });
     });
 
-    this.IntroJackTitle.ended(function(){
-        this.free();
-        thisMode.IntroJackDemo.delay(function(){
-            this.play();
-            thisMode.categoryready = thisMode.game.api.gamemode(thisMode); // Preload des catégories pendant le speech
-            this.skiplistener = bindKeyListener(function(choice) {
-                if (choice == 32) {
-                    unbindKeyListener(thisMode.skiplistener);
-                    thisMode.categoryready(function(category) {
-                        category.start(); // Barre espace = on passe au choix de la catégorie
-                    });
-                }
-            });
-        },300);
+    this.IntroJackTitle.ended(300,function(){
+        thisMode.IntroJackDemo.play();
+        thisMode.categoryready = thisMode.game.api.gamemode(thisMode); // Preload des catégories pendant le speech
+        thisMode.IntroJackDemo.skiplistener = bindKeyListener(function(choice) {
+            if (choice == 32) {
+                unbindKeyListener(thisMode.skiplistener);
+                thisMode.categoryready(function(category) {
+                    category.start(); // Barre espace = on passe au choix de la catégorie
+                });
+            }
+        });
     });
 
-    this.SFXJackTitle.ended(function(){
-        this.free();
-        thisMode.IntroJackTitle.delay(function(){
-            thisMode.MusicJack.volume(50); // On baisse le volume de la musique de fond
-            this.play();
-        },300);
+    this.SFXJackTitle.ended(300,function(){
+        thisMode.MusicJack.volume(50); // On baisse le volume de la musique de fond
+        thisMode.IntroJackTitle.play();
     });
 
     this.SFXBang.ended(function(){
-        this.free();
-        thisMode.SFXJackTitle.delay(function(){this.play()},300);
+        thisMode.SFXJackTitle.delay(300,function(){this.play()});
     });
 
     var playerNamesPos = 0;
@@ -74,7 +64,7 @@ ModeIntro.prototype.start = function() {
         this.free();
         thisMode.IntroJack.play();
         thisMode.MusicJack.play();
-        thisMode.SFXBang.delay(function(){this.play()},300);
+        thisMode.SFXBang.delay(300,function(){this.play()});
     });
 
     this.IntroPreTitle.play();
