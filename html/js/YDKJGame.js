@@ -53,7 +53,7 @@ function YDKJGame(html, demomode) {
             'left': '0',
             'right': '0',
             'margin': '0 auto'});
-        
+
         onresize = autozoom;
         autozoom();
     }
