@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <title>You Don't Know Jack® DEMO FR</title>
 <link href="css/ydkj.css" rel="stylesheet"/>
-<script src="js/jquery-1.11.0.min.js" type="text/javascript"></script>
+<script src="js/jquery-1.11.1.min.js" type="text/javascript"></script>
 <script src="js/YDKJ.js?ver=2" type="text/javascript"></script>
 
 <script type="text/javascript">

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <title>Test YDKJ</title>
-<script src="js/jquery-1.11.0.min.js" type="text/javascript"></script>
+<script src="js/jquery-1.11.1.min.js" type="text/javascript"></script>
 <script type="text/javascript">
 
 // 'fireOne' argument is optional, if set, will invoke the callback once for every
@@ -68,7 +68,7 @@ function YDKJAnimation(urlGif,urlJS,urlAudio,framestart,loop) {
   t.append('<source />').children().last().attr('type','audio/mpeg').attr('src',this.urlAudio+'.mp3');
 
   var thisAnim = this;
-  
+
   $.ajax({
     url: thisAnim.urlJS, // le nom du fichier indiqué dans le formulaire
     type: 'get', // la méthode indiquée dans le formulaire (get ou post)
@@ -195,7 +195,7 @@ YDKJAnimation.prototype.playAnim = function() {
 }
 
 jQuery(document).ready(function() {
-  
+
   // Idée : faire un affichage de la liste des frames, avec possibilité de cliquer desssus pour les afficher (sans animation auto) et défilement avec droite/gauche (en <select> plutôt ?)
 
   /*
