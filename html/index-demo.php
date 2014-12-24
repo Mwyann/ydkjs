@@ -19,7 +19,7 @@ function startgame() {
     screen.show();
     jQuery('#headerbuttons').show();
 
-    var game = new YDKJ(screen,false,true);
+    var game = new YDKJ(screen);
     jQuery('#fullscreen').click(function() {
         jQuery('#headerbuttons').hide();
         game.fullscreen(function() {
