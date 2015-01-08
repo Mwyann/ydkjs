@@ -113,8 +113,8 @@ YDKJAPI.prototype.initdemo = function() {
 
             // Précharger les questions avec l'interface de catégorie
             if ((mode.options.questionnumber % 2) == 1) { // Questions normales
-                questions = shuffle(['ABB', 'ABE', 'AJM']);
-                questiontitles = {'ABB': 'Keuf you !', 'ABE': 'Ma meilleure boum', 'AJM': 'C’est dur vraiment plus longtemps'};
+                questions = shuffle(['ABB', 'ABE', 'ACB', 'AJM']);
+                questiontitles = {'ABB': 'Keuf you !', 'ABE': 'Ma meilleure boum', 'ACB': 'Se noyer dans un verre d’eau', 'AJM': 'C’est dur vraiment plus longtemps'};
                 reslist['questiontitles'] = [];
 
                 for (i=1; i<=3; i++) {
@@ -225,6 +225,10 @@ YDKJAPI.prototype.initdemo = function() {
                 mode.options.correctanswer = 3;
                 mode.options.value = 2000;
             }
+            else if (mode.options.id == 'ACB') {
+                mode.options.correctanswer = 3;
+                mode.options.value = 2000;
+            }
             else if (mode.options.id == 'AJM') {
                 mode.options.correctanswer = 4;
                 mode.options.value = 2000;
@@ -238,7 +242,8 @@ YDKJAPI.prototype.initdemo = function() {
             reslist['Question/HideValue'] = demores('Question/HideValue'+mode.options.value+'F');
 
             reslist['Question/QuestionTitle'] = {urlAudio: res+'/snd/1'};
-            reslist['Question/PreQuestion'] = {urlAudio: res+'/snd/2'};
+            if (mode.options.id != 'ACB') reslist['Question/PreQuestion'] = {urlAudio: res+'/snd/2'};
+            else reslist['Question/PreQuestion'] = {urlAudio: 'res/5QDemo/Mc15/1'};
             reslist['Question/Question'] = {urlAudio: res+'/snd/3'};
             reslist['Question/Answers'] = {urlAudio: res+'/snd/5'};
             reslist['Question/EndQuestion'] = {urlAudio: res+'/snd/6'};

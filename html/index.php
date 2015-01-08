@@ -187,7 +187,7 @@ if (!isset($_SESSION['id'])) {
         ?>
         <div style="text-align:center;font-size:26px">Alpha-test disponible (questions QCM du jeu original) !<br/>Inscription : envoyez un mail à <a href="mailto:alpha@ydkj.fr">alpha@ydkj.fr</a></div>
         <div style="text-align:center;font-size:20px;margin:20px">Vous possédez déjà un compte ? <a href="?login=1">Connectez-vous !</a></div>
-        <div style="text-align:center;font-size:20px;margin:20px">Testez la démo du jeu (3 questions) : <a href="http://demo.ydkj.fr/">demo.ydkj.fr</a></div>
+        <div style="text-align:center;font-size:20px;margin:20px">Testez la démo du jeu (4 questions) : <a href="http://demo.ydkj.fr/">demo.ydkj.fr</a></div>
         <div id="warning" style="border:#F00 1px solid; background-color:#300;color:#FFF;margin:50px;padding:20px;font-family:JackCondensed;font-size:18px">
             <p style="text-align:center;font-size:24px;font-weight:bold">ATTENTION : A LIRE AVANT DE JOUER ! <span style="font-size:20px">(Si si, vraiment, au moins ce qui est <u>souligné</u>)</span></p>
             <p>
@@ -195,7 +195,7 @@ if (!isset($_SESSION['id'])) {
                 <br/>
                 <u>Je n'ai aucun lien avec Jackbox Games, et cette version du jeu n'est pas un développement officiel.</u> Il s'agit uniquement d'un travail de passionné. La seule version française existante ayant aujourd'hui plus de 15 ans, je souhaite juste en faire profiter les plus jeunes et rendre nostalgique les anciens joueurs.<br/>
                 <br/>
-                <u>Cette version est loin d'être finie</u>, beaucoup de choses ne sont pas fonctionnelles. J'ajouterai les éléments au fur et à mesure. Pour le moment, seules les questions simples de type QCM sont jouables. Vous pouvez tester la démo du jeu (3 questions) en cliquant sur <a style="color:#F00" href="http://demo.ydkj.fr/">ce lien</a>.<br/>
+                <u>Cette version est loin d'être finie</u>, beaucoup de choses ne sont pas fonctionnelles. J'ajouterai les éléments au fur et à mesure. Pour le moment, seules les questions simples de type QCM sont jouables. Vous pouvez tester la démo du jeu (4 questions) en cliquant sur <a style="color:#F00" href="http://demo.ydkj.fr/">ce lien</a>.<br/>
                 <br/>
                 <u>Le jeu fonctionne le mieux dans Firefox et Chrome</u>. Il est possible de profiter du jeu en "plein écran", en cliquant sur le lien en haut de l'écran et en appuyant sur F11 (F11 et Echap pour revenir en mode normal). Internet Explorer ne gère pas les polices CSS3 et il a des soucis avec les sons qui s'arrêtent trop tôt. Les navigateurs mobiles quant à eux ont des problèmes avec la gestion des fichiers audio (permission de jouer un seul fichier audio à la fois, et uniquement suite à une action de l'utilisateur...).<br/>
                 <br/>
