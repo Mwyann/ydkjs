@@ -16,6 +16,7 @@ while ($rs = $res->fetch()) {
             $ID = str_replace('.ogg','',$file);
             if ($ID < 1000) $IDlist[$ID] = 1;
         }
+        ksort($IDlist);
         if (sizeof($IDlist) > 0) {
             $IDlist = implode(',', array_keys($IDlist));
             $DB->query("UPDATE ressnd
