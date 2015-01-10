@@ -30,14 +30,16 @@ typedef struct {
 } IMGDEF;
 
 typedef struct {
-    ubyte imgnum; // Devrait être zéro, pour la première image...
-    ubyte val1;
+    ushort sameoffset; // Si différent de 0, alors on prend les mêmes images qu'à l'offset indiqué
     short offsetx; // Position des images
     short offsety;
     short sizex;
     short sizey;
     ushort nbimg; // Nombre d'images à afficher
+    local int64 currentpos4 = FTell();
+    if (sameoffset != 0) FSeek(headersize+sameoffset*12);
     if (nbimg > 0) IMGDEF imgs[nbimg];
+    if (sameoffset != 0) FSeek(currentpos4);
 } DEF;
 
 typedef struct {

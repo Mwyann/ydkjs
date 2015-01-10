@@ -122,7 +122,7 @@ object Form1: TForm1
     Width = 385
     Height = 21
     TabOrder = 5
-    Text = 'F:\YDKJ\res-full'
+    Text = 'F:\YDKJ\archives\res-full'
   end
   object Button1: TButton
     Left = 464

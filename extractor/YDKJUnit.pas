@@ -390,8 +390,7 @@ var si:^subimages;
     nbimages,i,j:word;
     nbframes,frameoffset:word;
 
-    val1:byte;
-    offsetx,offsety:smallint;
+    sameoffset,offsetx,offsety:smallint;
     sizex,sizey:word;
     nbframeimages:word;
 begin
@@ -411,19 +410,19 @@ begin
     end else begin
       currentpos2:=filepos(SRFhandler);
       seek(SRFhandler,fileoffset+10+nbframes*2+(frameoffset-1)*12);
-      readb; // imgnum, vaut toujours 0 ici
-      val1:=readb;
+      sameoffset:=readw; // Si différent de 0, alors on prend les mêmes images qu'à l'offset indiqué
       offsetx:=readw;
       offsety:=readw;
       sizex:=readw;
       sizey:=readw;
       nbframeimages:=readw;
       si^.frames[i].nbimages:=nbframeimages;
-      si^.frames[i].images[0].val1:=val1;
+      si^.frames[i].images[0].val1:=0;
       si^.frames[i].images[0].offsetx:=offsetx;
       si^.frames[i].images[0].offsety:=offsety;
       si^.frames[i].images[0].sizex:=sizex;
       si^.frames[i].images[0].sizey:=sizey;
+      if (sameoffset <> 0) then seek(SRFhandler,fileoffset+10+nbframes*2+sameoffset*12);
       if (nbframeimages > 0) then for j:=1 to nbframeimages do begin
         readb; // imgnum mais on l'a avec j de toutes façons
         si^.frames[i].images[j].val1:=readb;
