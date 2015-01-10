@@ -26,6 +26,52 @@ ModeDisOrDat.prototype.preload = function(resources) {
     this.QuestionTitle = new YDKJAnimation(resources['DisOrDat/QuestionTitle']);
     this.QuestionIntro1 = new YDKJAnimation(resources['DisOrDat/QuestionIntro1']);
     this.QuestionIntro2 = new YDKJAnimation(resources['DisOrDat/QuestionIntro2']);
+    this.MessageSpaceBarComesIn = new YDKJAnimation(resources['DisOrDat/MessageSpaceBarComesIn']);
+    this.MessageSpaceBarLeave = new YDKJAnimation(resources['DisOrDat/MessageSpaceBarLeave']);
+
+    this.SFXShowKey = new YDKJAnimation(resources['DisOrDat/SFXShowKey']);
+    this.Button1of4ComesIn = new YDKJAnimation(resources['DisOrDat/Button1of4ComesIn']);
+    this.Button1of4StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button1of4StandbyLoop']);
+    this.Button1of4Ready = new YDKJAnimation(resources['DisOrDat/Button1of4Ready']);
+    this.Button1of4Push = new YDKJAnimation(resources['DisOrDat/Button1of4Push']);
+    this.Button1of4Leave = new YDKJAnimation(resources['DisOrDat/Button1of4Leave']);
+
+    this.Button2of4ComesIn = new YDKJAnimation(resources['DisOrDat/Button2of4ComesIn']);
+    this.Button2of4StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button2of4StandbyLoop']);
+    this.Button2of4Ready = new YDKJAnimation(resources['DisOrDat/Button2of4Ready']);
+    this.Button2of4Push = new YDKJAnimation(resources['DisOrDat/Button2of4Push']);
+    this.Button2of4Leave = new YDKJAnimation(resources['DisOrDat/Button2of4Leave']);
+
+    this.Button3of4ComesIn = new YDKJAnimation(resources['DisOrDat/Button3of4ComesIn']);
+    this.Button3of4StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button3of4StandbyLoop']);
+    this.Button3of4Ready = new YDKJAnimation(resources['DisOrDat/Button3of4Ready']);
+    this.Button3of4Push = new YDKJAnimation(resources['DisOrDat/Button3of4Push']);
+    this.Button3of4Leave = new YDKJAnimation(resources['DisOrDat/Button3of4Leave']);
+
+    this.Button4of4ComesIn = new YDKJAnimation(resources['DisOrDat/Button4of4ComesIn']);
+    this.Button4of4StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button4of4StandbyLoop']);
+    this.Button4of4Ready = new YDKJAnimation(resources['DisOrDat/Button4of4Ready']);
+    this.Button4of4Push = new YDKJAnimation(resources['DisOrDat/Button4of4Push']);
+    this.Button4of4Leave = new YDKJAnimation(resources['DisOrDat/Button4of4Leave']);
+
+    this.Button1of3ComesIn = new YDKJAnimation(resources['DisOrDat/Button1of3ComesIn']);
+    this.Button1of3StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button1of3StandbyLoop']);
+    this.Button1of3Ready = new YDKJAnimation(resources['DisOrDat/Button1of3Ready']);
+    this.Button1of3Push = new YDKJAnimation(resources['DisOrDat/Button1of3Push']);
+    this.Button1of3Leave = new YDKJAnimation(resources['DisOrDat/Button1of3Leave']);
+
+    this.Button2of3ComesIn = new YDKJAnimation(resources['DisOrDat/Button2of3ComesIn']);
+    this.Button2of3StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button2of3StandbyLoop']);
+    this.Button2of3Ready = new YDKJAnimation(resources['DisOrDat/Button2of3Ready']);
+    this.Button2of3Push = new YDKJAnimation(resources['DisOrDat/Button2of3Push']);
+    this.Button2of3Leave = new YDKJAnimation(resources['DisOrDat/Button2of3Leave']);
+
+    this.Button4of3ComesIn = new YDKJAnimation(resources['DisOrDat/Button4of3ComesIn']);
+    this.Button4of3StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button4of3StandbyLoop']);
+    this.Button4of3Ready = new YDKJAnimation(resources['DisOrDat/Button4of3Ready']);
+    this.Button4of3Push = new YDKJAnimation(resources['DisOrDat/Button4of3Push']);
+    this.Button4of3Leave = new YDKJAnimation(resources['DisOrDat/Button4of3Leave']);
+
 };
 
 ModeDisOrDat.prototype.start = function() {
@@ -37,11 +83,79 @@ ModeDisOrDat.prototype.start = function() {
     if (this.chooseplayer == 2) this.ChoicePlayer = this.ChoicePlayer2on3;
     if (this.chooseplayer == 3) this.ChoicePlayer = this.ChoicePlayer3on3;
 
-    this.QuestionIntro2.ended(500,function() {
+    this.QuestionIntro2.ended(3500,function() {
         nextcategory.modeObj.MusicChooseCategoryLoop.free();
         nextcategory.modeObj.MusicChooseCategoryLoop = thisMode.MusicLoopRules1;
         thisMode.MusicLoopRules1 = false; // Pour ne pas être détruite au passage à la catégorie suivante
         nextcategory.start();
+    });
+
+    var buttonsStandby = [];
+
+    var loopStandBy = function(){ // Fonction servant à synchroniser les animations Standby
+        for(var i = 0; i < buttonsStandby.length; i++) {
+            if ((!buttonsStandby[i].ComesIn.isplaying) && (!buttonsStandby[i].StandBy.isplaying) && (!buttonsStandby[i].Push.isplaying)) {
+                buttonsStandby[i].ComesIn.free();
+                buttonsStandby[i].Push.reset();
+                buttonsStandby[i].StandBy.play();
+            }
+        }
+    };
+
+    var addStandBy = function(comesin, standby, push) {
+        buttonsStandby.push({ComesIn: comesin, StandBy: standby, Push: push});
+        standby.ended(function(){loopStandBy()});
+    };
+
+    this.Button4of4ComesIn.ended(function(){
+        addStandBy(thisMode.Button4of4ComesIn, thisMode.Button4of4StandbyLoop, thisMode.Button4of4Push);
+    });
+
+    this.Button3of4ComesIn.ended(function(){
+        addStandBy(thisMode.Button3of4ComesIn, thisMode.Button3of4StandbyLoop, thisMode.Button3of4Push);
+        this.delay(300,function(){
+
+        });
+    });
+
+    this.Button2of4ComesIn.ended(function(){
+        addStandBy(thisMode.Button2of4ComesIn, thisMode.Button2of4StandbyLoop, thisMode.Button2of4Push);
+        this.delay(300,function(){
+            thisMode.Button3of4ComesIn.play();
+            thisMode.SFXShowKey.reset();
+            thisMode.SFXShowKey.play();
+        });
+    });
+
+    this.Button1of4ComesIn.ended(function(){
+        addStandBy(thisMode.Button1of4ComesIn, thisMode.Button1of4StandbyLoop, thisMode.Button1of4Push);
+        loopStandBy();
+        this.delay(300,function(){
+            thisMode.Button2of4ComesIn.play();
+            thisMode.SFXShowKey.reset();
+            thisMode.SFXShowKey.play();
+        });
+    });
+
+    this.Button4of3ComesIn.ended(function(){
+        addStandBy(thisMode.Button4of3ComesIn, thisMode.Button4of3StandbyLoop, thisMode.Button4of3Push);
+    });
+
+    this.Button2of3ComesIn.ended(function(){
+        addStandBy(thisMode.Button2of3ComesIn, thisMode.Button2of3StandbyLoop, thisMode.Button2of3Push);
+        this.delay(300,function(){
+
+        });
+    });
+
+    this.Button1of3ComesIn.ended(function(){
+        addStandBy(thisMode.Button1of3ComesIn, thisMode.Button1of3StandbyLoop, thisMode.Button1of3Push);
+        loopStandBy();
+        this.delay(300,function(){
+            thisMode.Button2of3ComesIn.play();
+            thisMode.SFXShowKey.reset();
+            thisMode.SFXShowKey.play();
+        });
     });
 
     this.QuestionIntro1.ended(100,function() {
@@ -71,7 +185,12 @@ ModeDisOrDat.prototype.start = function() {
 
             textdiv.appendTo(div);
 
-            div.appendTo(thisMode.game.html.screen).animate({'left':'40px'},300,function(){textdiv.css({'font-style':'normal'})});
+            div.appendTo(thisMode.game.html.screen).animate({'left':'40px'},300,function(){
+                textdiv.css({'font-style':'normal'});
+                if (thisMode.options.nbchoices == 3) thisMode.Button1of3ComesIn.play();
+                else thisMode.Button1of4ComesIn.play();
+                thisMode.SFXShowKey.play();
+            });
         });
     });
 
@@ -109,6 +228,7 @@ ModeDisOrDat.prototype.start = function() {
                 animTransform(titlediv,0,1,1,1,0.15,300,0);
             });
             this.play();
+            //thisMode.MessageSpaceBarComesIn.play();
         });
     });
 

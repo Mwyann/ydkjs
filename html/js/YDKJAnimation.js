@@ -246,6 +246,15 @@ YDKJAnimation.prototype.play = function() {
     this.isplaying = 1;
     var thisAnim = this;
 
+    var setupEnd = function() { // this.triggerEnd lorsque l'animation est terminée, basée sur this.length()
+        var lth = thisAnim.length();
+        for(var i = 0; i < thisAnim.endedFunctions.length; i++) {
+            (function(i){
+                thisAnim.endedFunctions[i].endTimeout = setTimeout(function(){thisAnim.triggerEnd(i);},Math.max(0,parseInt(lth)+thisAnim.endedFunctions[i].ms));
+            })(i);
+        }
+    };
+
     if (this.urlGif != '') {
         this.newScreen();
 
@@ -269,7 +278,10 @@ YDKJAnimation.prototype.play = function() {
             }
             framenum++;
             if ((framenum > framestop) || ((val & 16) != 0)) {
-                if (thisAnim.loop) framenum = thisAnim.framestart; else {
+                if (thisAnim.loop) {
+                    framenum = thisAnim.framestart;
+                    setupEnd(); // Dans le cas d'une boucle, on exécute le "end" à la fin de chaque boucle
+                } else {
                     clearInterval(intervaltimer);
                     thisAnim.intervalTimer = 0;
                 }
@@ -308,16 +320,8 @@ YDKJAnimation.prototype.play = function() {
         }
     }
 
-    // this.triggerEnd lorsque l'animation est terminée, basée sur this.length()
-    // Dans le cas d'une boucle, il faudrait exécuter le "end" à la fin de chaque boucle ?
-    if (!thisAnim.loop) {
-        var lth = this.length();
-        for(var i = 0; i < this.endedFunctions.length; i++) {
-            (function(i){
-                thisAnim.endedFunctions[i].endTimeout = setTimeout(function(){thisAnim.triggerEnd(i);},Math.max(0,parseInt(lth)+thisAnim.endedFunctions[i].ms));
-            })(i);
-        }
-    }
+    setupEnd();
+
     return true;
 };
 
@@ -356,7 +360,7 @@ YDKJAnimation.prototype.stop = function() {
 YDKJAnimation.prototype.reset = function(fullreset) {
     this.stop();
     this.played = 0;
-    if (this.urlGif != '') {
+    if (this.urlGif != '') { // On vide l'animation
         this.newScreen();
         this.nextScreen();
     }

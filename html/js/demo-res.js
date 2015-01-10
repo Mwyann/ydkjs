@@ -276,5 +276,69 @@ var YDKJDemoAnim = {
         'Intro':{res:'5QDemo',name:'off4/14690',framestart:2,loop:0},
         'IntroStill':{res:'5QDemo',name:'off4/14690',framestart:74,loop:0},
         'TimerComesIn':{res:'5QDemo',name:'off4/8041',framestart:2,loop:0},
+
+        'Button1of4ComesIn':{res:'5QDemo',name:'off4/14000',framestart:111,loop:0},
+        'Button1of4StandbyLoop':{res:'5QDemo',name:'off4/14000',framestart:132,framestop:159,loop:0}, // Pas de boucle pour ces StanbyLoop, c'est fait en JS (pour améliorer la synchro)
+        'Button1of4Ready':{res:'5QDemo',name:'off4/14000',framestart:164,loop:0},
+        'Button1of4Push':{res:'5QDemo',name:'off4/14000',framestart:176,loop:0},
+        'Button1of4Leave':{res:'5QDemo',name:'off4/14000',framestart:189,framestop:194,loop:0},
+
+        'Button2of4ComesIn':{res:'5QDemo',name:'off4/14000',framestart:200,loop:0},
+        'Button2of4StandbyLoop':{res:'5QDemo',name:'off4/14000',framestart:219,framestop:246,loop:0},
+        'Button2of4Ready':{res:'5QDemo',name:'off4/14000',framestart:252,loop:0},
+        'Button2of4Push':{res:'5QDemo',name:'off4/14000',framestart:264,loop:0},
+        'Button2of4Leave':{res:'5QDemo',name:'off4/14000',framestart:277,framestop:284,loop:0},
+
+        'Button3of4ComesIn':{res:'5QDemo',name:'off4/14000',framestart:289,loop:0},
+        'Button3of4StandbyLoop':{res:'5QDemo',name:'off4/14000',framestart:308,framestop:335,loop:0},
+        'Button3of4Ready':{res:'5QDemo',name:'off4/14000',framestart:340,loop:0},
+        'Button3of4Push':{res:'5QDemo',name:'off4/14000',framestart:352,loop:0},
+        'Button3of4Leave':{res:'5QDemo',name:'off4/14000',framestart:364,framestop:371,loop:0},
+
+        'Button4of4ComesIn':{res:'5QDemo',name:'off4/14000',framestart:375,loop:0},
+        'Button4of4StandbyLoop':{res:'5QDemo',name:'off4/14000',framestart:394,framestop:421,loop:0},
+        'Button4of4Ready':{res:'5QDemo',name:'off4/14000',framestart:428,loop:0},
+        'Button4of4Push':{res:'5QDemo',name:'off4/14000',framestart:440,loop:0},
+        'Button4of4Leave':{res:'5QDemo',name:'off4/14000',framestart:452,framestop:457,loop:0},
+
+        'Button1of3ComesIn':{res:'5QDemo',name:'off4/14000',framestart:467,loop:0},
+        'Button1of3StandbyLoop':{res:'5QDemo',name:'off4/14000',framestart:488,framestop:515,loop:0},
+        'Button1of3Ready':{res:'5QDemo',name:'off4/14000',framestart:522,loop:0},
+        'Button1of3Push':{res:'5QDemo',name:'off4/14000',framestart:534,loop:0},
+        'Button1of3Leave':{res:'5QDemo',name:'off4/14000',framestart:547,framestop:552,loop:0},
+
+        'Button2of3ComesIn':{res:'5QDemo',name:'off4/14000',framestart:558,loop:0},
+        'Button2of3StandbyLoop':{res:'5QDemo',name:'off4/14000',framestart:576,framestop:603,loop:0},
+        'Button2of3Ready':{res:'5QDemo',name:'off4/14000',framestart:609,loop:0},
+        'Button2of3Push':{res:'5QDemo',name:'off4/14000',framestart:621,loop:0},
+        'Button2of3Leave':{res:'5QDemo',name:'off4/14000',framestart:634,framestop:642,loop:0},
+
+        'Button4of3ComesIn':{res:'5QDemo',name:'off4/14000',framestart:644,loop:0},
+        'Button4of3StandbyLoop':{res:'5QDemo',name:'off4/14000',framestart:662,framestop:689,loop:0},
+        'Button4of3Ready':{res:'5QDemo',name:'off4/14000',framestart:696,loop:0},
+        'Button4of3Push':{res:'5QDemo',name:'off4/14000',framestart:708,loop:0},
+        'Button4of3Leave':{res:'5QDemo',name:'off4/14000',framestart:720,framestop:725,loop:0},
+
+        'Value500FComesIn':{res:'5QDemo',name:'off4/14000',framestart:734,loop:0},
+        'Value500FMinus':{res:'5QDemo',name:'off4/14000',framestart:746,loop:0},
+        'Value500FLeave':{res:'5QDemo',name:'off4/14000',framestart:760,framestop:766,loop:0},
+        'Value1000FComesIn':{res:'5QDemo',name:'off4/14000',framestart:772,loop:0},
+        'Value1000FMinus':{res:'5QDemo',name:'off4/14000',framestart:785,loop:0},
+        'Value1000FLeave':{res:'5QDemo',name:'off4/14000',framestart:802,framestop:807,loop:0},
+
+        'MessageSpaceBarComesIn':{res:'5QDemo',name:'off4/14000',framestart:925,loop:0},
+        'MessageSpaceBarLeave':{res:'5QDemo',name:'off4/14000',framestart:928,loop:0},
+
+        'Player1ComesIn':{res:'5QDemo',name:'off4/14900',framestart:1,loop:0},
+        'Player1Win':{res:'5QDemo',name:'off4/14900',framestart:43,loop:0},
+        'Player1Lose':{res:'5QDemo',name:'off4/14900',framestart:94,loop:0},
+
+        'Player2ComesIn':{res:'5QDemo',name:'off4/14930',framestart:1,loop:0},
+        'Player2Win':{res:'5QDemo',name:'off4/14930',framestart:43,loop:0},
+        'Player2Lose':{res:'5QDemo',name:'off4/14930',framestart:94,loop:0},
+
+        'Player3ComesIn':{res:'5QDemo',name:'off4/14950',framestart:1,loop:0},
+        'Player3Win':{res:'5QDemo',name:'off4/14950',framestart:43,loop:0},
+        'Player3Lose':{res:'5QDemo',name:'off4/14950',framestart:94,loop:0},
     }
 };
