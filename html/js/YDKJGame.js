@@ -42,7 +42,7 @@ function YDKJGame(html, demomode) {
                 'overflow': 'hidden',
                 'zoom': zoom.toFixed(2),
                 '-moz-transform-origin': '50% 0',
-                '-moz-transform': 'scale('+zoom.toFixed(2)+', '+zoom.toFixed(2)+')'}).css('zoom',(zoom*100).toFixed(0)+'%');
+                '-moz-transform': 'scale('+zoom.toFixed(2)+','+zoom.toFixed(2)+')'}).css('zoom',(zoom*100).toFixed(0)+'%');
         };
         onfullscreenoff = f;
         oldcssbody = body.attr('style');

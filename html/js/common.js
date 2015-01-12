@@ -75,7 +75,7 @@ function unbindKeyListener(listener) {
 
 /********** Animation de transformation **********/
 
-function animTransform(elem,fromx,tox,fromy,toy,speed,w,h,callback) {
+function animTransform(elem,fromx,tox,fromy,toy,speed,w,h,align,callback) {
     var expandInterval = 0;
     var expandValX = fromx;
     var expandValY = fromy;
@@ -91,34 +91,46 @@ function animTransform(elem,fromx,tox,fromy,toy,speed,w,h,callback) {
             if (callback) callback();
         }
 
+        if (align == 'left') {
+            elem.css({
+                'left': (0 - ((w / 2) * (1 - expandValX))) + 'px',
+                'top': (0 - ((h / 2) * (1 - expandValY))) + 'px'
+            });
+        } else if (align == 'right') {
+            elem.css({
+                'left': (w - ((w / 2) * (1 - expandValX))) + 'px',
+                'top': (h - ((h / 2) * (1 - expandValY))) + 'px'
+            });
+        } // Sinon, toute autre valeur = centré (pour ne pas faire d'ambiguité, on peut mettre 'center')
+
         elem.css({
-            'left':(0-((w/2)*(1-expandValX)))+'px',
-            'top':(0-((h/2)*(1-expandValY)))+'px',
-            '-webkit-transform':'scale('+expandValX+', '+expandValY+')',
-            '-moz-transform':'scale('+expandValX+', '+expandValY+')',
-            '-ms-transform':'scale('+expandValX+', '+expandValY+')',
-            '-o-transform':'scale('+expandValX+', '+expandValY+')',
-            'transform':'scale('+expandValX+', '+expandValY+')'
+            '-webkit-transform':'scale('+expandValX+','+expandValY+')',
+            '-moz-transform':'scale('+expandValX+','+expandValY+')',
+            '-ms-transform':'scale('+expandValX+','+expandValY+')',
+            '-o-transform':'scale('+expandValX+','+expandValY+')',
+            'transform':'scale('+expandValX+','+expandValY+')'
         });
     };
     expandInterval = setInterval(expand,66);
 }
 
-function getSTRfromID(STR,id) {
-    for(var i = 0; i < STR.length; i++) if (STR[i].id == id) return STR[i].str;
+function getSTRfromID(STR,type,id) {
+    for(var i = 0; i < STR.length; i++) if ((STR[i].type == type) && (STR[i].id == id)) return STR[i].data;
     return '';
 }
 
 /********** Timer **********/
 
-function YDKJTimer10() {}
+function YDKJTimer(timerType) {
+    this.timerType = timerType;
+}
 
-YDKJTimer10.prototype.preload = function(resources) {
-    this.frames = resources['Common/Timer10/Frames'];
-    this.animation = new YDKJAnimation(resources['Common/Timer10']);
+YDKJTimer.prototype.preload = function(resources) {
+    this.frames = resources['Common/Timer'+this.timerType+'/Frames'];
+    this.animation = new YDKJAnimation(resources['Common/Timer'+this.timerType]);
     var thisTimer = this;
     this.step = 0; // 0 = Still, 1 = Hiding, 2 = Showing
-    this.current = 10;
+    this.current = this.timerType;
     this.next = 0;
     this.animation.ended(function() {
         if (thisTimer.step == 1) {
@@ -138,18 +150,22 @@ YDKJTimer10.prototype.preload = function(resources) {
     });
 };
 
-YDKJTimer10.prototype.ready = function(f) {
+YDKJTimer.prototype.ready = function(f) {
     this.animation.ready(f);
 };
 
-YDKJTimer10.prototype.free = function() {
+YDKJTimer.prototype.free = function() {
     if (this.animation) this.animation.free();
     this.animation = 0;
 };
 
-YDKJTimer10.prototype.playTimer = function(next) {
+YDKJTimer.prototype.reset = function() {
+    this.animation.reset();
+};
+
+YDKJTimer.prototype.playTimer = function(next) {
     if (typeof next == 'undefined') next = this.current-1;
-    if ((next < 0) || (next > 10)) return false;
+    if ((next < 0) || (next > this.timerType)) return false;
     var thisTimer = this;
     this.animation.ready(function() {
         thisTimer.animation.html = thisTimer.html;

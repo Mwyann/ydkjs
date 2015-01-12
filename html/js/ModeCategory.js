@@ -143,6 +143,8 @@ ModeCategory.prototype.start = function() {
         }).html(thisMode.game.players[thisMode.chooseplayer-1].name).appendTo(thisMode.game.html.screen);
     });
 
+    var categoryShown = false;
+
     this.ShowCategories.ended(300,function(){
         thisMode.SFXChoiceCategory.play();
         thisMode.ChooseCategoryText.play();
@@ -152,6 +154,7 @@ ModeCategory.prototype.start = function() {
         thisMode.LoopCategory1.click(function(){chooseCategory(1)});
         thisMode.LoopCategory2.click(function(){chooseCategory(2)});
         thisMode.LoopCategory3.click(function(){chooseCategory(3)});
+        categoryShown = true;
         this.free();
     });
 
@@ -169,7 +172,7 @@ ModeCategory.prototype.start = function() {
                     'left':'130px',
                     'top':(163+100*ShowCategoryNum)+'px',
                     'overflow':'hidden'
-                }).click(function(){chooseCategory(thisCatNum+1)});
+                }).click(function(){if (categoryShown) chooseCategory(thisCatNum+1)});
 
                 jQuery('<div />').css({
                     'width':'500px',

@@ -23,8 +23,9 @@ function YDKJAnimation(resource) {
 
     var thisAnim = this;
 
-    this.isplaying = 0;
-    this.played = 0;
+    this.isplaying = 0; // En train d'être joué
+    this.played = 0; // Lu au moins une fois en entier
+    this.stopped = 0; // Terminé ou appel à .stop()
 
     this.resetEndedFunctions = function() {
         thisAnim.endedFunctions = [];
@@ -35,6 +36,7 @@ function YDKJAnimation(resource) {
                 thisAnim.played = 1;
                 if (!thisAnim.loop) {
                     thisAnim.isplaying = 0;
+                    thisAnim.stopped = 1;
                 }
             }]
         });
@@ -77,6 +79,12 @@ function YDKJAnimation(resource) {
                 var audioelem = audiofile.get(0);
                 thisAnim.seamlessLoop = new SeamlessLoop();
                 thisAnim.seamlessLoop.addUri(thisAnim.urlAudio,audioelem.duration*1000,1);
+                var doLoopOriginal = thisAnim.seamlessLoop.doLoop;
+                thisAnim.seamlessLoop.doLoop = function(looped) { // Petit hack pour maintenir les fonctions ended en boucle synchro
+                    if (!looped) doLoopOriginal.call(thisAnim.seamlessLoop,looped);
+                    else if (!thisAnim.triggerEnd(0)) doLoopOriginal.call(thisAnim.seamlessLoop,looped);
+                    else thisAnim.stop();
+                };
                 seamlessloopready();
             }
         } else seamlessloopready();
@@ -186,10 +194,12 @@ function YDKJAnimation(resource) {
     };
 
     this.triggerEnd = function(idx) {
+        var result = false;
         var functions = this.endedFunctions[idx].functions; // On les sauvegarde au cas où qu'elles soient écrasées par l'une des fonctions...
         for(var i = 0; i < functions.length; i++) {
-            functions[i].call(this);
+            result |= functions[i].call(this);
         }
+        return result;
     }
 }
 
@@ -219,7 +229,7 @@ YDKJAnimation.prototype.ended = function(a,b) { // a = délai OU fonction OU fal
         return true;
     }
     if (!msbeforeend) msbeforeend = 0;
-    if (!this.played) {
+    if ((!this.played) || (this.loop)) {
         var idx = -1;
         var i;
         for(i = 0; i < this.endedFunctions.length; i++) if (this.endedFunctions[i].ms == msbeforeend) idx = i;
@@ -237,7 +247,8 @@ YDKJAnimation.prototype.delay = function(delay,f) {
 };
 
 YDKJAnimation.prototype.play = function() {
-    this.stop();
+    if (this.isplaying || this.stopped) return false; // Forcer un appel à reset() pour être capable de relancer une animation.
+
     if (!this.preloaded) {
         //this.ready(function(){this.play();});  // Ne pas attendre le preload (normalement tout est déjà préloadé)
         return true; // Retourne immédiatement, même si l'animation n'a pas encore joué...
@@ -291,6 +302,10 @@ YDKJAnimation.prototype.play = function() {
         intervaltimer = setInterval(runanim,speed); // Pourrait être calculé depuis frames[x].fps1/frames[x].fps2
         runanim();
         this.intervalTimer = intervaltimer;
+
+        YDKJAnimation.prototype.position = function() {
+            return (framenum-thisAnim.framestart)*speed;
+        };
     }
 
     if (this.audio) {
@@ -327,6 +342,7 @@ YDKJAnimation.prototype.play = function() {
 
 YDKJAnimation.prototype.stop = function() {
     this.isplaying = 0;
+    this.stopped = 1;
     for(var i = 0; i < this.endedFunctions.length; i++){
         if (this.endedFunctions[i].endTimeout) clearTimeout(this.endedFunctions[i].endTimeout);
         this.endedFunctions[i].endTimeout = 0;
@@ -360,6 +376,7 @@ YDKJAnimation.prototype.stop = function() {
 YDKJAnimation.prototype.reset = function(fullreset) {
     this.stop();
     this.played = 0;
+    this.stopped = 0;
     if (this.urlGif != '') { // On vide l'animation
         this.newScreen();
         this.nextScreen();

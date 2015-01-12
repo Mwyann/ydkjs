@@ -11,7 +11,7 @@ YDKJAPI.prototype.initdemo = function() {
     YDKJAPI.prototype.gamemode = function(currentmode) {
         var newmode;
         if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Intro', {});
-        //if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1}); // Ligne DEBUG
+        //if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 2}); // Ligne DEBUG
         if (currentmode instanceof ModeIntro) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1, chooseplayer: 3});
         if (currentmode instanceof ModeQuestion) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: currentmode.options.questionnumber+1});
 
@@ -141,7 +141,7 @@ YDKJAPI.prototype.initdemo = function() {
                 'Question/SFXShowQuestion': 0,
                 'Question/JingleReadQuestion': 0,
                 'Question/JingleTimer': 0,
-                'Question/SFXTimeOut': 0,
+                'Question/TimerTimeOut': 0,
                 'Question/SFXPlayerBuzz': 0,
                 'Question/SFXPlayerKey': 0,
                 'Question/SFXPlayerLose': 0,
@@ -254,17 +254,16 @@ YDKJAPI.prototype.initdemo = function() {
             if (mode.options.id != 'AJM') reslist['Question/RevealAnswer'] = {urlAudio: res+'/snd/11'};
             else reslist['Question/RevealAnswer'] = demores('Question/DefaultRevealAnswer');
 
-            mode.options.strjs = getYDKJFile('js',res+'/STR.js');
-            mode.options.timer = new YDKJTimer10();
-            var timerready = thisAPI.resources(mode.options.timer);
-            timerready(function(resources) {
+            mode.options.timer = new YDKJTimer(10);
+            var timer10ready = thisAPI.resources(mode.options.timer);
+            timer10ready(function(resources) {
                 mode.options.timer.preload(resources);
             });
 
             var strjs = getYDKJFile('js',res+'/STR.js');
             return function(f) {
                 strjs.ready(function() {
-                    mode.STR = strjs.res['STR'];
+                    mode.STR = strjs.res;
                     f(reslist);
                 });
             };
@@ -272,6 +271,7 @@ YDKJAPI.prototype.initdemo = function() {
         else if (mode instanceof ModeDisOrDat) {
             reslist = {
                 'DisOrDat/AnnounceCategory':0,
+                'DisOrDat/AnnounceTimer':0,
                 'DisOrDat/BadScoreSoFar':0,
                 'DisOrDat/CannotSkipLast':0,
                 'DisOrDat/ChoicePlayer1':0,
@@ -298,7 +298,6 @@ YDKJAPI.prototype.initdemo = function() {
                 'DisOrDat/MusicLoopScore':0,
                 'DisOrDat/MusicPlayEnd':0,
                 'DisOrDat/MusicUnknown':0,
-                'DisOrDat/PrepareTimer':0,
                 'DisOrDat/Public0on71':0,
                 'DisOrDat/Public0on72':0,
                 'DisOrDat/Public0on73':0,
@@ -317,9 +316,8 @@ YDKJAPI.prototype.initdemo = function() {
                 'DisOrDat/RulesSkipExplain':0,
                 'DisOrDat/SFXCorrect':0,
                 'DisOrDat/SFXHidePrice':0,
-                'DisOrDat/SFXKeyPress1':0,
+                'DisOrDat/SFXKeyPress':0,
                 'DisOrDat/SFXKeyPress2':0,
-                'DisOrDat/SFXPrepareTimer':0,
                 'DisOrDat/SFXShowKey':0,
                 'DisOrDat/SFXShowPriceCorrect':0,
                 'DisOrDat/SFXShowPriceWrong':0,
@@ -365,6 +363,7 @@ YDKJAPI.prototype.initdemo = function() {
                 'DisOrDat/WrongKeyToSkip':0,
 
                 'DisOrDat/IntroStill':0,
+                'DisOrDat/PrepareTimer':0,
 
                 'DisOrDat/Button1of4ComesIn':0,
                 'DisOrDat/Button1of4StandbyLoop':0,
@@ -439,18 +438,35 @@ YDKJAPI.prototype.initdemo = function() {
             reslist['DisOrDat/QuestionTitle'] = {urlAudio: resDD+'/snd/1'};
             reslist['DisOrDat/QuestionIntro1'] = {urlAudio: resDD+'/snd/2'};
             reslist['DisOrDat/QuestionIntro2'] = {urlAudio: resDD+'/snd/3'};
+            reslist['DisOrDat/QuestionAnswer1'] = {urlAudio: resDD+'/snd/4'};
+            reslist['DisOrDat/QuestionAnswer2'] = {urlAudio: resDD+'/snd/5'};
+
+            reslist['DisOrDat/Question1'] = {urlAudio: resDD+'/snd/6'};
+            reslist['DisOrDat/Question2'] = {urlAudio: resDD+'/snd/7'};
+            reslist['DisOrDat/Question3'] = {urlAudio: resDD+'/snd/8'};
+            reslist['DisOrDat/Question4'] = {urlAudio: resDD+'/snd/9'};
+            reslist['DisOrDat/Question5'] = {urlAudio: resDD+'/snd/10'};
+            reslist['DisOrDat/Question6'] = {urlAudio: resDD+'/snd/11'};
+            reslist['DisOrDat/Question7'] = {urlAudio: resDD+'/snd/12'};
+
+            mode.options.timer = new YDKJTimer(30);
+            var timer30ready = thisAPI.resources(mode.options.timer);
+            timer30ready(function(resources) {
+                mode.options.timer.preload(resources);
+            });
 
             var strjsDD = getYDKJFile('js',resDD+'/STR.js');
             return function(f) {
                 strjsDD.ready(function() {
-                    mode.STR = strjsDD.res['STR'];
+                    mode.STR = strjsDD.res;
                     f(reslist);
                 });
             };
         }
-        else if (mode instanceof YDKJTimer10) {
-            var resName = 'res/5QDemo/off4/8018';
-            reslist = {'Common/Timer10': {urlGif: resName+'.gif', urlJS: resName+'.js', framestart: 73, loop: 0, framestop: 75},
+        else if (mode instanceof YDKJTimer) {
+            var resName10 = 'res/5QDemo/off4/8018';
+            var resName30 = 'res/5QDemo/off4/8021';
+            reslist = {'Common/Timer10': {urlGif: resName10+'.gif', urlJS: resName10+'.js', framestart: 73, loop: 0, framestop: 75},
                        'Common/Timer10/Frames': {
                             'Still':{
                                 10:{framestart:69},
@@ -490,6 +506,108 @@ YDKJAPI.prototype.initdemo = function() {
                                 2:{framestart:209,framestop:215},
                                 1:{framestart:227,framestop:233},
                                 0:{framestart:245,framestop:251}
+                            }
+                       },
+                       'Common/Timer30': {urlGif: resName30+'.gif', urlJS: resName30+'.js', framestart: 79, loop: 0, framestop: 79},
+                       'Common/Timer30/Frames': {
+                            'Still':{
+                                30:{framestart:79},
+                                29:{framestart:99},
+                                28:{framestart:118},
+                                27:{framestart:139},
+                                26:{framestart:160},
+                                25:{framestart:180},
+                                24:{framestart:201},
+                                23:{framestart:221},
+                                22:{framestart:241},
+                                21:{framestart:261},
+                                20:{framestart:281},
+                                19:{framestart:300},
+                                18:{framestart:320},
+                                17:{framestart:340},
+                                16:{framestart:360},
+                                15:{framestart:380},
+                                14:{framestart:401},
+                                13:{framestart:421},
+                                12:{framestart:441},
+                                11:{framestart:461},
+                                10:{framestart:481},
+                                9:{framestart:500},
+                                8:{framestart:519},
+                                7:{framestart:537},
+                                6:{framestart:556},
+                                5:{framestart:575},
+                                4:{framestart:594},
+                                3:{framestart:612},
+                                2:{framestart:630},
+                                1:{framestart:648},
+                                0:{framestart:673}
+                            },
+                            'Hide':{
+                                30:{framestart:83,framestop:85},
+                                29:{framestart:102,framestop:104},
+                                28:{framestart:122,framestop:124},
+                                27:{framestart:144,framestop:146},
+                                26:{framestart:164,framestop:166},
+                                25:{framestart:184,framestop:186},
+                                24:{framestart:205,framestop:207},
+                                23:{framestart:225,framestop:227},
+                                22:{framestart:245,framestop:247},
+                                21:{framestart:265,framestop:267},
+                                20:{framestart:284,framestop:286},
+                                19:{framestart:304,framestop:306},
+                                18:{framestart:324,framestop:326},
+                                17:{framestart:344,framestop:346},
+                                16:{framestart:364,framestop:366},
+                                15:{framestart:384,framestop:386},
+                                14:{framestart:405,framestop:407},
+                                13:{framestart:425,framestop:427},
+                                12:{framestart:445,framestop:447},
+                                11:{framestart:465,framestop:467},
+                                10:{framestart:485,framestop:487},
+                                9:{framestart:504,framestop:506},
+                                8:{framestart:522,framestop:524},
+                                7:{framestart:541,framestop:543},
+                                6:{framestart:560,framestop:562},
+                                5:{framestart:579,framestop:581},
+                                4:{framestart:597,framestop:599},
+                                3:{framestart:615,framestop:617},
+                                2:{framestart:633,framestop:635},
+                                1:{framestart:651,framestop:653},
+                                0:{framestart:676,framestop:678}
+                            },
+                            'Show':{
+                                30:{framestart:79,framestop:79}, // Il n'y a pas d'animation pour montrer le 30, puisqu'on n'y revient jamais
+                                29:{framestart:89,framestop:95},
+                                28:{framestart:108,framestop:114},
+                                27:{framestart:128,framestop:134},
+                                26:{framestart:150,framestop:156},
+                                25:{framestart:170,framestop:176},
+                                24:{framestart:190,framestop:196},
+                                23:{framestart:211,framestop:217},
+                                22:{framestart:231,framestop:237},
+                                21:{framestart:251,framestop:257},
+                                20:{framestart:271,framestop:277},
+                                19:{framestart:290,framestop:296},
+                                18:{framestart:310,framestop:316},
+                                17:{framestart:330,framestop:336},
+                                16:{framestart:350,framestop:356},
+                                15:{framestart:370,framestop:376},
+                                14:{framestart:390,framestop:396},
+                                13:{framestart:411,framestop:417},
+                                12:{framestart:431,framestop:437},
+                                11:{framestart:451,framestop:457},
+                                10:{framestart:471,framestop:477},
+                                9:{framestart:491,framestop:497},
+                                8:{framestart:510,framestop:516},
+                                7:{framestart:528,framestop:534},
+                                6:{framestart:547,framestop:553},
+                                5:{framestart:566,framestop:572},
+                                4:{framestart:585,framestop:591},
+                                3:{framestart:603,framestop:609},
+                                2:{framestart:621,framestop:627},
+                                1:{framestart:639,framestop:645},
+                                0:{framestart:657,framestop:663}
                             }
                        }
             };
@@ -588,8 +706,8 @@ YDKJAPI.prototype.initgame = function() {
             data['category'] = mode.options.category;
             data['id'] = mode.options.id;
         }
-        else if (mode instanceof YDKJTimer10) {
-            data['mode'] = 'Timer10';
+        else if (mode instanceof YDKJTimer) {
+            data['mode'] = 'Timer'+mode.timerType;
         }
 
         var reslist;
@@ -619,9 +737,9 @@ YDKJAPI.prototype.initgame = function() {
                     mode.options.value = reslist['value'];
                     mode.options.correctanswer = reslist['correctanswer'];
                     mode.options.correctanswerisdefault = reslist['correctanswerisdefault'];
-                    mode.options.timer = new YDKJTimer10();
-                    var timerready = thisAPI.resources(mode.options.timer);
-                    timerready(function(resources) {
+                    mode.options.timer = new YDKJTimer(10);
+                    var timer10ready = thisAPI.resources(mode.options.timer);
+                    timer10ready(function(resources) {
                         mode.options.timer.preload(resources);
                     });
                 }

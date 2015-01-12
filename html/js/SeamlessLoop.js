@@ -116,12 +116,12 @@ function SeamlessLoop() {
 		aud.volume = this._volume;
 	};
 
-	this.doLoop = function() {
+	this.doLoop = function(looped) {
 		var key = (this.next == 1 ? "_1" : "_2");
 		var antikey = (this.next == 1 ? "_2" : "_1");
 
 		var t = this;
-		this.timeout = setTimeout(function() {t.doLoop();}, this.actual._length + this.playDelay);
+		this.timeout = setTimeout(function() {t.doLoop(true);}, this.actual._length + this.playDelay);
 
 		if(this.is.opera) this.actual[antikey].pause();
 
@@ -138,7 +138,7 @@ SeamlessLoop.prototype.start = function(id) {
 	if(id != "") {
 		this.actual = this.audios[id];
 	}
-	this.doLoop();
+	this.doLoop(false);
 };
 
 SeamlessLoop.prototype.volume = function(vol) {
@@ -181,7 +181,7 @@ SeamlessLoop.prototype.update = function(id, sync) {
 			if(this.is.opera) this.old.pause();
 		}
 		clearTimeout(this.timeout);
-		this.doLoop();
+		this.doLoop(true);
 	}
 };
 

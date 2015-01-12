@@ -16,10 +16,12 @@ ModeIntro.prototype.preload = function(resources) {
 ModeIntro.prototype.start = function() {
     var thisMode = this;
 
+    var skiplistener = 0;
+
     this.IntroJackDemo.ended(300,function(){
         thisMode.MusicJack.free();
         thisMode.IntroJack.free();
-        if (this.skiplistener) unbindKeyListener(this.skiplistener);
+        if (skiplistener) unbindKeyListener(skiplistener);
         thisMode.categoryready(function(category) {
             category.start(); // On passe au choix de la catégorie
         });
@@ -28,9 +30,9 @@ ModeIntro.prototype.start = function() {
     this.IntroJackTitle.ended(300,function(){
         thisMode.IntroJackDemo.play();
         thisMode.categoryready = thisMode.game.api.gamemode(thisMode); // Preload des catégories pendant le speech
-        thisMode.IntroJackDemo.skiplistener = bindKeyListener(function(choice) {
+        skiplistener = bindKeyListener(function(choice) {
             if (choice == 32) {
-                unbindKeyListener(thisMode.skiplistener);
+                unbindKeyListener(skiplistener);
                 thisMode.categoryready(function(category) {
                     category.start(); // Barre espace = on passe au choix de la catégorie
                 });

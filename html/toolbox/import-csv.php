@@ -6,7 +6,7 @@ pdo_select_db($DBsta);
 echo 'Importing QHDR...';
 if (($handle = fopen("qhdr.csv", "r")) !== FALSE) {
     $DB->query("DELETE FROM qhdr");
-    while (($data = fgetcsv($handle, 1000, chr(0xA4))) !== FALSE) {
+    while (($data = fgetcsv($handle, 2000, chr(0xBD), chr(0xBE))) !== FALSE) { // 0xBD et 0xBE sont les deux seuls caractères que j'ai trouvé utilisables, non présents dans le charset UTF8...
         $filename = str_replace('.SRF','',strtr(strtoupper($data[2]),':','/'));
 
         $qtype = '';
@@ -44,7 +44,7 @@ if (($handle = fopen("qhdr.csv", "r")) !== FALSE) {
 echo 'Importing strings...';
 if (($handle = fopen("strings.csv", "r")) !== FALSE) {
     $DB->query("DELETE FROM strings");
-    while (($data = fgetcsv($handle, 1000, chr(0xA4))) !== FALSE) {
+    while (($data = fgetcsv($handle, 2000, chr(0xBD), chr(0xBE))) !== FALSE) {
         $file = trim(strtr($data[0],'\\','/'),'/');
         $DB->query("INSERT IGNORE INTO strings (folder, strings) VALUES (
                     '".addslashes($file)."',

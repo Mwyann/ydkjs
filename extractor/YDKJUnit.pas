@@ -58,7 +58,9 @@ procedure exportSubimagesToGif(ssf:subsubfile;filename:string);
 procedure exportSubsoundToFile(ssf:subsubfile;filename:string);
 function readString(ssf:subsubfile):string;
 procedure exportStringToFile(ssf:subsubfile;filename:string);
-procedure exportStringlistToFile(ssf:subsubfile;filename:string);
+function exportStringlist(ssf:subsubfile):string;
+function exportStringlist2(ssf:subsubfile):string;
+function exportAnswers(ssf:subsubfile):string;
 procedure exportQHeadersToFile(ssf:subsubfile);
 
 procedure decodeImageBuffer(buf:array of byte; var bufresult:array of longint; buflen:longint);
@@ -743,19 +745,15 @@ begin
   closefile(f);
 end;
 
-// Export d'une stringlist
+// Export d'une stringlist séparée par des zéros
 
-procedure exportStringlistToFile(ssf:subsubfile;filename:string);
-var f:system.text;
-    data:array[0..65535] of char;
+function exportStringlist(ssf:subsubfile):string;
+var data:array[0..65535] of char;
     js,s:string;
     i:word;
 
 begin
-  assignfile(f,filename+'.js');
-  rewrite(f);
-
-  js:='res[''stringlist'']=[';
+  js:='[';
   seek(SRFhandler,ssf.fileoffset);
   blockread(SRFhandler,data,ssf.filesize);
   s:='';
@@ -769,11 +767,59 @@ begin
       end;
     end;
   end;
-  js:=js+'];';
+  js:=js+']';
+  exportStringlist:=js;
+end;
 
-  writeln(f,js);
+// Export d'une stringlist avec nombre de mots et taille de chaine
 
-  closefile(f);
+function exportStringlist2(ssf:subsubfile):string;
+var data:array[0..65535] of char;
+    js,s:string;
+    i,j,nbstr,strlength:word;
+
+begin
+  js:='[';
+  seek(SRFhandler,ssf.fileoffset);
+  blockread(SRFhandler,data,ssf.filesize);
+  nbstr:=ord(data[0])*$FF+ord(data[1]);
+  s:='';
+  i:=2;
+  while nbstr > 0 do begin
+    strlength:=ord(data[i]);inc(i);
+    for j:=1 to strlength do begin
+      s:=s+MactoUTF8(data[i]);inc(i);
+    end;
+    js:=js+''''+s+'''';
+    if (nbstr > 1) then js:=js+',';
+    s:='';
+    dec(nbstr);
+  end;
+  js:=js+']';
+  exportStringlist2:=js;
+end;
+
+// Export des réponses
+
+function exportAnswers(ssf:subsubfile):string;
+var data:array[0..65535] of byte;
+    js:string;
+    i:word;
+    nbans:longint;
+
+begin
+  js:='[';
+  seek(SRFhandler,ssf.fileoffset);
+  blockread(SRFhandler,data,ssf.filesize);
+  nbans:=data[0]*$FFFFFF+data[1]*$FFFF+data[2]*$FF+data[3];
+  i:=4;
+  while nbans > 0 do begin
+    js:=js+inttostr(data[i]);inc(i);
+    if (nbans > 1) then js:=js+',';
+    dec(nbans);
+  end;
+  js:=js+']';
+  exportAnswers:=js;
 end;
 
 // Export des QHDR
@@ -807,7 +853,7 @@ begin
     end else break;
   end;
   answer:=ord(data[146]);
-  qhdrCSV:=qhdrCSV+id+'¤'+title+'¤'+filename+'¤'+inttostr(qtype)+'¤'+inttostr(qsubtype)+'¤'+inttostr(value)+'¤'+inttostr(answer)+#10;
+  qhdrCSV:=qhdrCSV+'¾'+id+'¾½¾'+title+'¾½¾'+filename+'¾½¾'+inttostr(qtype)+'¾½¾'+inttostr(qsubtype)+'¾½¾'+inttostr(value)+'¾½¾'+inttostr(answer)+'¾'+#10;
 end;
 
 function filetype(ftype:string):string;

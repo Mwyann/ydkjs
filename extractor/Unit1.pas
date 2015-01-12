@@ -199,10 +199,11 @@ begin
         end else if (filetype(ftype)='string') then begin
           //exportStringToFile(SRFdata.filelist[filepos].subfile[subpos],fullname);
         end else if (filetype(ftype)='stringlist') then begin
-          exportStringlistToFile(SRFdata.filelist[filepos].subfile[subpos],fullname);
+          if (strings <> '') then strings:=strings+',';
+          strings:=strings+'{id:'''+ftype+''',data:{'+exportStringlist(SRFdata.filelist[filepos].subfile[subpos])+'}';
         end;
       end else begin
-        strings:=strings+'{id:'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname)+',str:'''+readString(SRFdata.filelist[filepos].subfile[subpos])+'''},';
+        strings:=strings+'{id:'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname)+',type:'''+ftype+''',str:'''+readString(SRFdata.filelist[filepos].subfile[subpos])+'''},';
       end;
     end;
   end;
@@ -234,7 +235,19 @@ begin
     // if (filetype(ftype)='string') then // Considérer que c'est une liste de chaines, à exporter en un seul fichier JS
 
     if SRFdata.filelist[filepos].nbsub > 0 then for subpos:=0 to SRFdata.filelist[filepos].nbsub-1 do begin
-      if (filetype(ftype)<>'string') then begin
+      if (filetype(ftype)='string') then begin
+        if (strings <> '') then strings:=strings+',';
+        strings:=strings+'{id:'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname)+',type:'''+ftype+''',data:'''+readString(SRFdata.filelist[filepos].subfile[subpos])+'''}';
+      end else if (filetype(ftype)='stringlist') then begin
+        if (strings <> '') then strings:=strings+',';
+        strings:=strings+'{id:'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname)+',type:'''+ftype+''',data:'+exportStringlist(SRFdata.filelist[filepos].subfile[subpos])+'}';
+      end else if (filetype(ftype)='stringlist2') then begin
+        if (strings <> '') then strings:=strings+',';
+        strings:=strings+'{id:'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname)+',type:'''+ftype+''',data:'+exportStringlist2(SRFdata.filelist[filepos].subfile[subpos])+'}';
+      end else if (filetype(ftype)='answers') then begin
+        if (strings <> '') then strings:=strings+',';
+        strings:=strings+'{id:'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname)+',type:'''+ftype+''',data:'+exportAnswers(SRFdata.filelist[filepos].subfile[subpos])+'}';
+      end else begin
         fullname:=RemoveExt(SafeFileName(Form1.Edit2.Text+'\'+RemoveBaseDir(Form1.Edit1.Text,filefrom)))+'\'+removespaces(ftype);
         ForceDirectories(fullname);
         fullname:=fullname+'\'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname);
@@ -242,16 +255,9 @@ begin
           exportSubimagesToGif(SRFdata.filelist[filepos].subfile[subpos],fullname);
         end else if (filetype(ftype)='subsound') then begin
           exportSubsoundToFile(SRFdata.filelist[filepos].subfile[subpos],fullname);
-        end else if (filetype(ftype)='string') then begin
-          //exportStringToFile(SRFdata.filelist[filepos].subfile[subpos],fullname);
-        end else if (filetype(ftype)='stringlist') then begin
-          exportStringlistToFile(SRFdata.filelist[filepos].subfile[subpos],fullname);
         end else if (filetype(ftype)='qheaders') then begin
           exportQHeadersToFile(SRFdata.filelist[filepos].subfile[subpos]);
         end;
-      end else begin
-        if (strings<>'') then strings:=strings+',';
-        strings:=strings+'{id:'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname)+',str:'''+readString(SRFdata.filelist[filepos].subfile[subpos])+'''}';
       end;
     end;
   end;
@@ -272,7 +278,7 @@ begin
     rewrite(f);
     write(f,'res[''STR'']=['+strings+'];');
     closefile(f);}
-    stringsCSV:=stringsCSV+RemoveExt(RemoveBaseDir(Form1.Edit1.Text,filefrom))+'¤['+strings+']'#10;
+    stringsCSV:=stringsCSV+'¾'+RemoveExt(RemoveBaseDir(Form1.Edit1.Text,filefrom))+'¾½¾['+strings+']¾'#10;
   end;
 end;
 
