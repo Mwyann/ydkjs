@@ -112,6 +112,9 @@ ModeDisOrDat.prototype.preload = function(resources) {
     this.Question7 = new YDKJAnimation(resources['DisOrDat/Question7']);
     this.LastQuestionAnnounce = new YDKJAnimation(resources['DisOrDat/LastQuestionAnnounce']);
 
+    this.Public0on7 = new YDKJAnimation(resources['DisOrDat/Public0on7']);
+    this.Public7on7 = new YDKJAnimation(resources['DisOrDat/Public7on7']);
+
     this.Timer = this.options.timer;
     this.timerTimeout = 0;
 };
@@ -153,6 +156,12 @@ ModeDisOrDat.prototype.start = function() {
     var currentQuestion = 0;
     var questionouterdiv;
     var questiondiv;
+
+    this.Public7on7.ended(1000,function() {
+        jumpToNextCategory();
+    });
+
+    var buttonslistener = 0;
 
     var displayAnswer = function(i) {
         var str = getSTRfromID(thisMode.STR,'STR#',3);
@@ -231,7 +240,7 @@ ModeDisOrDat.prototype.start = function() {
         if (currentQuestion == 5) thisQuestion = thisMode.Question6;
         if (currentQuestion == 6) thisQuestion = thisMode.Question7;
 
-        if (false) { // TODO En fait "la dernière" c'est quand il n'en reste plus qu'une à répondre (à vérifier), et tu ne peux pas la passer.
+        if (false) { // TODO En fait "la dernière" c'est quand il n'en reste plus qu'une à répondre (à vérifier), et on ne peut pas la passer.
             thisMode.LastQuestionAnnounce.ended(function(){
                 thisQuestion.reset();
                 thisQuestion.play();
@@ -254,26 +263,26 @@ ModeDisOrDat.prototype.start = function() {
         if (b < 2) {
             var answerdiv = textAnswer[b];
             answerdiv.css({
-                'top':'12px',
-                'font-size':'8px'
+                'top':'6px',
+                'font-size':'16px'
             });
-            bt.delay(66,function(){
+            bt.delay(60,function(){
                 answerdiv.css({
                     'display':'none'
                 });
-                bt.delay(66,function(){
+                bt.delay(60,function(){
                     answerdiv.css({
                         'display':'',
-                        'top':'-7px',
+                        'top':'-8px',
                         'font-size':'34px',
                         'color':'#F00'
                     });
-                    bt.delay(300,function() {
+                    bt.delay(330,function() {
                         answerdiv.css({
-                            'top': '12px',
-                            'font-size': '8px'
+                            'top': '6px',
+                            'font-size': '16px'
                         });
-                        bt.delay(66,function() {
+                        bt.delay(60,function() {
                             answerdiv.css({
                                 'top': '0',
                                 'font-size': '24px',
@@ -311,52 +320,6 @@ ModeDisOrDat.prototype.start = function() {
         */
     };
 
-    thisMode.Button4of4Ready.click(function(){
-        pressButton(3);
-    });
-    thisMode.Button4of4Push.click(function(){
-        pressButton(3);
-    });
-
-    thisMode.Button3of4Ready.click(function(){
-        pressButton(2);
-    });
-    thisMode.Button3of4Push.click(function(){
-        pressButton(2);
-    });
-    thisMode.Button4of3Ready.click(function(){
-        pressButton(2);
-    });
-    thisMode.Button4of3Push.click(function(){
-        pressButton(2);
-    });
-
-    thisMode.Button2of4Ready.click(function(){
-        pressButton(1);
-    });
-    thisMode.Button2of4Push.click(function(){
-        pressButton(1);
-    });
-    thisMode.Button2of3Ready.click(function(){
-        pressButton(1);
-    });
-    thisMode.Button2of3Push.click(function(){
-        pressButton(1);
-    });
-
-    thisMode.Button1of4Ready.click(function(){
-        pressButton(0);
-    });
-    thisMode.Button1of4Push.click(function(){
-        pressButton(0);
-    });
-    thisMode.Button1of3Ready.click(function(){
-        pressButton(0);
-    });
-    thisMode.Button1of3Push.click(function(){
-        pressButton(0);
-    });
-
     thisMode.MusicLoopPlay4.ended(function(){
         this.reset();
         thisMode.MusicLoopPlay1.play();
@@ -387,19 +350,102 @@ ModeDisOrDat.prototype.start = function() {
             thisMode.timerTimeout = setTimeout(timerRunning, 1100);
         } else {
             // Timeout
+            var i;
+            unbindKeyListener(buttonslistener);
             thisMode.MusicLoopPlay1.free();
             thisMode.MusicLoopPlay2.free();
             thisMode.MusicLoopPlay3.free();
             thisMode.MusicLoopPlay4.free();
             thisMode.MusicLoopRules1.reset();
             thisMode.MusicLoopRules1.play();
-            jumpToNextCategory();
+            for(i = 0; i < buttonsAnswer.length; i++) {
+                buttonsAnswer[i].Ready.free();
+                buttonsAnswer[i].Push.free();
+                buttonsAnswer[i].Leave.play();
+            }
+            for(i = 0; i < textAnswer.length; i++) {
+                (function() {
+                    var answerdiv = textAnswer[i];
+                    answerdiv.animate({
+                        'top': '-2px',
+                        'font-size': '26px'
+                    }, 60, function () {
+                        answerdiv.animate({
+                            'top': '12px',
+                            'font-size': '8px'
+                        }, 60, function () {
+                            answerdiv.remove();
+                        });
+                    });
+                })();
+            }
+            thisMode.Public7on7.play();
         }
     };
 
     thisMode.JingleStartPlay1.ended(function(){
         thisMode.JingleStartPlay2.play();
         thisMode.PrepareTimer.free();
+
+        thisMode.Button4of4Ready.click(function(){
+            pressButton(3);
+        });
+        thisMode.Button4of4Push.click(function(){
+            pressButton(3);
+        });
+
+        thisMode.Button3of4Ready.click(function(){
+            pressButton(2);
+        });
+        thisMode.Button3of4Push.click(function(){
+            pressButton(2);
+        });
+        thisMode.Button4of3Ready.click(function(){
+            pressButton(2);
+        });
+        thisMode.Button4of3Push.click(function(){
+            pressButton(2);
+        });
+
+        thisMode.Button2of4Ready.click(function(){
+            pressButton(1);
+        });
+        thisMode.Button2of4Push.click(function(){
+            pressButton(1);
+        });
+        thisMode.Button2of3Ready.click(function(){
+            pressButton(1);
+        });
+        thisMode.Button2of3Push.click(function(){
+            pressButton(1);
+        });
+
+        thisMode.Button1of4Ready.click(function(){
+            pressButton(0);
+        });
+        thisMode.Button1of4Push.click(function(){
+            pressButton(0);
+        });
+        thisMode.Button1of3Ready.click(function(){
+            pressButton(0);
+        });
+        thisMode.Button1of3Push.click(function(){
+            pressButton(0);
+        });
+
+        buttonslistener = bindKeyListener(function(choice) {
+            var chosed = 0;
+            if (choice == 49) chosed = 1;
+            else if (choice == 50) chosed = 2;
+            else if (choice == 51) chosed = 3;
+            else if (choice == 52) chosed = 4;
+            if (thisMode.options.nbchoices == 3) {
+                if (chosed == 3) chosed = 0;
+                if (chosed == 4) chosed = 3;
+            }
+            if (chosed > 0) pressButton(chosed-1);
+        });
+
         timerRunning();
         questionouterdiv = jQuery('<div />').css({ // Titre de la catégorie
             'position':'absolute',
@@ -597,8 +643,8 @@ ModeDisOrDat.prototype.start = function() {
     this.Button2of3ComesIn.ended(readAnswers);
     this.Button2of4ComesIn.ended(readAnswers);
 
-    var addStandBy = function(comesin, standby, push, ready) {
-        buttonsAnswer.push({ComesIn: comesin, StandBy: standby, Push: push, Ready: ready});
+    var addStandBy = function(comesin, standby, push, ready, leave) {
+        buttonsAnswer.push({ComesIn: comesin, StandBy: standby, Push: push, Ready: ready, Leave: leave});
         standby.ended(function(){loopStandBy()});
         /*
         // SECURITE DESACTIVEE SINON PROBLEME APRES car exécution de loopStandby en cours de jeu
@@ -713,18 +759,7 @@ ModeDisOrDat.prototype.start = function() {
         thisMode.QuestionIntro2.delay(100,function(){
             thisMode.ShowQuestion.play();
             showQuestion(function(){
-                if (thisMode.options.nbchoices == 3) {
-                    addStandBy(thisMode.Button1of3ComesIn, thisMode.Button1of3StandbyLoop, thisMode.Button1of3Push, thisMode.Button1of3Ready);
-                    addStandBy(thisMode.Button2of3ComesIn, thisMode.Button2of3StandbyLoop, thisMode.Button2of3Push, thisMode.Button2of3Ready);
-                    addStandBy(thisMode.Button4of3ComesIn, thisMode.Button4of3StandbyLoop, thisMode.Button4of3Push, thisMode.Button4of3Ready);
-                    thisMode.Button1of3ComesIn.play();
-                } else {
-                    addStandBy(thisMode.Button1of4ComesIn, thisMode.Button1of4StandbyLoop, thisMode.Button1of4Push, thisMode.Button1of4Ready);
-                    addStandBy(thisMode.Button2of4ComesIn, thisMode.Button2of4StandbyLoop, thisMode.Button2of4Push, thisMode.Button2of4Ready);
-                    addStandBy(thisMode.Button3of4ComesIn, thisMode.Button3of4StandbyLoop, thisMode.Button3of4Push, thisMode.Button3of4Ready);
-                    addStandBy(thisMode.Button4of4ComesIn, thisMode.Button4of4StandbyLoop, thisMode.Button4of4Push, thisMode.Button4of4Ready);
-                    thisMode.Button1of4ComesIn.play();
-                }
+                buttonsAnswer[0].ComesIn.play();
                 thisMode.SFXShowKey.play();
             });
         });
@@ -764,6 +799,17 @@ ModeDisOrDat.prototype.start = function() {
                 animTransform(titlediv,0,1,1,1,0.15,300,0,'left');
             });
             this.play();
+
+            if (thisMode.options.nbchoices == 3) {
+                addStandBy(thisMode.Button1of3ComesIn, thisMode.Button1of3StandbyLoop, thisMode.Button1of3Push, thisMode.Button1of3Ready, thisMode.Button1of3Leave);
+                addStandBy(thisMode.Button2of3ComesIn, thisMode.Button2of3StandbyLoop, thisMode.Button2of3Push, thisMode.Button2of3Ready, thisMode.Button2of3Leave);
+                addStandBy(thisMode.Button4of3ComesIn, thisMode.Button4of3StandbyLoop, thisMode.Button4of3Push, thisMode.Button4of3Ready, thisMode.Button4of3Leave);
+            } else {
+                addStandBy(thisMode.Button1of4ComesIn, thisMode.Button1of4StandbyLoop, thisMode.Button1of4Push, thisMode.Button1of4Ready, thisMode.Button1of4Leave);
+                addStandBy(thisMode.Button2of4ComesIn, thisMode.Button2of4StandbyLoop, thisMode.Button2of4Push, thisMode.Button2of4Ready, thisMode.Button2of4Leave);
+                addStandBy(thisMode.Button3of4ComesIn, thisMode.Button3of4StandbyLoop, thisMode.Button3of4Push, thisMode.Button3of4Ready, thisMode.Button3of4Leave);
+                addStandBy(thisMode.Button4of4ComesIn, thisMode.Button4of4StandbyLoop, thisMode.Button4of4Push, thisMode.Button4of4Ready, thisMode.Button4of4Leave);
+            }
             thisMode.MessageSpaceBarComesIn.play();
             skiplistener = bindKeyListener(function(choice) {
                 if (choice == 32) { // Barre espace = on passe les explications

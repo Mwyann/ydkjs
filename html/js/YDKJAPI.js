@@ -449,6 +449,9 @@ YDKJAPI.prototype.initdemo = function() {
             reslist['DisOrDat/Question6'] = {urlAudio: resDD+'/snd/11'};
             reslist['DisOrDat/Question7'] = {urlAudio: resDD+'/snd/12'};
 
+            reslist['DisOrDat/Public0on7'] = reslist['DisOrDat/Public0on7'+(Math.floor(Math.random()*3)+1)];
+            reslist['DisOrDat/Public7on7'] = reslist['DisOrDat/Public7on7'+(Math.floor(Math.random()*3)+1)];
+
             mode.options.timer = new YDKJTimer(30);
             var timer30ready = thisAPI.resources(mode.options.timer);
             timer30ready(function(resources) {
