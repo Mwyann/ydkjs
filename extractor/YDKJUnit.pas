@@ -754,7 +754,7 @@ var data:array[0..65535] of char;
     i:word;
 
 begin
-  js:='[';
+  js:='';
   seek(SRFhandler,ssf.fileoffset);
   blockread(SRFhandler,data,ssf.filesize);
   s:='';
@@ -769,7 +769,7 @@ begin
       end;
     end;
   end;
-  js:=js+']';
+  js:='['+js+']';
   exportStringlist:=js;
 end;
 
@@ -781,7 +781,7 @@ var data:array[0..65535] of char;
     i,nbw:word;
 
 begin
-  js:='[';
+  js:='';
   seek(SRFhandler,ssf.fileoffset);
   blockread(SRFhandler,data,ssf.filesize);
   s:='';
@@ -800,7 +800,7 @@ begin
     end;
     inc(i);
   end;
-  js:=js+']';
+  js:='['+js+']';
   exportStringlist1:=js;
 end;
 
