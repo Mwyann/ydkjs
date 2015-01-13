@@ -241,6 +241,9 @@ begin
       end else if (filetype(ftype)='stringlist') then begin
         if (strings <> '') then strings:=strings+',';
         strings:=strings+'{id:'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname)+',type:'''+ftype+''',data:'+exportStringlist(SRFdata.filelist[filepos].subfile[subpos])+'}';
+      end else if (filetype(ftype)='stringlist1') then begin
+        if (strings <> '') then strings:=strings+',';
+        strings:=strings+'{id:'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname)+',type:'''+ftype+''',data:'+exportStringlist1(SRFdata.filelist[filepos].subfile[subpos])+'}';
       end else if (filetype(ftype)='stringlist2') then begin
         if (strings <> '') then strings:=strings+',';
         strings:=strings+'{id:'+inttostr(SRFdata.filelist[filepos].subfile[subpos].subname)+',type:'''+ftype+''',data:'+exportStringlist2(SRFdata.filelist[filepos].subfile[subpos])+'}';

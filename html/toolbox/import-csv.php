@@ -26,14 +26,18 @@ if (($handle = fopen("qhdr.csv", "r")) !== FALSE) {
             case '4': $qsubtype = 'Eyes'; break;
         }
 
-        $DB->query("INSERT IGNORE INTO qhdr (id, title, folder, qtype, qsubtype, value, answer) VALUES (
+        $forcenext = 'NULL';
+        if ($data[7] != '') $forcenext = "'".addslashes($data[7])."'";
+
+        $DB->query("INSERT IGNORE INTO qhdr (id, title, folder, qtype, qsubtype, value, answer, forcenext) VALUES (
                     '".addslashes($data[0])."',
                     '".addslashes($data[1])."',
                     '".addslashes($filename)."',
                     '".addslashes($qtype)."',
                     '".addslashes($qsubtype)."',
                     '".addslashes($data[5])."',
-                    '".addslashes($data[6])."')");
+                    '".addslashes($data[6])."',
+                     ".$forcenext.")");
     }
     $DB->query("UPDATE qhdr SET qsubtype = NULL WHERE qsubtype = ''");
     $DB->query("UPDATE qhdr SET answer = NULL WHERE answer = 0");

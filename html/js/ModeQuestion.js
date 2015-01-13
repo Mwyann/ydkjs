@@ -258,7 +258,7 @@ ModeQuestion.prototype.start = function() {
                 'width':'540px',
                 'font-size':'44px',
                 'line-height':'44px'
-            }).html(getSTRfromID(thisMode.STR,'STR ',parseInt(thisMode.correctanswer)+2)).appendTo(div);
+            }).html(getSTRfromID(thisMode.STR,'STR',parseInt(thisMode.correctanswer)+2)).appendTo(div);
 
             thisMode.SFXRevealAnswer.play();
         });
@@ -540,7 +540,7 @@ ModeQuestion.prototype.start = function() {
             '-ms-transform':'scale(1.0,0.0)',
             '-o-transform':'scale(1.0,0.0)',
             'transform':'scale(1.0,0.0)'
-        }).html(getSTRfromID(thisMode.STR,'STR ',3)).click(function(){pressKey(49)}).appendTo(div1);
+        }).html(getSTRfromID(thisMode.STR,'STR',3)).click(function(){pressKey(49)}).appendTo(div1);
         animTransform(ans1,1,1,0,1,0.10,0,26,'left');
 
         var div2 = jQuery('<div />').css({ // Réponse 2
@@ -560,7 +560,7 @@ ModeQuestion.prototype.start = function() {
             '-ms-transform':'scale(1.0,0.0)',
             '-o-transform':'scale(1.0,0.0)',
             'transform':'scale(1.0,0.0)'
-        }).html(getSTRfromID(thisMode.STR,'STR ',4)).click(function(){pressKey(50)}).appendTo(div2);
+        }).html(getSTRfromID(thisMode.STR,'STR',4)).click(function(){pressKey(50)}).appendTo(div2);
         animTransform(ans2,1,1,0,1,0.10,0,26,'left');
 
         var div3 = jQuery('<div />').css({ // Réponse 3
@@ -580,7 +580,7 @@ ModeQuestion.prototype.start = function() {
             '-ms-transform':'scale(1.0,0.0)',
             '-o-transform':'scale(1.0,0.0)',
             'transform':'scale(1.0,0.0)'
-        }).html(getSTRfromID(thisMode.STR,'STR ',5)).click(function(){pressKey(51)}).appendTo(div3);
+        }).html(getSTRfromID(thisMode.STR,'STR',5)).click(function(){pressKey(51)}).appendTo(div3);
         animTransform(ans3,1,1,0,1,0.10,0,26,'left');
 
         var div4 = jQuery('<div />').css({ // Réponse 4
@@ -600,7 +600,7 @@ ModeQuestion.prototype.start = function() {
             '-ms-transform':'scale(1.0,0.0)',
             '-o-transform':'scale(1.0,0.0)',
             'transform':'scale(1.0,0.0)'
-        }).html(getSTRfromID(thisMode.STR,'STR ',6)).click(function(){pressKey(52)}).appendTo(div4);
+        }).html(getSTRfromID(thisMode.STR,'STR',6)).click(function(){pressKey(52)}).appendTo(div4);
         animTransform(ans4,1,1,0,1,0.10,0,26,'left');
 
         thisMode.availAnswers = [];
@@ -646,7 +646,7 @@ ModeQuestion.prototype.start = function() {
             '-ms-transform':'scale(0.0, 1.0)',
             '-o-transform':'scale(0.0, 1.0)',
             'transform':'scale(0.0,1.0)'
-        }).html(getSTRfromID(thisMode.STR,'STR ',1)).appendTo(div);
+        }).html(getSTRfromID(thisMode.STR,'STR',1)).appendTo(div);
 
         div.appendTo(thisMode.game.html.screen);
 
@@ -673,7 +673,7 @@ ModeQuestion.prototype.start = function() {
                     'font-family':'JackExtraCond',
                     'font-style':'italic',
                     'text-align':'center'
-                }).html(getSTRfromID(thisMode.STR,'STR ',2));
+                }).html(getSTRfromID(thisMode.STR,'STR',2));
 
                 textdiv.appendTo(div);
 
@@ -750,8 +750,8 @@ ModeQuestion.prototype.start = function() {
 
     this.AnnounceCategory.ended(function(){
         var textsize = 50;
-        if (getSTRfromID(thisMode.STR,'STR ',1).length < 35) textsize = 70;
-        if (getSTRfromID(thisMode.STR,'STR ',1).length < 10) textsize = 120;
+        if (getSTRfromID(thisMode.STR,'STR',1).length < 35) textsize = 70;
+        if (getSTRfromID(thisMode.STR,'STR',1).length < 10) textsize = 120;
 
         jQuery('<div />').attr('id','QuestionTitle').css({ // Titre de la catégorie
             'color':'#FFF',
@@ -766,7 +766,7 @@ ModeQuestion.prototype.start = function() {
             'left':'95px',
             'top':Math.round(125+textsize*0.05)+'px',
             'opacity':'0'
-        }).html(getSTRfromID(thisMode.STR,'STR ',1)).appendTo(thisMode.game.html.screen).animate({
+        }).html(getSTRfromID(thisMode.STR,'STR',1)).appendTo(thisMode.game.html.screen).animate({
                 'width':'450px',
                 'margin-left':'0px',
                 'margin-right':'0px',

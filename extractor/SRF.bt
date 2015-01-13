@@ -162,6 +162,7 @@ typedef struct {
     else if (filename[0] == 'M' && filename[1] != 't' && filename[2] != 'c' && filename[3] == 'h') SOUNDFILE sound <optimize=false>;
     else if (filename[0] == 'S' && filename[1] == 'T' && filename[2] == 'R' && filename[3] == ' ') STRING str <optimize=false>;
     else if (filename[0] == 'S' && filename[1] == 'T' && filename[2] == 'R' && filename[3] == 'L') STRINGLIST strl <optimize=false>;
+    else if (filename[0] == 'W' && filename[1] == 'r' && filename[2] == 'd' && filename[3] == 's') STRINGLIST strl <optimize=false>;
     else if (filename[0] == 'A' && filename[1] == 'N' && filename[2] == 'S' && filename[3] == '#') ANSLIST strl <optimize=false>;
     else if (filename[0] == 'S' && filename[1] == 'T' && filename[2] == 'R' && filename[3] == '#') STRINGLIST2 strl <optimize=false>;
     else if (filename[0] == 'q' && filename[1] == 'h' && filename[2] == 'd' && filename[3] == 'r') QHDR qhdr <optimize=false>;

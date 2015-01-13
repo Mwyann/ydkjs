@@ -698,7 +698,7 @@ ModeDisOrDat.prototype.start = function() {
             'font-family':'JackRoman',
             'font-style':'italic',
             'text-align':'center'
-        }).html(getSTRfromID(thisMode.STR,'STR ',2));
+        }).html(getSTRfromID(thisMode.STR,'STR',2));
 
         textdiv.appendTo(div);
 
@@ -757,7 +757,7 @@ ModeDisOrDat.prototype.start = function() {
                     '-ms-transform':'scale(0.0,1.0)',
                     '-o-transform':'scale(0.0,1.0)',
                     'transform':'scale(0.0,1.0)'
-                }).html(getSTRfromID(thisMode.STR,'STR ',1)).appendTo(div);
+                }).html(getSTRfromID(thisMode.STR,'STR',1)).appendTo(div);
 
                 div.appendTo(thisMode.game.html.screen);
 
@@ -790,8 +790,8 @@ ModeDisOrDat.prototype.start = function() {
 
     this.AnnounceCategory.ended(-400,function() {
         var textsize = 50;
-        if (getSTRfromID(thisMode.STR,'STR ',1).length < 35) textsize = 70;
-        if (getSTRfromID(thisMode.STR,'STR ',1).length < 15) textsize = 120;
+        if (getSTRfromID(thisMode.STR,'STR',1).length < 35) textsize = 70;
+        if (getSTRfromID(thisMode.STR,'STR',1).length < 15) textsize = 120;
 
         jQuery('<div />').attr('id','QuestionTitle').css({ // Titre de la catégorie
             'color':'#FFF',
@@ -804,7 +804,7 @@ ModeDisOrDat.prototype.start = function() {
             'left':'95px',
             'top':Math.round(155+textsize*0.05)+'px', // Plus bas que les catégories des questions
             'opacity':'0'
-        }).html(getSTRfromID(thisMode.STR,'STR ',1)).appendTo(thisMode.game.html.screen).animate({
+        }).html(getSTRfromID(thisMode.STR,'STR',1)).appendTo(thisMode.game.html.screen).animate({
                 'top':'155px', // Plus bas que les catégories des questions
                 'font-size':textsize+'px',
                 'line-height':Math.round(textsize*1.10)+'px',

@@ -90,6 +90,7 @@ function resources() {
                            FROM ".$DBsta.".qhdr
                            WHERE qtype = 'Question'
                            AND qsubtype = 'Normal'
+                           AND NOT EXISTS (SELECT * FROM ".$DBsta.".qhdr a WHERE qhdr.id = a.forcenext)
                            ORDER BY RAND()
                            LIMIT 0,3");
         } else {

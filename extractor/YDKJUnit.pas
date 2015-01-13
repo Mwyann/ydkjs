@@ -59,6 +59,7 @@ procedure exportSubsoundToFile(ssf:subsubfile;filename:string);
 function readString(ssf:subsubfile):string;
 procedure exportStringToFile(ssf:subsubfile;filename:string);
 function exportStringlist(ssf:subsubfile):string;
+function exportStringlist1(ssf:subsubfile):string;
 function exportStringlist2(ssf:subsubfile):string;
 function exportAnswers(ssf:subsubfile):string;
 procedure exportQHeadersToFile(ssf:subsubfile);
@@ -762,13 +763,45 @@ begin
       s:=s+MactoUTF8(data[i]);
     end else begin
       if (s <> '') then begin
-        js:=js+''''+s+''',';
+        if (js <> '') then js:=js+',';
+        js:=js+''''+s+'''';
         s:='';
       end;
     end;
   end;
   js:=js+']';
   exportStringlist:=js;
+end;
+
+// Export d'une stringlist séparée par des zéros (2eme méthode)
+
+function exportStringlist1(ssf:subsubfile):string;
+var data:array[0..65535] of char;
+    js,s:string;
+    i,nbw:word;
+
+begin
+  js:='[';
+  seek(SRFhandler,ssf.fileoffset);
+  blockread(SRFhandler,data,ssf.filesize);
+  s:='';
+  i:=2;
+  nbw:=ord(data[1]);
+  while (i < ssf.filesize) and (nbw > 0) do begin
+    if (data[i] <> #00) then begin
+      s:=s+MactoUTF8(data[i]);
+    end else begin
+      if (s <> '') then begin
+        if (js <> '') then js:=js+',';
+        js:=js+''''+s+'''';
+        s:='';
+        dec(nbw);
+      end;
+    end;
+    inc(i);
+  end;
+  js:=js+']';
+  exportStringlist1:=js;
 end;
 
 // Export d'une stringlist avec nombre de mots et taille de chaine
@@ -826,7 +859,7 @@ end;
 
 procedure exportQHeadersToFile(ssf:subsubfile);
 var data:array[0..65535] of char;
-    id,title,filename:string;
+    id,title,filename,force:string;
     i:word;
     value,qtype,qsubtype,answer:byte;
 
@@ -853,17 +886,24 @@ begin
     end else break;
   end;
   answer:=ord(data[146]);
-  qhdrCSV:=qhdrCSV+'¾'+id+'¾½¾'+title+'¾½¾'+filename+'¾½¾'+inttostr(qtype)+'¾½¾'+inttostr(qsubtype)+'¾½¾'+inttostr(value)+'¾½¾'+inttostr(answer)+'¾'+#10;
+  force:='';
+  if (ssf.filesize >= 152) then for i:=150 to 152 do begin
+    if (data[i] <> #00) then begin
+      force:=force+MactoUTF8(data[i]);
+    end else break;
+  end;
+  qhdrCSV:=qhdrCSV+'¾'+id+'¾½¾'+title+'¾½¾'+filename+'¾½¾'+inttostr(qtype)+'¾½¾'+inttostr(qsubtype)+'¾½¾'+inttostr(value)+'¾½¾'+inttostr(answer)+'¾½¾'+force+'¾'+#10;
 end;
 
 function filetype(ftype:string):string;
 begin
   result:='';
   if (ftype='off4') then result:='subimages';
-  if (ftype='snd ') then result:='subsound';
+  if (ftype='snd') then result:='subsound';
   if (ftype[1]='M') and (ftype <> 'Mtch') then result:='subsound';
-  if (ftype='STR ') then result:='string';
+  if (ftype='STR') then result:='string';
   if (ftype='STRL') then result:='stringlist';
+  if (ftype='Wrds') then result:='stringlist1';
   // Utilisés pour le Couci-Couça, entre autres
   if (ftype='ANS#') then result:='answers';
   if (ftype='STR#') then result:='stringlist2';
@@ -895,6 +935,7 @@ begin
     blockread(SRFhandler,buf,4);
     subcount:=readlw;
     ftype:=chr(buf[0])+chr(buf[1])+chr(buf[2])+chr(buf[3]);
+    while ftype[length(ftype)] = ' ' do delete(ftype,length(ftype),1);
     nbsub:=subcount;
     if (nbsub > 1000) then raise Exception.create('Too many subfiles');
     if (subcount > 0) then for i:=0 to subcount-1 do begin
