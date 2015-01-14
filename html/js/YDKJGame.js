@@ -39,8 +39,7 @@ function YDKJGame(html, demomode) {
             var centerup = Math.max(0,Math.round((jQuery(window).height()-(zoom*480))/4));
             body.css({
                 'background-color': '#000',
-                'margin-top': '640px',
-                'padding-top': '640px',
+                'padding-top': '2000px',
                 'overflow': 'hidden',
                 'zoom': zoom.toFixed(2),
                 '-moz-transform-origin': '50% 0',
