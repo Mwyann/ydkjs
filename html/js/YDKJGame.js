@@ -38,11 +38,16 @@ function YDKJGame(html, demomode) {
             var zoom = Math.min(jQuery(window).width()/640,jQuery(window).height()/480);
             var centerup = Math.max(0,Math.round((jQuery(window).height()-(zoom*480))/4));
             body.css({
-                'padding-top': centerup+'px',
+                'background-color': '#000',
+                'margin-top': '640px',
+                'padding-top': '640px',
                 'overflow': 'hidden',
                 'zoom': zoom.toFixed(2),
                 '-moz-transform-origin': '50% 0',
                 '-moz-transform': 'scale('+zoom.toFixed(2)+','+zoom.toFixed(2)+')'}).css('zoom',(zoom*100).toFixed(0)+'%');
+            thisGame.html.screen.css({
+                'top': centerup+'px'
+            });
         };
         onfullscreenoff = f;
         oldcssbody = body.attr('style');
