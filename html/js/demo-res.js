@@ -109,8 +109,8 @@ var YDKJDemoSnd = {
         'MusicLoopRules1':{res:'5QDemo',name:'Mb71',min:1,max:1,loop:1},
         'MusicLoopRules2':{res:'5QDemo',name:'Mb72',min:1,max:1,loop:1},
         'MusicLoopScore':{res:'5QDemo',name:'Mb80',min:1,max:1,loop:1},
-        'MusicPlayEnd':{res:'5QDemo',name:'Mb78',min:1,max:1},
-        'MusicUnknown':{res:'5QDemo',name:'Mb79',min:1,max:1}, // Probablement pour le Timeout, ou bien pour faire reboucler ?
+        'MusicUnknown':{res:'5QDemo',name:'Mb78',min:1,max:1}, // Probablement pour le Timeout, ou bien pour faire reboucler ?
+        'MusicPlayEnd':{res:'5QDemo',name:'Mb79',min:1,max:1},
         'Public0on71':{res:'5QDemo',name:'Mp33',min:1,max:1},
         'Public0on72':{res:'5QDemo',name:'Mp34',min:1,max:1},
         'Public0on73':{res:'5QDemo',name:'Mp35',min:1,max:1},
@@ -145,7 +145,7 @@ var YDKJDemoSnd = {
         'Score14on7':{res:'5QDemo',name:'Mp20',min:1,max:1},
         'Score15on7':{res:'5QDemo',name:'Mp18',min:1,max:1},
         'Score16on7':{res:'5QDemo',name:'Mp16',min:1,max:1},
-        'Score17on7WithTimeLeft':{res:'5QDemo',name:'Mp14',min:1,max:1},
+        'Score17on7WithTimeLeft':{res:'5QDemo',name:'Mp14',min:1,max:1}, // WithTimeLeft : il y a une variante sans ?
         'Score20on7':{res:'5QDemo',name:'Mp29',min:1,max:1},
         'Score21on7':{res:'5QDemo',name:'Mp27',min:1,max:1},
         'Score22on7':{res:'5QDemo',name:'Mp25',min:1,max:1},

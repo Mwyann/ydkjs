@@ -386,11 +386,16 @@ YDKJAnimation.prototype.reset = function(fullreset) {
 
 YDKJAnimation.prototype.free = function() {
     this.stop();
-    if (this.gif) this.gif.free();
-    if (this.js) this.js.free();
-    if (this.audio) this.audio.free();
-    if (this.div) this.div.addClass('markedAsRemoved'); // Sera retiré réellement à la prochaine animation (pour éviter les écrans noirs entre animations)
-    if (this.tmpdiv) this.tmpdiv.remove();
+    var gif = this.gif; this.gif = false;
+    var js = this.js; this.js = false;
+    var audio = this.audio; this.audio = false;
+    var div = this.div; this.div = false;
+    var tmpdiv = this.tmpdiv; this.tmpdiv = false;
+    if (gif) gif.free();
+    if (js) js.free();
+    if (audio) audio.free();
+    if (div) div.addClass('markedAsRemoved'); // Sera retiré réellement à la prochaine animation (pour éviter les écrans noirs entre animations)
+    if (tmpdiv) tmpdiv.remove();
 };
 
 YDKJAnimation.prototype.volume = function(vol) {

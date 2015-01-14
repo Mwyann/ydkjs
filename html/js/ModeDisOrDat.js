@@ -111,9 +111,23 @@ ModeDisOrDat.prototype.preload = function(resources) {
     this.Question6 = new YDKJAnimation(resources['DisOrDat/Question6']);
     this.Question7 = new YDKJAnimation(resources['DisOrDat/Question7']);
     this.LastQuestionAnnounce = new YDKJAnimation(resources['DisOrDat/LastQuestionAnnounce']);
+    this.CannotSkipLast = new YDKJAnimation(resources['DisOrDat/CannotSkipLast']);
+    this.SFXCorrect = new YDKJAnimation(resources['DisOrDat/SFXCorrect']);
+    this.SFXWrong = new YDKJAnimation(resources['DisOrDat/SFXWrong']);
+    this.RestartSkipped = new YDKJAnimation(resources['DisOrDat/RestartSkipped']);
 
+    this.MusicPlayEnd = new YDKJAnimation(resources['DisOrDat/MusicPlayEnd']);
     this.Public0on7 = new YDKJAnimation(resources['DisOrDat/Public0on7']);
     this.Public7on7 = new YDKJAnimation(resources['DisOrDat/Public7on7']);
+
+    this.Score10on7 = new YDKJAnimation(resources['DisOrDat/Score10on7']);
+    this.Score11on7 = new YDKJAnimation(resources['DisOrDat/Score11on7']);
+    this.Score12on7 = new YDKJAnimation(resources['DisOrDat/Score12on7']);
+    this.Score13on7 = new YDKJAnimation(resources['DisOrDat/Score13on7']);
+    this.Score14on7 = new YDKJAnimation(resources['DisOrDat/Score14on7']);
+    this.Score15on7 = new YDKJAnimation(resources['DisOrDat/Score15on7']);
+    this.Score16on7 = new YDKJAnimation(resources['DisOrDat/Score16on7']);
+    this.Score17on7WithTimeLeft = new YDKJAnimation(resources['DisOrDat/Score17on7WithTimeLeft']);
 
     this.Timer = this.options.timer;
     this.timerTimeout = 0;
@@ -142,6 +156,14 @@ ModeDisOrDat.prototype.start = function() {
         this.PlayerWin = this.Player3Win;
         this.PlayerLose = this.Player3Lose;
     }
+    var playerdiv;
+    var tempscore = 0;
+    var tempscorediv;
+
+    thisMode.PlayerComesIn.ended(function(){
+        playerdiv = thisMode.game.displayPlayer(thisMode.chooseplayer,1,1);
+        playerdiv.css({'color':'#666'}).show().animate({'color':'#FFF'},180);
+    });
 
     var jumpToNextCategory = function() {
         nextcategory.modeObj.MusicChooseCategoryLoop.free();
@@ -150,18 +172,100 @@ ModeDisOrDat.prototype.start = function() {
         nextcategory.start();
     };
 
-    var buttonsAnswer = [];
+    var buttonsAnswer = [0]; // Rien pour le 0, comme ça on décale pas
     var textAnswer = [];
     var currentAnswers = [0,0,0,0,0,0,0]; // 0 = non répondu, 1 = gagné, 2 = perdu
-    var currentQuestion = 0;
+    var currentQuestion = -1;
+    var canPress = 1;
     var questionouterdiv;
     var questiondiv;
 
-    this.Public7on7.ended(1000,function() {
-        jumpToNextCategory();
+    var buttonslistener = 0;
+
+    thisMode.MusicPlayEnd.ended(100,function(){
+        var nbgoodanswers = 0;
+        for(var i = 0; i < currentAnswers.length; i++) if (currentAnswers[i] == 1) nbgoodanswers++;
+
+        var scoremessage;
+        if (nbgoodanswers == 0) scoremessage = thisMode.Score10on7;
+        if (nbgoodanswers == 1) scoremessage = thisMode.Score11on7;
+        if (nbgoodanswers == 2) scoremessage = thisMode.Score12on7;
+        if (nbgoodanswers == 3) scoremessage = thisMode.Score13on7;
+        if (nbgoodanswers == 4) scoremessage = thisMode.Score14on7;
+        if (nbgoodanswers == 5) scoremessage = thisMode.Score15on7;
+        if (nbgoodanswers == 6) scoremessage = thisMode.Score16on7;
+        if (nbgoodanswers == 7) scoremessage = thisMode.Score17on7WithTimeLeft;
+
+        scoremessage.ended(1500,function(){
+            jumpToNextCategory();
+        });
+        scoremessage.play();
     });
 
-    var buttonslistener = 0;
+    thisMode.MusicPlayEnd.ended(function(){
+        thisMode.MusicLoopRules1.reset();
+        thisMode.MusicLoopRules1.play();
+    });
+
+    var endQuestion = function() {
+        var i;
+        clearInterval(thisMode.timerTimeout);
+        unbindKeyListener(buttonslistener);
+
+        var totalButtons = 0;
+        var tempscoreLeave = function() {
+            totalButtons--;
+            if (totalButtons == 0) {
+                tempscorediv.animate({
+                    'color':'#000'
+                },180,function(){tempscorediv.remove()});
+                // TODO En même temps, on affiche le gros score
+
+                thisMode.MusicLoopPlay1.free();
+                thisMode.MusicLoopPlay2.free();
+                thisMode.MusicLoopPlay3.free();
+                thisMode.MusicLoopPlay4.free();
+                thisMode.MusicPlayEnd.play();
+
+                var nbgoodanswers = 0;
+                for(var i = 0; i < currentAnswers.length; i++) if (currentAnswers[i] == 1) nbgoodanswers++;
+
+                if (nbgoodanswers > 3) {
+                    thisMode.Public7on7.play();
+                    thisMode.Public7on7.volume(70);
+                } else {
+                    thisMode.Public0on7.play();
+                    thisMode.Public0on7.volume(70);
+                }
+            }
+        };
+        for(i = 0; i < buttonsAnswer.length; i++) if (buttonsAnswer[i]) {
+            buttonsAnswer[i].Ready.free();
+            buttonsAnswer[i].Push.free();
+            totalButtons++;
+            buttonsAnswer[i].Leave.ended(-50,tempscoreLeave);
+            buttonsAnswer[i].Leave.play();
+        }
+
+        questionouterdiv.remove();
+
+        for(i = 0; i < textAnswer.length; i++) {
+            (function() {
+                var answerdiv = textAnswer[i];
+                answerdiv.animate({
+                    'top': '-3px',
+                    'font-size': '28px'
+                }, 30, function () {
+                    answerdiv.animate({
+                        'top': '12px',
+                        'font-size': '8px'
+                    }, 90, function () {
+                        answerdiv.remove();
+                    });
+                });
+            })();
+        }
+    };
 
     var displayAnswer = function(i) {
         var str = getSTRfromID(thisMode.STR,'STR#',3);
@@ -173,7 +277,10 @@ ModeDisOrDat.prototype.start = function() {
         });
 
         var left = '0';
-        if (i == 2) left = '226px';
+        if (i == 2) {
+            if (thisMode.options.nbchoices == 2) left = '226px';
+            else left = '158px';
+        }
 
         var answerdiv = jQuery('<div />').css({
             'position':'relative',
@@ -199,22 +306,11 @@ ModeDisOrDat.prototype.start = function() {
         textAnswer[i-1] = answerdiv;
     };
 
-    var loopStandBy = function(){ // Fonction servant à synchroniser les animations Standby
-        for(var i = 0; i < buttonsAnswer.length; i++) {
-            if ((!buttonsAnswer[i].ComesIn.isplaying) && (buttonsAnswer[i].ComesIn.played) && (!buttonsAnswer[i].StandBy.isplaying) && (!buttonsAnswer[i].Push.isplaying)) {
-                buttonsAnswer[i].ComesIn.free();
-                buttonsAnswer[i].Push.reset();
-                buttonsAnswer[i].StandBy.reset();
-                buttonsAnswer[i].StandBy.play();
-            }
-        }
-    };
-
     var askQuestion = function() {
         var str = getSTRfromID(thisMode.STR,'STR#',3);
 
         questionouterdiv.html('');
-        questiondiv = jQuery('<div />').attr('id','QuestionDiv').css({ // Titre de la catégorie
+        questiondiv = jQuery('<div />').attr('id','QuestionDiv').css({ // Question
             'color':'#FFF',
             'font-family':'JackExtraCond',
             'text-align':'center',
@@ -240,7 +336,10 @@ ModeDisOrDat.prototype.start = function() {
         if (currentQuestion == 5) thisQuestion = thisMode.Question6;
         if (currentQuestion == 6) thisQuestion = thisMode.Question7;
 
-        if (false) { // TODO En fait "la dernière" c'est quand il n'en reste plus qu'une à répondre (à vérifier), et on ne peut pas la passer.
+        var nbquestions = 0;
+        for(var i = 0; i < currentAnswers.length; i++) if (currentAnswers[i] == 0) nbquestions++;
+
+        if (nbquestions == 1) { // "la dernière" c'est quand il n'en reste plus qu'une à répondre (à vérifier), et on ne peut pas la passer.
             thisMode.LastQuestionAnnounce.ended(function(){
                 thisQuestion.reset();
                 thisQuestion.play();
@@ -250,9 +349,40 @@ ModeDisOrDat.prototype.start = function() {
             thisQuestion.reset();
             thisQuestion.play();
         }
+        canPress = 1;
     };
 
-    var pressButton = function(b,ans) { // Appuie sur les boutons. Fonction pour gérer les animations, sons et styles CSS
+    var animateValue = function(div,from,to,frames,callback) {
+        var speed;
+        if (typeof animationSpeed == 'undefined') speed = 66; else speed = animationSpeed;
+        var step = Math.floor((to-from)/frames);
+        var loopAnimValue = function() {
+            frames--;
+            if (frames > 0) {
+                from = from+step;
+                div.html(from.toString()+'&thinsp;F');
+                setTimeout(loopAnimValue, speed);
+            } else {
+                div.html(to.toString()+'&thinsp;F');
+                callback();
+            }
+        };
+        setTimeout(loopAnimValue, speed);
+    };
+
+    var afterPressAnimation;
+
+    var RestartSkipped = this.RestartSkipped;
+
+    var pressButton = function(b) { // Appuie sur les boutons. Fonction pour gérer les animations, sons et styles CSS
+        if (!canPress) return false;
+        var nbquestions = 0;
+        for(var i = 0; i < currentAnswers.length; i++) if (currentAnswers[i] == 0) nbquestions++;
+        if ((nbquestions == 1) && (b == 4)) {
+            thisMode.CannotSkipLast.play();
+            return false;
+        }
+
         var bt = buttonsAnswer[b].Push;
         buttonsAnswer[b].StandBy.reset();
         buttonsAnswer[b].Ready.reset(true);
@@ -260,8 +390,8 @@ ModeDisOrDat.prototype.start = function() {
         bt.play();
         thisMode.SFXKeyPress.reset();
         thisMode.SFXKeyPress.play();
-        if (b < 2) {
-            var answerdiv = textAnswer[b];
+        if (b < 3) {
+            var answerdiv = textAnswer[b-1];
             answerdiv.css({
                 'top':'6px',
                 'font-size':'16px'
@@ -294,19 +424,87 @@ ModeDisOrDat.prototype.start = function() {
             });
         }
 
-        if (questiondiv) {
+        if (currentQuestion >= 0) {
+            canPress = 0;
             // Animation différente si gagné ou perdu
             // INFO : le score (+500-500) s'incrémente tous les 83 par frames sur 6 frames, soit environ 500/6 => 83*6 = 496 (et on ajoute 1 frame pour afficher la valeur exacte).
             // Pour l'addition, c'est sur 11 frames (et on ajoute 1 pour le score exact), donc 1500 ~= 136*11 par exemple.
-            //if (ans == true) {
-                questiondiv.animate({
-                    'left': '640px'
-                }, 250, function () {
+
+            var nextQuestion = function() {
+                var nbquestions = 0;
+                for (var i = 0; i < currentAnswers.length; i++) if (currentAnswers[i] == 0) nbquestions++;
+                if (nbquestions == 0) {
+                    setTimeout(endQuestion(),300);
+                } else {
+                    var announceRestartSkipped = false;
                     currentQuestion++;
-                    if (currentQuestion == 7) currentQuestion = 0;
-                    askQuestion();
-                });
-            //};
+                    if (currentQuestion == 7) {
+                        currentQuestion = 0;
+                        announceRestartSkipped = true;
+                    }
+                    while (currentAnswers[currentQuestion] != 0) {
+                        currentQuestion++;
+                        if (currentQuestion == 7) {
+                            currentQuestion = 0;
+                            announceRestartSkipped = true;
+                        }
+                    }
+                    if ((announceRestartSkipped) && (RestartSkipped)) {
+                        RestartSkipped.ended(100,function(){askQuestion();});
+                        RestartSkipped.delay(150,function(){this.play()});
+                        RestartSkipped = false;
+                    } else {
+                        setTimeout(askQuestion, 100);
+                    }
+                }
+            };
+
+            if (b == 4) { // On passe la question
+                questiondiv.animate({
+                    'opacity': '0'
+                }, 300, function(){questiondiv.html('').css({'opacity':'1'})});
+                afterPressAnimation = function() {
+                    nextQuestion();
+                };
+            } else {
+                var ans = getSTRfromID(thisMode.STR,'ANS#',4);
+                if (b == ans[currentQuestion]) { // Bonne réponse !
+                    currentAnswers[currentQuestion] = 1;
+                    questiondiv.animate({
+                        'left': '640px'
+                    }, 300);
+                    afterPressAnimation = function(){
+                        thisMode.SFXCorrect.reset();
+                        thisMode.SFXCorrect.play();
+                        tempscorediv.animate({color:'#0F0'},150);
+                        var oldtempscore = tempscore;
+                        tempscore += thisMode.options.value;
+                        animateValue(tempscorediv,oldtempscore,tempscore,6,function(){
+                            tempscorediv.animate({color:'#33F'},150,function(){
+                                nextQuestion();
+                            });
+                        });
+                    };
+                } else { // Perdu !
+                    currentAnswers[currentQuestion] = 2;
+                    questiondiv.animate({
+                        'top':'12px',
+                        'font-size': '8px'
+                    }, 300, function(){questiondiv.html('').css({'font-size':'70px','top':'0'})});
+                    afterPressAnimation = function(){
+                        thisMode.SFXWrong.reset();
+                        thisMode.SFXWrong.play();
+                        tempscorediv.animate({color:'#F00'},150);
+                        var oldtempscore = tempscore;
+                        tempscore -= thisMode.options.value;
+                        animateValue(tempscorediv,oldtempscore,tempscore,6,function(){
+                            tempscorediv.animate({color:'#33F'},150,function(){
+                                nextQuestion();
+                            });
+                        });
+                    };
+                }
+            }
         }
 
         /*
@@ -350,36 +548,8 @@ ModeDisOrDat.prototype.start = function() {
             thisMode.timerTimeout = setTimeout(timerRunning, 1100);
         } else {
             // Timeout
-            var i;
-            unbindKeyListener(buttonslistener);
-            thisMode.MusicLoopPlay1.free();
-            thisMode.MusicLoopPlay2.free();
-            thisMode.MusicLoopPlay3.free();
-            thisMode.MusicLoopPlay4.free();
-            thisMode.MusicLoopRules1.reset();
-            thisMode.MusicLoopRules1.play();
-            for(i = 0; i < buttonsAnswer.length; i++) {
-                buttonsAnswer[i].Ready.free();
-                buttonsAnswer[i].Push.free();
-                buttonsAnswer[i].Leave.play();
-            }
-            for(i = 0; i < textAnswer.length; i++) {
-                (function() {
-                    var answerdiv = textAnswer[i];
-                    answerdiv.animate({
-                        'top': '-2px',
-                        'font-size': '26px'
-                    }, 60, function () {
-                        answerdiv.animate({
-                            'top': '12px',
-                            'font-size': '8px'
-                        }, 60, function () {
-                            answerdiv.remove();
-                        });
-                    });
-                })();
-            }
-            thisMode.Public7on7.play();
+            // TODO normalement il y a une animation avec un SFX pour le timeout
+            endQuestion();
         }
     };
 
@@ -387,63 +557,26 @@ ModeDisOrDat.prototype.start = function() {
         thisMode.JingleStartPlay2.play();
         thisMode.PrepareTimer.free();
 
-        thisMode.Button4of4Ready.click(function(){
-            pressButton(3);
-        });
-        thisMode.Button4of4Push.click(function(){
-            pressButton(3);
-        });
-
-        thisMode.Button3of4Ready.click(function(){
-            pressButton(2);
-        });
-        thisMode.Button3of4Push.click(function(){
-            pressButton(2);
-        });
-        thisMode.Button4of3Ready.click(function(){
-            pressButton(2);
-        });
-        thisMode.Button4of3Push.click(function(){
-            pressButton(2);
-        });
-
-        thisMode.Button2of4Ready.click(function(){
-            pressButton(1);
-        });
-        thisMode.Button2of4Push.click(function(){
-            pressButton(1);
-        });
-        thisMode.Button2of3Ready.click(function(){
-            pressButton(1);
-        });
-        thisMode.Button2of3Push.click(function(){
-            pressButton(1);
-        });
-
-        thisMode.Button1of4Ready.click(function(){
-            pressButton(0);
-        });
-        thisMode.Button1of4Push.click(function(){
-            pressButton(0);
-        });
-        thisMode.Button1of3Ready.click(function(){
-            pressButton(0);
-        });
-        thisMode.Button1of3Push.click(function(){
-            pressButton(0);
-        });
+        var i;
+        for(i = 0; i < buttonsAnswer.length; i++) if (buttonsAnswer[i]) {
+            (function(){
+                var j = i;
+                buttonsAnswer[j].Ready.click(function(){
+                    pressButton(j);
+                });
+                buttonsAnswer[j].Push.click(function(){
+                    pressButton(j);
+                });
+            })();
+        }
 
         buttonslistener = bindKeyListener(function(choice) {
             var chosed = 0;
             if (choice == 49) chosed = 1;
             else if (choice == 50) chosed = 2;
-            else if (choice == 51) chosed = 3;
+            else if ((choice == 51) && (thisMode.options.nbchoices == 3)) chosed = 3;
             else if (choice == 52) chosed = 4;
-            if (thisMode.options.nbchoices == 3) {
-                if (chosed == 3) chosed = 0;
-                if (chosed == 4) chosed = 3;
-            }
-            if (chosed > 0) pressButton(chosed-1);
+            if (chosed > 0) pressButton(chosed);
         });
 
         timerRunning();
@@ -457,9 +590,13 @@ ModeDisOrDat.prototype.start = function() {
 
         questionouterdiv.appendTo(thisMode.game.html.screen);
 
-        for(var i = 0; i < buttonsAnswer.length; i++) {
+        for(i = 0; i < buttonsAnswer.length; i++) if (buttonsAnswer[i]) {
             buttonsAnswer[i].Push.ended(false);
+            buttonsAnswer[i].Push.ended(-150,function(){
+                afterPressAnimation();
+            });
         }
+        currentQuestion = 0;
         askQuestion();
     });
 
@@ -473,6 +610,7 @@ ModeDisOrDat.prototype.start = function() {
     });
 
     thisMode.AnnounceTimer.ended(100,function() {
+        canPress = 0;
         thisMode.TimerComesIn.free();
         thisMode.PrepareTimer.play();
     });
@@ -493,20 +631,14 @@ ModeDisOrDat.prototype.start = function() {
         var i;
         if (skiplistener) unbindKeyListener(skiplistener);
         countLoopRules2 = 0; // TODO: on laisse finir la musique ou bien on arrête immédiatement ?
-        thisMode.MusicLoopRules1.ended(false);
-        thisMode.Button1of3ComesIn.free(); // Grosse libération globale : si on passe les explications, il faut tout arrêter immédiatement.
-        thisMode.Button2of3ComesIn.free();
-        thisMode.Button4of3ComesIn.free();
-        thisMode.Button1of4ComesIn.free();
-        thisMode.Button2of4ComesIn.free();
-        thisMode.Button3of4ComesIn.free();
-        thisMode.Button4of4ComesIn.free();
-        for(i = 0; i < buttonsAnswer.length; i++) {
+        thisMode.MusicLoopRules1.ended(false); // Grosse libération globale : si on passe les explications, il faut tout arrêter immédiatement.
+        for(i = 0; i < buttonsAnswer.length; i++) if (buttonsAnswer[i]) {
+            buttonsAnswer[i].ComesIn.free();
             buttonsAnswer[i].Push.reset();
             buttonsAnswer[i].StandBy.free();
         }
+        thisMode.SFXKeyPress.stop();
         thisMode.SFXShowKey.free();
-        thisMode.SFXKeyPress.free();
         thisMode.SFXShowPriceCorrect.free();
         thisMode.SFXShowPriceWrong.free();
         thisMode.SFXHidePrice.free();
@@ -522,7 +654,7 @@ ModeDisOrDat.prototype.start = function() {
         thisMode.ValueMinus.free();
         thisMode.ValueLeave.free();
         thisMode.PlayerComesIn.play();
-        for(i = 0; i < buttonsAnswer.length; i++) {
+        for(i = 0; i < buttonsAnswer.length; i++) if (buttonsAnswer[i]) {
             buttonsAnswer[i].Ready.play();
         }
         if (textAnswer.length == 0) {
@@ -530,12 +662,23 @@ ModeDisOrDat.prototype.start = function() {
             displayAnswer(2);
         } else if (textAnswer.length == 1) displayAnswer(2);
 
-        // TODO: afficher le score du joueur et le score temporaire à gauche.
+        tempscorediv = jQuery('<div />').css({ // Score temporaire (en bas à gauche)
+            'position':'absolute',
+            'left':'0',
+            'top':'390px',
+            'width':'270px',
+            'color':'#000',
+            'text-align':'center',
+            'font-size':'90px',
+            'line-height':'70px',
+            'font-family':'JackExtraCond'
+        }).html('0&thinsp;F');
+
+        tempscorediv.appendTo(thisMode.game.html.screen).animate({'color':'#33F'},180);
 
         var prepareGame = function() {
             thisMode.AnnounceTimer.delay(600,function() {
                 this.play();
-                //jumpToNextCategory();
             });
         };
         if (thisMode.RulesSkipExplain.isplaying) thisMode.RulesSkipExplain.ended(prepareGame); else prepareGame();
@@ -565,20 +708,6 @@ ModeDisOrDat.prototype.start = function() {
         thisMode.SFXShowPriceCorrect.play();
     };
 
-    this.Button4of3Push.ended(function() { // Il faut un délai après le ended sinon, si le Push est stop/reset avant le délai, cela ne sera jamais exécuté.
-        this.delay(200,function(){
-            this.ended(false);
-            rulesExplainNext();
-        });
-    });
-
-    this.Button4of4Push.ended(function() {
-        this.delay(200,function(){
-            this.ended(false);
-            rulesExplainNext();
-        });
-    });
-
     this.MusicLoopRules2.ended(function() {
         if (countLoopRules2 <= 0) {
             this.free();
@@ -598,26 +727,38 @@ ModeDisOrDat.prototype.start = function() {
         });
     };
 
+    var rulesExplainSkip = function(){
+        thisMode.RulesExplainSkip.play();
+        thisMode.RulesExplainSkip.delay(300,function(){
+            buttonsAnswer[4].ComesIn.play();
+            thisMode.SFXShowKey.reset();
+            thisMode.SFXShowKey.play();
+        });
+    };
+
+    thisMode.RulesExplainBoth.ended(800,function(){
+        rulesExplainSkip();
+    });
+
+    thisMode.RulesExplainBoth.ended(-350,function(){
+        pressButton(3);
+    });
+
     thisMode.QuestionAnswer2.ended(800,function(){
-        if (thisMode.options.nbchoices == 3) {
-            thisMode.RulesExplainSkip.play();
-            thisMode.QuestionAnswer2.delay(300,function(){
-                thisMode.Button4of3ComesIn.play();
-                thisMode.SFXShowKey.reset();
-                thisMode.SFXShowKey.play();
-            });
+        if (thisMode.options.nbchoices == 2) {
+            rulesExplainSkip();
         } else {
-            thisMode.RulesExplainBoth.play(); // TODO: gérer la suite...
+            thisMode.RulesExplainBoth.play();
         }
     });
 
     thisMode.QuestionAnswer2.ended(-350,function(){
-        pressButton(1);
+        pressButton(2);
     });
 
     thisMode.QuestionAnswer1.ended(800,function(){
         // EST-CE LA MEILLEURE MANIERE DE FAIRE ?
-        // On attend que le bouton 1 (donc n° 0) soit à nouveau en Standby avant d'appuyer, donc on attend si nécessaire que le 2 ait le temps de faire une boucle.
+        // On attend que le bouton 1 soit à nouveau en Standby avant d'appuyer, donc on attend si nécessaire que le 2 ait le temps de faire une boucle.
         var timeleft = buttonsAnswer[1].StandBy.length()-buttonsAnswer[1].StandBy.position();
         var anslen = thisMode.QuestionAnswer2.length()-350;
         var interval = timeleft - anslen + 100;
@@ -629,7 +770,7 @@ ModeDisOrDat.prototype.start = function() {
     });
 
     thisMode.QuestionAnswer1.ended(-350,function(){
-        pressButton(0);
+        pressButton(1);
     });
 
     var readAnswers = function() {
@@ -640,8 +781,16 @@ ModeDisOrDat.prototype.start = function() {
         })
     };
 
-    this.Button2of3ComesIn.ended(readAnswers);
-    this.Button2of4ComesIn.ended(readAnswers);
+    var loopStandBy = function() { // Fonction servant à synchroniser les animations Standby
+        for(var i = 0; i < buttonsAnswer.length; i++) if (buttonsAnswer[i]) {
+            if ((!buttonsAnswer[i].ComesIn.isplaying) && (buttonsAnswer[i].ComesIn.played) && (!buttonsAnswer[i].StandBy.isplaying) && (!buttonsAnswer[i].Push.isplaying)) {
+                buttonsAnswer[i].ComesIn.free();
+                buttonsAnswer[i].Push.reset();
+                buttonsAnswer[i].StandBy.reset();
+                buttonsAnswer[i].StandBy.play();
+            }
+        }
+    };
 
     var addStandBy = function(comesin, standby, push, ready, leave) {
         buttonsAnswer.push({ComesIn: comesin, StandBy: standby, Push: push, Ready: ready, Leave: leave});
@@ -658,70 +807,6 @@ ModeDisOrDat.prototype.start = function() {
         });
         */
     };
-
-    this.Button4of4ComesIn.ended(function(){
-        this.delay(300,function(){
-            buttonsAnswer[3].ComesIn.free();
-            pressButton(3);
-        });
-        this.delay(300,function(){
-            MusicLoopRules2();
-        });
-    });
-
-    this.Button3of4ComesIn.ended(function(){
-    });
-
-    this.Button2of4ComesIn.ended(-100,function() {
-        displayAnswer(2);
-    });
-    this.Button2of4ComesIn.ended(function(){
-        this.delay(300,function(){
-            thisMode.Button3of4ComesIn.play();
-            thisMode.SFXShowKey.reset();
-            thisMode.SFXShowKey.play();
-        });
-    });
-
-    this.Button1of4ComesIn.ended(-100,function() {
-        displayAnswer(1);
-    });
-    this.Button1of4ComesIn.ended(function(){
-        loopStandBy();
-        this.delay(300,function(){
-            thisMode.Button2of4ComesIn.play();
-            thisMode.SFXShowKey.reset();
-            thisMode.SFXShowKey.play();
-        });
-    });
-
-    this.Button4of3ComesIn.ended(function(){
-        this.delay(300,function(){
-            buttonsAnswer[2].ComesIn.free();
-            pressButton(2);
-        });
-    });
-
-    this.Button2of3ComesIn.ended(-100,function() {
-        displayAnswer(2);
-    });
-    this.Button2of3ComesIn.ended(function(){
-        this.delay(300,function(){
-            MusicLoopRules2();
-        });
-    });
-
-    this.Button1of3ComesIn.ended(-100,function() {
-        displayAnswer(1);
-    });
-    this.Button1of3ComesIn.ended(function(){
-        loopStandBy();
-        this.delay(300,function(){
-            thisMode.Button2of3ComesIn.play();
-            thisMode.SFXShowKey.reset();
-            thisMode.SFXShowKey.play();
-        });
-    });
 
     var showQuestion = function(f) {
         showQuestion = function(){}; // Auto-détruire la fonction pour éviter qu'elle ne soit exécutée plusieurs fois
@@ -759,7 +844,7 @@ ModeDisOrDat.prototype.start = function() {
         thisMode.QuestionIntro2.delay(100,function(){
             thisMode.ShowQuestion.play();
             showQuestion(function(){
-                buttonsAnswer[0].ComesIn.play();
+                buttonsAnswer[1].ComesIn.play();
                 thisMode.SFXShowKey.play();
             });
         });
@@ -800,9 +885,10 @@ ModeDisOrDat.prototype.start = function() {
             });
             this.play();
 
-            if (thisMode.options.nbchoices == 3) {
+            if (thisMode.options.nbchoices == 2) {
                 addStandBy(thisMode.Button1of3ComesIn, thisMode.Button1of3StandbyLoop, thisMode.Button1of3Push, thisMode.Button1of3Ready, thisMode.Button1of3Leave);
                 addStandBy(thisMode.Button2of3ComesIn, thisMode.Button2of3StandbyLoop, thisMode.Button2of3Push, thisMode.Button2of3Ready, thisMode.Button2of3Leave);
+                buttonsAnswer.push(0); // Rien pour le bouton 3
                 addStandBy(thisMode.Button4of3ComesIn, thisMode.Button4of3StandbyLoop, thisMode.Button4of3Push, thisMode.Button4of3Ready, thisMode.Button4of3Leave);
             } else {
                 addStandBy(thisMode.Button1of4ComesIn, thisMode.Button1of4StandbyLoop, thisMode.Button1of4Push, thisMode.Button1of4Ready, thisMode.Button1of4Leave);
@@ -810,6 +896,57 @@ ModeDisOrDat.prototype.start = function() {
                 addStandBy(thisMode.Button3of4ComesIn, thisMode.Button3of4StandbyLoop, thisMode.Button3of4Push, thisMode.Button3of4Ready, thisMode.Button3of4Leave);
                 addStandBy(thisMode.Button4of4ComesIn, thisMode.Button4of4StandbyLoop, thisMode.Button4of4Push, thisMode.Button4of4Ready, thisMode.Button4of4Leave);
             }
+
+            // Setup des boutons pour les explications
+
+            buttonsAnswer[4].Push.ended(function() { // Il faut un délai après le ended sinon, si le Push est stop/reset avant le délai, cela ne sera jamais exécuté.
+                this.delay(200,function(){
+                    this.ended(false);
+                    rulesExplainNext();
+                });
+            });
+
+            buttonsAnswer[4].ComesIn.ended(function(){
+                this.delay(300,function(){
+                    buttonsAnswer[4].ComesIn.free();
+                    pressButton(4);
+                });
+            });
+
+            buttonsAnswer[thisMode.options.nbchoices].ComesIn.ended(function(){
+                this.delay(300,function(){
+                    MusicLoopRules2();
+                });
+                readAnswers();
+            });
+
+            buttonsAnswer[2].ComesIn.ended(-100,function() {
+                displayAnswer(2);
+            });
+
+            if (thisMode.options.nbchoices == 3) {
+                buttonsAnswer[2].ComesIn.ended(function(){
+                    this.delay(300,function(){
+                        buttonsAnswer[3].ComesIn.play();
+                        thisMode.SFXShowKey.reset();
+                        thisMode.SFXShowKey.play();
+                    });
+                });
+            }
+
+            buttonsAnswer[1].ComesIn.ended(-100,function() {
+                displayAnswer(1);
+            });
+
+            buttonsAnswer[1].ComesIn.ended(function(){
+                loopStandBy();
+                this.delay(300,function(){
+                    buttonsAnswer[2].ComesIn.play();
+                    thisMode.SFXShowKey.reset();
+                    thisMode.SFXShowKey.play();
+                });
+            });
+
             thisMode.MessageSpaceBarComesIn.play();
             skiplistener = bindKeyListener(function(choice) {
                 if (choice == 32) { // Barre espace = on passe les explications

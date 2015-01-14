@@ -431,7 +431,8 @@ YDKJAPI.prototype.initdemo = function() {
             };
             for(r in reslist) if (reslist.hasOwnProperty(r)) reslist[r] = demores(r);
 
-            mode.options.nbchoices = 3;
+            mode.options.nbchoices = 2;
+            mode.options.value = 500;
 
             var resDD = 'res/QFold1/'+mode.options.id;
 
@@ -451,6 +452,7 @@ YDKJAPI.prototype.initdemo = function() {
 
             reslist['DisOrDat/Public0on7'] = reslist['DisOrDat/Public0on7'+(Math.floor(Math.random()*3)+1)];
             reslist['DisOrDat/Public7on7'] = reslist['DisOrDat/Public7on7'+(Math.floor(Math.random()*3)+1)];
+            reslist['DisOrDat/RestartSkipped'] = reslist['DisOrDat/RestartSkipped'+(Math.floor(Math.random()*2)+1)];
 
             mode.options.timer = new YDKJTimer(30);
             var timer30ready = thisAPI.resources(mode.options.timer);

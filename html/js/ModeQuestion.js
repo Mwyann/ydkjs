@@ -704,10 +704,10 @@ ModeQuestion.prototype.start = function() {
             thisMode.ShowPlayer1Key.delay(200,function(){
                 this.play();
                 this.click(function(){pressKey(thisMode.game.players[0].keycode)});
-                if (thisMode.game.players.length >= 2) thisMode.ShowPlayer2Key.delay(100,function(){
+                if (thisMode.game.players.length >= 2) thisMode.ShowPlayer2Key.delay(90,function(){
                     this.play();
                     this.click(function(){pressKey(thisMode.game.players[1].keycode)});
-                    if (thisMode.game.players.length == 3) thisMode.ShowPlayer3Key.delay(100,function(){
+                    if (thisMode.game.players.length == 3) thisMode.ShowPlayer3Key.delay(90,function(){
                         this.play();
                         this.click(function(){pressKey(thisMode.game.players[2].keycode)});
                     });

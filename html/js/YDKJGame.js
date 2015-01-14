@@ -73,23 +73,29 @@ YDKJGame.prototype.fullscreen = function(f) {
     this.fullscreen(f);
 };
 
-YDKJGame.prototype.displayPlayer = function(playernumber) {
+YDKJGame.prototype.displayPlayer = function(playernumber,position,outof) {
     var x;
-    if (this.players.length == 3) {
+    if (!position) position = playernumber;
+    if (!outof) outof = this.players.length;
+    if (outof == 3) {
         x=[106,320,533];
+    }
+    if (outof == 1) {
+        x=[320];
     }
 
     var playerdiv = jQuery('<div />').css({
         'position':'absolute',
         'z-index':'1000',
-        'left':(x[playernumber-1]-100)+'px',
+        'left':(x[position-1]-100)+'px',
         'top':'400px',
         'width':'200px',
         'text-align':'center',
         'color':'#FFF',
         'font-family':'JackRoman',
         'font-size':'20px',
-        'line-height':'30px'
+        'line-height':'30px',
+        'display':'none'
     }).appendTo(this.html.screen);
 
     jQuery('<div />').addClass('name').css({'position':'relative'}).html(this.players[playernumber-1].name).appendTo(playerdiv);
