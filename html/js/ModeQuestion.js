@@ -289,7 +289,7 @@ ModeQuestion.prototype.start = function() {
         thisMode.SFXPlayerLose.delay(100,function() {
             var currentPlayer = thisMode.currentPlayer;
             thisMode.game.players[currentPlayer-1].score = parseInt(thisMode.game.players[currentPlayer-1].score) - parseInt(thisMode.options.value);
-            thisMode.availPlayers[currentPlayer].find('.score').html(thisMode.game.players[currentPlayer-1].score+' F');
+            thisMode.availPlayers[currentPlayer].find('.score').html(thisMode.game.displayCurrency(thisMode.game.players[currentPlayer-1].score));
 
             var PlayerWrong, PlayerAnswerLoop;
             switch (currentPlayer) {
@@ -430,7 +430,7 @@ ModeQuestion.prototype.start = function() {
             }
 
             thisMode.game.players[thisMode.currentPlayer-1].score = parseInt(thisMode.game.players[thisMode.currentPlayer-1].score) + parseInt(thisMode.options.value);
-            thisMode.availPlayers[thisMode.currentPlayer].find('.score').html(thisMode.game.players[thisMode.currentPlayer-1].score+' F');
+            thisMode.availPlayers[thisMode.currentPlayer].find('.score').html(thisMode.game.displayCurrency(thisMode.game.players[thisMode.currentPlayer-1].score));
 
             thisMode.SFXPlayerCorrect.play();
             unbindKeyListener(thisMode.listener);
@@ -723,7 +723,7 @@ ModeQuestion.prototype.start = function() {
             'font-family':'JackRoman',
             'right':'-80px',
             'top':'22px'
-        }).html(thisMode.options.value+' F').appendTo(thisMode.game.html.screen).animate({'right':'20px'}, 500).animate({'right':'15px'}, 200);
+        }).html(thisMode.game.displayCurrency(thisMode.options.value)).appendTo(thisMode.game.html.screen).animate({'right':'20px'}, 500).animate({'right':'15px'}, 200);
     });
 
     this.VoiceAnnounceValue.ended(function(){

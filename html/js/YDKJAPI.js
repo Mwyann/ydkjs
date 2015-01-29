@@ -297,7 +297,7 @@ YDKJAPI.prototype.initdemo = function() {
                 'DisOrDat/MusicLoopRules2':0,
                 'DisOrDat/MusicLoopScore':0,
                 'DisOrDat/MusicPlayEnd':0,
-                'DisOrDat/MusicUnknown':0,
+                'DisOrDat/MusicEndTimeOut':0,
                 'DisOrDat/Public0on71':0,
                 'DisOrDat/Public0on72':0,
                 'DisOrDat/Public0on73':0,
@@ -324,6 +324,7 @@ YDKJAPI.prototype.initdemo = function() {
                 'DisOrDat/SFXTimeOut1':0,
                 'DisOrDat/SFXTimeOut2':0,
                 'DisOrDat/SFXWrong':0,
+                'DisOrDat/SFXTimeOutScore':0,
                 'DisOrDat/Score10on7':0,
                 'DisOrDat/Score11on7':0,
                 'DisOrDat/Score12on7':0,
@@ -331,7 +332,7 @@ YDKJAPI.prototype.initdemo = function() {
                 'DisOrDat/Score14on7':0,
                 'DisOrDat/Score15on7':0,
                 'DisOrDat/Score16on7':0,
-                'DisOrDat/Score17on7WithTimeLeft':0,
+                'DisOrDat/Score17on7':0,
                 'DisOrDat/Score20on7':0,
                 'DisOrDat/Score21on7':0,
                 'DisOrDat/Score22on7':0,
@@ -340,16 +341,16 @@ YDKJAPI.prototype.initdemo = function() {
                 'DisOrDat/Score25on7':0,
                 'DisOrDat/Score26on7':0,
                 'DisOrDat/Score27on7':0,
-                'DisOrDat/Score2Bad':0,
-                'DisOrDat/Score2Good':0,
-                'DisOrDat/Score2NotBad':0,
-                'DisOrDat/Score2NotGreat':0,
-                'DisOrDat/Score2NotSoGood':0,
-                'DisOrDat/Score2PrettyBad':0,
-                'DisOrDat/Score2QuiteBad':0,
-                'DisOrDat/Score2VeryBad':0,
+                'DisOrDat/Score3Positive':0,
+                'DisOrDat/Score36on7':0,
+                'DisOrDat/Score35on7':0,
+                'DisOrDat/Score34on7':0,
+                'DisOrDat/Score3Negative':0,
+                'DisOrDat/Score32on7':0,
+                'DisOrDat/Score31on7':0,
+                'DisOrDat/Score30on7':0,
                 'DisOrDat/ShowQuestion':0,
-                'DisOrDat/ShowQuestion2':0,
+                'DisOrDat/ShowFinalScore':0,
                 'DisOrDat/SuggestSkip1':0,
                 'DisOrDat/SuggestSkip2':0,
                 'DisOrDat/SuggestSkip3':0,
@@ -364,6 +365,7 @@ YDKJAPI.prototype.initdemo = function() {
 
                 'DisOrDat/IntroStill':0,
                 'DisOrDat/PrepareTimer':0,
+                'DisOrDat/TimerTimeOut':0,
 
                 'DisOrDat/Button1of4ComesIn':0,
                 'DisOrDat/Button1of4StandbyLoop':0,
@@ -427,11 +429,13 @@ YDKJAPI.prototype.initdemo = function() {
 
                 'DisOrDat/Player3ComesIn':0,
                 'DisOrDat/Player3Win':0,
-                'DisOrDat/Player3Lose':0
+                'DisOrDat/Player3Lose':0,
+
+                'Question/SFXPlayerCorrect':0,
+                'Question/SFXPlayerLose':0
             };
             for(r in reslist) if (reslist.hasOwnProperty(r)) reslist[r] = demores(r);
 
-            mode.options.nbchoices = 2;
             mode.options.value = 500;
 
             var resDD = 'res/QFold1/'+mode.options.id;
@@ -725,26 +729,39 @@ YDKJAPI.prototype.initgame = function() {
             data: data,
             success: function(html, status, xhr) {
                 var data = getHeaderJSON(xhr);
+                var strtmp;
 
                 reslist = data['reslist'];
 
                 if (mode instanceof ModeCategory) {
                     // Précharger les questions avec l'interface de catégorie
                     for (i = 1; i <= 3; i++) {
-                        reslist['question'+i] = new YDKJMode(thisAPI.game, 'Question', {category: mode.options.category, questionnumber: mode.options.questionnumber, id: reslist['question'+i]}); // Preload des questions suivantes
+                        reslist['question'+i] = new YDKJMode(thisAPI.game, reslist['questiontype'+i], {category: mode.options.category, questionnumber: mode.options.questionnumber, id: reslist['question'+i]}); // Preload des questions suivantes
                     }
                 }
 
                 if (mode instanceof ModeQuestion) {
-                    var strtmp = [];
+                    strtmp = [];
                     eval('strtmp = '+reslist['STR']);
                     mode.STR = strtmp;
-                    mode.options.value = reslist['value'];
+                    mode.options.value = parseInt(reslist['value']);
                     mode.options.correctanswer = reslist['correctanswer'];
                     mode.options.correctanswerisdefault = reslist['correctanswerisdefault'];
                     mode.options.timer = new YDKJTimer(10);
                     var timer10ready = thisAPI.resources(mode.options.timer);
                     timer10ready(function(resources) {
+                        mode.options.timer.preload(resources);
+                    });
+                }
+
+                if (mode instanceof ModeDisOrDat) {
+                    strtmp = [];
+                    eval('strtmp = '+reslist['STR']);
+                    mode.STR = strtmp;
+                    mode.options.value = parseInt(reslist['value']);
+                    mode.options.timer = new YDKJTimer(30);
+                    var timer30ready = thisAPI.resources(mode.options.timer);
+                    timer30ready(function(resources) {
                         mode.options.timer.preload(resources);
                     });
                 }

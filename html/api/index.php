@@ -14,7 +14,7 @@ function gamemode() {
     $currentmode = $_POST['currentmode'];
     $newmode = array();
     switch ($currentmode) {
-        case 'None': //$newmode = array('mode' => 'Intro'); break;
+        case 'None': $newmode = array('mode' => 'Intro'); break;
         case 'Intro': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 1, 'chooseplayer' => rand(1,3)); break;
         case 'Category':
             if (!isset($_POST['category'])) die('Gamemode 2');
@@ -34,6 +34,60 @@ function resources() {
 
     if (!isset($_POST['mode'])) die('Resources 1');
     $mode = $_POST['mode'];
+
+    if ($mode == 'Intro') {
+        $intro = rand(1,4);
+
+        $reslist = array();
+        $res = $DB->query("SELECT *
+                           FROM ".$DBsta.".resani a, ".$DBsta.".resfiles f
+                           WHERE a.resid = f.resid
+                           AND grp = 'Intro'");
+        while ($rs = $res->fetch()) {
+            $r = array(
+                'urlGif' => uriToUid('res-full/'.$rs['filename'].'.gif'),
+                'urlJS' => uriToUid('res-full/'.$rs['filename'].'.js'),
+                'framestart' => $rs['framestart']
+            );
+            if ($rs['framestop'] !== null) $r['framestop'] = $rs['framestop'];
+            if ($rs['loopani']) $r['loop'] = $rs['loopani'];
+            $reslist[$rs['grp'].'/'.$rs['name']] = $r;
+        }
+
+        $reslist['Intro/IntroJack'] = $reslist['Intro/IntroJack'.$intro];
+        $reslist['Intro/JackLogo'] = $reslist['Intro/JackLogo'.$intro];
+        unset($reslist['Intro/IntroJack1']);
+        unset($reslist['Intro/IntroJack2']);
+        unset($reslist['Intro/IntroJack3']);
+        unset($reslist['Intro/IntroJack4']);
+        unset($reslist['Intro/JackLogo1']);
+        unset($reslist['Intro/JackLogo2']);
+        unset($reslist['Intro/JackLogo3']);
+        unset($reslist['Intro/JackLogo4']);
+
+        $res = $DB->query("SELECT *
+                           FROM ".$DBsta.".ressnd
+                           WHERE grp = 'Intro'");
+        while ($rs = $res->fetch()) {
+            $names = array($rs['name']);
+
+            $possiblevalues = explode(',',$rs['val']);
+            if (sizeof($possiblevalues) > 1) shuffle($possiblevalues);
+
+            foreach($names as $idname => $name) {
+                $key = $rs['grp'] . '/' . $name;
+                if (!isset($reslist[$key])) {
+                    if ((substr($name, 0, 3) == 'SFX') && (isset($reslist[$rs['grp'] . '/' . substr($name, 3)]))) $key = $rs['grp'] . '/' . substr($name, 3);
+                    else $reslist[$key] = array();
+                }
+
+                if ($key == 'Intro/IntroJackSound') $possiblevalues = array($intro);
+
+                $reslist[$key]['urlAudio'] = uriToUid('res-full/' . $rs['resfolder'] . '/' . $possiblevalues[$idname]);
+                if ($rs['loopsnd']) $reslist[$key]['loop'] = $rs['loopsnd'];
+            }
+        }
+    }
 
     if ($mode == 'Category') {
         if (!isset($_POST['category'])) die('Resources 2');
@@ -84,8 +138,7 @@ function resources() {
 
         $reslist['questiontitles'] = array();
 
-        //if (($questionnumber % 2) == 1) {
-        if (1) {
+        if (($questionnumber % 4) == 1) {
             $res = $DB->query("SELECT *
                            FROM ".$DBsta.".qhdr
                            WHERE qtype = 'Question'
@@ -104,6 +157,7 @@ function resources() {
         while ($rs = $res->fetch()) {
             $reslist['questiontitles'][$c] = $rs['title'];
             $reslist['question'.($c+1)] = $rs['id'];
+            $reslist['questiontype'.($c+1)] = $rs['qtype'];
             $c++;
         }
     }
@@ -249,6 +303,85 @@ function resources() {
 
         $reslist['STR'] = $qhdr['strings'];
         $reslist['correctanswer'] = $qhdr['answer'];
+    }
+
+    if ($mode == 'DisOrDat') {
+        if (!isset($_POST['category'])) die('Resources 2');
+        $category = $_POST['category'];
+        if (!isset($_POST['id'])) die('Resources 2');
+        $id = $_POST['id'];
+
+        $res = $DB->query("SELECT *
+                           FROM ".$DBsta.".qhdr q, ".$DBsta.".strings s
+                           WHERE id = '".addslashes($id)."'
+                           AND q.folder = s.folder");
+        $qhdr = $res->fetch();
+        $value = number_format(500*$category,0,'','');
+
+        $reslist = array('value' => $value);
+        $res = $DB->query("SELECT *
+                           FROM ".$DBsta.".resani a, ".$DBsta.".resfiles f
+                           WHERE a.resid = f.resid
+                           AND grp = 'DisOrDat'");
+        while ($rs = $res->fetch()) {
+            $r = array(
+                'urlGif' => uriToUid('res-full/'.$rs['filename'].'.gif'),
+                'urlJS' => uriToUid('res-full/'.$rs['filename'].'.js'),
+                'framestart' => $rs['framestart']
+            );
+            if ($rs['framestop'] !== null) $r['framestop'] = $rs['framestop'];
+            if ($rs['loopani']) $r['loop'] = $rs['loopani'];
+            $reslist[$rs['grp'].'/'.$rs['name']] = $r;
+        }
+
+        $res = $DB->query("SELECT *
+                           FROM ".$DBsta.".ressnd
+                           WHERE grp = 'DisOrDat'
+                           OR (grp = 'Question' AND name IN ('SFXPlayerCorrect','SFXPlayerLose'))");
+        while ($rs = $res->fetch()) {
+            $names = array($rs['name']);
+
+            $possiblevalues = explode(',',$rs['val']);
+            if (sizeof($possiblevalues) > 1) shuffle($possiblevalues);
+
+            foreach($names as $idname => $name) {
+                $key = $rs['grp'] . '/' . $name;
+                if (!isset($reslist[$key])) {
+                    if ((substr($name, 0, 3) == 'SFX') && (isset($reslist[$rs['grp'] . '/' . substr($name, 3)]))) $key = $rs['grp'] . '/' . substr($name, 3);
+                    else $reslist[$key] = array();
+                }
+
+                $reslist[$key]['urlAudio'] = uriToUid('res-full/' . $rs['resfolder'] . '/' . $possiblevalues[$idname]);
+                if ($rs['loopsnd']) $reslist[$key]['loop'] = $rs['loopsnd'];
+            }
+        }
+
+        $reslist['DisOrDat/QuestionTitle'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/1'));
+        $reslist['DisOrDat/QuestionIntro1'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/2'));
+        $reslist['DisOrDat/QuestionIntro2'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/3'));
+        $reslist['DisOrDat/QuestionAnswer1'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/4'));
+        $reslist['DisOrDat/QuestionAnswer2'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/5'));
+        $reslist['DisOrDat/Question1'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/6'));
+        $reslist['DisOrDat/Question2'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/7'));
+        $reslist['DisOrDat/Question3'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/8'));
+        $reslist['DisOrDat/Question4'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/9'));
+        $reslist['DisOrDat/Question5'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/10'));
+        $reslist['DisOrDat/Question6'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/11'));
+        $reslist['DisOrDat/Question7'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/12'));
+
+        $reslist['DisOrDat/Public0on7'] = $reslist['DisOrDat/Public0on7'.rand(1,3)];
+        unset($reslist['DisOrDat/Public0on71']);
+        unset($reslist['DisOrDat/Public0on72']);
+        unset($reslist['DisOrDat/Public0on73']);
+        $reslist['DisOrDat/Public7on7'] = $reslist['DisOrDat/Public7on7'.rand(1,3)];
+        unset($reslist['DisOrDat/Public7on71']);
+        unset($reslist['DisOrDat/Public7on72']);
+        unset($reslist['DisOrDat/Public7on73']);
+        $reslist['DisOrDat/RestartSkipped'] = $reslist['DisOrDat/RestartSkipped'.rand(1,2)];
+        unset($reslist['DisOrDat/RestartSkipped1']);
+        unset($reslist['DisOrDat/RestartSkipped2']);
+
+        $reslist['STR'] = $qhdr['strings'];
     }
 
     if ($mode == 'Timer10') {

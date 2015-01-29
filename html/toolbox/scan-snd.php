@@ -7,7 +7,9 @@ echo 'Scanning SND...';
 
 $res = $DB->query("SELECT *
                    FROM ressnd
-                   WHERE resfolder NOT LIKE '5QDemo/%'");
+                   WHERE resfolder NOT LIKE '5QDemo/%'
+                   AND resfolder NOT LIKE '%Mb85'
+                   AND resfolder NOT LIKE '%Mh23'");
 while ($rs = $res->fetch()) {
     $list = scandir('../res-full/'.$rs['resfolder']);
     if (sizeof($list)) {

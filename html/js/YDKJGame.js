@@ -5,10 +5,13 @@ function YDKJGame(html, demomode) {
     if (!demomode) demomode = false;
     this.html = html;
     this.api = new YDKJAPI(this, demomode);
+    this.demomode = demomode;
+    this.engineVersion = 2;
     jQuery.fx.interval = 66;
     this.playersready = this.api.players();
     this.gamemodeready = this.api.gamemode();
     this.currentmode = 0;
+    this.locale = 'fr_FR';
 
     // Gestion du fullscreen
     var onresize = function() {};
@@ -102,7 +105,34 @@ YDKJGame.prototype.displayPlayer = function(playernumber,position,outof) {
     }).appendTo(this.html.screen);
 
     jQuery('<div />').addClass('name').css({'position':'relative'}).html(this.players[playernumber-1].name).appendTo(playerdiv);
-    jQuery('<div />').addClass('score').css({'position':'relative'}).html(this.players[playernumber-1].score+' F').appendTo(playerdiv);
+    jQuery('<div />').addClass('score').css({'position':'relative'}).html(this.displayCurrency(this.players[playernumber-1].score)).appendTo(playerdiv);
 
     return playerdiv;
+};
+
+YDKJGame.prototype.displayCurrency = function(value) {
+    var thousandSeparator = function(value,separator,decimal) {
+        if (decimal === undefined) decimal = '.';
+        var parts = value.toString().split(decimal);
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, separator);
+        return parts.join(decimal);
+    };
+
+    var minus = '';
+    if (value < 0) minus = '-';
+    value = Math.abs(value).toString();
+
+    if (this.locale == 'fr_FR') {
+        return minus+value+' F';
+    }
+    if (this.locale == 'en_GB') {
+        return minus+'£'+thousandSeparator(value,',');
+    }
+    if (this.locale == 'en_US') {
+        return minus+'$'+value.toString();
+    }
+    if (this.locale == 'de_DE') {
+        return minus+'DM '+value.toString();
+    }
+    return value.toString();
 };

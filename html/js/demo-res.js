@@ -109,7 +109,7 @@ var YDKJDemoSnd = {
         'MusicLoopRules1':{res:'5QDemo',name:'Mb71',min:1,max:1,loop:1},
         'MusicLoopRules2':{res:'5QDemo',name:'Mb72',min:1,max:1,loop:1},
         'MusicLoopScore':{res:'5QDemo',name:'Mb80',min:1,max:1,loop:1},
-        'MusicUnknown':{res:'5QDemo',name:'Mb78',min:1,max:1}, // Probablement pour le Timeout, ou bien pour faire reboucler ?
+        'MusicEndTimeOut':{res:'5QDemo',name:'Mb78',min:1,max:1},
         'MusicPlayEnd':{res:'5QDemo',name:'Mb79',min:1,max:1},
         'Public0on71':{res:'5QDemo',name:'Mp33',min:1,max:1},
         'Public0on72':{res:'5QDemo',name:'Mp34',min:1,max:1},
@@ -136,17 +136,18 @@ var YDKJDemoSnd = {
         'SFXShowPriceCorrect':{res:'5QDemo',name:'Mb88',min:1,max:1},
         'SFXShowPriceWrong':{res:'5QDemo',name:'Mb89',min:1,max:1},
         'SFXTimeOut1':{res:'5QDemo',name:'Mb86',min:1,max:1},
-        'SFXTimeOut2':{res:'5QDemo',name:'Mb87',min:1,max:1},
-        'SFXWrong':{res:'5QDemo',name:'Mb85',min:1,max:2},
-        'Score10on7':{res:'5QDemo',name:'Mp28',min:1,max:1},
+        'SFXTimeOut2':{res:'5QDemo',name:'Mb87',min:1,max:1}, // Inutilisé ?
+        'SFXWrong':{res:'5QDemo',name:'Mb85',min:1,max:1},
+        'SFXTimeOutScore':{res:'5QDemo',name:'Mb85',min:2,max:2}, // Pour le décompte du score lors d'un time out (même ressource, n° 2 !)
+        'Score10on7':{res:'5QDemo',name:'Mp28',min:1,max:1}, // Sons utilisés lorsqu'on a répondu à toutes les questions dans les temps
         'Score11on7':{res:'5QDemo',name:'Mp26',min:1,max:1},
         'Score12on7':{res:'5QDemo',name:'Mp24',min:1,max:1},
         'Score13on7':{res:'5QDemo',name:'Mp22',min:1,max:1},
         'Score14on7':{res:'5QDemo',name:'Mp20',min:1,max:1},
         'Score15on7':{res:'5QDemo',name:'Mp18',min:1,max:1},
         'Score16on7':{res:'5QDemo',name:'Mp16',min:1,max:1},
-        'Score17on7WithTimeLeft':{res:'5QDemo',name:'Mp14',min:1,max:1}, // WithTimeLeft : il y a une variante sans ?
-        'Score20on7':{res:'5QDemo',name:'Mp29',min:1,max:1},
+        'Score17on7':{res:'5QDemo',name:'Mp14',min:1,max:1},
+        'Score20on7':{res:'5QDemo',name:'Mp29',min:1,max:1}, // Sons après lecture du Score1, et après addition au total
         'Score21on7':{res:'5QDemo',name:'Mp27',min:1,max:1},
         'Score22on7':{res:'5QDemo',name:'Mp25',min:1,max:1},
         'Score23on7':{res:'5QDemo',name:'Mp23',min:1,max:1},
@@ -154,21 +155,21 @@ var YDKJDemoSnd = {
         'Score25on7':{res:'5QDemo',name:'Mp19',min:1,max:1},
         'Score26on7':{res:'5QDemo',name:'Mp17',min:1,max:1},
         'Score27on7':{res:'5QDemo',name:'Mp15',min:1,max:1},
-        'Score2Bad':{res:'5QDemo',name:'Mp09',min:1,max:1},
-        'Score2Good':{res:'5QDemo',name:'Mp07',min:1,max:1},
-        'Score2NotBad':{res:'5QDemo',name:'Mp06',min:1,max:1},
-        'Score2NotGreat':{res:'5QDemo',name:'Mp13',min:1,max:1},
-        'Score2NotSoGood':{res:'5QDemo',name:'Mp08',min:1,max:1},
-        'Score2PrettyBad':{res:'5QDemo',name:'Mp12',min:1,max:1},
-        'Score2QuiteBad':{res:'5QDemo',name:'Mp11',min:1,max:1},
-        'Score2VeryBad':{res:'5QDemo',name:'Mp10',min:1,max:1},
+        'Score3Positive':{res:'5QDemo',name:'Mp06',min:1,max:1}, // Plus de temps, score positif, après lecture des Timeout
+        'Score36on7':{res:'5QDemo',name:'Mp07',min:1,max:1}, // Après addition : 6/7
+        'Score35on7':{res:'5QDemo',name:'Mp08',min:1,max:1}, // 5/7 ?
+        'Score34on7':{res:'5QDemo',name:'Mp09',min:1,max:1}, // 4/7 ?
+        'Score3Negative':{res:'5QDemo',name:'Mp10',min:1,max:1}, // Plus de temps, score négatif, après lecture des Timeout
+        'Score32on7':{res:'5QDemo',name:'Mp11',min:1,max:1}, // Après addition : 3/7 OU 2/7
+        'Score31on7':{res:'5QDemo',name:'Mp12',min:1,max:1}, // 1/7
+        'Score30on7':{res:'5QDemo',name:'Mp13',min:1,max:1}, // 0/7
         'ShowQuestion':{res:'5QDemo',name:'Mb92',min:1,max:1},
-        'ShowQuestion2':{res:'5QDemo',name:'Mb94',min:1,max:1},
-        'SuggestSkip1':{res:'5QDemo',name:'Mb16',min:1,max:1},
-        'SuggestSkip2':{res:'5QDemo',name:'Mb17',min:1,max:1},
-        'SuggestSkip3':{res:'5QDemo',name:'Mb18',min:1,max:1},
-        'TimeOut':{res:'5QDemo',name:'Mp01',min:1,max:1},
-        'TimeOutLose1000FMoreQuestions':{res:'5QDemo',name:'Mp05',min:1,max:1},
+        'ShowFinalScore':{res:'5QDemo',name:'Mb94',min:1,max:1},
+        'SuggestSkip1':{res:'5QDemo',name:'Mb16',min:1,max:1}, // 1er avert
+        'SuggestSkip2':{res:'5QDemo',name:'Mb17',min:1,max:1}, // 1er avert, 2eme version
+        'SuggestSkip3':{res:'5QDemo',name:'Mb18',min:1,max:1}, // 2nd avert ?
+        'TimeOut':{res:'5QDemo',name:'Mp01',min:1,max:1}, // Juste après la sonnerie (Mb86)
+        'TimeOutLose1000FMoreQuestions':{res:'5QDemo',name:'Mp05',min:1,max:1}, // Ces 4 là, juste après TimeOut
         'TimeOutLose1000FOneQuestion':{res:'5QDemo',name:'Mp04',min:1,max:1},
         'TimeOutLose500FMoreQuestions':{res:'5QDemo',name:'Mp03',min:1,max:1},
         'TimeOutLose500FOneQuestion':{res:'5QDemo',name:'Mp02',min:1,max:1},
@@ -278,6 +279,7 @@ var YDKJDemoAnim = {
         'IntroStill':{res:'5QDemo',name:'off4/14690',framestart:74,loop:0},
         'TimerComesIn':{res:'5QDemo',name:'off4/8041',framestart:2,loop:0},
         'PrepareTimer':{res:'5QDemo',name:'off4/8021',framestart:12,loop:0},
+        'TimerTimeOut':{res:'5QDemo',name:'off4/8021',framestart:666,loop:0},
 
         'Button1of4ComesIn':{res:'5QDemo',name:'off4/14000',framestart:111,loop:0},
         'Button1of4StandbyLoop':{res:'5QDemo',name:'off4/14000',framestart:132,framestop:159,loop:0}, // Pas de boucle pour ces StanbyLoop, c'est fait en JS (pour améliorer la synchro)

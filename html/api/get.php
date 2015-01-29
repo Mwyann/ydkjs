@@ -27,7 +27,7 @@ if (file_exists($file)) {
         preg_match('/bytes=(\d+)-(\d+)?/', $_SERVER['HTTP_RANGE'], $matches);
 
         $offset = intval($matches[1]);
-        if (intval($matches[2]) > 0) $length = intval($matches[2]) - $offset + 1;
+        if ((isset($matches[2])) && (intval($matches[2]) > 0)) $length = intval($matches[2]) - $offset + 1;
         else $length = $filesize-$offset;
     } else {
         $partialContent = false;

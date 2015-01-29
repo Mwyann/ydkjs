@@ -23,7 +23,7 @@ ob_start();
 
 function displaylogin() {
 ?>
-    <form action="/" method="post">
+    <form action="./" method="post">
         <div style="width:300px; margin-left:auto; margin-right:auto">
             <div style="text-align:right;font-size:20px;margin:10px">Login : <input type="text" name="login"/></div>
             <div style="text-align:right;font-size:20px;margin:10px">Pass : <input type="password" name="password"/></div>
@@ -36,7 +36,7 @@ function displaylogin() {
 function invited() {
     ?>
     <div style="text-align:center;font-size:28px">Félicitations, vous avez été invité(e) à tester<br/>la version alpha de You Don't Know Jack® !<br/>Inscrivez-vous via le formulaire ci-dessous :</div>
-    <form action="/" method="post">
+    <form action="./" method="post">
         <div style="width:300px; margin-left:auto; margin-right:auto">
             <input type="hidden" name="invitation" value="<?php echo $_GET['invitation']; ?>"/>
             <div style="text-align:right;font-size:20px;margin:10px">Pseudo : <input type="text" name="nickname"/></div>
@@ -145,7 +145,7 @@ if (!isset($_SESSION['id'])) {
                                SET dateused = NOW(),
                                godson = ".$id."
                                WHERE uid = '" . addslashes($invitation) . "'");
-                    header('Location: /?login=1');
+                    header('Location: ./?login=1');
                 }
             } else echo "<div style=\"text-align:center;font-size:28px\">L'invitation a déjà été utilisée.<br/>Contactez <a href=\"mailto:alpha@ydkj.fr\">alpha@ydkj.fr</a> pour en obtenir une.</div>";
         } else echo "<div style=\"text-align:center;font-size:28px\">L'invitation n'existe pas.<br/>Contactez <a href=\"mailto:alpha@ydkj.fr\">alpha@ydkj.fr</a> pour en obtenir une.</div>";
@@ -178,7 +178,7 @@ if (!isset($_SESSION['id'])) {
             $_SESSION['nickname'] = $rs['nickname'];
             $_SESSION['currentsession'] = $rs['currentsession'];
             $_SESSION['invitationsleft'] = $rs['invitationsleft'];
-            header('Location: /');
+            header('Location: ./');
         } else displaylogin();
 
     } else if (isset($_GET['login'])) {

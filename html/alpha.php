@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <title>You Don't Know Jack® ALPHA FR</title>
 <link href="css/ydkj.css" rel="stylesheet"/>
-<script src="js/jquery-1.11.1.min.js" type="text/javascript"></script>
+<script src="js/jquery-1.11.2.min.js" type="text/javascript"></script>
 <script src="js/jquery.animate-colors-min.js" type="text/javascript"></script>
 <script src="js/YDKJ.js?ver=2" type="text/javascript"></script>
 
@@ -28,7 +28,7 @@
 </head>
 
 <body style="background-color:#000;margin:0;padding:0;border:0">
-  <div style="text-align:center;font-size:20px;margin:5px;font-family:JackCondensed, sans-serif" id="headerbuttons"><a href="#" id="fullscreen" style="color:#666">Plein écran</a> &nbsp; &nbsp; &nbsp; <a href="/" style="color:#666">Retour à l'accueil</a></div>
+  <div style="text-align:center;font-size:20px;margin:5px;font-family:JackCondensed, sans-serif" id="headerbuttons"><a href="#" id="fullscreen" style="color:#666">Plein écran</a> &nbsp; &nbsp; &nbsp; <a href="./" style="color:#666">Retour à l'accueil</a></div>
   <div id="screen" style="margin-left:auto;margin-right:auto">
     <img src="ajax-loader.gif" style="position:absolute;left:293px;top:212px" class="markedAsRemoved"/>
   </div> <!-- Couleur #EEE pour l'intro -->
