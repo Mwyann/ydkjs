@@ -6,7 +6,7 @@ function YDKJGame(html, demomode) {
     this.html = html;
     this.api = new YDKJAPI(this, demomode);
     this.demomode = demomode;
-    this.engineVersion = 2;
+    //this.engineVersion = 2;
     jQuery.fx.interval = 66;
     this.playersready = this.api.players();
     this.gamemodeready = this.api.gamemode();
@@ -132,7 +132,7 @@ YDKJGame.prototype.displayCurrency = function(value) {
         return minus+'$'+value.toString();
     }
     if (this.locale == 'de_DE') {
-        return minus+'DM '+value.toString();
+        return minus+'<span style="font-size:70%">DM</span>'+value.toString();
     }
     return value.toString();
 };

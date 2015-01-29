@@ -52,7 +52,7 @@ if (($handle = fopen("strings.csv", "r")) !== FALSE) {
         $file = trim(strtr($data[0],'\\','/'),'/');
         $DB->query("INSERT IGNORE INTO strings (folder, strings) VALUES (
                     '".addslashes($file)."',
-                    '".addslashes($data[1])."')");
+                    '".addslashes(str_replace(chr(13),'\\n',str_replace(chr(10),'',$data[1])))."')");
     }
     fclose($handle);
     echo 'OK<br/>';

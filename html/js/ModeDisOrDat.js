@@ -1240,6 +1240,7 @@ ModeDisOrDat.prototype.start = function() {
     });
 
     this.Intro.ended(function() {
+        this.free();
         thisMode.IntroStill.play();
         thisMode.MusicLoopRules1.play();
         thisMode.AnnounceCategory.delay(500,function(){

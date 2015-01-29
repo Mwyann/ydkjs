@@ -673,7 +673,7 @@ ModeQuestion.prototype.start = function() {
                     'font-family':'JackExtraCond',
                     'font-style':'italic',
                     'text-align':'center'
-                }).html(getSTRfromID(thisMode.STR,'STR',2));
+                }).html(getSTRfromID(thisMode.STR,'STR',2).replace(/(\n)+/g, '<br />'));
 
                 textdiv.appendTo(div);
 

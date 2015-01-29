@@ -622,7 +622,7 @@ begin
   else if (ord(c) = $9F) then result:=chr($C3)+chr($BC) // ü
   else if (ord(c) = $A0) then result:=chr($E2)+chr($80)+chr($A0) // †
   else if (ord(c) = $A1) then result:=chr($C2)+chr($B0) // °
-  else if (ord(c) = $A2) then result:=chr($C2)+chr($A2) // ¢
+  else if (ord(c) = $A2) then result:=chr($C2)+chr($AE) // ®
   else if (ord(c) = $A3) then result:=chr($C2)+chr($A3) // £
   else if (ord(c) = $A4) then result:=chr($C2)+chr($A7) // §
   else if (ord(c) = $A5) then result:=chr($E2)+chr($80)+chr($A2) // •
@@ -643,7 +643,7 @@ begin
   else if (ord(c) = $B4) then result:=chr($C2)+chr($A5) // ¥
   else if (ord(c) = $B5) then result:=chr($C2)+chr($B5) // µ
   else if (ord(c) = $B6) then result:=chr($E2)+chr($88)+chr($82) // ?
-  else if (ord(c) = $B7) then result:=chr($E2)+chr($88)+chr($91) // ?
+  else if (ord(c) = $B7) then result:=chr($C3)+chr($9F) // ß
   else if (ord(c) = $B8) then result:=chr($E2)+chr($88)+chr($8F) // ?
   else if (ord(c) = $B9) then result:=chr($CF)+chr($80) // p
   else if (ord(c) = $BA) then result:=chr($E2)+chr($88)+chr($AB) // ?
