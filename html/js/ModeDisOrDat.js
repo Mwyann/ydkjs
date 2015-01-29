@@ -232,10 +232,10 @@ ModeDisOrDat.prototype.start = function() {
             frames--;
             if (frames > 0) {
                 from = from+step;
-                div.html(thisMode.game.displayCurrency(from).replace(' ','&thinsp;'));
+                div.html(thisMode.game.displayCurrency(from).replace('_','&thinsp;'));
                 setTimeout(loopAnimValue, speed);
             } else {
-                div.html(thisMode.game.displayCurrency(to).replace(' ','&thinsp;'));
+                div.html(thisMode.game.displayCurrency(to).replace('_','&thinsp;'));
                 callback();
             }
         };
@@ -327,7 +327,7 @@ ModeDisOrDat.prototype.start = function() {
                     'font-size':'70px',
                     'line-height':'50px',
                     'font-family':'JackExtraCond'
-                }).html(thisMode.game.displayCurrency(tempscore).replace(' ','&thinsp;'));
+                }).html(thisMode.game.displayCurrency(tempscore).replace('_','&thinsp;'));
 
                 finalscorediv.appendTo(thisMode.game.html.screen).animate({
                     'opacity':'1',
@@ -902,7 +902,7 @@ ModeDisOrDat.prototype.start = function() {
             'font-size':'90px',
             'line-height':'70px',
             'font-family':'JackExtraCond'
-        }).html(thisMode.game.displayCurrency(0).replace(' ','&thinsp;'));
+        }).html(thisMode.game.displayCurrency(0).replace('_','&thinsp;'));
 
         tempscorediv.appendTo(thisMode.game.html.screen).animate({'color':'#33F'},180);
 

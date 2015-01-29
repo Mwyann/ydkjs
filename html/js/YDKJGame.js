@@ -84,7 +84,7 @@ YDKJGame.prototype.displayPlayer = function(playernumber,position,outof) {
     if (!position) position = playernumber;
     if (!outof) outof = this.players.length;
     if (outof == 3) {
-        x=[106,320,533];
+        x=[106,320,534];
     }
     if (outof == 1) {
         x=[320];
@@ -93,9 +93,9 @@ YDKJGame.prototype.displayPlayer = function(playernumber,position,outof) {
     var playerdiv = jQuery('<div />').css({
         'position':'absolute',
         'z-index':'1000',
-        'left':(x[position-1]-100)+'px',
+        'left':(x[position-1]-150)+'px',
         'top':'400px',
-        'width':'200px',
+        'width':'300px',
         'text-align':'center',
         'color':'#FFF',
         'font-family':'JackRoman',
@@ -105,7 +105,7 @@ YDKJGame.prototype.displayPlayer = function(playernumber,position,outof) {
     }).appendTo(this.html.screen);
 
     jQuery('<div />').addClass('name').css({'position':'relative'}).html(this.players[playernumber-1].name).appendTo(playerdiv);
-    jQuery('<div />').addClass('score').css({'position':'relative'}).html(this.displayCurrency(this.players[playernumber-1].score)).appendTo(playerdiv);
+    jQuery('<div />').addClass('score').css({'position':'relative'}).html(this.displayCurrency(this.players[playernumber-1].score).replace('_','&nbsp;')).appendTo(playerdiv);
 
     return playerdiv;
 };
@@ -123,7 +123,7 @@ YDKJGame.prototype.displayCurrency = function(value) {
     value = Math.abs(value).toString();
 
     if (this.locale == 'fr_FR') {
-        return minus+value+' F';
+        return minus+value+'_F';
     }
     if (this.locale == 'en_GB') {
         return minus+'£'+thousandSeparator(value,',');
