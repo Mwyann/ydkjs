@@ -127,7 +127,7 @@ var YDKJDemoSnd = {
         'RulesExplainBoth':{res:'5QDemo',name:'Mb07',min:1,max:1},
         'RulesExplainSkip':{res:'5QDemo',name:'Mb08',min:1,max:1},
         'RulesSkipExplain':{res:'5QDemo',name:'Mb09',min:1,max:1},
-        'SFXCorrect':{res:'5QDemo',name:'Mb84',min:1,max:2},
+        'SFXCorrect':{res:'5QDemo',name:'Mb84',min:1,max:1},
         'SFXHidePrice':{res:'5QDemo',name:'Mb90',min:1,max:1},
         'SFXKeyPress':{res:'5QDemo',name:'Mb82',min:1,max:1},
         'SFXKeyPress2':{res:'5QDemo',name:'Mb83',min:1,max:1},
@@ -138,7 +138,8 @@ var YDKJDemoSnd = {
         'SFXTimeOut1':{res:'5QDemo',name:'Mb86',min:1,max:1},
         'SFXTimeOut2':{res:'5QDemo',name:'Mb87',min:1,max:1}, // Inutilisé ?
         'SFXWrong':{res:'5QDemo',name:'Mb85',min:1,max:1},
-        'SFXTimeOutScore':{res:'5QDemo',name:'Mb85',min:2,max:2}, // Pour le décompte du score lors d'un time out (même ressource, n° 2 !)
+        'SFXScoreWin':{res:'5QDemo',name:'Mb84',min:2,max:2}, // Pour le décompte du score (même ressource, n° 2 !)
+        'SFXScoreLose':{res:'5QDemo',name:'Mb85',min:2,max:2}, // Pour le décompte du score (même ressource, n° 2 !)
         'Score10on7':{res:'5QDemo',name:'Mp28',min:1,max:1}, // Sons utilisés lorsqu'on a répondu à toutes les questions dans les temps
         'Score11on7':{res:'5QDemo',name:'Mp26',min:1,max:1},
         'Score12on7':{res:'5QDemo',name:'Mp24',min:1,max:1},

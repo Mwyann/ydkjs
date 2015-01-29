@@ -37,6 +37,7 @@ function resources() {
 
     if ($mode == 'Intro') {
         $intro = rand(1,4);
+        $pretitle = rand(1,11);
 
         $reslist = array();
         $res = $DB->query("SELECT *
@@ -44,6 +45,12 @@ function resources() {
                            WHERE a.resid = f.resid
                            AND grp = 'Intro'");
         while ($rs = $res->fetch()) {
+            if (substr($rs['name'],0,13) == 'IntroPreTitle') {
+                if ($rs['name'] == 'IntroPreTitle'.$pretitle.'.1') $rs['name'] = 'IntroPreTitle1';
+                elseif ($rs['name'] == 'IntroPreTitle'.$pretitle.'.2') $rs['name'] = 'IntroPreTitle2';
+                else continue;
+            }
+
             $r = array(
                 'urlGif' => uriToUid('res-full/'.$rs['filename'].'.gif'),
                 'urlJS' => uriToUid('res-full/'.$rs['filename'].'.js'),
@@ -138,7 +145,7 @@ function resources() {
 
         $reslist['questiontitles'] = array();
 
-        if (($questionnumber % 4) == 1) {
+        if (($questionnumber % 4) != 0) {
             $res = $DB->query("SELECT *
                            FROM ".$DBsta.".qhdr
                            WHERE qtype = 'Question'

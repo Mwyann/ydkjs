@@ -117,7 +117,8 @@ ModeDisOrDat.prototype.preload = function(resources) {
     this.CannotSkipLast = new YDKJAnimation(resources['DisOrDat/CannotSkipLast']);
     this.SFXCorrect = new YDKJAnimation(resources['DisOrDat/SFXCorrect']);
     this.SFXWrong = new YDKJAnimation(resources['DisOrDat/SFXWrong']);
-    this.SFXTimeOutScore = new YDKJAnimation(resources['DisOrDat/SFXTimeOutScore']);
+    this.SFXScoreWin = new YDKJAnimation(resources['DisOrDat/SFXScoreWin']);
+    this.SFXScoreLose = new YDKJAnimation(resources['DisOrDat/SFXScoreLose']);
     this.RestartSkipped = new YDKJAnimation(resources['DisOrDat/RestartSkipped']);
 
     this.MusicPlayEnd = new YDKJAnimation(resources['DisOrDat/MusicPlayEnd']);
@@ -165,7 +166,7 @@ ModeDisOrDat.prototype.preload = function(resources) {
 ModeDisOrDat.prototype.start = function() {
     var thisMode = this;
 
-    var nextcategory = 0;
+    var nextcategoryready;
 
     if (this.chooseplayer == 1) {
         this.ChoicePlayer = this.ChoicePlayer1on3;
@@ -204,10 +205,13 @@ ModeDisOrDat.prototype.start = function() {
     });
 
     var jumpToNextCategory = function() {
-        nextcategory.modeObj.MusicChooseCategoryLoop.free();
-        nextcategory.modeObj.MusicChooseCategoryLoop = thisMode.MusicLoopRules1;
-        thisMode.MusicLoopRules1 = false; // Pour ne pas être détruite au passage à la catégorie suivante
-        nextcategory.start();
+        nextcategoryready(function(nextcategory){
+            nextcategory.modeObj.chooseplayer = thisMode.chooseplayer;
+            nextcategory.modeObj.MusicChooseCategoryLoop.free();
+            nextcategory.modeObj.MusicChooseCategoryLoop = thisMode.MusicLoopRules1;
+            thisMode.MusicLoopRules1 = false; // Pour ne pas être détruite au passage à la catégorie suivante
+            nextcategory.start();
+        });
     };
 
     var buttonsAnswer = [0]; // Rien pour le 0, comme ça on décale pas
@@ -267,11 +271,11 @@ ModeDisOrDat.prototype.start = function() {
                         var from = thisMode.game.players[thisMode.chooseplayer-1].score;
                         thisMode.game.players[thisMode.chooseplayer-1].score += tempscore;
                         if (tempscore > 0) {
-                            thisMode.SFXCorrect.reset();
-                            thisMode.SFXCorrect.play();
+                            thisMode.SFXScoreWin.reset();
+                            thisMode.SFXScoreWin.play();
                         } else {
-                            thisMode.SFXTimeOutScore.reset();
-                            thisMode.SFXTimeOutScore.play();
+                            thisMode.SFXScoreLose.reset();
+                            thisMode.SFXScoreLose.play();
                         }
                         animateValue(playerdiv.find('.score'),from,thisMode.game.players[thisMode.chooseplayer-1].score,12,function(){
                             setTimeout(function(){
@@ -384,7 +388,7 @@ ModeDisOrDat.prototype.start = function() {
         if (nbanswersleft == 1) tm = thisMode.TimeOutLoseOneQuestion;
         else tm = thisMode.TimeOutLoseMoreQuestions;
         tm.ended(-150,function(){
-            thisMode.SFXTimeOutScore.play();
+            thisMode.SFXScoreLose.play();
             tempscorediv.animate({color:'#F00'},150);
             var oldtempscore = tempscore;
             tempscore -= thisMode.options.value*nbanswersleft;
@@ -1251,6 +1255,5 @@ ModeDisOrDat.prototype.start = function() {
         });
     });
 
-    nextcategory = new YDKJMode(this.game, 'Category', {category:1,questionnumber:this.options.questionnumber+1});
-    nextcategory.modeObj.chooseplayer = this.chooseplayer;
+    nextcategoryready = this.game.api.gamemode(thisMode); // Préchargement de la prochaine catégorie
 };

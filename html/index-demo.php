@@ -48,11 +48,13 @@ function startgame() {
      <br/>
      <u>Le jeu fonctionne le mieux dans Firefox et Chrome</u>. Il est possible de profiter du jeu en "plein écran", en cliquant sur le lien en haut de l'écran et en appuyant sur F11 (F11 et Echap pour revenir en mode normal). Internet Explorer ne gère pas les polices CSS3 et il a des soucis avec les sons qui s'arrêtent trop tôt. Les navigateurs mobiles quant à eux ont des problèmes avec la gestion des fichiers audio (permission de jouer un seul fichier audio à la fois, et uniquement suite à une action de l'utilisateur...).<br/>
      <br/>
-     <u>Le but de ce projet est de transformer le jeu complet et d'y ajouter des fonctionnalités multi-joueurs en ligne</u>. Etant donné mon temps libre et le travail que cela va demander, ce n'est pas pour tout de suite, ni pour demain... mais à suivre ! Vous pouvez vous abonner au compte Twitter <a style="color:#F00" href="https://twitter.com/YdkjFr" target="_blank">@YdkjFr</a> associé pour connaître les dernières nouveautés. Si vous ne connaissez pas déjà le jeu, je vous laisse le découvrir.<br/>
+     <u>Le but de ce projet est de transformer le jeu complet et d'y ajouter des fonctionnalités multi-joueurs en ligne</u>. Etant donné mon temps libre et le travail que cela va demander, ce n'est pas pour tout de suite, ni pour demain... mais à suivre ! Vous pouvez vous abonner au compte Twitter <a style="color:#F00" href="https://twitter.com/YdkjFr" target="_blank">@YdkjFr</a> associé pour connaître les dernières nouveautés. Le projet global derrière cette démo se situe à cette adresse : <a style="color:#F00" href="http://www.ydkjs.eu/">You Don't Know Javascript</a>. Si vous ne connaissez pas déjà le jeu, je vous laisse le découvrir.<br/>
      <br/>
      Contact : <a style="color:#F00" href="mailto:demo@ydkj.fr">demo@ydkj.fr</a>
      <br/>
      <u>Alpha disponible</u> ! Plus d'infos ici : <a style="color:#F00" href="http://play.ydkj.fr/">play.ydkj.fr</a>
+     <br/>
+     <u>UK version available</u>! Try the demo : <a style="color:#F00" href="http://demo.ydkj.co.uk/">demo.ydkj.co.uk</a>
     </p>
     <p style="text-align:center"><br/><input type="button" onclick="startgame()" value="Chargement..." id="startbutton" /><br/>
         <span style="font-size:12px">Super, <span style="color:#FF0"><?php include 'count.txt'; ?></span> personnes ont osé essayer !</span></p>

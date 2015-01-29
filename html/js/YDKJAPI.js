@@ -13,7 +13,7 @@ YDKJAPI.prototype.initdemo = function() {
         if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Intro', {});
         //if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 2}); // Ligne DEBUG
         if (currentmode instanceof ModeIntro) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1, chooseplayer: 3});
-        if (currentmode instanceof ModeQuestion) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: currentmode.options.questionnumber+1});
+        if ((currentmode instanceof ModeQuestion) || (currentmode instanceof ModeDisOrDat)) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: currentmode.options.questionnumber+1});
 
         return function(f) {f(newmode)}
     };
@@ -324,7 +324,8 @@ YDKJAPI.prototype.initdemo = function() {
                 'DisOrDat/SFXTimeOut1':0,
                 'DisOrDat/SFXTimeOut2':0,
                 'DisOrDat/SFXWrong':0,
-                'DisOrDat/SFXTimeOutScore':0,
+                'DisOrDat/SFXScoreWin':0,
+                'DisOrDat/SFXScoreLose':0,
                 'DisOrDat/Score10on7':0,
                 'DisOrDat/Score11on7':0,
                 'DisOrDat/Score12on7':0,
@@ -660,7 +661,7 @@ YDKJAPI.prototype.initgame = function() {
 
         if (currentmode === undefined) data['currentmode'] = 'None';
         if (currentmode instanceof ModeIntro) data['currentmode'] = 'Intro';
-        if (currentmode instanceof ModeQuestion) {data['currentmode'] = 'Category'; data['category'] = 1; data['questionnumber'] = parseInt(currentmode.options.questionnumber)+1;}
+        if ((currentmode instanceof ModeQuestion) || (currentmode instanceof ModeDisOrDat)) {data['currentmode'] = 'Category'; data['category'] = 1; data['questionnumber'] = parseInt(currentmode.options.questionnumber)+1;}
 
         var newmode;
         var ready = 0;
