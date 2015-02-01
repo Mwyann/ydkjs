@@ -6,7 +6,9 @@ if (!isset($_POST['call'])) die('API ready 1');
 $call = $_POST['call'];
 
 function uriToUid($uri) {
-  return 'api/get.php?uid='.base64_encode($uri).'&type=';
+    global $GETsalt;
+    $base64 = base64_encode($uri);
+    return 'api/get.php?uid='.$base64.sha1($base64.$GETsalt).'&type=';
 }
 
 function gamemode() {

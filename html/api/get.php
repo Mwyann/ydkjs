@@ -7,7 +7,14 @@ if (!isset($_GET['uid'])) die('No uid');
 
 session_write_close();
 
-$uid = str_replace('..','',base64_decode($_GET['uid']).$_GET['type']);
+require_once 'mysql.inc.php';
+
+$hash = substr($_GET['uid'],-40);
+$uid = substr($_GET['uid'],0,-40);
+
+if (sha1($uid.$GETsalt) != $hash) die('Incorrect hash');
+
+$uid = str_replace('..','',base64_decode($uid).$_GET['type']);
 
 $file = '../'.$uid;
 
