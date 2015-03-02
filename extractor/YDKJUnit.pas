@@ -919,6 +919,7 @@ var buf:array[0..3] of byte;
 begin
   closeSRF;
   assignfile(SRFhandler,filename);
+  FileMode := fmOpenRead;
   reset(SRFhandler,1);
   blockread(SRFhandler,buf,4);
   if (buf[0] <> $73) and (buf[1] <> $72) and (buf[2] <> $66) and (buf[3] <> $31) then begin // srf1

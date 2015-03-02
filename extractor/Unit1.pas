@@ -329,6 +329,7 @@ begin
     write(f,stringsCSV);
     closefile(f);
   end;
+  Memo1.Lines.Add('Conversion done.');
 end;
 
 end.
