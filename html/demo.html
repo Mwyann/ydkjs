@@ -6,7 +6,7 @@
 <link href="css/ydkj.css" rel="stylesheet"/>
 <script src="js/jquery-1.11.2.min.js" type="text/javascript"></script>
 <script src="js/jquery.animate-colors-min.js" type="text/javascript"></script>
-<script src="js/YDKJ.js?ver=2" type="text/javascript"></script>
+<script src="js/YDKJ.js?ver=3" type="text/javascript"></script>
 
 <script type="text/javascript">
 

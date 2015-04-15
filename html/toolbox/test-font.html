@@ -1,0 +1,182 @@
+<html>
+
+<head>
+<link href="../css/ydkj.css" rel="stylesheet"/>
+<script src="../js/jquery-1.11.2.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    var waitForWebfonts = function(fonts, callback) {
+        var loadedFonts = 0;
+        for(var i = 0, l = fonts.length; i < l; ++i) {
+            (function(font) {
+                var node = document.createElement('canvas');
+                // Characters that vary significantly among different fonts
+                var text = 'giItT1WQy@!-/#';
+                //node.innerHTML = text;
+                // Visible - so we can measure it - but not on the screen
+                node.style.position      = 'absolute';
+                node.style.left          = '-10000px';
+                node.style.top           = '-10000px';
+                // Large font size makes even subtle changes obvious
+                node.style.fontSize      = '300px';
+                // Reset any font properties
+                node.style.fontFamily    = 'sans-serif';
+                node.style.fontVariant   = 'normal';
+                node.style.fontStyle     = 'normal';
+                node.style.fontWeight    = 'normal';
+                node.style.letterSpacing = '0';
+                document.body.appendChild(node);
+
+                var ctx = node.getContext('2d');
+
+                // Remember width with no applied web font
+                ctx.font = "300px sans-serif";
+                var width = ctx.measureText(text).width;
+
+                ctx.font = '300px '+font;
+                node.style.fontFamily = font;
+                var widthChanged = 0;
+                var timeOut = 20;
+
+                var interval;
+                function checkFont() {
+                    if (node) {
+                        timeOut--;
+                        // Compare current width with original width
+                        if (ctx.measureText(text).width != width) { // If width has changed
+                            widthChanged = 1;
+                            width = ctx.measureText(text).width;
+                        } else {
+                            if (widthChanged) { // When width has stopped changing
+                                timeOut = 0;
+                            }
+                        }
+                    }
+
+                    if (timeOut <= 0) {
+                        ++loadedFonts;
+                        node.parentNode.removeChild(node);
+                        node = null;
+                    }
+
+                    // If all fonts have been loaded
+                    if(loadedFonts >= fonts.length) {
+                        if(interval) {
+                            clearInterval(interval);
+                        }
+                        if(loadedFonts == fonts.length) {
+                            callback();
+                            return true;
+                        }
+                    }
+                };
+
+                if(!checkFont()) {
+                    interval = setInterval(checkFont, 50);
+                }
+            })(fonts[i]);
+        }
+    };
+
+    function measureTextHeight(text, font, left, top, width, height) {
+        var tmpdiv = $('<div />');
+        tmpdiv.html('gM');
+        tmpdiv.css({'position':'absolute', 'left':'-1000px', 'top':'-1000px', 'font':font});
+        $('body').append(tmpdiv);
+        //var textheight = parseInt($(tmpdiv).css('font-size'),10); // font size (only one line)
+        var textheight = parseInt($(tmpdiv).height(),10); // font height (with line break support)
+        // DEBUG STUFF
+        //tmpdiv.css({'position':'', 'left':'', 'top':'', 'float':'left'});
+        //tmpdiv.html(text.replace("\n","<br/>"));
+        // NO DEBUG
+        tmpdiv.remove();
+
+        // DEBUG STUFF
+        var fontDraw = document.createElement("canvas");
+        //$('body').append(fontDraw);
+        // here we expect that font size will be less canvas geometry
+        fontDraw.setAttribute("height", height);
+        fontDraw.setAttribute("width", width);
+
+        var ctx = fontDraw.getContext('2d');
+        ctx.fillStyle = 'black';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top'; // important!
+        ctx.font = font;
+
+        var tmptop = top+1;
+        var sp = text.split("\n");
+        $(sp).each(function(idx, el) {
+            ctx.fillText(el, left, tmptop);
+            tmptop += textheight;
+        });
+
+        // Get the pixel data from the canvas
+        var data = ctx.getImageData(left, top, width, height).data,
+                first = false,
+                last = false,
+                r = height,
+                c = 0;
+
+        // Find the last line with a non-white pixel
+        while(!last && r) {
+            r--;
+            for(c = 0; c < width; c++) {
+                if(data[r * width * 4 + c * 4 + 3]) {
+                    last = r;
+                    break;
+                }
+            }
+        }
+
+        // Find the first line with a non-white pixel
+        r = 0;
+        while(!first && (r < last)) {
+            for(c = 0; c < width; c++) {
+                if(data[r * width * 4 + c * 4 + 3]) {
+                    first = r;
+                    break;
+                }
+            }
+            r++;
+        }
+
+        return last - first + 1;
+    }
+
+    // Set the font
+    var font = 'JackRoman';
+    var string = "gM\ntest";
+
+    function checkFontHeight(string, totalheight) {
+        var sp = string.split("\n");
+        var fontsize = parseInt(Math.round(totalheight/sp.length));
+        var actualheight = totalheight;
+        var maxwidth = 800;
+        var maxheight = parseInt(Math.round(totalheight*1.5));
+        while (actualheight >= totalheight) {
+            fontsize--;
+            actualheight = measureTextHeight(string, fontsize.toString()+'px "'+font+'"', 0, 0, maxwidth, maxheight);
+        }
+        while (actualheight <= totalheight) {
+            fontsize++;
+            actualheight = measureTextHeight(string, fontsize.toString()+'px "'+font+'"', 0, 0, maxwidth, maxheight);
+        }
+        fontsize--;
+        actualheight = measureTextHeight(string, fontsize.toString()+'px "'+font+'"', 0, 0, maxwidth, maxheight);
+        $('body').append($('<div />').html(actualheight));
+        $('body').append($('<div />').html(fontsize));
+        $('body').append($('<div />').html(string.replace("\n",'<br/>')).css('font',fontsize.toString()+'px "'+font+'"'));
+    }
+
+    waitForWebfonts([font], function() {
+                checkFontHeight(string, 200);
+        }
+    );
+
+});
+</script>
+</head>
+<body>
+</body>
+</html>

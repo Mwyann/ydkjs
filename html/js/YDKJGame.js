@@ -5,6 +5,7 @@ function YDKJGame(html, demomode) {
     if (!demomode) demomode = false;
     this.html = html;
     this.api = new YDKJAPI(this, demomode);
+    this.font = new YDKJFont();
     this.demomode = demomode;
     //this.engineVersion = 2;
     jQuery.fx.interval = 66;
@@ -67,10 +68,12 @@ function YDKJGame(html, demomode) {
 
 YDKJGame.prototype.start = function() {
     var thisGame = this;
-    this.playersready(function (players) {
-        thisGame.players = players;
-        thisGame.gamemodeready(function (gamemode) {
-            gamemode.start();
+    this.font.preload(function () {
+        thisGame.playersready(function (players) {
+            thisGame.players = players;
+            thisGame.gamemodeready(function (gamemode) {
+                gamemode.start();
+            });
         });
     });
 };

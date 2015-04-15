@@ -29,6 +29,7 @@ function YDKJ(screen, debug) {
     };
 
     if (typeof YDKJGame == "undefined") loadScript('js/YDKJGame.js');
+    if (typeof YDKJFont == "undefined") loadScript('js/YDKJFont.js');
     if (typeof YDKJMode == "undefined") loadScript('js/YDKJMode.js');
     if (typeof YDKJAPI == "undefined") loadScript('js/YDKJAPI.js');
     if (typeof YDKJAnimation == "undefined") loadScript('js/YDKJAnimation.js');
@@ -38,6 +39,7 @@ function YDKJ(screen, debug) {
     if (typeof ModeCategory == "undefined") loadScript('js/ModeCategory.js');
     if (typeof ModeQuestion == "undefined") loadScript('js/ModeQuestion.js');
     if (typeof ModeDisOrDat == "undefined") loadScript('js/ModeDisOrDat.js');
+    if (typeof ModeJackAttack == "undefined") loadScript('js/ModeJackAttack.js');
     if (typeof YDKJDemoSnd == "undefined") loadScript('js/demo-res.js');
     if (typeof SeamlessLoop == "undefined") loadScript('js/SeamlessLoop.js');
 

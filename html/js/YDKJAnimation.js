@@ -114,6 +114,8 @@ function YDKJAnimation(resource) {
     };
 
     this.addTile = function(tileid, x, y) {
+        if (!this.tiles) return false;
+        if (this.tiles.length < tileid) return false;
         var ourtile = this.tiles[tileid];
         if (!ourtile) return false;
         var ourdiv = jQuery('<div />');
@@ -135,6 +137,26 @@ function YDKJAnimation(resource) {
         return true;
     };
 
+    this.addText = function(textid, x, y, w, h) {
+        if (!thisAnim.html.debug) return true;
+        var ourdiv = jQuery('<div />');
+        ourdiv.css({
+            'background-color':'#999',
+            'opacity':'0.5',
+            'width':(w)+'px',
+            'height':(h)+'px',
+            'position':'absolute',
+            'left':x+'px',
+            'top':y+'px'
+        }).on('mousedown',(function() {
+            for(var i = 0; i < thisAnim.clickFunctions.length; i++) {
+                thisAnim.clickFunctions[i].call(thisAnim);
+            }
+        })).html(textid);
+        ourdiv.appendTo(this.tmpdiv);
+        return true;
+    };
+
     this.addFrame = function(frameid) {
         var ourframe = this.frames[frameid];
         var val = 0;
@@ -144,8 +166,11 @@ function YDKJAnimation(resource) {
             //var sizex = ourframe.img[0].sx;
             //var sizey = ourframe.img[0].sy;
             val = ourframe.img[0].val;
-            for(var i = 1; i <= ourframe.nbimg; i++) {
-                this.addTile(ourframe.img[i].idx-1, offsetx+ourframe.img[i].ox, offsety+ourframe.img[i].oy);
+            for (var i = 1; i <= ourframe.nbimg; i++) {
+                if ((ourframe.img[i].val & 32) == 32)
+                    this.addText(ourframe.img[i].idx, offsetx + ourframe.img[i].ox, offsety + ourframe.img[i].oy, ourframe.img[i].sx, ourframe.img[i].sy);
+                else
+                    this.addTile(ourframe.img[i].idx - 1, offsetx + ourframe.img[i].ox, offsety + ourframe.img[i].oy);
                 val = val | ourframe.img[i].val;
             }
             return val;
