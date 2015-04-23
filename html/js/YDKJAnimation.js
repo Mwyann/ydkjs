@@ -48,6 +48,7 @@ function YDKJAnimation(resource) {
     this.intervalTimer = 0;
     this.audiostopTimer = 0;
     this.html = {};
+    this.font = 0;
 
     this.preloaded = 0;
     this.readyFunctions = [];

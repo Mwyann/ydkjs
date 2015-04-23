@@ -40,6 +40,7 @@ YDKJMode.prototype.start = function() {
             if ((thisMode.modeObj[i] instanceof YDKJAnimation) || (thisMode.modeObj[i] instanceof YDKJTimer)) {
                 numobj++;
                 thisMode.modeObj[i].html = thisMode.modeObj.game.html;
+                thisMode.modeObj[i].font = thisMode.modeObj.game.font;
                 thisMode.modeObj[i].ready(readyfunction);
             }
         }

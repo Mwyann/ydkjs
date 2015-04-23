@@ -22,83 +22,89 @@ var animationSpeed = 66;
 <script type="text/javascript">
 
 var animationFile = '';
+var Font = 0;
 
 jQuery(document).ready(function() {
-    var anim = 0;
-    var screen = jQuery('#screen');
-    var debug = jQuery('#debuglive');
-    var slider = 0;
-    var loadAnim = function() {
-      if (anim) anim.free();
-      screen.html('');
-      debug.html('');
-      if (slider) $("#slider").slider({disabled: true});
-      anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js'});
-      anim.html = {screen: screen, debug: debug};
-      anim.ready(function() {
-        var thisAnim = this;
-
-        $("#slider").slider({
-          value: 0,
-          min: 0,
-          max: thisAnim.frames.length-1,
-          step: 1,
-          disabled: false,
-          slide: function( event, ui ) {
-            if (anim) anim.free();
-            anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js', framestart: ui.value, framestop: ui.value});
-            anim.html = {screen: screen, debug: debug};
-            anim.ready(function() {
-              this.play();
-            });
-          }
-        });
-        slider= 1;
-      });
-      anim = 0;
-    };
-
-    var filename = $('#filename');
-    animationFile = filename.val();
-    loadAnim();
-    filename.on('change',function() {
-      animationFile = $(this).val();
-      loadAnim();
-    });
-
-    $('#animslow').on('click',function() {
-      if ($('#animslow').is(':checked')) animationSpeed = 300; else animationSpeed = 66;
-    });
-
-    $('#animplay').on('click',function() {
-        var framefrom = parseInt($('#framefrom').val());
-        if (!framefrom) framefrom = 0;
-        var frameto = parseInt($('#frameto').val());
-        if (!frameto) frameto = -1;
-        var animloop = $('#animloop').is(':checked');
-
-        if (anim) {
-          anim.free();
-          anim = 0;
-        }
-
-        if ((framefrom >= 0) && (animationFile != '')) {
-          anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js', framestart: framefrom, loop: animloop, framestop: frameto});
+    Font = new YDKJFont();
+    Font.preload(function() {
+        Font.strings['110'] = 'Joueur 1';
+        Font.strings['115'] = '0 F';
+        var anim = 0;
+        var screen = jQuery('#screen');
+        var debug = jQuery('#debuglive');
+        var slider = 0;
+        var loadAnim = function() {
+          if (anim) anim.free();
+          screen.html('');
+          debug.html('');
+          if (slider) $("#slider").slider({disabled: true});
+          anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js'});
           anim.html = {screen: screen, debug: debug};
-          anim.frame(function(framenum) {
-              $("#slider").slider("value",framenum);
-          });
           anim.ready(function() {
-            this.play();
-          });
-        }
-    });
+            var thisAnim = this;
 
-    $('#animstop').on('click',function() {
-        if (anim) {
-            anim.free();
-            anim = 0;
-        }
+            $("#slider").slider({
+              value: 0,
+              min: 0,
+              max: thisAnim.frames.length-1,
+              step: 1,
+              disabled: false,
+              slide: function( event, ui ) {
+                if (anim) anim.free();
+                anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js', framestart: ui.value, framestop: ui.value});
+                anim.html = {screen: screen, debug: debug};
+                anim.ready(function() {
+                  this.play();
+                });
+              }
+            });
+            slider= 1;
+          });
+          anim = 0;
+        };
+
+        var filename = $('#filename');
+        animationFile = filename.val();
+        loadAnim();
+        filename.on('change',function() {
+          animationFile = $(this).val();
+          loadAnim();
+        });
+
+        $('#animslow').on('click',function() {
+          if ($('#animslow').is(':checked')) animationSpeed = 300; else animationSpeed = 66;
+        });
+
+        $('#animplay').on('click',function() {
+            var framefrom = parseInt($('#framefrom').val());
+            if (!framefrom) framefrom = 0;
+            var frameto = parseInt($('#frameto').val());
+            if (!frameto) frameto = -1;
+            var animloop = $('#animloop').is(':checked');
+
+            if (anim) {
+              anim.free();
+              anim = 0;
+            }
+
+            if ((framefrom >= 0) && (animationFile != '')) {
+              anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js', framestart: framefrom, loop: animloop, framestop: frameto});
+              anim.html = {screen: screen, debug: debug};
+              anim.frame(function(framenum) {
+                  $("#slider").slider("value",framenum);
+              });
+              anim.ready(function() {
+                this.play();
+              });
+            }
+        });
+
+        $('#animstop').on('click',function() {
+            if (anim) {
+                anim.free();
+                anim = 0;
+            }
+        });
     });
 });
 
