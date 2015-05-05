@@ -8,6 +8,7 @@
 <script src="js/SeamlessLoop.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="css/ui-lightness/jquery-ui-1.10.4.custom.min.css">
+<link rel="stylesheet" href="css/ydkj.css"/>
 <script src="js/jquery-ui-1.10.4.custom.min.js"></script>
 
 <script type="text/javascript">
@@ -27,36 +28,44 @@ var Font = 0;
 jQuery(document).ready(function() {
     Font = new YDKJFont();
     Font.preload(function() {
-        Font.strings['110'] = 'Joueur 1';
+        Font.strings['110'] = 'Jeff';
         Font.strings['115'] = '0 F';
+        Font.strings['100'] = 'Jeff';
+        Font.strings['102'] = 'Jeff';
+        Font.strings['103'] = 'Jeff';
+        Font.strings['1010'] = 'C’est dur vraiment plus longtemps';
+        Font.strings['1020'] = 'Se noyer dans un verre d’eau';
+        Font.strings['1030'] = 'Ma meilleure boum';
         var anim = 0;
         var screen = jQuery('#screen');
         var debug = jQuery('#debuglive');
         var slider = 0;
         var loadAnim = function() {
-          if (anim) anim.free();
-          screen.html('');
-          debug.html('');
-          if (slider) $("#slider").slider({disabled: true});
-          anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js'});
-          anim.html = {screen: screen, debug: debug};
-          anim.ready(function() {
+            if (anim) anim.free();
+            screen.html('');
+            debug.html('');
+            if (slider) $("#slider").slider({disabled: true});
+            anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js'});
+            anim.html = {screen: screen, debug: debug};
+            anim.font = Font;
+            anim.ready(function() {
             var thisAnim = this;
 
             $("#slider").slider({
-              value: 0,
-              min: 0,
-              max: thisAnim.frames.length-1,
-              step: 1,
-              disabled: false,
-              slide: function( event, ui ) {
-                if (anim) anim.free();
-                anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js', framestart: ui.value, framestop: ui.value});
-                anim.html = {screen: screen, debug: debug};
-                anim.ready(function() {
-                  this.play();
-                });
-              }
+                value: 0,
+                min: 0,
+                max: thisAnim.frames.length-1,
+                step: 1,
+                disabled: false,
+                slide: function( event, ui ) {
+                    if (anim) anim.free();
+                    anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js', framestart: ui.value, framestop: ui.value});
+                    anim.html = {screen: screen, debug: debug};
+                    anim.font = Font;
+                    anim.ready(function() {
+                        this.play();
+                    });
+                }
             });
             slider= 1;
           });
@@ -67,12 +76,12 @@ jQuery(document).ready(function() {
         animationFile = filename.val();
         loadAnim();
         filename.on('change',function() {
-          animationFile = $(this).val();
-          loadAnim();
+            animationFile = $(this).val();
+            loadAnim();
         });
 
         $('#animslow').on('click',function() {
-          if ($('#animslow').is(':checked')) animationSpeed = 300; else animationSpeed = 66;
+            if ($('#animslow').is(':checked')) animationSpeed = 300; else animationSpeed = 66;
         });
 
         $('#animplay').on('click',function() {
@@ -83,19 +92,20 @@ jQuery(document).ready(function() {
             var animloop = $('#animloop').is(':checked');
 
             if (anim) {
-              anim.free();
-              anim = 0;
+                anim.free();
+                anim = 0;
             }
 
             if ((framefrom >= 0) && (animationFile != '')) {
-              anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js', framestart: framefrom, loop: animloop, framestop: frameto});
-              anim.html = {screen: screen, debug: debug};
-              anim.frame(function(framenum) {
-                  $("#slider").slider("value",framenum);
-              });
-              anim.ready(function() {
-                this.play();
-              });
+                anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js', framestart: framefrom, loop: animloop, framestop: frameto});
+                anim.html = {screen: screen, debug: debug};
+                anim.font = Font;
+                anim.frame(function(framenum) {
+                    $("#slider").slider("value",framenum);
+                });
+                anim.ready(function() {
+                    this.play();
+                });
             }
         });
 
@@ -109,14 +119,14 @@ jQuery(document).ready(function() {
 });
 
 function play(t) {
-  var jt = jQuery(t);
-  anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js', framestart: jt.val()});
-  anim.ended(function() {
-    this.free();
-  });
-  anim.ready(function() {
-    this.play();
-  });
+    var jt = jQuery(t);
+    anim = new YDKJAnimation({urlGif: animationFile+'.gif', urlJS: animationFile+'.js', framestart: jt.val()});
+    anim.ended(function() {
+        this.free();
+    });
+    anim.ready(function() {
+        this.play();
+    });
 }
 
 </script>
@@ -136,6 +146,8 @@ function play(t) {
          <option value="res-full/JACKART/off4/3200">3200 - Player Numbers (2 players)</option>
          <option value="res-full/JACKART/off4/3300">3300 - Player Numbers (1 player)</option>
          <option value="res-full/TITLE/off4/3500">3500 - Ads & Title</option>
+         <option value="res-full/FONTS/off4/5030">5030 - Font 1-30</option>
+         <option value="res-full/FONTS/off4/5064">5064 - Font 1-64</option>
          <option value="res-full/JACKART/off4/8009">8009 - Timer 1</option>
          <option value="res-full/JACKART/off4/8012">8012 - Round 2</option>
          <option value="res-full/JACKART/off4/8013">8013 - Drelin To Timer 10</option>

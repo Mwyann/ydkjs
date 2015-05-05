@@ -3,6 +3,15 @@
 function YDKJFont() {
     this.strings = {};
     this.fontdata = {};
+    this.textdata = {
+        // ModeCategory
+        100: {font:'JackRoman',size:38,color:'#FFF',height:78}, // Player name with shadow
+        102: {font:'JackRoman',size:38,color:'#FFF',height:75,opacity:0.15},
+        103: {font:'JackRoman',size:38,color:'#FFF',height:78,opacity:0.40},
+        1010:{font:'JackRoman',size:29,color:'#FC0',halign:'l',width:500,height:102}, // Categories text
+        1020:{font:'JackRoman',size:29,color:'#FC0',halign:'l',width:500,height:102},
+        1030:{font:'JackRoman',size:29,color:'#FC0',halign:'l',width:500,height:102}
+    };
 }
 
 YDKJFont.prototype.preload = function(callback){
@@ -13,7 +22,7 @@ YDKJFont.prototype.preload = function(callback){
         for(var i = 0, l = fonts.length; i < l; ++i) {
             (function(font) {
                 var height = thisFont.measureTextHeight('giItT1WQy@!-/#', testheight.toString() + 'px "' + font + '"', 10, 10, parseInt(Math.round(testheight*1.5)), 1500);
-                thisFont.fontdata[font] = {heightratio: testheight / height['height'], topratio: testheight/height['top']};
+                thisFont.fontdata[font] = {heightratio: testheight / height['height'], topratio: height['top']/testheight};
             })(fonts[i]);
         }
         callback();
@@ -159,13 +168,13 @@ YDKJFont.prototype.measureTextHeight = function(text, font, left, top, width, he
     return {height: last - first + 1, top: first - top};
 };
 
-YDKJFont.prototype.displayText = function(string, posx, posy, width, height, transforms) {
-    // string : format "text [id]"
+YDKJFont.prototype.makeText = function(textid, width, height, transforms) {
+    // string : string id
 
     /* Text styles:
      0: normal style, eventually get the maximum font size (keeping ratio) until it fits (line breaks allowed)
      1: same as previous, just italics
-     2: to be found out, not sure...
+     2: to be found out, not sure... (hidden for right now)
      4: shrink the text on one or both axis if it doesn’t fit (for example answers on standard questions - also used in JackAttack - 15000 - not sure if it’s correct there)
      5: don’t shrink text, instead hide anything outside the boundaries
      6: to be found out, used in 15000 and 3300
@@ -173,4 +182,87 @@ YDKJFont.prototype.displayText = function(string, posx, posy, width, height, tra
      8: 33% opacity (approx.)
      */
 
+    if (transforms === undefined) transforms = 0;
+
+    var div = jQuery('<div />');
+    var container = jQuery('<div />');
+    div.appendTo(container);
+
+    var string = textid+'/'+transforms;
+
+    if (this.strings[textid] !== undefined) string = this.strings[textid];
+
+    if (this.textdata[textid] !== undefined) {
+        var textdata = this.textdata[textid];
+        var font = textdata['font'];
+        var fontsize = Math.floor(textdata['size']*this.fontdata[font].heightratio).toFixed(0);
+        var left = -2;
+        var top = -2-Math.floor(textdata['size']*this.fontdata[font].topratio).toFixed(0);
+        var realheight = height;
+        if (textdata.height) realheight = textdata.height;
+        var realwidth = width;
+        if (textdata.width) realwidth = textdata.width;
+
+        container.css({
+            'width': (realwidth)+'px',
+            'height': (realheight)+'px'
+        });
+        div.css({
+            'width': (realwidth)+'px',
+            'position': 'relative',
+            'left': left+'px',
+            'top': top+'px',
+            'color': this.textdata[textid]['color'],
+            'font': (fontsize)+'px/'+(fontsize)+'px "'+font+'"'
+        }).html(string.replace(/(\n)+/g, '<br />').replace(/ /g,'&#8200;')); // Line breaks and thin spaces
+
+        var halign = 'c';
+        if (textdata.halign !== undefined) halign = textdata.halign;
+        if (halign == 'c') {
+            div.css({
+                'text-align':'center'
+            });
+        }
+
+        var valign = 'c';
+        if (textdata.valign !== undefined) valign = textdata.valign;
+        if (valign == 'c') {
+            div.css({
+                'vertical-align':'middle',
+                'display':'inline-block'
+            });
+            container.css({
+                'height': (realheight)+'px',
+                'line-height': (realheight)+'px'
+            });
+        }
+
+        var opacity = 1;
+        if (textdata.opacity !== undefined) opacity = textdata.opacity;
+        if (transforms == 7) opacity = opacity*0.66;
+        if (transforms == 8) opacity = opacity*0.33;
+        div.css({
+            'opacity':opacity
+        });
+
+        if (transforms == 2) {
+            container.css({'display':'none'});
+        }
+
+        if (transforms == 5) {
+            container.css({
+                'width': width+'px',
+                'overflow': 'hidden'
+            });
+        }
+    } else {
+        div.css({
+            'background-color': '#999',
+            'opacity': '0.5',
+            'width': (width) + 'px',
+            'height': (height) + 'px'
+        }).html(string);
+    }
+
+    return container;
 };

@@ -146,7 +146,7 @@ $(document).ready(function() {
 
     // Set the font
     var font = 'JackRoman';
-    var string = "gM\ntest";
+    var string = "Jeff";
 
     function checkFontHeight(string, totalheight) {
         var sp = string.split("\n");
@@ -164,13 +164,20 @@ $(document).ready(function() {
         }
         fontsize--;
         actualheight = measureTextHeight(string, fontsize.toString()+'px "'+font+'"', 0, 0, maxwidth, maxheight);
-        $('body').append($('<div />').html(actualheight));
-        $('body').append($('<div />').html(fontsize));
-        $('body').append($('<div />').html(string.replace("\n",'<br/>')).css('font',fontsize.toString()+'px "'+font+'"'));
+        $('body').append($('<div />').html('Required height: '+actualheight+'px'));
+        $('body').append($('<div />').html('Actual height: '+actualheight+'px'));
+        $('body').append($('<div />').html('Font size: '+fontsize+'px'));
+        var c = $('<div />');
+        $('body').append(c);
+        var d = $('<div style="color:red;background-color: gray"/>').html(string.replace("\n",'<br/>')).css('font',fontsize.toString()+'px "'+font+'"');//.css('line-height',fontsize.toString()+'px');
+        $('body').append(d);
+        c.html('Div height: '+d.height()+'px');
     }
 
     waitForWebfonts([font], function() {
-                checkFontHeight(string, 200);
+                checkFontHeight(string, 31);
+                checkFontHeight("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!", 38);
+                checkFontHeight("giItT1WQy@!-/#", 23);
         }
     );
 

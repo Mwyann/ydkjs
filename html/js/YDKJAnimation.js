@@ -138,8 +138,9 @@ function YDKJAnimation(resource) {
         return true;
     };
 
-    this.addText = function(textid, x, y, w, h) {
+    this.addText = function(textid, x, y, w, h, transform) {
         if (!thisAnim.html.debug) return true;
+        /*
         var ourdiv = jQuery('<div />');
         ourdiv.css({
             'background-color':'#999',
@@ -149,11 +150,20 @@ function YDKJAnimation(resource) {
             'position':'absolute',
             'left':x+'px',
             'top':y+'px'
+        }).html(textid);
+        */
+        var ourdiv = this.font.makeText(textid, w, h, transform);
+        if (!ourdiv) return true;
+        ourdiv.css({
+            'position':'absolute',
+            'left':x+'px',
+            'top':y+'px'
         }).on('mousedown',(function() {
             for(var i = 0; i < thisAnim.clickFunctions.length; i++) {
                 thisAnim.clickFunctions[i].call(thisAnim);
             }
-        })).html(textid);
+        }));
+        if (thisAnim.html.debug) ourdiv.attr('title',textid+'/'+transform);
         ourdiv.appendTo(this.tmpdiv);
         return true;
     };
@@ -168,9 +178,11 @@ function YDKJAnimation(resource) {
             //var sizey = ourframe.img[0].sy;
             val = ourframe.img[0].val;
             for (var i = 1; i <= ourframe.nbimg; i++) {
-                if ((ourframe.img[i].val & 32) == 32)
-                    this.addText(ourframe.img[i].idx, offsetx + ourframe.img[i].ox, offsety + ourframe.img[i].oy, ourframe.img[i].sx, ourframe.img[i].sy);
-                else
+                if ((ourframe.img[i].val & 32) == 32) {
+                    var textid = Math.floor(ourframe.img[i].idx/10).toFixed(0);
+                    var transform = ourframe.img[i].idx-(textid*10);
+                    this.addText(textid, offsetx + ourframe.img[i].ox, offsety + ourframe.img[i].oy, ourframe.img[i].sx, ourframe.img[i].sy, transform);
+                } else
                     this.addTile(ourframe.img[i].idx - 1, offsetx + ourframe.img[i].ox, offsety + ourframe.img[i].oy);
                 val = val | ourframe.img[i].val;
             }
