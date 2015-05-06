@@ -4,13 +4,28 @@ function YDKJFont() {
     this.strings = {};
     this.fontdata = {};
     this.textdata = {
+        // Player's names and scores
+        110: {font:'JackRoman',size:23,color:'#FFF'}, // Player 1's name
+        115: {font:'JackRoman',size:23,color:'#FFF'}, // Player 1's score
+        120: {font:'JackRoman',size:23,color:'#FFF'}, // Player 2's name
+        125: {font:'JackRoman',size:23,color:'#FFF'}, // Player 2's score
+        130: {font:'JackRoman',size:23,color:'#FFF'}, // Player 3's name
+        135: {font:'JackRoman',size:23,color:'#FFF'}, // Player 3's score
         // ModeCategory
         100: {font:'JackRoman',size:38,color:'#FFF'}, // Player name with shadow
         102: {font:'JackRoman',size:38,color:'#FFF',opacity:0.15},
         103: {font:'JackRoman',size:38,color:'#FFF',opacity:0.40},
         1010:{font:'JackRoman',size:29,color:'#FC0',halign:'l'}, // Categories text
         1020:{font:'JackRoman',size:29,color:'#FC0',halign:'l'},
-        1030:{font:'JackRoman',size:29,color:'#FC0',halign:'l'}
+        1030:{font:'JackRoman',size:29,color:'#FC0',halign:'l'},
+        // Questions
+        1100:{font:'JackExtraCond',size:60,color:'#FFF'}, // Big category title TODO: font size can change with text length
+        1200:{font:'JackRoman',size:20,color:'#33F',halign:'l'}, // Category title, header TODO: check real font size
+        1205:{font:'JackRoman',size:20,color:'#33F',halign:'r'}, // Category value, header TODO: check real font size
+        1211:{font:'JackCondensed',size:27,color:'#33F',halign:'l'}, // Answer 1 TODO: check real font size
+        1212:{font:'JackCondensed',size:29,color:'#33F',halign:'l'}, // Answer 2 TODO: check real font size
+        //1213:{font:'JackCondensed',size:28,color:'#33F',halign:'l'}, // Answer 3 TODO: check real font size
+        //1214:{font:'JackCondensed',size:28,color:'#33F',halign:'l'}  // Answer 4 TODO: check real font size
     };
 }
 
@@ -168,18 +183,22 @@ YDKJFont.prototype.measureTextHeight = function(text, font, left, top, width, he
     return {height: last - first + 1, top: first - top};
 };
 
-YDKJFont.prototype.makeText = function(textid, width, height, transforms) {
+YDKJFont.prototype.makeText = function(textid, width, height, transforms, val) {
     // string : string id
 
     /* Text styles:
      0: normal style, eventually get the maximum font size (keeping ratio) until it fits (line breaks allowed)
      1: same as previous, just italics
-     2: Seems to be an information about the final size, for example when used in conjunction with style 5 (see 10000 - Categories). Or it might be "val & 8".
+     2: Seems to be an information about the normal text size, for example when used in conjunction with style 4 and 5 (see 10000 - Categories and 14000 - DisOrDat).
      4: shrink the text on one or both axis if it doesn’t fit (for example answers on standard questions - also used in JackAttack - 15000 - not sure if it’s correct there)
      5: don’t shrink text, instead hide anything outside the boundaries
-     6: to be found out, used in 15000 and 3300
-     7: 66% opacity (approx.)
-     8: 33% opacity (approx.)
+     6: First color to apply (color by default). To be found out, used in 15000 and 3300...
+     7: Second color, or opacity (for ex. 66%)
+     8: Third color, or opacity (for ex. 33%)
+
+     Usage of style 2 and 4:
+     Get the final size with the style 2 (like for the style 5), then apply the transformation so that the final box fits into the temporary box.
+     So you just need to apply the transformation ratio between the current width/height and the final width/height.
      */
 
     if (transforms === undefined) transforms = 0;
@@ -188,15 +207,15 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms) {
     var container = jQuery('<div />');
     div.appendTo(container);
 
-    var string = textid+'/'+transforms;
+    var string = textid+'/'+transforms+'/'+val;
 
-    if (this.textdata[textid] !== undefined) {
+    if ((this.textdata[textid] !== undefined) && (this.textdata[textid]['font'] !== undefined)) {
         if (this.strings[textid] !== undefined) string = this.strings[textid];
 
         var textdata = this.textdata[textid];
         var font = textdata['font'];
         var fontsize = Math.floor(textdata['size']*this.fontdata[font].heightratio).toFixed(0);
-        var left = -2;
+        var left = 0;
         var top = -2-Math.floor(textdata['size']*this.fontdata[font].topratio).toFixed(0);
 
         container.css({
@@ -214,9 +233,19 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms) {
 
         var halign = 'c';
         if (textdata.halign !== undefined) halign = textdata.halign;
+        if (halign == 'l') {
+            div.css({
+                'text-align':'left'
+            });
+        }
         if (halign == 'c') {
             div.css({
                 'text-align':'center'
+            });
+        }
+        if (halign == 'r') {
+            div.css({
+                'text-align':'right'
             });
         }
 
@@ -235,16 +264,50 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms) {
 
         var opacity = 1;
         if (textdata.opacity !== undefined) opacity = textdata.opacity;
-        if (transforms == 7) opacity = opacity*0.66;
-        if (transforms == 8) opacity = opacity*0.33;
+        //if (transforms == 7) opacity = opacity*0.66;
+        //if (transforms == 8) opacity = opacity*0.33;
         div.css({
             'opacity':opacity
         });
 
+        if (transforms == 1) {
+            div.css({
+                'font-style':'italic'
+            });
+        }
+
         if (transforms == 2) {
+            if (this.textdata[textid] === undefined) this.textdata[textid] = {};
             this.textdata[textid]['fullwidth'] = width;
             this.textdata[textid]['fullheight'] = height;
             return false;
+        }
+
+        if (transforms == 4) {
+            var realcontainer = jQuery('<div />');
+            container.appendTo(realcontainer);
+            var fullwidth = width;
+            if (this.textdata[textid]['fullwidth'] !== undefined) fullwidth = this.textdata[textid]['fullwidth'];
+            var fullheight = height;
+            if (this.textdata[textid]['fullheight'] !== undefined) fullheight = this.textdata[textid]['fullheight'];
+
+            div.css({
+                'width': fullwidth+'px'
+            });
+            container.css({
+                'position': 'relative',
+                'left': (left-((fullwidth-width)/2).toFixed(0))+'px',
+                'top': '0',
+                //'top': (top-((fullheight-height)/2).toFixed(0))+'px',
+                'width': fullwidth+'px',
+                'height': fullheight+'px',
+                'transform': 'scale('+(width/fullwidth).toFixed(2)+','+(height/fullheight).toFixed(2)+')'
+            });
+            realcontainer.css({
+                'width': fullwidth+'px',
+                'height': fullheight+'px'
+            });
+            container = realcontainer;
         }
 
         if (transforms == 5) {
@@ -259,13 +322,31 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms) {
                 'overflow': 'hidden'
             });
         }
+
+        if (transforms >= 6) {
+            return false;
+        }
     } else {
+        if (transforms == 2) {
+            if (this.textdata[textid] === undefined) this.textdata[textid] = {};
+            this.textdata[textid]['fullwidth'] = width;
+            this.textdata[textid]['fullheight'] = height;
+            //return false;
+        }
+
         div.css({
             'background-color': '#999',
             'opacity': '0.5',
             'width': (width) + 'px',
             'height': (height) + 'px'
         }).html(string);
+
+        if (transforms == 2) div.css({
+            'background-color': '#F99'
+        });
+        if (transforms >= 6) div.css({
+            'background-color': '#9F9'
+        });
     }
 
     return container;

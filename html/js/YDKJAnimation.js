@@ -138,7 +138,7 @@ function YDKJAnimation(resource) {
         return true;
     };
 
-    this.addText = function(textid, x, y, w, h, transform) {
+    this.addText = function(textid, x, y, w, h, transform, val) {
         if (!thisAnim.html.debug) return true;
         /*
         var ourdiv = jQuery('<div />');
@@ -152,7 +152,7 @@ function YDKJAnimation(resource) {
             'top':y+'px'
         }).html(textid);
         */
-        var ourdiv = this.font.makeText(textid, w, h, transform);
+        var ourdiv = this.font.makeText(textid, w, h, transform, val);
         if (!ourdiv) return true;
         ourdiv.css({
             'position':'absolute',
@@ -163,7 +163,7 @@ function YDKJAnimation(resource) {
                 thisAnim.clickFunctions[i].call(thisAnim);
             }
         }));
-        if (thisAnim.html.debug) ourdiv.attr('title',textid+'/'+transform);
+        if (thisAnim.html.debug) ourdiv.attr('title',textid+'/'+transform+'/'+val);
         ourdiv.appendTo(this.tmpdiv);
         return true;
     };
@@ -181,7 +181,7 @@ function YDKJAnimation(resource) {
                 if ((ourframe.l[i].v & 32) == 32) {
                     var textid = Math.floor(ourframe.l[i].i/10).toFixed(0);
                     var transform = ourframe.l[i].i-(textid*10);
-                    this.addText(textid, left + ourframe.l[i].l, top + ourframe.l[i].t, ourframe.l[i].r - ourframe.l[i].l, ourframe.l[i].b - ourframe.l[i].t, transform);
+                    this.addText(textid, left + ourframe.l[i].l, top + ourframe.l[i].t, ourframe.l[i].r - ourframe.l[i].l, ourframe.l[i].b - ourframe.l[i].t, transform, ourframe.l[i].v & 207);
                 } else
                     this.addTile(ourframe.l[i].i - 1, left + ourframe.l[i].l, top + ourframe.l[i].t);
                 val = val | ourframe.l[i].v;
