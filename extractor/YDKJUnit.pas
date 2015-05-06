@@ -10,9 +10,8 @@ type subimages=record // Type à utiliser uniquement sous forme de pointeur (subi
        frames:array[0..3000] of record
          nbimages:word;
          images:array[0..64] of record
-           val1:byte; // Valeur inconnue : 0, 16, 167
-           offsetx,offsety:smallint;
-           sizex,sizey:word;
+           val:byte; // Flag binaire (4, 8, 32...)
+           left,top,right,bottom:smallint;
            imgindex:word;
          end;
        end;
@@ -359,17 +358,17 @@ begin
 
   js:=js+#13#10'res[''frames'']=[';
   for i:=0 to si^.nbframes-1 do begin
-    js:=js+'{nbimg:'+inttostr(si^.frames[i].nbimages);
+    js:=js+'{n:'+inttostr(si^.frames[i].nbimages);
     if (si^.frames[i].nbimages > 0) then begin
-      js:=js+',fps1:'+inttostr(si^.fps1)+',fps2:'+inttostr(si^.fps2)+',img:[';
+      js:=js+',f:'+inttostr(si^.fps1)+',g:'+inttostr(si^.fps2)+',l:[';
       for j:=0 to si^.frames[i].nbimages do begin
         js:=js+'{'
-        +'val:'+inttostr(si^.frames[i].images[j].val1)+','
-        +'ox:'+inttostr(si^.frames[i].images[j].offsetx)+','
-        +'oy:'+inttostr(si^.frames[i].images[j].offsety)+','
-        +'sx:'+inttostr(si^.frames[i].images[j].sizex)+','
-        +'sy:'+inttostr(si^.frames[i].images[j].sizey)+','
-        +'idx:'+inttostr(si^.frames[i].images[j].imgindex)
+        +'v:'+inttostr(si^.frames[i].images[j].val)+','
+        +'l:'+inttostr(si^.frames[i].images[j].left)+','
+        +'t:'+inttostr(si^.frames[i].images[j].top)+','
+        +'r:'+inttostr(si^.frames[i].images[j].right)+','
+        +'b:'+inttostr(si^.frames[i].images[j].bottom)+','
+        +'i:'+inttostr(si^.frames[i].images[j].imgindex)
         +'},';
       end;
       js:=js+']';
@@ -393,8 +392,7 @@ var si:^subimages;
     nbimages,i,j:word;
     nbframes,frameoffset:word;
 
-    sameoffset,offsetx,offsety:smallint;
-    sizex,sizey:word;
+    sameoffset,left,top,right,bottom:smallint;
     nbframeimages:word;
 begin
   getmem(si,sizeof(subimages));
@@ -414,25 +412,25 @@ begin
       currentpos2:=filepos(SRFhandler);
       seek(SRFhandler,fileoffset+10+nbframes*2+(frameoffset-1)*12);
       sameoffset:=readw; // Si différent de 0, alors on prend les mêmes images qu'à l'offset indiqué
-      offsetx:=readw;
-      offsety:=readw;
-      sizex:=readw;
-      sizey:=readw;
+      left:=readw;
+      top:=readw;
+      right:=readw;
+      bottom:=readw;
       nbframeimages:=readw;
       si^.frames[i].nbimages:=nbframeimages;
-      si^.frames[i].images[0].val1:=0;
-      si^.frames[i].images[0].offsetx:=offsetx;
-      si^.frames[i].images[0].offsety:=offsety;
-      si^.frames[i].images[0].sizex:=sizex;
-      si^.frames[i].images[0].sizey:=sizey;
+      si^.frames[i].images[0].val:=0;
+      si^.frames[i].images[0].left:=left;
+      si^.frames[i].images[0].top:=top;
+      si^.frames[i].images[0].right:=right;
+      si^.frames[i].images[0].bottom:=bottom;
       if (sameoffset <> 0) then seek(SRFhandler,fileoffset+10+nbframes*2+sameoffset*12);
       if (nbframeimages > 0) then for j:=1 to nbframeimages do begin
         readb; // imgnum mais on l'a avec j de toutes façons
-        si^.frames[i].images[j].val1:=readb;
-        si^.frames[i].images[j].offsetx:=readw;
-        si^.frames[i].images[j].offsety:=readw;
-        si^.frames[i].images[j].sizex:=readw;
-        si^.frames[i].images[j].sizey:=readw;
+        si^.frames[i].images[j].val:=readb;
+        si^.frames[i].images[j].left:=readw;
+        si^.frames[i].images[j].top:=readw;
+        si^.frames[i].images[j].right:=readw;
+        si^.frames[i].images[j].bottom:=readw;
         si^.frames[i].images[j].imgindex:=readw;
       end;
       seek(SRFhandler,currentpos2);

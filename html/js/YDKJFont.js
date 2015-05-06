@@ -5,12 +5,12 @@ function YDKJFont() {
     this.fontdata = {};
     this.textdata = {
         // ModeCategory
-        100: {font:'JackRoman',size:38,color:'#FFF',height:78}, // Player name with shadow
-        102: {font:'JackRoman',size:38,color:'#FFF',height:75,opacity:0.15},
-        103: {font:'JackRoman',size:38,color:'#FFF',height:78,opacity:0.40},
-        1010:{font:'JackRoman',size:29,color:'#FC0',halign:'l',width:500,height:102}, // Categories text
-        1020:{font:'JackRoman',size:29,color:'#FC0',halign:'l',width:500,height:102},
-        1030:{font:'JackRoman',size:29,color:'#FC0',halign:'l',width:500,height:102}
+        100: {font:'JackRoman',size:38,color:'#FFF'}, // Player name with shadow
+        102: {font:'JackRoman',size:38,color:'#FFF',opacity:0.15},
+        103: {font:'JackRoman',size:38,color:'#FFF',opacity:0.40},
+        1010:{font:'JackRoman',size:29,color:'#FC0',halign:'l'}, // Categories text
+        1020:{font:'JackRoman',size:29,color:'#FC0',halign:'l'},
+        1030:{font:'JackRoman',size:29,color:'#FC0',halign:'l'}
     };
 }
 
@@ -174,7 +174,7 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms) {
     /* Text styles:
      0: normal style, eventually get the maximum font size (keeping ratio) until it fits (line breaks allowed)
      1: same as previous, just italics
-     2: to be found out, not sure... (hidden for right now)
+     2: Seems to be an information about the final size, for example when used in conjunction with style 5 (see 10000 - Categories). Or it might be "val & 8".
      4: shrink the text on one or both axis if it doesn’t fit (for example answers on standard questions - also used in JackAttack - 15000 - not sure if it’s correct there)
      5: don’t shrink text, instead hide anything outside the boundaries
      6: to be found out, used in 15000 and 3300
@@ -190,31 +190,27 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms) {
 
     var string = textid+'/'+transforms;
 
-    if (this.strings[textid] !== undefined) string = this.strings[textid];
-
     if (this.textdata[textid] !== undefined) {
+        if (this.strings[textid] !== undefined) string = this.strings[textid];
+
         var textdata = this.textdata[textid];
         var font = textdata['font'];
         var fontsize = Math.floor(textdata['size']*this.fontdata[font].heightratio).toFixed(0);
         var left = -2;
         var top = -2-Math.floor(textdata['size']*this.fontdata[font].topratio).toFixed(0);
-        var realheight = height;
-        if (textdata.height) realheight = textdata.height;
-        var realwidth = width;
-        if (textdata.width) realwidth = textdata.width;
 
         container.css({
-            'width': (realwidth)+'px',
-            'height': (realheight)+'px'
+            'width': (width)+'px',
+            'height': (height)+'px'
         });
         div.css({
-            'width': (realwidth)+'px',
+            'width': (width)+'px',
             'position': 'relative',
             'left': left+'px',
             'top': top+'px',
             'color': this.textdata[textid]['color'],
             'font': (fontsize)+'px/'+(fontsize)+'px "'+font+'"'
-        }).html(string.replace(/(\n)+/g, '<br />').replace(/ /g,'&#8200;')); // Line breaks and thin spaces
+        }).html(string.replace(/(\n)+/g, '<br />').replace(/ /g,'&#8197;')); // Line breaks and thin spaces
 
         var halign = 'c';
         if (textdata.halign !== undefined) halign = textdata.halign;
@@ -232,8 +228,8 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms) {
                 'display':'inline-block'
             });
             container.css({
-                'height': (realheight)+'px',
-                'line-height': (realheight)+'px'
+                'height': (height)+'px',
+                'line-height': (height)+'px'
             });
         }
 
@@ -246,10 +242,18 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms) {
         });
 
         if (transforms == 2) {
-            container.css({'display':'none'});
+            this.textdata[textid]['fullwidth'] = width;
+            this.textdata[textid]['fullheight'] = height;
+            return false;
         }
 
         if (transforms == 5) {
+            var fullwidth = width;
+            if (this.textdata[textid]['fullwidth'] !== undefined) fullwidth = this.textdata[textid]['fullwidth'];
+
+            div.css({
+                'width': fullwidth+'px'
+            });
             container.css({
                 'width': width+'px',
                 'overflow': 'hidden'

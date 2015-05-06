@@ -171,20 +171,20 @@ function YDKJAnimation(resource) {
     this.addFrame = function(frameid) {
         var ourframe = this.frames[frameid];
         var val = 0;
-        if (ourframe.nbimg > 0) {
-            var offsetx = ourframe.img[0].ox;
-            var offsety = ourframe.img[0].oy;
-            //var sizex = ourframe.img[0].sx;
-            //var sizey = ourframe.img[0].sy;
-            val = ourframe.img[0].val;
-            for (var i = 1; i <= ourframe.nbimg; i++) {
-                if ((ourframe.img[i].val & 32) == 32) {
-                    var textid = Math.floor(ourframe.img[i].idx/10).toFixed(0);
-                    var transform = ourframe.img[i].idx-(textid*10);
-                    this.addText(textid, offsetx + ourframe.img[i].ox, offsety + ourframe.img[i].oy, ourframe.img[i].sx, ourframe.img[i].sy, transform);
+        if (ourframe.n > 0) {
+            var left = ourframe.l[0].l;
+            var top = ourframe.l[0].t;
+            //var right = ourframe.l[0].r;
+            //var bottom = ourframe.l[0].b;
+            val = ourframe.l[0].v;
+            for (var i = 1; i <= ourframe.n; i++) {
+                if ((ourframe.l[i].v & 32) == 32) {
+                    var textid = Math.floor(ourframe.l[i].i/10).toFixed(0);
+                    var transform = ourframe.l[i].i-(textid*10);
+                    this.addText(textid, left + ourframe.l[i].l, top + ourframe.l[i].t, ourframe.l[i].r - ourframe.l[i].l, ourframe.l[i].b - ourframe.l[i].t, transform);
                 } else
-                    this.addTile(ourframe.img[i].idx - 1, offsetx + ourframe.img[i].ox, offsety + ourframe.img[i].oy);
-                val = val | ourframe.img[i].val;
+                    this.addTile(ourframe.l[i].i - 1, left + ourframe.l[i].l, top + ourframe.l[i].t);
+                val = val | ourframe.l[i].v;
             }
             return val;
         }
@@ -194,10 +194,10 @@ function YDKJAnimation(resource) {
     this.getFrameVal = function(frameid) {
         var ourframe = this.frames[frameid];
         var val = 0;
-        if (ourframe.nbimg > 0) {
-            val = ourframe.img[0].val;
-            for(var i = 1; i <= ourframe.nbimg; i++) {
-                val = val | ourframe.img[i].val;
+        if (ourframe.n > 0) {
+            val = ourframe.l[0].v;
+            for(var i = 1; i <= ourframe.n; i++) {
+                val = val | ourframe.l[i].v;
             }
             return val;
         }
@@ -319,9 +319,9 @@ YDKJAnimation.prototype.play = function() {
             //setTimeout(runanim,66);
             var val = thisAnim.addFrame(framenum);
             if (((val & 4) == 0) || ((val & 8) != 0)) thisAnim.nextScreen();
-            if (((val & 32) != 0) && ((val & 8) != 0) && (thisAnim.animCallback)) thisAnim.animCallback();
+            if (((val & 32) != 0) && ((val & 8) != 0) && (thisAnim.animCallback)) thisAnim.animCallback(); // TODO: Enlever cette gestion du flag 32 qui n'a rien à voir avec un callback
             if (thisAnim.html.debug)
-                thisAnim.html.debug.html('frame '+framenum+'/'+(thisAnim.frames.length-1)+' ; val:'+val+' ; nbimg: '+thisAnim.frames[framenum].nbimg);
+                thisAnim.html.debug.html('frame '+framenum+'/'+(thisAnim.frames.length-1)+' ; val:'+val+' ; nbimg: '+thisAnim.frames[framenum].n);
             for(var i = 0; i < thisAnim.frameFunctions.length; i++) {
                 thisAnim.frameFunctions[i].call(this, framenum);
             }
@@ -337,7 +337,7 @@ YDKJAnimation.prototype.play = function() {
             }
         };
 
-        intervaltimer = setInterval(runanim,speed); // Pourrait être calculé depuis frames[x].fps1/frames[x].fps2
+        intervaltimer = setInterval(runanim,speed); // Pourrait être calculé depuis frames[x].f/frames[x].g
         runanim();
         this.intervalTimer = intervaltimer;
 

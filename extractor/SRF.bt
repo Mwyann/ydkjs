@@ -21,20 +21,20 @@ val1 :
 
 typedef struct {
     ubyte imgnum; // N° de l'image
-    ubyte val1; // 
-    short offsetx;
-    short offsety;
-    short sizex;
-    short sizey;
+    ubyte val; // Flags binaires : 4 = ?, 8 = ?, 32 = texte.
+    short left;
+    short top;
+    short right;
+    short bottom;
     ushort imgindex; // On a autant d'images que la valeur max... :-)
 } IMGDEF;
 
 typedef struct {
     ushort sameoffset; // Si différent de 0, alors on prend les mêmes images qu'à l'offset indiqué
-    short offsetx; // Position des images
-    short offsety;
-    short sizex;
-    short sizey;
+    short left; // Position des images
+    short top;
+    short right;
+    short bottom;
     ushort nbimg; // Nombre d'images à afficher
     local int64 currentpos4 = FTell();
     if (sameoffset != 0) FSeek(headersize+sameoffset*12);
