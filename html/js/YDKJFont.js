@@ -5,27 +5,27 @@ function YDKJFont() {
     this.fontdata = {};
     this.textdata = {
         // Player's names and scores
-        110: {font:'JackRoman',size:23,color:'#FFF'}, // Player 1's name
-        115: {font:'JackRoman',size:23,color:'#FFF'}, // Player 1's score
-        120: {font:'JackRoman',size:23,color:'#FFF'}, // Player 2's name
-        125: {font:'JackRoman',size:23,color:'#FFF'}, // Player 2's score
-        130: {font:'JackRoman',size:23,color:'#FFF'}, // Player 3's name
-        135: {font:'JackRoman',size:23,color:'#FFF'}, // Player 3's score
+        110: {font:'JackRoman',size:23,color:['#FFF']}, // Player 1's name
+        115: {font:'JackRoman',size:23,color:['#FFF']}, // Player 1's score
+        120: {font:'JackRoman',size:23,color:['#FFF']}, // Player 2's name
+        125: {font:'JackRoman',size:23,color:['#FFF']}, // Player 2's score
+        130: {font:'JackRoman',size:23,color:['#FFF']}, // Player 3's name
+        135: {font:'JackRoman',size:23,color:['#FFF']}, // Player 3's score
         // ModeCategory
-        100: {font:'JackRoman',size:38,color:'#FFF'}, // Player name with shadow
-        102: {font:'JackRoman',size:38,color:'#FFF',opacity:0.15},
-        103: {font:'JackRoman',size:38,color:'#FFF',opacity:0.40},
-        1010:{font:'JackRoman',size:29,color:'#FC0',halign:'l'}, // Categories text
-        1020:{font:'JackRoman',size:29,color:'#FC0',halign:'l'},
-        1030:{font:'JackRoman',size:29,color:'#FC0',halign:'l'},
+        100: {font:'JackRoman',size:38,color:['#FFF']}, // Player name with shadow
+        102: {font:'JackRoman',size:38,color:['#FFF'],opacity:0.15},
+        103: {font:'JackRoman',size:38,color:['#FFF'],opacity:0.40},
+        1010:{font:'JackRoman',size:29,color:['#FC0'],halign:'l'}, // Categories text
+        1020:{font:'JackRoman',size:29,color:['#FC0'],halign:'l'},
+        1030:{font:'JackRoman',size:29,color:['#FC0'],halign:'l'},
         // Questions
-        1100:{font:'JackExtraCond',size:60,color:'#FFF'}, // Big category title TODO: font size can change with text length
-        1200:{font:'JackRoman',size:20,color:'#33F',halign:'l'}, // Category title, header TODO: check real font size
-        1205:{font:'JackRoman',size:20,color:'#33F',halign:'r'}, // Category value, header TODO: check real font size
-        1211:{font:'JackCondensed',size:27,color:'#33F',halign:'l'}, // Answer 1 TODO: check real font size
-        1212:{font:'JackCondensed',size:29,color:'#33F',halign:'l'}, // Answer 2 TODO: check real font size
-        //1213:{font:'JackCondensed',size:28,color:'#33F',halign:'l'}, // Answer 3 TODO: check real font size
-        //1214:{font:'JackCondensed',size:28,color:'#33F',halign:'l'}  // Answer 4 TODO: check real font size
+        1100:{font:'JackExtraCond',size:60,color:['#FFF','#666','#AAA']}, // Big category title TODO: font size can change with text length, also check real font size
+        1200:{font:'JackRoman',size:20,color:['#33F'],halign:'l'}, // Category title, header TODO: check real font size
+        1205:{font:'JackRoman',size:20,color:['#33F'],halign:'r'}, // Category value, header TODO: check real font size
+        1211:{font:'JackCondensed',size:26,color:['#FC0','#FC0'],halign:'l'}, // Answer 1 TODO: check real font size ; 2nd color should be #F00 once good answer is found
+        1212:{font:'JackCondensed',size:26,color:['#FC0','#FC0'],halign:'l'}, // Answer 2 TODO: check real font size
+        //1213:{font:'JackCondensed',size:28,color:'#FC0',halign:'l'}, // Answer 3 TODO: check real font size
+        //1214:{font:'JackCondensed',size:28,color:'#FC0',halign:'l'}  // Answer 4 TODO: check real font size
     };
 }
 
@@ -183,7 +183,7 @@ YDKJFont.prototype.measureTextHeight = function(text, font, left, top, width, he
     return {height: last - first + 1, top: first - top};
 };
 
-YDKJFont.prototype.makeText = function(textid, width, height, transforms, val) {
+YDKJFont.prototype.makeText = function(textid, width, height, transforms, val, debug) {
     // string : string id
 
     /* Text styles:
@@ -202,6 +202,7 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val) {
      */
 
     if (transforms === undefined) transforms = 0;
+    if (debug === undefined) debug = 0;
 
     var div = jQuery('<div />');
     var container = jQuery('<div />');
@@ -209,14 +210,18 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val) {
 
     var string = textid+'/'+transforms+'/'+val;
 
-    if ((this.textdata[textid] !== undefined) && (this.textdata[textid]['font'] !== undefined)) {
+    if ((!debug) && ((this.textdata[textid] !== undefined) && (this.textdata[textid]['font'] !== undefined))) {
         if (this.strings[textid] !== undefined) string = this.strings[textid];
 
         var textdata = this.textdata[textid];
         var font = textdata['font'];
         var fontsize = Math.floor(textdata['size']*this.fontdata[font].heightratio).toFixed(0);
         var left = 0;
-        var top = -2-Math.floor(textdata['size']*this.fontdata[font].topratio).toFixed(0);
+        //var top = -2-Math.floor(textdata['size']*this.fontdata[font].topratio).toFixed(0);
+        var top = -3;
+        var colorid = 0;
+        if (textdata.colorid !== undefined) colorid = textdata.colorid;
+        if (textdata['color'][colorid] === undefined) colorid = 0;
 
         container.css({
             'width': (width)+'px',
@@ -227,7 +232,7 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val) {
             'position': 'relative',
             'left': left+'px',
             'top': top+'px',
-            'color': this.textdata[textid]['color'],
+            'color': textdata['color'][colorid],
             'font': (fontsize)+'px/'+(fontsize)+'px "'+font+'"'
         }).html(string.replace(/(\n)+/g, '<br />').replace(/ /g,'&#8197;')); // Line breaks and thin spaces
 
@@ -296,16 +301,18 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val) {
             });
             container.css({
                 'position': 'relative',
-                'left': (left-((fullwidth-width)/2).toFixed(0))+'px',
-                'top': '0',
-                //'top': (top-((fullheight-height)/2).toFixed(0))+'px',
+                'left': (0-((fullwidth-width)/2).toFixed(0))+'px',
+                'top': (0-((fullheight-height)/2).toFixed(0))+'px',
                 'width': fullwidth+'px',
                 'height': fullheight+'px',
-                'transform': 'scale('+(width/fullwidth).toFixed(2)+','+(height/fullheight).toFixed(2)+')'
+                'transform': 'scale('+(width/fullwidth).toFixed(2)+','+(height/fullheight).toFixed(2)+')',
+                'display':'inline-block'
             });
+
             realcontainer.css({
                 'width': fullwidth+'px',
-                'height': fullheight+'px'
+                'height': fullheight+'px',
+                'line-height': (fullheight)+'px'
             });
             container = realcontainer;
         }
@@ -324,9 +331,12 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val) {
         }
 
         if (transforms >= 6) {
+            this.textdata[textid]['colorid'] = transforms-6;
             return false;
         }
-    } else {
+    }
+
+    if (debug) {
         if (transforms == 2) {
             if (this.textdata[textid] === undefined) this.textdata[textid] = {};
             this.textdata[textid]['fullwidth'] = width;
@@ -344,9 +354,14 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val) {
         if (transforms == 2) div.css({
             'background-color': '#F99'
         });
-        if (transforms >= 6) div.css({
-            'background-color': '#9F9'
-        });
+        if (transforms >= 6) {
+            if (this.textdata[textid] === undefined) this.textdata[textid] = {};
+            this.textdata[textid]['colorid'] = transforms-6;
+
+            div.css({
+                'background-color': '#9F9'
+            });
+        }
     }
 
     return container;

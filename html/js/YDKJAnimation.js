@@ -138,8 +138,9 @@ function YDKJAnimation(resource) {
         return true;
     };
 
-    this.addText = function(textid, x, y, w, h, transform, val) {
+    this.addText = function(textid, x, y, w, h, transform, val, debug) {
         if (!thisAnim.html.debug) return true;
+        if (debug === undefined) debug = 0;
         /*
         var ourdiv = jQuery('<div />');
         ourdiv.css({
@@ -152,7 +153,7 @@ function YDKJAnimation(resource) {
             'top':y+'px'
         }).html(textid);
         */
-        var ourdiv = this.font.makeText(textid, w, h, transform, val);
+        var ourdiv = this.font.makeText(textid, w, h, transform, val, debug);
         if (!ourdiv) return true;
         ourdiv.css({
             'position':'absolute',
@@ -181,6 +182,7 @@ function YDKJAnimation(resource) {
                 if ((ourframe.l[i].v & 32) == 32) {
                     var textid = Math.floor(ourframe.l[i].i/10).toFixed(0);
                     var transform = ourframe.l[i].i-(textid*10);
+                    if (thisAnim.html.debug) this.addText(textid, left + ourframe.l[i].l, top + ourframe.l[i].t, ourframe.l[i].r - ourframe.l[i].l, ourframe.l[i].b - ourframe.l[i].t, transform, ourframe.l[i].v & 207, true);
                     this.addText(textid, left + ourframe.l[i].l, top + ourframe.l[i].t, ourframe.l[i].r - ourframe.l[i].l, ourframe.l[i].b - ourframe.l[i].t, transform, ourframe.l[i].v & 207);
                 } else
                     this.addTile(ourframe.l[i].i - 1, left + ourframe.l[i].l, top + ourframe.l[i].t);
