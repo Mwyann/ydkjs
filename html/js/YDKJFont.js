@@ -25,16 +25,16 @@ function YDKJFont() {
         1010:{font:'JackRoman',size:29,color:'#FC0',halign:'l'}, // Categories text
         1020:{font:'JackRoman',size:29,color:'#FC0',halign:'l'},
         1030:{font:'JackRoman',size:29,color:'#FC0',halign:'l'},
-        1100:{font:'JackExtraCond',size:[64,42],color:['#FFF','#666','#AAA']}, // Big category title
+        1100:{font:'JackExtraCond',size:[83,64,42],color:['#FFF','#666','#AAA']}, // Big category title (check big sizes, like 83)
         // Questions
         1200:{font:'JackRoman',size:20,color:'#33F',halign:'l'}, // Category title, header
         1205:{font:'JackRoman',size:20,color:'#33F',halign:'r'}, // Category value, header
         1210:{font:'JackExtraCond',size:[42,32],color:'#FFF'}, // Question
-        1211:{font:'JackCondensed',size:21,color:['#FC0','#FC0'],halign:'l'}, // Answer 1 2nd color should be #F00 once good answer is found
-        1212:{font:'JackCondensed',size:21,color:['#FC0','#FC0'],halign:'l'}, // Answer 2
-        1213:{font:'JackCondensed',size:21,color:['#FC0','#FC0'],halign:'l'}, // Answer 3
-        1214:{font:'JackCondensed',size:21,color:['#FC0','#FC0'],halign:'l'}, // Answer 4
-        1215:{font:'JackRoman',size:61,color:'#FC0'}, // Revealed answer (probably more than one size here)
+        1211:{font:'JackCondensed',size:21,color:['#FC0','#F00'],halign:'l'}, // Answer 1
+        1212:{font:'JackCondensed',size:21,color:['#FC0','#F00'],halign:'l'}, // Answer 2
+        1213:{font:'JackCondensed',size:21,color:['#FC0','#F00'],halign:'l'}, // Answer 3
+        1214:{font:'JackCondensed',size:21,color:['#FC0','#F00'],halign:'l'}, // Answer 4
+        1215:{font:'JackRoman',size:[61,38,29,23],color:'#FC0'}, // Revealed answer (probably more than one size here, check sizes like 38, 29, 23)
         // DisOrDat
         1400:{font:'JackRoman',size:20,color:'#33F',halign:'l'}, // Category title, header
         1410:{font:'JackRoman',size:29,color:'#FF0'}, // Question

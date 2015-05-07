@@ -233,10 +233,14 @@ var YDKJDemoAnim = {
 
         'TimerComesIn':{res:'5QDemo',name:'off4/8017',framestart:2,loop:0},
         'Round1':{res:'5QDemo',name:'off4/8014',framestart:0,loop:0},
+        'ShowCategory':{res:'5QDemo',name:'off4/11020',framestart:0,loop:0},
         'AnnounceValue2000F':{res:'5QDemo',name:'off4/11020',framestart:16,loop:0},
         'HideValue2000F':{res:'5QDemo',name:'off4/11020',framestart:35,loop:0},
         'PrepareTimer':{res:'5QDemo',name:'off4/8018',framestart:8,loop:0},
         'TimerTimeOut':{res:'5QDemo',name:'off4/8018',framestart:254,loop:0},
+        'ShowHeader':{res:'5QDemo',name:'off4/12000',framestart:9,framestop:20,loop:0},
+        'ShowQuestion':{res:'5QDemo',name:'off4/12000',framestart:22,loop:0},
+        'HideQuestion':{res:'5QDemo',name:'off4/12000',framestart:31,framestop:35,loop:0},
 
         'ShowPlayer1Key':{res:'5QDemo',name:'off4/3000',framestart:292,loop:0},
         'Player1Answer':{res:'5QDemo',name:'off4/3000',framestart:307,framestop:319,loop:0},
@@ -259,10 +263,10 @@ var YDKJDemoAnim = {
         'Player3Wrong':{res:'5QDemo',name:'off4/3000',framestart:1156,loop:0},
         'Player3Cancel':{res:'5QDemo',name:'off4/3000',framestart:1172,loop:0},
 
-        'NumberAnswer1':{res:'5QDemo',name:'off4/12000',framestart:188,loop:0},
-        'NumberAnswer2':{res:'5QDemo',name:'off4/12000',framestart:194,loop:0},
-        'NumberAnswer3':{res:'5QDemo',name:'off4/12000',framestart:200,loop:0},
-        'NumberAnswer4':{res:'5QDemo',name:'off4/12000',framestart:206,loop:0},
+        'ShowAnswer1':{res:'5QDemo',name:'off4/12000',framestart:36,loop:0},
+        'ShowAnswer2':{res:'5QDemo',name:'off4/12000',framestart:53,loop:0},
+        'ShowAnswer3':{res:'5QDemo',name:'off4/12000',framestart:70,loop:0},
+        'ShowAnswer4':{res:'5QDemo',name:'off4/12000',framestart:87,loop:0},
         'LoopAnswer1':{res:'5QDemo',name:'off4/12000',framestart:114,framestop:119,loop:1},
         'LoopAnswer2':{res:'5QDemo',name:'off4/12000',framestart:121,framestop:126,loop:1},
         'LoopAnswer3':{res:'5QDemo',name:'off4/12000',framestart:128,framestop:133,loop:1},
@@ -275,6 +279,7 @@ var YDKJDemoAnim = {
         'WrongAnswer2':{res:'5QDemo',name:'off4/12000',framestart:163,framestop:167,loop:0},
         'WrongAnswer3':{res:'5QDemo',name:'off4/12000',framestart:168,framestop:172,loop:0},
         'WrongAnswer4':{res:'5QDemo',name:'off4/12000',framestart:173,framestop:177,loop:0},
+        'RevealAnswer':{res:'5QDemo',name:'off4/12000',framestart:178,loop:0},
     },
     'DisOrDat':{
         'Intro':{res:'5QDemo',name:'off4/14690',framestart:2,loop:0},

@@ -137,17 +137,19 @@ YDKJAPI.prototype.initdemo = function() {
         else if (mode instanceof ModeQuestion) {
             reslist = {
                 'Question/AnnounceCategory': 0,
+                'Question/ShowCategory': 0,
                 'Question/TimerComesIn': 0,
                 'Question/PrepareTimer': 0,
-                'Question/SFXShowQuestion': 0,
                 'Question/JingleReadQuestion': 0,
                 'Question/JingleTimer': 0,
                 'Question/TimerTimeOut': 0,
+                'Question/ShowHeader': 0,
+                'Question/ShowQuestion': 0,
+                'Question/HideQuestion': 0,
                 'Question/SFXPlayerBuzz': 0,
                 'Question/SFXPlayerKey': 0,
                 'Question/SFXPlayerLose': 0,
                 'Question/SFXPlayerCorrect': 0,
-                'Question/SFXRevealAnswer': 0,
                 'Question/DefaultRevealLastAnswer': 0,
                 'Question/ShowPlayer1Key': 0,
                 'Question/Player1Answer': 0,
@@ -170,10 +172,10 @@ YDKJAPI.prototype.initdemo = function() {
                 'Question/Player3Correct': 0,
                 'Question/Player3Wrong': 0,
                 'Question/Player3Cancel': 0,
-                'Question/NumberAnswer1': 0,
-                'Question/NumberAnswer2': 0,
-                'Question/NumberAnswer3': 0,
-                'Question/NumberAnswer4': 0,
+                'Question/ShowAnswer1': 0,
+                'Question/ShowAnswer2': 0,
+                'Question/ShowAnswer3': 0,
+                'Question/ShowAnswer4': 0,
                 'Question/LoopAnswer1': 0,
                 'Question/LoopAnswer2': 0,
                 'Question/LoopAnswer3': 0,
@@ -191,7 +193,8 @@ YDKJAPI.prototype.initdemo = function() {
                 'Question/LastPlayer3': 0,
                 'Question/LastPlayers12': 0,
                 'Question/LastPlayers13': 0,
-                'Question/LastPlayers23': 0
+                'Question/LastPlayers23': 0,
+                'Question/RevealAnswer': 0
             };
             for(r in reslist) if (reslist.hasOwnProperty(r)) reslist[r] = demores(r);
 
@@ -252,8 +255,8 @@ YDKJAPI.prototype.initdemo = function() {
             reslist['Question/Answer2'] = {urlAudio: res+'/snd/8'};
             reslist['Question/Answer3'] = {urlAudio: res+'/snd/9'};
             reslist['Question/Answer4'] = {urlAudio: res+'/snd/10'};
-            if (mode.options.id != 'AJM') reslist['Question/RevealAnswer'] = {urlAudio: res+'/snd/11'};
-            else reslist['Question/RevealAnswer'] = demores('Question/DefaultRevealAnswer');
+            if (mode.options.id != 'AJM') reslist['Question/AboutToRevealAnswer'] = {urlAudio: res+'/snd/11'};
+            else reslist['Question/AboutToRevealAnswer'] = demores('Question/DefaultRevealAnswer');
 
             mode.options.timer = new YDKJTimer(10);
             var timer10ready = thisAPI.resources(mode.options.timer);
