@@ -22,10 +22,23 @@ function YDKJFont() {
         1100:{font:'JackExtraCond',size:60,color:['#FFF','#666','#AAA']}, // Big category title TODO: font size can change with text length, also check real font size
         1200:{font:'JackRoman',size:20,color:['#33F'],halign:'l'}, // Category title, header TODO: check real font size
         1205:{font:'JackRoman',size:20,color:['#33F'],halign:'r'}, // Category value, header TODO: check real font size
+        1210:{font:'JackExtraCond',size:40,color:['#FFF']}, // Question TODO: font size can change with text length, also check real font size
         1211:{font:'JackCondensed',size:26,color:['#FC0','#FC0'],halign:'l'}, // Answer 1 TODO: check real font size ; 2nd color should be #F00 once good answer is found
         1212:{font:'JackCondensed',size:26,color:['#FC0','#FC0'],halign:'l'}, // Answer 2 TODO: check real font size
-        //1213:{font:'JackCondensed',size:28,color:'#FC0',halign:'l'}, // Answer 3 TODO: check real font size
-        //1214:{font:'JackCondensed',size:28,color:'#FC0',halign:'l'}  // Answer 4 TODO: check real font size
+        1213:{font:'JackCondensed',size:26,color:['#FC0','#FC0'],halign:'l'}, // Answer 3 TODO: check real font size
+        1214:{font:'JackCondensed',size:26,color:['#FC0','#FC0'],halign:'l'}, // Answer 4 TODO: check real font size
+        //JackAttack
+        1499:{font:'JackCondensed',size:40,color:['#FFF','#666','#AAA']}, // Hint TODO: check real font size
+        1510:{font:'JackCondensed',size:28,color:['#FFF','#666','#AAA']}, // Answers TODO: check real font size
+        1511:{font:'JackCondensed',size:28,color:['#FFF']},
+        1512:{font:'JackCondensed',size:28,color:['#FFF'],opacity:0.40},
+        1513:{font:'JackCondensed',size:28,color:['#FFF'],opacity:0.15},
+        211:{font:'JackRoman',size:20,color:['#FFF']}, // Players names when lost
+        221:{font:'JackRoman',size:20,color:['#FFF']},
+        231:{font:'JackRoman',size:20,color:['#FFF']},
+        216:{font:'JackRoman',size:20,color:['#F00','#A00','#600']}, // 2000F when lost
+        226:{font:'JackRoman',size:20,color:['#F00','#A00','#600']},
+        236:{font:'JackRoman',size:20,color:['#F00','#A00','#600']},
     };
 }
 
@@ -196,6 +209,8 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val, d
      7: Second color, or opacity (for ex. 66%)
      8: Third color, or opacity (for ex. 33%)
 
+     Val & 1 : text is horizontally reversed (used in conjunction with style 4) (or maybe it is defined in the style 6/7, see 15000).
+
      Usage of style 2 and 4:
      Get the final size with the style 2 (like for the style 5), then apply the transformation so that the final box fits into the temporary box.
      So you just need to apply the transformation ratio between the current width/height and the final width/height.
@@ -293,8 +308,14 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val, d
             container.appendTo(realcontainer);
             var fullwidth = width;
             if (this.textdata[textid]['fullwidth'] !== undefined) fullwidth = this.textdata[textid]['fullwidth'];
+            else if (this.textdata[Math.floor(textid/10)*10] !== undefined) if (this.textdata[Math.floor(textid/10)*10]['fullwidth'] !== undefined) fullwidth = this.textdata[Math.floor(textid/10)*10]['fullwidth'];
+
             var fullheight = height;
             if (this.textdata[textid]['fullheight'] !== undefined) fullheight = this.textdata[textid]['fullheight'];
+            else if (this.textdata[Math.floor(textid/10)*10] !== undefined) if (this.textdata[Math.floor(textid/10)*10]['fullheight'] !== undefined) fullheight = this.textdata[Math.floor(textid/10)*10]['fullheight'];
+
+            var side = 1;
+            if (val & 1) side = -1;
 
             div.css({
                 'width': fullwidth+'px'
@@ -305,7 +326,8 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val, d
                 'top': (0-((fullheight-height)/2).toFixed(0))+'px',
                 'width': fullwidth+'px',
                 'height': fullheight+'px',
-                'transform': 'scale('+(width/fullwidth).toFixed(2)+','+(height/fullheight).toFixed(2)+')',
+                'line-height': fullheight+'px',
+                'transform': 'scale('+(side*width/fullwidth).toFixed(2)+','+(height/fullheight).toFixed(2)+')',
                 'display':'inline-block'
             });
 

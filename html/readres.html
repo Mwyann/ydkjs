@@ -40,13 +40,25 @@ jQuery(document).ready(function() {
         Font.strings['1010'] = 'C’est dur vraiment plus longtemps';
         Font.strings['1020'] = 'Se noyer dans un verre d’eau';
         Font.strings['1030'] = 'Ma meilleure boum';
-        Font.strings['1100'] = Font.strings['1010'];
-        Font.strings['1200'] = Font.strings['1010'];
+        Font.strings['1100'] = Font.strings['1020'];
+        Font.strings['1200'] = Font.strings['1020'];
         Font.strings['1205'] = '2000 F';
+        Font.strings['1210'] = 'Où ton QI devra tomber pour atteindre le plus grand fond, même si dans le fond t’es pas si con ?';
         Font.strings['1211'] = 'la Méditerranée';
         Font.strings['1212'] = 'l’Atlantique';
         Font.strings['1213'] = 'le Pacifique';
         Font.strings['1214'] = 'la Mer Noire';
+        Font.strings['1499'] = 'Voici l’indice';
+        Font.strings['1510'] = 'la réponse';
+        Font.strings['1511'] = Font.strings['1510'];
+        Font.strings['1512'] = Font.strings['1510'];
+        Font.strings['1513'] = Font.strings['1510'];
+        Font.strings['211'] = Font.strings['110'];
+        Font.strings['216'] = '2000 F';
+        Font.strings['221'] = Font.strings['120'];
+        Font.strings['226'] = '2000 F';
+        Font.strings['231'] = Font.strings['130'];
+        Font.strings['236'] = '2000 F';
         var anim = 0;
         var screen = jQuery('#screen');
         var debug = jQuery('#debuglive');
@@ -89,6 +101,10 @@ jQuery(document).ready(function() {
         filename.on('change',function() {
             animationFile = $(this).val();
             loadAnim();
+        });
+
+        $('#bluebg').on('click',function() {
+            if ($('#bluebg').is(':checked')) screen.css('background-color','#00C'); else screen.css('background-color','#000');
         });
 
         $('#animslow').on('click',function() {
@@ -219,13 +235,13 @@ function play(t) {
          <option value="res-full/DISORDAT/off4/14900">14900 - DOD Player 1</option>
          <option value="res-full/DISORDAT/off4/14930">14930 - DOD Player 2</option>
          <option value="res-full/DISORDAT/off4/14950">14950 - DOD Player 3</option>
-         <option value="res-full/JATTACK2/off4/15000">15000 - JackAttack Disappear</option>
+         <option value="res-full/JATTACK2/off4/15000">15000 - JackAttack</option>
          <option value="res-full/ENDGAME/off4/16000">16000 - Final Score</option>
          <option value="res-full/JACKART/off4/17000">17000 - Options Menu</option>
          <option value="res-full/JATTACK1/off4/17010">17010 - JackAttack Space Bar Text</option>
          <option value="res-full/CREDITS/off4/18000">18000 - Credits & Outro Menu</option>
          <option value="res-full/SHORTVAR/off4/19000">19000 - Fill In The Blanks</option>
-         <option value="res-full/JATTACK2/off4/19001">19001 - JackAttack</option>
+         <option value="res-full/JATTACK2/off4/19001">19001 - JackAttack Rules</option>
          <option value="res-full/SHORTVAR/off4/20000">20000 - Who is this</option>
          <option value="res-full/SHORTVAR/off4/21000">21000 - Open Your Eyes</option>
          <option value="res-full/HISCORES/off4/23000">23000 - Hiscores</option>
@@ -259,7 +275,7 @@ function play(t) {
          <option value="res/5QDemo/off4/21000">21000 - Open Your Eyes</option>
          <option value="res/5QDemo/off4/23000">23000 - Hiscores</option>
      </select><br/><br/>
-     Play from <input type="text" id="framefrom" style="width:50px"/> to <input type="text" id="frameto" style="width:50px"/> loop <input type="checkbox" id="animloop" /> slow <input type="checkbox" id="animslow" /> <input type="button" id="animplay" value="Play" /> <input type="button" id="animstop" value="Stop" /><br/><br/>
+     Play from <input type="text" id="framefrom" style="width:50px"/> to <input type="text" id="frameto" style="width:50px"/> loop <input type="checkbox" id="animloop" /> slow <input type="checkbox" id="animslow" /> blue bg <input type="checkbox" id="bluebg" /> <input type="button" id="animplay" value="Play" /> <input type="button" id="animstop" value="Stop" /><br/><br/>
 
   </div>
   <div id="tmpscreen" style="display:none"></div>
