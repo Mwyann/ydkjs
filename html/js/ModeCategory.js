@@ -12,6 +12,7 @@ ModeCategory.prototype.preload = function(resources) {
     this.MusicChooseCategoryStart.volume(70);
     this.MusicChooseCategoryLoop.volume(70);
     this.ShowCategories = new YDKJAnimation(resources['Category/ShowCategories']);
+    this.CategoryTitles = new YDKJAnimation(resources['Category/CategoryTitles']);
 
     this.MusicChooseCategoryStart.ended(function(){
         thisMode.MusicChooseCategoryLoop.play();
@@ -76,9 +77,9 @@ ModeCategory.prototype.start = function() {
                     break;
             }
             unbindKeyListener(listener);
-            thisMode.game.html.screen.find('.QuestionTitle:not(#QuestionTitle' + (chosed - 1) + ')').remove();
             thisMode.ChooseCategoryPlayer.free();
             thisMode.MusicChooseCategoryLoop.free();
+            thisMode.CategoryTitles.free();
             thisMode.LoopCategory1.free();
             thisMode.LoopCategory2.free();
             thisMode.LoopCategory3.free();
@@ -108,42 +109,9 @@ ModeCategory.prototype.start = function() {
         },10000); // 10 secondes de timeout
     });
 
-    this.ChooseCategoryText.ended(function(){
-        jQuery('<div />').css({
-            'position':'absolute',
-            'width':'320px',
-            'left':'270px',
-            'top':'67px',
-            'font-family':'JackRoman',
-            'font-size':'32px',
-            'color':'#000',
-            'text-align':'center',
-            'opacity':'0.15'
-        }).html(thisMode.game.players[thisMode.chooseplayer-1].name).appendTo(thisMode.game.html.screen);
-        jQuery('<div />').css({
-            'position':'absolute',
-            'width':'320px',
-            'left':'288px',
-            'top':'85px',
-            'font-family':'JackRoman',
-            'font-size':'32px',
-            'color':'#000',
-            'text-align':'center',
-            'opacity':'0.40'
-        }).html(thisMode.game.players[thisMode.chooseplayer-1].name).appendTo(thisMode.game.html.screen);
-        jQuery('<div />').css({
-            'position':'absolute',
-            'width':'320px',
-            'left':'280px',
-            'top':'75px',
-            'font-family':'JackRoman',
-            'font-size':'32px',
-            'color':'#FFF',
-            'text-align':'center'
-        }).html(thisMode.game.players[thisMode.chooseplayer-1].name).appendTo(thisMode.game.html.screen);
-    });
-
-    var categoryShown = false;
+    this.game.font.strings[100] = this.game.players[thisMode.chooseplayer-1].name;
+    this.game.font.strings[102] = this.game.players[thisMode.chooseplayer-1].name;
+    this.game.font.strings[103] = this.game.players[thisMode.chooseplayer-1].name;
 
     this.ShowCategories.ended(300,function(){
         thisMode.SFXChoiceCategory.play();
@@ -154,41 +122,13 @@ ModeCategory.prototype.start = function() {
         thisMode.LoopCategory1.click(function(){chooseCategory(1)});
         thisMode.LoopCategory2.click(function(){chooseCategory(2)});
         thisMode.LoopCategory3.click(function(){chooseCategory(3)});
-        categoryShown = true;
         this.free();
+        thisMode.CategoryTitles.play();
     });
 
-    var ShowCategoryNum = 0;
-    this.ShowCategories.setAnimCallback(function(){
-        if (ShowCategoryNum < 3) {
-            (function(){
-                var thisCatNum = ShowCategoryNum;
-                var title = thisMode.questiontitles[ShowCategoryNum];
-                var div = jQuery('<div />').addClass('QuestionTitle').attr('id','QuestionTitle'+ShowCategoryNum).css({ // Titre de la catégorie
-                    'position':'absolute',
-                    'width':'0px',
-                    'height':'100px',
-                    'line-height':'100px',
-                    'left':'130px',
-                    'top':(163+100*ShowCategoryNum)+'px',
-                    'overflow':'hidden'
-                }).click(function(){if (categoryShown) chooseCategory(thisCatNum+1)});
-
-                jQuery('<div />').css({
-                    'width':'500px',
-                    'vertical-align':'middle',
-                    'display':'inline-block',
-                    'font-size':'32px',
-                    'line-height':'32px',
-                    'color':'#FC0',
-                    'font-family':'JackRoman'
-                }).html(title).appendTo(div);
-
-                div.appendTo(thisMode.game.html.screen).animate({'width':'500px'},150);
-            })();
-            ShowCategoryNum++;
-        }
-    });
+    this.game.font.strings[1010] = this.questiontitles[0];
+    this.game.font.strings[1020] = this.questiontitles[1];
+    this.game.font.strings[1030] = this.questiontitles[2];
 
     this.ChooseCategory.ended(300,function(){
         thisMode.ShowCategories.play();

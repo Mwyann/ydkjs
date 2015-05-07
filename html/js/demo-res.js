@@ -215,6 +215,7 @@ var YDKJDemoAnim = {
         'ChooseCategory3':{res:'5QDemo',name:'off4/10002',framestart:7,loop:0},
         'ChooseCategoryText':{res:'5QDemo',name:'off4/10000',framestart:26,loop:0},
         'ShowCategories':{res:'5QDemo',name:'off4/10000',framestart:35,loop:0},
+        'CategoryTitles':{res:'5QDemo',name:'off4/10000',framestart:51,loop:0},
         'LoopCategory1':{res:'5QDemo',name:'off4/10000',framestart:55,framestop:70,loop:1},
         'LoopCategory2':{res:'5QDemo',name:'off4/10000',framestart:72,framestop:87,loop:1},
         'LoopCategory3':{res:'5QDemo',name:'off4/10000',framestart:89,framestop:104,loop:1},
@@ -345,5 +346,5 @@ var YDKJDemoAnim = {
         'Player3ComesIn':{res:'5QDemo',name:'off4/14950',framestart:1,loop:0},
         'Player3Win':{res:'5QDemo',name:'off4/14950',framestart:43,loop:0},
         'Player3Lose':{res:'5QDemo',name:'off4/14950',framestart:94,loop:0},
-    }
+    },
 };

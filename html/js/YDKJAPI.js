@@ -11,7 +11,7 @@ YDKJAPI.prototype.initdemo = function() {
     YDKJAPI.prototype.gamemode = function(currentmode) {
         var newmode;
         if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Intro', {});
-        //if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 2}); // Ligne DEBUG
+        //if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1}); // Ligne DEBUG
         if (currentmode instanceof ModeIntro) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1, chooseplayer: 3});
         if ((currentmode instanceof ModeQuestion) || (currentmode instanceof ModeDisOrDat)) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: currentmode.options.questionnumber+1});
 
@@ -92,6 +92,7 @@ YDKJAPI.prototype.initdemo = function() {
                 'Category/MusicChooseCategoryStart': 0,
                 'Category/MusicChooseCategoryLoop':0,
                 'Category/ShowCategories': 0,
+                'Category/CategoryTitles': 0,
                 'Category/ChooseCategoryText': 0,
                 'Category/ChooseCategoryPlayer1': 0,
                 'Category/ChooseCategoryPlayer2': 0,

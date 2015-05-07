@@ -75,18 +75,12 @@ ModeIntro.prototype.start = function() {
             thisMode.SFXJackTitle.play()
         });
 
-        var playerNamesPos = 0;
-        var actualPlayer = 0;
-        this.IntroJack.setAnimCallback(function () {
-            if (playerNamesPos % 3 == 0) {
-                actualPlayer = thisMode.game.displayPlayer(Math.floor(playerNamesPos / 3) + 1);
-                actualPlayer.css({'opacity': '0.33'}).show();
-            } else {
-                if (playerNamesPos % 3 == 1) actualPlayer.css({'opacity': '0.66'});
-                else actualPlayer.css({'opacity': 1});
-            }
-            playerNamesPos++;
-        });
+        this.game.font.strings[310] = this.game.players[0].name;
+        this.game.font.strings[315] = this.game.displayCurrency(this.game.players[0].score).replace('_','&nbsp;');
+        this.game.font.strings[320] = this.game.players[1].name;
+        this.game.font.strings[325] = this.game.displayCurrency(this.game.players[1].score).replace('_','&nbsp;');
+        this.game.font.strings[330] = this.game.players[2].name;
+        this.game.font.strings[335] = this.game.displayCurrency(this.game.players[2].score).replace('_','&nbsp;');
 
         this.IntroPreTitle.ended(function () {
             this.free();

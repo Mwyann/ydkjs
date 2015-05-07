@@ -139,7 +139,7 @@ function YDKJAnimation(resource) {
     };
 
     this.addText = function(textid, x, y, w, h, transform, val, debug) {
-        if (!thisAnim.html.debug) return true;
+        //if (!thisAnim.html.debug) return true;
         if (debug === undefined) debug = 0;
         /*
         var ourdiv = jQuery('<div />');
@@ -321,7 +321,6 @@ YDKJAnimation.prototype.play = function() {
             //setTimeout(runanim,66);
             var val = thisAnim.addFrame(framenum);
             if (((val & 4) == 0) || ((val & 8) != 0)) thisAnim.nextScreen();
-            if (((val & 32) != 0) && ((val & 8) != 0) && (thisAnim.animCallback)) thisAnim.animCallback(); // TODO: Enlever cette gestion du flag 32 qui n'a rien à voir avec un callback
             if (thisAnim.html.debug)
                 thisAnim.html.debug.html('frame '+framenum+'/'+(thisAnim.frames.length-1)+' ; val:'+val+' ; nbimg: '+thisAnim.frames[framenum].n);
             for(var i = 0; i < thisAnim.frameFunctions.length; i++) {
@@ -458,10 +457,6 @@ YDKJAnimation.prototype.volume = function(vol) {
             }
         }
     });
-};
-
-YDKJAnimation.prototype.setAnimCallback = function(callback) {
-    this.animCallback = callback;
 };
 
 YDKJAnimation.prototype.length = function() {

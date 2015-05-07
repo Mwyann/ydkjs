@@ -145,8 +145,8 @@ $(document).ready(function() {
     }
 
     // Set the font
-    var font = 'JackRoman';
-    var string = "Jeff";
+    var font = 'JackRoman'; // ['JackCondensed','JackExtraCond','JackInput','JackRoman']
+    var string = "1500 F";
 
     function checkFontHeight(string, totalheight) {
         var sp = string.split("\n");
@@ -164,7 +164,7 @@ $(document).ready(function() {
         }
         fontsize--;
         actualheight = measureTextHeight(string, fontsize.toString()+'px "'+font+'"', 0, 0, maxwidth, maxheight);
-        $('body').append($('<div />').html('Required height: '+actualheight+'px'));
+        $('body').append($('<div />').html('Required height: '+totalheight+'px'));
         $('body').append($('<div />').html('Actual height: '+actualheight+'px'));
         $('body').append($('<div />').html('Font size: '+fontsize+'px'));
         var c = $('<div />');
@@ -175,9 +175,9 @@ $(document).ready(function() {
     }
 
     waitForWebfonts([font], function() {
-                checkFontHeight(string, 19);
-                checkFontHeight("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!", 23);
-                checkFontHeight("giItT1WQy@!-/#", 23);
+                checkFontHeight(string, 32);
+                checkFontHeight("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!", 39);
+                //checkFontHeight("giItT1WQy@!-/#", 23);
         }
     );
 

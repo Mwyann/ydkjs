@@ -5,38 +5,62 @@ function YDKJFont() {
     this.fontdata = {};
     this.textdata = {
         // Player's names and scores
-        110: {font:'JackRoman',size:23,color:['#FFF']}, // Player 1's name
-        115: {font:'JackRoman',size:23,color:['#FFF']}, // Player 1's score
-        120: {font:'JackRoman',size:23,color:['#FFF']}, // Player 2's name
-        125: {font:'JackRoman',size:23,color:['#FFF']}, // Player 2's score
-        130: {font:'JackRoman',size:23,color:['#FFF']}, // Player 3's name
-        135: {font:'JackRoman',size:23,color:['#FFF']}, // Player 3's score
+        110: {font:'JackRoman',size:23,color:['#FFF','#0F0','#F00']}, // Player 1's name
+        115: {font:'JackRoman',size:23,color:['#FFF','#0F0','#F00']}, // Player 1's score
+        120: {font:'JackRoman',size:23,color:['#FFF','#0F0','#F00']}, // Player 2's name
+        125: {font:'JackRoman',size:23,color:['#FFF','#0F0','#F00']}, // Player 2's score
+        130: {font:'JackRoman',size:23,color:['#FFF','#0F0','#F00']}, // Player 3's name
+        135: {font:'JackRoman',size:23,color:['#FFF','#0F0','#F00']}, // Player 3's score
+        // Intro
+        310: {font:'JackRoman',size:23,color:['#FFF','#999','#333']}, // Player 1's name
+        315: {font:'JackRoman',size:23,color:['#FFF','#999','#333']}, // Player 1's score
+        320: {font:'JackRoman',size:23,color:['#FFF','#999','#333']}, // Player 2's name
+        325: {font:'JackRoman',size:23,color:['#FFF','#999','#333']}, // Player 2's score
+        330: {font:'JackRoman',size:23,color:['#FFF','#999','#333']}, // Player 3's name
+        335: {font:'JackRoman',size:23,color:['#FFF','#999','#333']}, // Player 3's score
         // ModeCategory
-        100: {font:'JackRoman',size:38,color:['#FFF']}, // Player name with shadow
-        102: {font:'JackRoman',size:38,color:['#FFF'],opacity:0.15},
-        103: {font:'JackRoman',size:38,color:['#FFF'],opacity:0.40},
-        1010:{font:'JackRoman',size:29,color:['#FC0'],halign:'l'}, // Categories text
-        1020:{font:'JackRoman',size:29,color:['#FC0'],halign:'l'},
-        1030:{font:'JackRoman',size:29,color:['#FC0'],halign:'l'},
+        100: {font:'JackRoman',size:38,color:'#FFF'}, // Player name with shadow
+        102: {font:'JackRoman',size:38,color:'#000',opacity:0.15},
+        103: {font:'JackRoman',size:38,color:'#000',opacity:0.40},
+        1010:{font:'JackRoman',size:29,color:'#FC0',halign:'l'}, // Categories text
+        1020:{font:'JackRoman',size:29,color:'#FC0',halign:'l'},
+        1030:{font:'JackRoman',size:29,color:'#FC0',halign:'l'},
+        1100:{font:'JackExtraCond',size:[64,42],color:['#FFF','#666','#AAA']}, // Big category title
         // Questions
-        1100:{font:'JackExtraCond',size:60,color:['#FFF','#666','#AAA']}, // Big category title TODO: font size can change with text length, also check real font size
-        1200:{font:'JackRoman',size:20,color:['#33F'],halign:'l'}, // Category title, header TODO: check real font size
-        1205:{font:'JackRoman',size:20,color:['#33F'],halign:'r'}, // Category value, header TODO: check real font size
-        1210:{font:'JackExtraCond',size:40,color:['#FFF']}, // Question TODO: font size can change with text length, also check real font size
-        1211:{font:'JackCondensed',size:26,color:['#FC0','#FC0'],halign:'l'}, // Answer 1 TODO: check real font size ; 2nd color should be #F00 once good answer is found
-        1212:{font:'JackCondensed',size:26,color:['#FC0','#FC0'],halign:'l'}, // Answer 2 TODO: check real font size
-        1213:{font:'JackCondensed',size:26,color:['#FC0','#FC0'],halign:'l'}, // Answer 3 TODO: check real font size
-        1214:{font:'JackCondensed',size:26,color:['#FC0','#FC0'],halign:'l'}, // Answer 4 TODO: check real font size
-        //JackAttack
+        1200:{font:'JackRoman',size:20,color:'#33F',halign:'l'}, // Category title, header
+        1205:{font:'JackRoman',size:20,color:'#33F',halign:'r'}, // Category value, header
+        1210:{font:'JackExtraCond',size:[42,32],color:'#FFF'}, // Question
+        1211:{font:'JackCondensed',size:21,color:['#FC0','#FC0'],halign:'l'}, // Answer 1 2nd color should be #F00 once good answer is found
+        1212:{font:'JackCondensed',size:21,color:['#FC0','#FC0'],halign:'l'}, // Answer 2
+        1213:{font:'JackCondensed',size:21,color:['#FC0','#FC0'],halign:'l'}, // Answer 3
+        1214:{font:'JackCondensed',size:21,color:['#FC0','#FC0'],halign:'l'}, // Answer 4
+        1215:{font:'JackRoman',size:61,color:'#FC0'}, // Revealed answer (probably more than one size here)
+        // DisOrDat
+        1400:{font:'JackRoman',size:20,color:'#33F',halign:'l'}, // Category title, header
+        1410:{font:'JackRoman',size:29,color:'#FF0'}, // Question
+        1420:{font:'JackExtraCond',size:64,color:'#FFF'}, // Word to answer
+        1430:{font:'JackCondensed',size:21,color:['#FF0','#F00']}, // First answer
+        1435:{font:'JackCondensed',size:31,color:'#F00'}, // First answer, big (pushed)
+        1440:{font:'JackCondensed',size:21,color:['#FF0','#F00']}, // Second answer
+        1445:{font:'JackCondensed',size:31,color:'#F00'}, // Second answer, big (pushed)
+        1470:{font:'JackExtraCond',size:83,color:['#33F','#22A','#116']}, // Temporary score (bottom left)
+        1475:{font:'JackExtraCond',size:83,color:['#33F']}, // Temporary score (bottom left), maybe while counting TODO color scheme is not complete
+        1480:{font:'JackExtraCond',size:114,color:['#0F0','#0A0','#060']}, // Final score (centered), positive
+        1485:{font:'JackExtraCond',size:114,color:['#F00','#A00','#600']}, // Final score (centered), negative
+        1487:{font:'JackRoman',size:25,color:['#FFF','#AAA','#666']}, // Player's name, while appearing
+        1491:{font:'JackRoman',size:25,color:['#FFF','#0F0','#F00']}, // Player's name
+        1492:{font:'JackRoman',size:25,color:['#FFF','#AAA','#666']}, // Player's score
+        1497:{font:'JackRoman',size:39,color:['#0F0','#F00']}, // Player's new score
+        // JackAttack
         1499:{font:'JackCondensed',size:40,color:['#FFF','#666','#AAA']}, // Hint TODO: check real font size
         1510:{font:'JackCondensed',size:28,color:['#FFF','#666','#AAA']}, // Answers TODO: check real font size
-        1511:{font:'JackCondensed',size:28,color:['#FFF']},
-        1512:{font:'JackCondensed',size:28,color:['#FFF'],opacity:0.40},
-        1513:{font:'JackCondensed',size:28,color:['#FFF'],opacity:0.15},
-        211:{font:'JackRoman',size:20,color:['#FFF']}, // Players names when lost
-        221:{font:'JackRoman',size:20,color:['#FFF']},
-        231:{font:'JackRoman',size:20,color:['#FFF']},
-        216:{font:'JackRoman',size:20,color:['#F00','#A00','#600']}, // 2000F when lost
+        1511:{font:'JackCondensed',size:28,color:'#FFF'},
+        1512:{font:'JackCondensed',size:28,color:'#FFF',opacity:0.40},
+        1513:{font:'JackCondensed',size:28,color:'#FFF',opacity:0.15},
+        211:{font:'JackRoman',size:20,color:['#FFF','#AAA']}, // Players names when lost TODO: check real font size
+        221:{font:'JackRoman',size:20,color:['#FFF','#AAA']},
+        231:{font:'JackRoman',size:20,color:['#FFF','#AAA']},
+        216:{font:'JackRoman',size:20,color:['#F00','#A00','#600']}, // 2000F when lost TODO: check real font size
         226:{font:'JackRoman',size:20,color:['#F00','#A00','#600']},
         236:{font:'JackRoman',size:20,color:['#F00','#A00','#600']},
     };
@@ -209,7 +233,7 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val, d
      7: Second color, or opacity (for ex. 66%)
      8: Third color, or opacity (for ex. 33%)
 
-     Val & 1 : text is horizontally reversed (used in conjunction with style 4) (or maybe it is defined in the style 6/7, see 15000).
+     Val & 1 : text (and images too maybe?) is horizontally reversed (used for example in conjunction with style 4)
 
      Usage of style 2 and 4:
      Get the final size with the style 2 (like for the style 5), then apply the transformation so that the final box fits into the temporary box.
@@ -229,27 +253,56 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val, d
         if (this.strings[textid] !== undefined) string = this.strings[textid];
 
         var textdata = this.textdata[textid];
-        var font = textdata['font'];
-        var fontsize = Math.floor(textdata['size']*this.fontdata[font].heightratio).toFixed(0);
-        var left = 0;
-        //var top = -2-Math.floor(textdata['size']*this.fontdata[font].topratio).toFixed(0);
-        var top = -3;
+
         var colorid = 0;
         if (textdata.colorid !== undefined) colorid = textdata.colorid;
-        if (textdata['color'][colorid] === undefined) colorid = 0;
+        if (typeof textdata.color == 'string') textdata.color = [textdata.color];
+        if (textdata.color[colorid] === undefined) colorid = 0;
 
         container.css({
-            'width': (width)+'px',
-            'height': (height)+'px'
+            'width': (width) + 'px',
+            'height': (height) + 'px'
         });
         div.css({
-            'width': (width)+'px',
+            'width': (width) + 'px',
             'position': 'relative',
-            'left': left+'px',
-            'top': top+'px',
-            'color': textdata['color'][colorid],
-            'font': (fontsize)+'px/'+(fontsize)+'px "'+font+'"'
-        }).html(string.replace(/(\n)+/g, '<br />').replace(/ /g,'&#8197;')); // Line breaks and thin spaces
+            'color': textdata.color[colorid]
+        });
+
+        var font = textdata['font'];
+
+        var sizeid = 0;
+        if (textdata.sizeid !== undefined) sizeid = textdata.sizeid;
+        if (typeof textdata.size == 'number') textdata.size = [textdata['size']];
+        if (textdata.size[sizeid] === undefined) sizeid = 0;
+
+        var lookupsize = 1;
+        while (lookupsize && (sizeid < textdata.size.length)) { // If font size is too big for the container, we'd liek to try some more
+            var fontsize = Math.floor(textdata.size[sizeid] * this.fontdata[font].heightratio).toFixed(0);
+            var left = 0;
+            //var top = -2-Math.floor(textdata.size[sizeid]*this.fontdata[font].topratio).toFixed(0);
+            var top = -3;
+
+            div.css({
+                'left': left + 'px',
+                'top': top + 'px',
+                'font': (fontsize) + 'px/' + (fontsize) + 'px "' + font + '"'
+            }).html(string.replace(/(\n)+/g, '<br />').replace(/ /g, '&#8197;')); // Line breaks and thin spaces
+
+            if ((textdata.sizeid === undefined) && (textdata.size.length > 1)) { // Try to find the best fitting font size, once and for all
+                var tmpdiv = div.clone();
+                tmpdiv.css({
+                    'position': 'absolute',
+                    'left': '-10000px'
+                });
+                $('body').append(tmpdiv);
+                if (tmpdiv.height() <= height+2) lookupsize = 0; // Found! (with 2 margin pixels, don't be so picky)
+                else if (sizeid+1 < textdata.size.length) sizeid++; // Try next size, if there's one
+                else lookupsize = 0; // No lower size, darn it, stop there.
+                if (lookupsize == 0) this.textdata[textid]['sizeid'] = sizeid; // If we stopped with some size, save it for future use.
+                tmpdiv.remove();
+            } else lookupsize = 0; // Only one size, don't even try
+        }
 
         var halign = 'c';
         if (textdata.halign !== undefined) halign = textdata.halign;
@@ -328,7 +381,7 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val, d
                 'height': fullheight+'px',
                 'line-height': fullheight+'px',
                 'transform': 'scale('+(side*width/fullwidth).toFixed(2)+','+(height/fullheight).toFixed(2)+')',
-                'display':'inline-block'
+                'display': 'inline-block'
             });
 
             realcontainer.css({
@@ -387,4 +440,10 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val, d
     }
 
     return container;
+};
+
+YDKJFont.prototype.resetTextStyle = function(textid) {
+    if (this.textdata[textid] === undefined) this.textdata[textid] = {};
+    this.textdata[textid]['sizeid'] = undefined;
+    this.textdata[textid]['colorid'] = 0;
 };
