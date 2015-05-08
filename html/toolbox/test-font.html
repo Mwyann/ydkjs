@@ -2,7 +2,7 @@
 
 <head>
 <link href="../css/ydkj.css" rel="stylesheet"/>
-<script src="../js/jquery-1.11.2.min.js" type="text/javascript"></script>
+<script src="../js/jquery-1.11.3.min.js" type="text/javascript"></script>
 <script type="text/javascript">
 $(document).ready(function() {
     var waitForWebfonts = function(fonts, callback) {
@@ -146,7 +146,7 @@ $(document).ready(function() {
 
     // Set the font
     var font = 'JackRoman'; // ['JackCondensed','JackExtraCond','JackInput','JackRoman']
-    var string = "1500 F";
+    var string = "2000 F";
 
     function checkFontHeight(string, totalheight) {
         var sp = string.split("\n");
@@ -175,8 +175,8 @@ $(document).ready(function() {
     }
 
     waitForWebfonts([font], function() {
-                checkFontHeight(string, 32);
-                checkFontHeight("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!", 39);
+                checkFontHeight(string, 19);
+                checkFontHeight("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!", 23);
                 //checkFontHeight("giItT1WQy@!-/#", 23);
         }
     );

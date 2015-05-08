@@ -47,9 +47,9 @@ function YDKJFont() {
         1475:{font:'JackExtraCond',size:83,color:['#0F0','#900','#F00']}, // Temporary score (bottom left), second color scheme
         1480:{font:'JackExtraCond',size:114,color:['#0F0','#0A0','#060']}, // Final score (centered), positive
         1485:{font:'JackExtraCond',size:114,color:['#F00','#A00','#600']}, // Final score (centered), negative
-        1487:{font:'JackRoman',size:25,color:['#FFF','#AAA','#666']}, // Player's name, while appearing
-        1491:{font:'JackRoman',size:25,color:['#FFF','#0F0','#F00']}, // Player's name
-        1492:{font:'JackRoman',size:25,color:['#FFF','#AAA','#666']}, // Player's score
+        1487:{font:'JackRoman',size:23,color:['#FFF','#AAA','#666']}, // Player's name, while appearing
+        1491:{font:'JackRoman',size:23,color:['#FFF','#0F0','#F00']}, // Player's name
+        1492:{font:'JackRoman',size:23,color:['#FFF','#AAA','#666']}, // Player's score
         1497:{font:'JackRoman',size:39,color:['#0F0','#F00']}, // Player's new score
         // JackAttack
         1499:{font:'JackCondensed',size:40,color:['#FFF','#666','#AAA']}, // Hint TODO: check real font size
@@ -227,7 +227,7 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val, d
      0: normal style, eventually get the maximum font size (keeping ratio) until it fits (line breaks allowed)
      1: same as previous, just italics
      2: Seems to be an information about the normal text size, for example when used in conjunction with style 4 and 5 (see 10000 - Categories and 14000 - DisOrDat).
-     4: shrink the text on one or both axis if it doesn’t fit (for example answers on standard questions - also used in JackAttack - 15000 - not sure if it’s correct there)
+     4: shrink the text on one or both axis (for example answers on standard questions - also used in JackAttack - 15000)
      5: don’t shrink text, instead hide anything outside the boundaries
      6: First color to apply (color by default). To be found out, used in 15000 and 3300...
      7: Second color, or opacity (for ex. 66%)
