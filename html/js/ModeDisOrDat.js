@@ -14,7 +14,17 @@ ModeDisOrDat.prototype.preload = function(resources) {
     this.IntroStill = new YDKJAnimation(resources['DisOrDat/IntroStill']);
     this.MusicLoopRules1 = new YDKJAnimation(resources['DisOrDat/MusicLoopRules1']);
     this.MusicLoopRules2 = new YDKJAnimation(resources['DisOrDat/MusicLoopRules2']);
+
+    this.ShowHeader = new YDKJAnimation(resources['DisOrDat/ShowHeader']);
+    this.ShowCategory = new YDKJAnimation(resources['DisOrDat/ShowCategory']);
+    this.HideCategory = new YDKJAnimation(resources['DisOrDat/HideCategory']);
+    this.ShowSubject = new YDKJAnimation(resources['DisOrDat/ShowSubject']);
+    this.HideSubject = new YDKJAnimation(resources['DisOrDat/HideSubject']);
     this.ShowQuestion = new YDKJAnimation(resources['DisOrDat/ShowQuestion']);
+    this.HideQuestionSkip = new YDKJAnimation(resources['DisOrDat/HideQuestionSkip']);
+    this.HideQuestionWrong = new YDKJAnimation(resources['DisOrDat/HideQuestionWrong']);
+    this.HideQuestionCorrect = new YDKJAnimation(resources['DisOrDat/HideQuestionCorrect']);
+    this.HideQuestionTimeout = new YDKJAnimation(resources['DisOrDat/HideQuestionTimeout']);
 
     this.JingleStartPlay1 = new YDKJAnimation(resources['DisOrDat/JingleStartPlay1']);
     this.JingleStartPlay2 = new YDKJAnimation(resources['DisOrDat/JingleStartPlay2']);
@@ -88,16 +98,42 @@ ModeDisOrDat.prototype.preload = function(resources) {
     this.Button4of3Leave = new YDKJAnimation(resources['DisOrDat/Button4of3Leave']);
 
     this.Player1ComesIn = new YDKJAnimation(resources['DisOrDat/Player1ComesIn']);
+    this.Player1WinGrow = new YDKJAnimation(resources['DisOrDat/Player1WinGrow']);
+    this.Player1WinBig = new YDKJAnimation(resources['DisOrDat/Player1WinBig']);
     this.Player1Win = new YDKJAnimation(resources['DisOrDat/Player1Win']);
+    this.Player1LoseGrow = new YDKJAnimation(resources['DisOrDat/Player1LoseGrow']);
+    this.Player1LoseBig = new YDKJAnimation(resources['DisOrDat/Player1LoseBig']);
     this.Player1Lose = new YDKJAnimation(resources['DisOrDat/Player1Lose']);
 
     this.Player2ComesIn = new YDKJAnimation(resources['DisOrDat/Player2ComesIn']);
+    this.Player2WinGrow = new YDKJAnimation(resources['DisOrDat/Player2WinGrow']);
+    this.Player2WinBig = new YDKJAnimation(resources['DisOrDat/Player2WinBig']);
     this.Player2Win = new YDKJAnimation(resources['DisOrDat/Player2Win']);
+    this.Player2LoseGrow = new YDKJAnimation(resources['DisOrDat/Player2LoseGrow']);
+    this.Player2LoseBig = new YDKJAnimation(resources['DisOrDat/Player2LoseBig']);
     this.Player2Lose = new YDKJAnimation(resources['DisOrDat/Player2Lose']);
 
     this.Player3ComesIn = new YDKJAnimation(resources['DisOrDat/Player3ComesIn']);
+    this.Player3WinGrow = new YDKJAnimation(resources['DisOrDat/Player3WinGrow']);
+    this.Player3WinBig = new YDKJAnimation(resources['DisOrDat/Player3WinBig']);
     this.Player3Win = new YDKJAnimation(resources['DisOrDat/Player3Win']);
+    this.Player3LoseGrow = new YDKJAnimation(resources['DisOrDat/Player3LoseGrow']);
+    this.Player3LoseBig = new YDKJAnimation(resources['DisOrDat/Player3LoseBig']);
     this.Player3Lose = new YDKJAnimation(resources['DisOrDat/Player3Lose']);
+
+    this.TempScoreShow = new YDKJAnimation(resources['DisOrDat/TempScoreShow']);
+    this.TempScoreCorrectStart = new YDKJAnimation(resources['DisOrDat/TempScoreCorrectStart']);
+    this.TempScoreCorrect = new YDKJAnimation(resources['DisOrDat/TempScoreCorrect']);
+    this.TempScoreCorrectStop = new YDKJAnimation(resources['DisOrDat/TempScoreCorrectStop']);
+    this.TempScoreWrongStart = new YDKJAnimation(resources['DisOrDat/TempScoreWrongStart']);
+    this.TempScoreWrong = new YDKJAnimation(resources['DisOrDat/TempScoreWrong']);
+    this.TempScoreWrongStop = new YDKJAnimation(resources['DisOrDat/TempScoreWrongStop']);
+    this.TempScoreHide = new YDKJAnimation(resources['DisOrDat/TempScoreHide']);
+
+    this.FinalScoreWinShow = new YDKJAnimation(resources['DisOrDat/FinalScoreWinShow']);
+    this.FinalScoreWinHide = new YDKJAnimation(resources['DisOrDat/FinalScoreWinHide']);
+    this.FinalScoreLoseShow = new YDKJAnimation(resources['DisOrDat/FinalScoreLoseShow']);
+    this.FinalScoreLoseHide = new YDKJAnimation(resources['DisOrDat/FinalScoreLoseHide']);
 
     this.SFXPlayerCorrect = new YDKJAnimation(resources['Question/SFXPlayerCorrect']);
     this.SFXPlayerLose = new YDKJAnimation(resources['Question/SFXPlayerLose']);
@@ -171,19 +207,31 @@ ModeDisOrDat.prototype.start = function() {
     if (this.chooseplayer == 1) {
         this.ChoicePlayer = this.ChoicePlayer1on3;
         this.PlayerComesIn = this.Player1ComesIn;
+        this.PlayerWinGrow = this.Player1WinGrow;
+        this.PlayerWinBig = this.Player1WinBig;
         this.PlayerWin = this.Player1Win;
+        this.PlayerLoseGrow = this.Player1LoseGrow;
+        this.PlayerLoseBig = this.Player1LoseBig;
         this.PlayerLose = this.Player1Lose;
     }
     if (this.chooseplayer == 2) {
         this.ChoicePlayer = this.ChoicePlayer2on3;
         this.PlayerComesIn = this.Player2ComesIn;
+        this.PlayerWinGrow = this.Player2WinGrow;
+        this.PlayerWinBig = this.Player2WinBig;
         this.PlayerWin = this.Player2Win;
+        this.PlayerLoseGrow = this.Player2LoseGrow;
+        this.PlayerLoseBig = this.Player2LoseBig;
         this.PlayerLose = this.Player2Lose;
     }
     if (this.chooseplayer == 3) {
         this.ChoicePlayer = this.ChoicePlayer3on3;
         this.PlayerComesIn = this.Player3ComesIn;
+        this.PlayerWinGrow = this.Player3WinGrow;
+        this.PlayerWinBig = this.Player3WinBig;
         this.PlayerWin = this.Player3Win;
+        this.PlayerLoseGrow = this.Player3LoseGrow;
+        this.PlayerLoseBig = this.Player3LoseBig;
         this.PlayerLose = this.Player3Lose;
     }
 
@@ -191,18 +239,7 @@ ModeDisOrDat.prototype.start = function() {
     var nbchoices = 2;
     for(var a = 0; a < anslist.length; a++) if (anslist[a] == 3) nbchoices = 3;
 
-    var playerdiv;
     var tempscore = 0;
-    var tempscorediv;
-    var finalscorediv;
-
-    this.PlayerComesIn.ended(function(){
-        playerdiv = thisMode.game.displayPlayer(thisMode.chooseplayer,1,1);
-        playerdiv.css({
-            'color':'#666',
-            'font-size':'24px'
-        }).show().animate({'color':'#FFF'},180);
-    });
 
     var jumpToNextCategory = function() {
         nextcategoryready(function(nextcategory){
@@ -215,89 +252,107 @@ ModeDisOrDat.prototype.start = function() {
     };
 
     var buttonsAnswer = [0]; // Rien pour le 0, comme ça on décale pas
-    var textAnswer = [];
     var currentAnswers = [0,0,0,0,0,0,0]; // 0 = non répondu, 1 = gagné, 2 = perdu
     var currentQuestion = -1;
     var canPress = 1;
-    var questionouterdiv;
-    var questiondiv;
 
     var buttonslistener = 0;
 
-    var animateValue = function(div,from,to,frames,callback) {
-        var speed;
-        if (typeof animationSpeed == 'undefined') speed = 66; else speed = animationSpeed;
+    var animateValue = function(animstart,animloop,animstop,changevalue,from,to,frames,callback) {
         var step = Math.floor((to-from)/frames);
         var loopAnimValue = function() {
             frames--;
             if (frames > 0) {
                 from = from+step;
-                div.html(thisMode.game.displayCurrency(from).replace('_','&thinsp;'));
-                setTimeout(loopAnimValue, speed);
+                changevalue(thisMode.game.displayCurrency(from).replace('_','&thinsp;'));
             } else {
-                div.html(thisMode.game.displayCurrency(to).replace('_','&thinsp;'));
-                callback();
+                changevalue(thisMode.game.displayCurrency(to).replace('_','&thinsp;'));
             }
         };
-        setTimeout(loopAnimValue, speed);
+        var nextStep = function() {
+            if (frames == 0) {
+                callback();
+                return false;
+            }
+            loopAnimValue();
+            animstart.reset();
+            if (frames > 0) {
+                animloop.reset();
+                animloop.play();
+            } else {
+                animloop.reset();
+                animstop.play();
+            }
+        };
+
+        animstop.ended(false);
+        animstop.ended(nextStep);
+
+        animloop.ended(false);
+        animloop.ended(nextStep);
+
+        animstart.ended(false);
+        animstart.ended(nextStep);
+
+        loopAnimValue();
+        animstart.play();
     };
 
     var sumScores = function(endmessage) {
-        finalscorediv.animate({
-            'top':'135px'
-        },120,function(){
-            finalscorediv.animate({
-                'top':'375px',
-                'font-size':'40px',
-                'line-height':'30px'
-            },180,function(){
-                var color;
-                if (tempscore > 0) color = '#0F0'; else color = '#F00';
-                setTimeout(function(){
-                    finalscorediv.remove();
-                },30);
+        var finalscorehide;
+        if (tempscore > 0) {
+            thisMode.FinalScoreWinShow.free();
+            finalscorehide = thisMode.FinalScoreWinHide;
+        } else {
+            thisMode.FinalScoreLoseShow.free();
+            finalscorehide = thisMode.FinalScoreLoseHide;
+        }
+        finalscorehide.ended(-60,function(){
+            var PlayerGrow;
+            var PlayerBig;
+            if (tempscore > 0) {
+                PlayerGrow = thisMode.PlayerWinGrow;
+                PlayerBig = thisMode.PlayerWinBig;
+            } else {
+                PlayerGrow = thisMode.PlayerLoseGrow;
+                PlayerBig = thisMode.PlayerLoseBig;
+            }
 
-                playerdiv.css({'color':color});
-                playerdiv.find('.score').animate({
-                    'line-height':'35px',
-                    'font-size':'45px'
-                },150,function(){
-                    setTimeout(function() {
-                        playerdiv.find('.score').css({
-                            'font-size': '43px'
-                        });
-                    },60);
+            PlayerGrow.ended(200,function() {
+                this.free();
+                var from = thisMode.game.players[thisMode.chooseplayer-1].score;
+                thisMode.game.players[thisMode.chooseplayer-1].score += tempscore;
+                if (tempscore > 0) {
+                    thisMode.SFXScoreWin.reset();
+                    thisMode.SFXScoreWin.play();
+                } else {
+                    thisMode.SFXScoreLose.reset();
+                    thisMode.SFXScoreLose.play();
+                }
+                animateValue(PlayerBig,PlayerBig,PlayerBig, function(newvalue) {
+                    thisMode.game.font.strings['1492'] = newvalue;
+                    thisMode.game.font.strings['1497'] = newvalue;
+                },from,thisMode.game.players[thisMode.chooseplayer-1].score,12,function(){
                     setTimeout(function(){
-                        var from = thisMode.game.players[thisMode.chooseplayer-1].score;
-                        thisMode.game.players[thisMode.chooseplayer-1].score += tempscore;
+                        endmessage.ended(800,jumpToNextCategory);
+                        endmessage.play();
+                        PlayerBig.free();
                         if (tempscore > 0) {
-                            thisMode.SFXScoreWin.reset();
-                            thisMode.SFXScoreWin.play();
+                            thisMode.PlayerWin.play();
+                            thisMode.SFXPlayerCorrect.play();
                         } else {
-                            thisMode.SFXScoreLose.reset();
-                            thisMode.SFXScoreLose.play();
+                            thisMode.PlayerLose.play();
+                            thisMode.SFXPlayerLose.play();
                         }
-                        animateValue(playerdiv.find('.score'),from,thisMode.game.players[thisMode.chooseplayer-1].score,12,function(){
-                            setTimeout(function(){
-                                endmessage.ended(800,jumpToNextCategory);
-                                endmessage.play();
-                                thisMode.PlayerComesIn.free();
-                                if (tempscore > 0) {
-                                    thisMode.PlayerWin.play();
-                                    thisMode.SFXPlayerCorrect.play();
-                                } else {
-                                    thisMode.PlayerLose.play();
-                                    thisMode.SFXPlayerLose.play();
-                                }
-                            },200);
-                        });
-                    },250);
+                    },200);
                 });
             });
-        })
+            thisMode.PlayerComesIn.free();
+            PlayerGrow.play();
+        });
+        finalscorehide.play();
     };
 
-    var hideQuestionTitle; // rempli dans la fonction d'affichage
     var endQuestion = function(callback) {
         var i;
         clearInterval(thisMode.timerTimeout);
@@ -307,42 +362,18 @@ ModeDisOrDat.prototype.start = function() {
         var tempscoreLeave = function() {
             totalButtons--;
             if (totalButtons == 0) {
-                tempscorediv.animate({
-                    'color': '#000'
-                }, 180, function () {
-                    tempscorediv.remove()
-                });
+                thisMode.TempScoreShow.free();
+                thisMode.TempScoreCorrectStop.free();
+                thisMode.TempScoreWrongStop.free();
+                thisMode.TempScoreHide.play();
 
-                var color;
-                if (tempscore > 0) color = '#0F0'; else color = '#F00';
-
-                finalscorediv = jQuery('<div />').css({ // Score final
-                    'position':'absolute',
-                    'left':'0',
-                    'top':'175px',
-                    'width':'640px',
-                    'color':color,
-                    'opacity':'0',
-                    'text-align':'center',
-                    'font-size':'70px',
-                    'line-height':'50px',
-                    'font-family':'JackExtraCond'
-                }).html(thisMode.game.displayCurrency(tempscore).replace('_','&thinsp;'));
-
-                finalscorediv.appendTo(thisMode.game.html.screen).animate({
-                    'opacity':'1',
-                    'top':'145px',
-                    'font-size':'135px',
-                    'line-height':'100px'
-                },250,function(){
-                    setTimeout(function() {
-                        finalscorediv.css({
-                            'top': '150px',
-                            'font-size': '130px',
-                            'line-height': '95px'
-                        });
-                    },60);
-                });
+                thisMode.game.font.strings['1480'] = thisMode.game.displayCurrency(tempscore).replace('_','&thinsp;');
+                thisMode.game.font.strings['1485'] = thisMode.game.font.strings['1480'];
+                if (tempscore > 0) {
+                    thisMode.FinalScoreWinShow.play();
+                } else {
+                    thisMode.FinalScoreLoseShow.play();
+                }
 
                 if (callback) callback();
             }
@@ -355,25 +386,13 @@ ModeDisOrDat.prototype.start = function() {
             buttonsAnswer[i].Leave.play();
         }
 
-        questionouterdiv.remove();
+        thisMode.ShowQuestion.free();
+        thisMode.HideQuestionCorrect.free();
+        thisMode.HideQuestionWrong.free();
+        thisMode.HideQuestionTimeout.free();
 
-        for(i = 0; i < textAnswer.length; i++) {
-            (function() {
-                var answerdiv = textAnswer[i];
-                answerdiv.animate({
-                    'top': '-3px',
-                    'font-size': '28px'
-                }, 30, function () {
-                    answerdiv.animate({
-                        'top': '12px',
-                        'font-size': '8px'
-                    }, 90, function () {
-                        answerdiv.remove();
-                    });
-                });
-            })();
-        }
-        hideQuestionTitle();
+        thisMode.ShowSubject.free();
+        thisMode.HideSubject.play();
     };
 
     this.MusicPlayEnd.ended(function(){
@@ -389,42 +408,45 @@ ModeDisOrDat.prototype.start = function() {
         else tm = thisMode.TimeOutLoseMoreQuestions;
         tm.ended(-150,function(){
             thisMode.SFXScoreLose.play();
-            tempscorediv.animate({color:'#F00'},150);
+            thisMode.TempScoreShow.reset();
+            thisMode.TempScoreCorrectStop.reset();
+            thisMode.TempScoreWrongStop.reset();
             var oldtempscore = tempscore;
             tempscore -= thisMode.options.value*nbanswersleft;
-            animateValue(tempscorediv,oldtempscore,tempscore,6,function(){
-                tempscorediv.animate({color:'#33F'},150,function(){
-                    endQuestion(function(){
-                        var nbgoodanswers = 0;
-                        for(var i = 0; i < currentAnswers.length; i++) if (currentAnswers[i] == 1) nbgoodanswers++;
+            animateValue(thisMode.TempScoreWrongStart, thisMode.TempScoreWrong, thisMode.TempScoreWrongStop, function(newvalue) {
+                thisMode.game.font.strings['1470'] = newvalue;
+                thisMode.game.font.strings['1475'] = newvalue;
+            }, oldtempscore, tempscore, 6, function(){
+                endQuestion(function(){
+                    var nbgoodanswers = 0;
+                    for(var i = 0; i < currentAnswers.length; i++) if (currentAnswers[i] == 1) nbgoodanswers++;
 
-                        var scoremessage;
-                        if (nbgoodanswers >= 4) scoremessage = thisMode.Score3Positive;
-                        else scoremessage = thisMode.Score3Negative;
+                    var scoremessage;
+                    if (nbgoodanswers >= 4) scoremessage = thisMode.Score3Positive;
+                    else scoremessage = thisMode.Score3Negative;
 
-                        var endmessage;
-                        if (nbgoodanswers == 0) endmessage = thisMode.Score30on7;
-                        if (nbgoodanswers == 1) endmessage = thisMode.Score31on7;
-                        if (nbgoodanswers == 2) endmessage = thisMode.Score32on7;
-                        if (nbgoodanswers == 3) endmessage = thisMode.Score32on7; // Partage le même son que le 2/7
-                        if (nbgoodanswers == 4) endmessage = thisMode.Score34on7;
-                        if (nbgoodanswers == 5) endmessage = thisMode.Score35on7;
-                        if (nbgoodanswers == 6) endmessage = thisMode.Score36on7;
+                    var endmessage;
+                    if (nbgoodanswers == 0) endmessage = thisMode.Score30on7;
+                    if (nbgoodanswers == 1) endmessage = thisMode.Score31on7;
+                    if (nbgoodanswers == 2) endmessage = thisMode.Score32on7;
+                    if (nbgoodanswers == 3) endmessage = thisMode.Score32on7; // Partage le même son que le 2/7
+                    if (nbgoodanswers == 4) endmessage = thisMode.Score34on7;
+                    if (nbgoodanswers == 5) endmessage = thisMode.Score35on7;
+                    if (nbgoodanswers == 6) endmessage = thisMode.Score36on7;
 
-                        endmessage.ended(1500,function(){
-                            jumpToNextCategory();
-                        });
-
-                        scoremessage.ended(500,function(){
-                            sumScores(endmessage);
-                        });
-
-                        thisMode.ShowFinalScore.ended(300,function(){
-                            scoremessage.play();
-                        });
-
-                        thisMode.ShowFinalScore.play();
+                    endmessage.ended(1500,function(){
+                        jumpToNextCategory();
                     });
+
+                    scoremessage.ended(500,function(){
+                        sumScores(endmessage);
+                    });
+
+                    thisMode.ShowFinalScore.ended(300,function(){
+                        scoremessage.play();
+                    });
+
+                    thisMode.ShowFinalScore.play();
                 });
             });
         });
@@ -440,65 +462,15 @@ ModeDisOrDat.prototype.start = function() {
         thisMode.SFXTimeOut1.play();
     });
 
-    var displayAnswer = function(i) {
-        var str = getSTRfromID(thisMode.STR,'STR#',3);
-
-        var div = jQuery('<div />').css({ // Titre de la catégorie
-            'position':'absolute',
-            'left':'0',
-            'top':'330px'
-        });
-
-        var left = '0';
-        if (i == 2) {
-            if (nbchoices == 2) left = '226px';
-            else left = '158px';
-        }
-
-        var answerdiv = jQuery('<div />').css({
-            'position':'relative',
-            'text-align':'center',
-            'top':'12px',
-            'left':left,
-            'width':'200px',
-            'font-size':'8px',
-            'color':'#FF0',
-            'font-family':'JackCondensed'
-        }).html(str[i-1]).appendTo(div).animate({
-            'top':'-6px',
-            'font-size':'30px'
-        },90,function(){
-            answerdiv.css({
-                'top':'0',
-                'font-size':'24px'
-            })
-        });
-
-        div.appendTo(thisMode.game.html.screen);
-
-        textAnswer[i-1] = answerdiv;
-    };
-
     var askQuestion = function() {
         var str = getSTRfromID(thisMode.STR,'STR#',3);
 
-        questionouterdiv.html('');
-        questiondiv = jQuery('<div />').attr('id','QuestionDiv').css({ // Question
-            'color':'#FFF',
-            'font-family':'JackExtraCond',
-            'text-align':'center',
-            'font-size':'70px',
-            'line-height':'70px',
-            'position':'absolute',
-            'width':'640px',
-            '-webkit-transform':'scale(0.0,1.0)',
-            '-moz-transform':'scale(0.0,1.0)',
-            '-ms-transform':'scale(0.0,1.0)',
-            '-o-transform':'scale(0.0,1.0)',
-            'transform':'scale(0.0,1.0)'
-        }).html(str[currentQuestion+2]).appendTo(questionouterdiv);
-
-        animTransform(questiondiv,0,1,1,1,0.30,640,0,'center');
+        thisMode.HideQuestionSkip.reset();
+        thisMode.HideQuestionCorrect.reset();
+        thisMode.HideQuestionWrong.reset();
+        thisMode.game.font.resetTextStyle('1420');
+        thisMode.game.font.strings['1420'] = str[currentQuestion+2];
+        thisMode.ShowQuestion.play();
 
         var thisQuestion;
         if (currentQuestion == 0) thisQuestion = thisMode.Question1;
@@ -545,39 +517,6 @@ ModeDisOrDat.prototype.start = function() {
         bt.play();
         thisMode.SFXKeyPress.reset();
         thisMode.SFXKeyPress.play();
-        if (b < 3) {
-            var answerdiv = textAnswer[b-1];
-            answerdiv.css({
-                'top':'6px',
-                'font-size':'16px'
-            });
-            bt.delay(60,function(){
-                answerdiv.css({
-                    'display':'none'
-                });
-                bt.delay(60,function(){
-                    answerdiv.css({
-                        'display':'',
-                        'top':'-8px',
-                        'font-size':'34px',
-                        'color':'#F00'
-                    });
-                    bt.delay(330,function() {
-                        answerdiv.css({
-                            'top': '6px',
-                            'font-size': '16px'
-                        });
-                        bt.delay(60,function() {
-                            answerdiv.css({
-                                'top': '0',
-                                'font-size': '24px',
-                                'color': '#FF0'
-                            });
-                        });
-                    });
-                });
-            });
-        }
 
         if (currentQuestion >= 0) {
             canPress = 0;
@@ -667,44 +606,48 @@ ModeDisOrDat.prototype.start = function() {
             };
 
             if (b == 4) { // On passe la question
-                animTransform(questiondiv,1,0,1,1,0.30,640,0,'center',function(){questiondiv.html('')});
+                thisMode.ShowQuestion.reset();
+                thisMode.HideQuestionSkip.play();
                 afterPressAnimation = function() {
                     nextQuestion();
                 };
             } else {
                 if (b == anslist[currentQuestion]) { // Bonne réponse !
                     currentAnswers[currentQuestion] = 1;
-                    questiondiv.animate({
-                        'left': '640px'
-                    }, 300);
+                    thisMode.ShowQuestion.reset();
+                    thisMode.HideQuestionCorrect.play();
                     afterPressAnimation = function(){
                         thisMode.SFXCorrect.reset();
                         thisMode.SFXCorrect.play();
-                        tempscorediv.animate({color:'#0F0'},150);
+                        thisMode.TempScoreShow.reset();
+                        thisMode.TempScoreCorrectStop.reset();
+                        thisMode.TempScoreWrongStop.reset();
                         var oldtempscore = tempscore;
                         tempscore += thisMode.options.value;
-                        animateValue(tempscorediv,oldtempscore,tempscore,6,function(){
-                            tempscorediv.animate({color:'#33F'},150,function(){
-                                nextQuestion();
-                            });
+                        animateValue(thisMode.TempScoreCorrectStart, thisMode.TempScoreCorrect, thisMode.TempScoreCorrectStop, function(newvalue) {
+                            thisMode.game.font.strings['1470'] = newvalue;
+                            thisMode.game.font.strings['1475'] = newvalue;
+                        },oldtempscore,tempscore,6,function(){
+                            nextQuestion();
                         });
                     };
                 } else { // Perdu !
                     currentAnswers[currentQuestion] = 2;
-                    questiondiv.animate({
-                        'top':'12px',
-                        'font-size': '8px'
-                    }, 300, function(){questiondiv.html('').css({'font-size':'70px','top':'0'})});
+                    thisMode.ShowQuestion.reset();
+                    thisMode.HideQuestionWrong.play();
                     afterPressAnimation = function(){
                         thisMode.SFXWrong.reset();
                         thisMode.SFXWrong.play();
-                        tempscorediv.animate({color:'#F00'},150);
+                        thisMode.TempScoreShow.reset();
+                        thisMode.TempScoreCorrectStop.reset();
+                        thisMode.TempScoreWrongStop.reset();
                         var oldtempscore = tempscore;
                         tempscore -= thisMode.options.value;
-                        animateValue(tempscorediv,oldtempscore,tempscore,6,function(){
-                            tempscorediv.animate({color:'#33F'},150,function(){
-                                nextQuestion();
-                            });
+                        animateValue(thisMode.TempScoreWrongStart, thisMode.TempScoreWrong, thisMode.TempScoreWrongStop, function(newvalue) {
+                            thisMode.game.font.strings['1470'] = newvalue;
+                            thisMode.game.font.strings['1475'] = newvalue;
+                        }, oldtempscore,tempscore,6,function(){
+                            nextQuestion();
                         });
                     };
                 }
@@ -752,7 +695,8 @@ ModeDisOrDat.prototype.start = function() {
             thisMode.timerTimeout = setTimeout(timerRunning, 1000);
         } else { // Timeout
             thisMode.Timer.playTimer();
-            animTransform(questiondiv,1,1,1,0,0.05,640,0,'center');
+            thisMode.ShowQuestion.reset();
+            thisMode.HideQuestionTimeout.play();
 
             clearInterval(thisMode.timerTimeout);
             unbindKeyListener(buttonslistener);
@@ -810,15 +754,6 @@ ModeDisOrDat.prototype.start = function() {
         });
 
         timerRunning();
-        questionouterdiv = jQuery('<div />').css({
-            'position':'absolute',
-            'height':'70px',
-            'line-height':'70px',
-            'left':'0',
-            'top':'150px'
-        });
-
-        questionouterdiv.appendTo(thisMode.game.html.screen);
 
         for(i = 0; i < buttonsAnswer.length; i++) if (buttonsAnswer[i]) {
             buttonsAnswer[i].Push.ended(false);
@@ -887,24 +822,10 @@ ModeDisOrDat.prototype.start = function() {
         for(i = 0; i < buttonsAnswer.length; i++) if (buttonsAnswer[i]) {
             buttonsAnswer[i].Ready.play();
         }
-        if (textAnswer.length == 0) {
-            displayAnswer(1);
-            displayAnswer(2);
-        } else if (textAnswer.length == 1) displayAnswer(2);
 
-        tempscorediv = jQuery('<div />').css({ // Score temporaire (en bas à gauche)
-            'position':'absolute',
-            'left':'0',
-            'top':'385px',
-            'width':'270px',
-            'color':'#000',
-            'text-align':'center',
-            'font-size':'90px',
-            'line-height':'70px',
-            'font-family':'JackExtraCond'
-        }).html(thisMode.game.displayCurrency(0).replace('_','&thinsp;'));
-
-        tempscorediv.appendTo(thisMode.game.html.screen).animate({'color':'#33F'},180);
+        thisMode.game.font.strings['1470'] = thisMode.game.displayCurrency(0).replace('_','&thinsp;');
+        thisMode.game.font.strings['1475'] = thisMode.game.font.strings['1470'];
+        thisMode.TempScoreShow.play();
 
         var prepareGame = function() {
             thisMode.AnnounceTimer.delay(600,function() {
@@ -1038,54 +959,15 @@ ModeDisOrDat.prototype.start = function() {
         */
     };
 
-    var showQuestion = function(f) {
-        showQuestion = function(){}; // Auto-détruire la fonction pour éviter qu'elle ne soit exécutée plusieurs fois
-        var div = jQuery('<div />').css({ // Texte de la question
-            'position':'absolute',
-            'height':'150px',
-            'line-height':'150px',
-            'left':'-560px',
-            'top':'70px'
-        });
-
-        var textdiv = jQuery('<div />').css({
-            'position':'relative',
-            'width':'560px',
-            'vertical-align':'top',
-            'display':'inline-block',
-            'font-size':'29px',
-            'line-height':'34px',
-            'color':'#FF0',
-            'font-family':'JackRoman',
-            'font-style':'italic',
-            'text-align':'center'
-        }).html(getSTRfromID(thisMode.STR,'STR',2));
-
-        textdiv.appendTo(div);
-
-        div.appendTo(thisMode.game.html.screen).animate({'left':'40px'},300,function() {
-            textdiv.css({'font-style':'normal'});
-            if (f) f();
-        });
-
-        hideQuestionTitle = function(){
-            div.animate({'left':'30px'},120,function(){
-                setTimeout(function(){
-                    textdiv.css({'font-style':'italic'});
-                    div.animate({'left':'640px'},180);
-                },60);
-            })
-        }
-    };
+    thisMode.ShowSubject.ended(function(){
+        buttonsAnswer[1].ComesIn.play();
+        thisMode.SFXShowKey.play();
+    });
 
     this.QuestionIntro1.ended(100,function() {
         thisMode.QuestionIntro2.play();
         thisMode.QuestionIntro2.delay(100,function(){
-            thisMode.ShowQuestion.play();
-            showQuestion(function(){
-                buttonsAnswer[1].ComesIn.play();
-                thisMode.SFXShowKey.play();
-            });
+            thisMode.ShowSubject.play();
         });
     });
 
@@ -1093,34 +975,7 @@ ModeDisOrDat.prototype.start = function() {
         thisMode.QuestionIntro1.play();
         thisMode.TimerComesIn.delay(200,function(){
             this.ended(-500,function(){
-                var div = jQuery('<div />').css({ // Titre de la catégorie
-                    'position':'absolute',
-                    'height':'70px',
-                    'line-height':'70px',
-                    'left':'70px',
-                    'top':'0'
-                });
-
-                var titlediv = jQuery('<div />').css({
-                    'position':'relative',
-                    'left':'-150px',
-                    'width':'300px',
-                    'vertical-align':'middle',
-                    'display':'inline-block',
-                    'font-size':'20px',
-                    'line-height':'24px',
-                    'color':'#33F',
-                    'font-family':'JackRoman',
-                    '-webkit-transform':'scale(0.0,1.0)',
-                    '-moz-transform':'scale(0.0,1.0)',
-                    '-ms-transform':'scale(0.0,1.0)',
-                    '-o-transform':'scale(0.0,1.0)',
-                    'transform':'scale(0.0,1.0)'
-                }).html(getSTRfromID(thisMode.STR,'STR',1)).appendTo(div);
-
-                div.appendTo(thisMode.game.html.screen);
-
-                animTransform(titlediv,0,1,1,1,0.15,300,0,'left');
+                thisMode.ShowHeader.play();
             });
             this.play();
 
@@ -1159,10 +1014,6 @@ ModeDisOrDat.prototype.start = function() {
                 readAnswers();
             });
 
-            buttonsAnswer[2].ComesIn.ended(-100,function() {
-                displayAnswer(2);
-            });
-
             if (nbchoices == 3) {
                 buttonsAnswer[2].ComesIn.ended(function(){
                     this.delay(300,function(){
@@ -1172,10 +1023,6 @@ ModeDisOrDat.prototype.start = function() {
                     });
                 });
             }
-
-            buttonsAnswer[1].ComesIn.ended(-100,function() {
-                displayAnswer(1);
-            });
 
             buttonsAnswer[1].ComesIn.ended(function(){
                 loopStandBy();
@@ -1191,7 +1038,8 @@ ModeDisOrDat.prototype.start = function() {
                 thisMode.MessageSpaceBarComesIn.free();
                 thisMode.MessageSpaceBarLeave.play();
                 thisMode.RulesSkipExplain.play();
-                showQuestion();
+                thisMode.ShowSubject.volume(0);
+                thisMode.ShowSubject.play();
                 endOfRules();
             };
 
@@ -1205,9 +1053,8 @@ ModeDisOrDat.prototype.start = function() {
     });
 
     this.QuestionTitle.ended(-400,function() {
-        thisMode.game.html.screen.find('#QuestionTitle').css('font-style','italic').delay(100).animate({'left':'-500px'},500,function(){
-            thisMode.game.html.screen.find('#QuestionTitle').remove();
-        });
+        thisMode.ShowCategory.free();
+        thisMode.HideCategory.play();
     });
 
     this.AnnounceCategory.ended(100,function() {
@@ -1215,29 +1062,22 @@ ModeDisOrDat.prototype.start = function() {
     });
 
     this.AnnounceCategory.ended(-400,function() {
-        var textsize = 50;
-        if (getSTRfromID(thisMode.STR,'STR',1).length < 35) textsize = 70;
-        if (getSTRfromID(thisMode.STR,'STR',1).length < 15) textsize = 120;
-
-        jQuery('<div />').attr('id','QuestionTitle').css({ // Titre de la catégorie
-            'color':'#FFF',
-            'font-family':'JackExtraCond',
-            'text-align':'center',
-            'font-size':Math.round(textsize*0.90)+'px',
-            'line-height':textsize+'px',
-            'position':'absolute',
-            'width':'450px',
-            'left':'95px',
-            'top':Math.round(155+textsize*0.05)+'px', // Plus bas que les catégories des questions
-            'opacity':'0'
-        }).html(getSTRfromID(thisMode.STR,'STR',1)).appendTo(thisMode.game.html.screen).animate({
-                'top':'155px', // Plus bas que les catégories des questions
-                'font-size':textsize+'px',
-                'line-height':Math.round(textsize*1.10)+'px',
-                'opacity':'1',
-                'display':'none'}
-            ,250);
+        thisMode.ShowCategory.play();
     });
+
+    this.game.font.strings['1100'] = getSTRfromID(thisMode.STR,'STR',1);
+    this.game.font.strings['1400'] = this.game.font.strings['1100'];
+    this.game.font.strings['1410'] = getSTRfromID(thisMode.STR,'STR',2);
+    var str = getSTRfromID(thisMode.STR,'STR#',3);
+    this.game.font.strings['1430'] = str[0];
+    this.game.font.strings['1435'] = this.game.font.strings['1430'];
+    this.game.font.strings['1440'] = str[1];
+    this.game.font.strings['1445'] = this.game.font.strings['1440'];
+
+    this.game.font.strings['1487'] = this.game.players[this.chooseplayer-1].name;
+    this.game.font.strings['1491'] = this.game.font.strings['1487'];
+    this.game.font.strings['1492'] = this.game.displayCurrency(this.game.players[this.chooseplayer-1].score).replace('_','&nbsp;');
+    this.game.font.strings['1497'] = this.game.font.strings['1492'];
 
     this.Intro.ended(function() {
         this.free();

@@ -42,6 +42,13 @@ ModeIntro.prototype.preload = function(resources) {
 ModeIntro.prototype.start = function() {
     var thisMode = this;
 
+    this.game.font.strings[310] = this.game.players[0].name;
+    this.game.font.strings[315] = this.game.displayCurrency(this.game.players[0].score).replace('_','&nbsp;');
+    this.game.font.strings[320] = this.game.players[1].name;
+    this.game.font.strings[325] = this.game.displayCurrency(this.game.players[1].score).replace('_','&nbsp;');
+    this.game.font.strings[330] = this.game.players[2].name;
+    this.game.font.strings[335] = this.game.displayCurrency(this.game.players[2].score).replace('_','&nbsp;');
+
     if (this.game.demomode) {
         var skiplistener = 0;
 
@@ -75,13 +82,6 @@ ModeIntro.prototype.start = function() {
             thisMode.SFXJackTitle.play()
         });
 
-        this.game.font.strings[310] = this.game.players[0].name;
-        this.game.font.strings[315] = this.game.displayCurrency(this.game.players[0].score).replace('_','&nbsp;');
-        this.game.font.strings[320] = this.game.players[1].name;
-        this.game.font.strings[325] = this.game.displayCurrency(this.game.players[1].score).replace('_','&nbsp;');
-        this.game.font.strings[330] = this.game.players[2].name;
-        this.game.font.strings[335] = this.game.displayCurrency(this.game.players[2].score).replace('_','&nbsp;');
-
         this.IntroPreTitle.ended(function () {
             this.free();
             thisMode.IntroJack.play();
@@ -112,20 +112,14 @@ ModeIntro.prototype.start = function() {
 
         this.Player2on3.ended(1000,function(){
             thisMode.Player3on3.play();
-            var a = thisMode.game.displayPlayer(3);
-            a.css({'opacity': '0','display':'','font-size':'24px'}).animate({'opacity':'1'},180);
         });
 
         this.Player1on3.ended(1000,function(){
             thisMode.Player2on3.play();
-            var a = thisMode.game.displayPlayer(2);
-            a.css({'opacity': '0','display':'','font-size':'24px'}).animate({'opacity':'1'},180);
         });
 
         this.Player1on2.ended(1000,function(){
             thisMode.Player2on2.play();
-            var a = thisMode.game.displayPlayer(2);
-            a.css({'opacity': '0','display':'','font-size':'24px'}).animate({'opacity':'1'},180);
         });
 
         this.IntroJackTitle.ended(300, function () {
@@ -143,8 +137,6 @@ ModeIntro.prototype.start = function() {
                     if (thisMode.game.players.length == 1) thisMode.Player1on1.play();
                     if (thisMode.game.players.length == 2) thisMode.Player1on2.play();
                     if (thisMode.game.players.length == 3) thisMode.Player1on3.play();
-                    var a = thisMode.game.displayPlayer(1);
-                    a.css({'opacity': '0','display':'','font-size':'24px'}).animate({'opacity':'1'},180);
                 });
             });
         });

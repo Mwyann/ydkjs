@@ -164,7 +164,7 @@ var YDKJDemoSnd = {
         'Score32on7':{res:'5QDemo',name:'Mp11',min:1,max:1}, // Après addition : 3/7 OU 2/7
         'Score31on7':{res:'5QDemo',name:'Mp12',min:1,max:1}, // 1/7
         'Score30on7':{res:'5QDemo',name:'Mp13',min:1,max:1}, // 0/7
-        'ShowQuestion':{res:'5QDemo',name:'Mb92',min:1,max:1},
+        'SFXShowSubject':{res:'5QDemo',name:'Mb92',min:1,max:1},
         'ShowFinalScore':{res:'5QDemo',name:'Mb94',min:1,max:1},
         'SuggestSkip1':{res:'5QDemo',name:'Mb16',min:1,max:1}, // 1er avert
         'SuggestSkip2':{res:'5QDemo',name:'Mb17',min:1,max:1}, // 1er avert, 2eme version
@@ -287,6 +287,16 @@ var YDKJDemoAnim = {
         'TimerComesIn':{res:'5QDemo',name:'off4/8041',framestart:2,loop:0},
         'PrepareTimer':{res:'5QDemo',name:'off4/8021',framestart:12,loop:0},
         'TimerTimeOut':{res:'5QDemo',name:'off4/8021',framestart:666,loop:0},
+        'ShowHeader':{res:'5QDemo',name:'off4/14000',framestart:8,framestop:15,loop:0},
+        'ShowCategory':{res:'5QDemo',name:'off4/14000',framestart:21,loop:0},
+        'HideCategory':{res:'5QDemo',name:'off4/14000',framestart:28,framestop:35,loop:0},
+        'ShowSubject':{res:'5QDemo',name:'off4/14000',framestart:40,loop:0},
+        'HideSubject':{res:'5QDemo',name:'off4/14000',framestart:51,framestop:57,loop:0},
+        'ShowQuestion':{res:'5QDemo',name:'off4/14000',framestart:63,loop:0},
+        'HideQuestionSkip':{res:'5QDemo',name:'off4/14000',framestart:69,framestop:72,loop:0},
+        'HideQuestionWrong':{res:'5QDemo',name:'off4/14000',framestart:76,framestop:80,loop:0},
+        'HideQuestionCorrect':{res:'5QDemo',name:'off4/14000',framestart:84,framestop:88,loop:0},
+        'HideQuestionTimeout':{res:'5QDemo',name:'off4/14000',framestart:93,framestop:107,loop:0},
 
         'Button1of4ComesIn':{res:'5QDemo',name:'off4/14000',framestart:111,loop:0},
         'Button1of4StandbyLoop':{res:'5QDemo',name:'off4/14000',framestart:132,framestop:159,loop:0}, // Pas de boucle pour ces StanbyLoop, c'est fait en JS (pour améliorer la synchro)
@@ -341,15 +351,41 @@ var YDKJDemoAnim = {
         'MessageSpaceBarLeave':{res:'5QDemo',name:'off4/14000',framestart:928,loop:0},
 
         'Player1ComesIn':{res:'5QDemo',name:'off4/14900',framestart:1,loop:0},
+        'Player1WinGrow':{res:'5QDemo',name:'off4/14900',framestart:22,framestop:25,loop:0},
+        'Player1WinBig':{res:'5QDemo',name:'off4/14900',framestart:33,framestop:33,loop:0},
         'Player1Win':{res:'5QDemo',name:'off4/14900',framestart:43,loop:0},
+        'Player1LoseGrow':{res:'5QDemo',name:'off4/14900',framestart:70,framestop:73,loop:0},
+        'Player1LoseBig':{res:'5QDemo',name:'off4/14900',framestart:81,framestop:81,loop:0},
         'Player1Lose':{res:'5QDemo',name:'off4/14900',framestart:94,loop:0},
 
         'Player2ComesIn':{res:'5QDemo',name:'off4/14930',framestart:1,loop:0},
+        'Player2WinGrow':{res:'5QDemo',name:'off4/14930',framestart:22,framestop:25,loop:0},
+        'Player2WinBig':{res:'5QDemo',name:'off4/14930',framestart:33,framestop:33,loop:0},
         'Player2Win':{res:'5QDemo',name:'off4/14930',framestart:43,loop:0},
+        'Player2LoseGrow':{res:'5QDemo',name:'off4/14930',framestart:70,framestop:73,loop:0},
+        'Player2LoseBig':{res:'5QDemo',name:'off4/14930',framestart:81,framestop:81,loop:0},
         'Player2Lose':{res:'5QDemo',name:'off4/14930',framestart:94,loop:0},
 
         'Player3ComesIn':{res:'5QDemo',name:'off4/14950',framestart:1,loop:0},
+        'Player3WinGrow':{res:'5QDemo',name:'off4/14950',framestart:22,framestop:25,loop:0},
+        'Player3WinBig':{res:'5QDemo',name:'off4/14950',framestart:33,framestop:33,loop:0},
         'Player3Win':{res:'5QDemo',name:'off4/14950',framestart:43,loop:0},
+        'Player3LoseGrow':{res:'5QDemo',name:'off4/14950',framestart:70,framestop:73,loop:0},
+        'Player3LoseBig':{res:'5QDemo',name:'off4/14950',framestart:81,framestop:81,loop:0},
         'Player3Lose':{res:'5QDemo',name:'off4/14950',framestart:94,loop:0},
+
+        'TempScoreShow':{res:'5QDemo',name:'off4/14000',framestart:814,loop:0},
+        'TempScoreCorrectStart':{res:'5QDemo',name:'off4/14000',framestart:822,framestop:823,loop:0},
+        'TempScoreCorrect':{res:'5QDemo',name:'off4/14000',framestart:829,framestop:829,loop:0},
+        'TempScoreCorrectStop':{res:'5QDemo',name:'off4/14000',framestart:836,loop:0},
+        'TempScoreWrongStart':{res:'5QDemo',name:'off4/14000',framestart:843,framestop:844,loop:0},
+        'TempScoreWrong':{res:'5QDemo',name:'off4/14000',framestart:853,framestop:853,loop:0},
+        'TempScoreWrongStop':{res:'5QDemo',name:'off4/14000',framestart:862,loop:0},
+        'TempScoreHide':{res:'5QDemo',name:'off4/14000',framestart:873,framestop:874,loop:0},
+
+        'FinalScoreWinShow':{res:'5QDemo',name:'off4/14000',framestart:881,loop:0},
+        'FinalScoreWinHide':{res:'5QDemo',name:'off4/14000',framestart:891,framestop:898,loop:0},
+        'FinalScoreLoseShow':{res:'5QDemo',name:'off4/14000',framestart:903,loop:0},
+        'FinalScoreLoseHide':{res:'5QDemo',name:'off4/14000',framestart:913,framestop:920,loop:0},
     },
 };

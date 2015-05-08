@@ -30,18 +30,20 @@ function play() {
 }
 
 function sql() {
-    var sql = 'INSERT INTO ressnd (grp, name, resfolder) VALUES<br>';
+    var sql = 'INSERT IGNORE INTO ressnd (grp, name, resfolder) VALUES<br>';
+    var sql2 = '';
     var virgule = '';
 
     for (var i in YDKJDemoSnd) if (YDKJDemoSnd.hasOwnProperty(i)) {
         for (var j in YDKJDemoSnd[i]) if (YDKJDemoSnd[i].hasOwnProperty(j)) {
             sql = sql + virgule + ' (\''+i+'\',\''+j+'\',\''+YDKJDemoSnd[i][j]['res']+'/'+YDKJDemoSnd[i][j]['name']+'\')';
+            //sql2 = sql2 + 'DELETE FROM ressnd WHERE grp = \''+i+'\' AND name = \''+j+'\';<br/>';
             virgule = ',<br/>';
         }
     }
     sql = sql + ';<br/>';
 
-    sql = sql + 'INSERT INTO resani (grp, name, resid, framestart, framestop, loopani) VALUES<br>';
+    sql = sql + 'INSERT IGNORE INTO resani (grp, name, resid, framestart, framestop, loopani) VALUES<br>';
     virgule = '';
 
     for (var i in YDKJDemoAnim) if (YDKJDemoAnim.hasOwnProperty(i)) {
@@ -51,12 +53,13 @@ function sql() {
             var framestop = YDKJDemoAnim[i][j]['framestop'];
             if ((framestop === undefined) ||(framestop == -1)) framestop = 'NULL';
             sql = sql + virgule + ' (\''+i+'\',\''+j+'\',REPLACE(\''+YDKJDemoAnim[i][j]['res']+'/'+YDKJDemoAnim[i][j]['name']+'\',\'5QDemo/off4/\',\'\'),'+YDKJDemoAnim[i][j]['framestart']+','+framestop+','+loop+')';
+            sql2 = sql2 + 'DELETE FROM resani WHERE grp = \''+i+'\' AND name = \''+j+'\';<br/>';
             virgule = ',<br/>';
         }
     }
     sql = sql + ';<br/>';
 
-    document.getElementById('debug').innerHTML = sql;
+    document.getElementById('debug').innerHTML = sql2+sql;
 }
 
 </script>

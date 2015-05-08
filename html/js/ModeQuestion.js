@@ -122,16 +122,16 @@ ModeQuestion.prototype.start = function() {
                 thisMode.SFXPlayerBuzz.play();
                 switch (thisMode.buzzPlayer) {
                     case 1:
-                        thisMode.Player1Answer.play();
                         thisMode.ShowPlayer1Key.free();
+                        thisMode.Player1Answer.play();
                         break;
                     case 2:
-                        thisMode.Player2Answer.play();
                         thisMode.ShowPlayer2Key.free();
+                        thisMode.Player2Answer.play();
                         break;
                     case 3:
-                        thisMode.Player3Answer.play();
                         thisMode.ShowPlayer3Key.free();
+                        thisMode.Player3Answer.play();
                         break;
                 }
             }
@@ -157,20 +157,20 @@ ModeQuestion.prototype.start = function() {
                 }
                 switch(thisMode.currentAns){
                     case 1:
-                        thisMode.LoopAnswer1.play();
                         thisMode.ShowAnswer1.free();
+                        thisMode.LoopAnswer1.play();
                         break;
                     case 2:
-                        thisMode.LoopAnswer2.play();
                         thisMode.ShowAnswer2.free();
+                        thisMode.LoopAnswer2.play();
                         break;
                     case 3:
-                        thisMode.LoopAnswer3.play();
                         thisMode.ShowAnswer3.free();
+                        thisMode.LoopAnswer3.play();
                         break;
                     case 4:
-                        thisMode.LoopAnswer4.play();
                         thisMode.ShowAnswer4.free();
+                        thisMode.LoopAnswer4.play();
                         break;
                 }
                 thisMode.JingleTimer.stop();

@@ -17,8 +17,8 @@ function YDKJGame(html, demomode) {
     // Gestion du fullscreen
     var onresize = function() {};
     var onfullscreenoff = function() {};
-    var oldcssbody = '';
-    var oldcssscreen = '';
+    var oldcssbody = undefined;
+    var oldcssscreen = undefined;
     var body = jQuery('body');
     var thewindow = jQuery(window);
 
@@ -28,7 +28,7 @@ function YDKJGame(html, demomode) {
     });
 
     thewindow.keyup(function(event) {
-        if (event.keyCode == 27) {
+        if ((event.keyCode == 27) && (oldcssbody !== undefined) && (oldcssscreen !== undefined)) {
             onresize = function() {};
             body.attr('style',oldcssbody);
             thisGame.html.screen.attr('style',oldcssscreen);
@@ -80,37 +80,6 @@ YDKJGame.prototype.start = function() {
 
 YDKJGame.prototype.fullscreen = function(f) {
     this.fullscreen(f);
-};
-
-YDKJGame.prototype.displayPlayer = function(playernumber,position,outof) {
-    var x;
-    if (!position) position = playernumber;
-    if (!outof) outof = this.players.length;
-    if (outof == 3) {
-        x=[106,320,534];
-    }
-    if (outof == 1) {
-        x=[320];
-    }
-
-    var playerdiv = jQuery('<div />').css({
-        'position':'absolute',
-        'z-index':'1000',
-        'left':(x[position-1]-150)+'px',
-        'top':'400px',
-        'width':'300px',
-        'text-align':'center',
-        'color':'#FFF',
-        'font-family':'JackRoman',
-        'font-size':'20px',
-        'line-height':'30px',
-        'display':'none'
-    }).appendTo(this.html.screen);
-
-    jQuery('<div />').addClass('name').css({'position':'relative'}).html(this.players[playernumber-1].name).appendTo(playerdiv);
-    jQuery('<div />').addClass('score').css({'position':'relative'}).html(this.displayCurrency(this.players[playernumber-1].score).replace('_','&nbsp;')).appendTo(playerdiv);
-
-    return playerdiv;
 };
 
 YDKJGame.prototype.displayCurrency = function(value) {

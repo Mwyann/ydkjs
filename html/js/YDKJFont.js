@@ -25,26 +25,26 @@ function YDKJFont() {
         1010:{font:'JackRoman',size:29,color:'#FC0',halign:'l'}, // Categories text
         1020:{font:'JackRoman',size:29,color:'#FC0',halign:'l'},
         1030:{font:'JackRoman',size:29,color:'#FC0',halign:'l'},
-        1100:{font:'JackExtraCond',size:[83,64,42],color:['#FFF','#666','#AAA']}, // Big category title (check big sizes, like 83)
+        1100:{font:'JackExtraCond',size:[83,64,42],color:['#FFF','#666','#AAA']}, // Big category title (TODO check big sizes, like 83)
         // Questions
         1200:{font:'JackRoman',size:20,color:'#33F',halign:'l'}, // Category title, header
         1205:{font:'JackRoman',size:20,color:'#33F',halign:'r'}, // Category value, header
         1210:{font:'JackExtraCond',size:[42,32],color:'#FFF'}, // Question
-        1211:{font:'JackCondensed',size:21,color:['#FC0','#F00'],halign:'l'}, // Answer 1
-        1212:{font:'JackCondensed',size:21,color:['#FC0','#F00'],halign:'l'}, // Answer 2
-        1213:{font:'JackCondensed',size:21,color:['#FC0','#F00'],halign:'l'}, // Answer 3
-        1214:{font:'JackCondensed',size:21,color:['#FC0','#F00'],halign:'l'}, // Answer 4
-        1215:{font:'JackRoman',size:[61,38,29,23],color:'#FC0'}, // Revealed answer (probably more than one size here, check sizes like 38, 29, 23)
+        1211:{font:'JackCondensed',size:22,color:['#FC0','#F00'],halign:'l'}, // Answer 1
+        1212:{font:'JackCondensed',size:22,color:['#FC0','#F00'],halign:'l'}, // Answer 2
+        1213:{font:'JackCondensed',size:22,color:['#FC0','#F00'],halign:'l'}, // Answer 3
+        1214:{font:'JackCondensed',size:22,color:['#FC0','#F00'],halign:'l'}, // Answer 4
+        1215:{font:'JackRoman',size:[61,38,29,23],color:'#FC0'}, // Revealed answer (probably more than one size here, TODO check sizes like 38, 29, 23)
         // DisOrDat
         1400:{font:'JackRoman',size:20,color:'#33F',halign:'l'}, // Category title, header
-        1410:{font:'JackRoman',size:29,color:'#FF0'}, // Question
-        1420:{font:'JackExtraCond',size:64,color:'#FFF'}, // Word to answer
-        1430:{font:'JackCondensed',size:21,color:['#FF0','#F00']}, // First answer
-        1435:{font:'JackCondensed',size:31,color:'#F00'}, // First answer, big (pushed)
-        1440:{font:'JackCondensed',size:21,color:['#FF0','#F00']}, // Second answer
-        1445:{font:'JackCondensed',size:31,color:'#F00'}, // Second answer, big (pushed)
-        1470:{font:'JackExtraCond',size:83,color:['#33F','#22A','#116']}, // Temporary score (bottom left)
-        1475:{font:'JackExtraCond',size:83,color:['#33F']}, // Temporary score (bottom left), maybe while counting TODO color scheme is not complete
+        1410:{font:'JackRoman',size:29,color:'#FF0'}, // Subject
+        1420:{font:'JackExtraCond',size:[64,42],color:'#FFF'}, // Question
+        1430:{font:'JackCondensed',size:22,color:['#FF0','#F00']}, // First answer
+        1435:{font:'JackCondensed',size:32,color:'#F00'}, // First answer, big (pushed)
+        1440:{font:'JackCondensed',size:22,color:['#FF0','#F00']}, // Second answer
+        1445:{font:'JackCondensed',size:32,color:'#F00'}, // Second answer, big (pushed)
+        1470:{font:'JackExtraCond',size:83,color:['#090','#33F','#063']}, // Temporary score (bottom left)
+        1475:{font:'JackExtraCond',size:83,color:['#0F0','#900','#F00']}, // Temporary score (bottom left), second color scheme
         1480:{font:'JackExtraCond',size:114,color:['#0F0','#0A0','#060']}, // Final score (centered), positive
         1485:{font:'JackExtraCond',size:114,color:['#F00','#A00','#600']}, // Final score (centered), negative
         1487:{font:'JackRoman',size:25,color:['#FFF','#AAA','#666']}, // Player's name, while appearing
@@ -167,8 +167,8 @@ YDKJFont.prototype.measureTextHeight = function(text, font, left, top, width, he
     // NO DEBUG
     tmpdiv.remove();
 
-    // DEBUG STUFF
     var fontDraw = document.createElement("canvas");
+    // DEBUG STUFF
     //$('body').append(fontDraw);
     // here we expect that font size will be less canvas geometry
     fontDraw.setAttribute("height", height);

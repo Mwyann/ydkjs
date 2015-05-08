@@ -11,7 +11,7 @@ YDKJAPI.prototype.initdemo = function() {
     YDKJAPI.prototype.gamemode = function(currentmode) {
         var newmode;
         if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Intro', {});
-        //if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1}); // Ligne DEBUG
+        //if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 2}); // Ligne DEBUG
         if (currentmode instanceof ModeIntro) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1, chooseplayer: 3});
         if ((currentmode instanceof ModeQuestion) || (currentmode instanceof ModeDisOrDat)) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: currentmode.options.questionnumber+1});
 
@@ -354,7 +354,6 @@ YDKJAPI.prototype.initdemo = function() {
                 'DisOrDat/Score32on7':0,
                 'DisOrDat/Score31on7':0,
                 'DisOrDat/Score30on7':0,
-                'DisOrDat/ShowQuestion':0,
                 'DisOrDat/ShowFinalScore':0,
                 'DisOrDat/SuggestSkip1':0,
                 'DisOrDat/SuggestSkip2':0,
@@ -371,6 +370,16 @@ YDKJAPI.prototype.initdemo = function() {
                 'DisOrDat/IntroStill':0,
                 'DisOrDat/PrepareTimer':0,
                 'DisOrDat/TimerTimeOut':0,
+                'DisOrDat/ShowHeader':0,
+                'DisOrDat/ShowCategory':0,
+                'DisOrDat/HideCategory':0,
+                'DisOrDat/ShowSubject':0,
+                'DisOrDat/HideSubject':0,
+                'DisOrDat/ShowQuestion':0,
+                'DisOrDat/HideQuestionSkip':0,
+                'DisOrDat/HideQuestionWrong':0,
+                'DisOrDat/HideQuestionCorrect':0,
+                'DisOrDat/HideQuestionTimeout':0,
 
                 'DisOrDat/Button1of4ComesIn':0,
                 'DisOrDat/Button1of4StandbyLoop':0,
@@ -425,16 +434,42 @@ YDKJAPI.prototype.initdemo = function() {
                 'DisOrDat/MessageSpaceBarLeave':0,
 
                 'DisOrDat/Player1ComesIn':0,
+                'DisOrDat/Player1WinGrow':0,
+                'DisOrDat/Player1WinBig':0,
                 'DisOrDat/Player1Win':0,
+                'DisOrDat/Player1LoseGrow':0,
+                'DisOrDat/Player1LoseBig':0,
                 'DisOrDat/Player1Lose':0,
 
                 'DisOrDat/Player2ComesIn':0,
+                'DisOrDat/Player2WinGrow':0,
+                'DisOrDat/Player2WinBig':0,
                 'DisOrDat/Player2Win':0,
+                'DisOrDat/Player2LoseGrow':0,
+                'DisOrDat/Player2LoseBig':0,
                 'DisOrDat/Player2Lose':0,
 
                 'DisOrDat/Player3ComesIn':0,
+                'DisOrDat/Player3WinGrow':0,
+                'DisOrDat/Player3WinBig':0,
                 'DisOrDat/Player3Win':0,
+                'DisOrDat/Player3LoseGrow':0,
+                'DisOrDat/Player3LoseBig':0,
                 'DisOrDat/Player3Lose':0,
+
+                'DisOrDat/TempScoreShow':0,
+                'DisOrDat/TempScoreCorrectStart':0,
+                'DisOrDat/TempScoreCorrect':0,
+                'DisOrDat/TempScoreCorrectStop':0,
+                'DisOrDat/TempScoreWrongStart':0,
+                'DisOrDat/TempScoreWrong':0,
+                'DisOrDat/TempScoreWrongStop':0,
+                'DisOrDat/TempScoreHide':0,
+
+                'DisOrDat/FinalScoreWinShow':0,
+                'DisOrDat/FinalScoreWinHide':0,
+                'DisOrDat/FinalScoreLoseShow':0,
+                'DisOrDat/FinalScoreLoseHide':0,
 
                 'Question/SFXPlayerCorrect':0,
                 'Question/SFXPlayerLose':0
