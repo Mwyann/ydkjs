@@ -307,8 +307,8 @@ function resources() {
         }
 
         $RevealAnswer = 'res-full/'.$qhdr['folder'].'/snd/11';
-        if (file_exists('../'.$RevealAnswer.'.ogg')) $reslist['Question/RevealAnswer'] = array('urlAudio' => uriToUid($RevealAnswer));
-        else $reslist['Question/RevealAnswer'] = PickAnySnd('Question','DefaultRevealAnswer');
+        if (file_exists('../'.$RevealAnswer.'.ogg')) $reslist['Question/AboutToRevealAnswer'] = array('urlAudio' => uriToUid($RevealAnswer));
+        else $reslist['Question/AboutToRevealAnswer'] = PickAnySnd('Question','DefaultRevealAnswer');
 
         $reslist['STR'] = $qhdr['strings'];
         $reslist['correctanswer'] = $qhdr['answer'];

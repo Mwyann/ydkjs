@@ -595,7 +595,7 @@ ModeQuestion.prototype.start = function() {
     this.game.font.strings[1212] = getSTRfromID(thisMode.STR,'STR',4);
     this.game.font.strings[1213] = getSTRfromID(thisMode.STR,'STR',5);
     this.game.font.strings[1214] = getSTRfromID(thisMode.STR,'STR',6);
-    this.game.font.strings[1215] = this.game.font.strings[1210+this.correctanswer];
+    this.game.font.strings[1215] = this.game.font.strings[1210+parseInt(this.correctanswer)];
 
     this.ShowCategory.ended(150,function() {
         thisMode.AnnounceValue.play();
