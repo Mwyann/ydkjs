@@ -330,8 +330,8 @@ ModeDisOrDat.prototype.start = function() {
                     thisMode.SFXScoreLose.play();
                 }
                 animateValue(PlayerBig,PlayerBig,PlayerBig, function(newvalue) {
-                    thisMode.game.font.strings['1492'] = newvalue;
-                    thisMode.game.font.strings['1497'] = newvalue;
+                    thisMode.game.font.strings[1492] = newvalue;
+                    thisMode.game.font.strings[1497] = newvalue;
                 },from,thisMode.game.players[thisMode.chooseplayer-1].score,12,function(){
                     setTimeout(function(){
                         endmessage.ended(800,jumpToNextCategory);
@@ -367,8 +367,8 @@ ModeDisOrDat.prototype.start = function() {
                 thisMode.TempScoreWrongStop.free();
                 thisMode.TempScoreHide.play();
 
-                thisMode.game.font.strings['1480'] = thisMode.game.displayCurrency(tempscore).replace('_','&thinsp;');
-                thisMode.game.font.strings['1485'] = thisMode.game.font.strings['1480'];
+                thisMode.game.font.strings[1480] = thisMode.game.displayCurrency(tempscore).replace('_','&thinsp;');
+                thisMode.game.font.strings[1485] = thisMode.game.font.strings[1480];
                 if (tempscore > 0) {
                     thisMode.FinalScoreWinShow.play();
                 } else {
@@ -414,8 +414,8 @@ ModeDisOrDat.prototype.start = function() {
             var oldtempscore = tempscore;
             tempscore -= thisMode.options.value*nbanswersleft;
             animateValue(thisMode.TempScoreWrongStart, thisMode.TempScoreWrong, thisMode.TempScoreWrongStop, function(newvalue) {
-                thisMode.game.font.strings['1470'] = newvalue;
-                thisMode.game.font.strings['1475'] = newvalue;
+                thisMode.game.font.strings[1470] = newvalue;
+                thisMode.game.font.strings[1475] = newvalue;
             }, oldtempscore, tempscore, 6, function(){
                 endQuestion(function(){
                     var nbgoodanswers = 0;
@@ -468,8 +468,8 @@ ModeDisOrDat.prototype.start = function() {
         thisMode.HideQuestionSkip.reset();
         thisMode.HideQuestionCorrect.reset();
         thisMode.HideQuestionWrong.reset();
-        thisMode.game.font.resetTextStyle('1420');
-        thisMode.game.font.strings['1420'] = str[currentQuestion+2];
+        thisMode.game.font.resetTextStyle(1420);
+        thisMode.game.font.strings[1420] = str[currentQuestion+2];
         thisMode.ShowQuestion.play();
 
         var thisQuestion;
@@ -625,8 +625,8 @@ ModeDisOrDat.prototype.start = function() {
                         var oldtempscore = tempscore;
                         tempscore += thisMode.options.value;
                         animateValue(thisMode.TempScoreCorrectStart, thisMode.TempScoreCorrect, thisMode.TempScoreCorrectStop, function(newvalue) {
-                            thisMode.game.font.strings['1470'] = newvalue;
-                            thisMode.game.font.strings['1475'] = newvalue;
+                            thisMode.game.font.strings[1470] = newvalue;
+                            thisMode.game.font.strings[1475] = newvalue;
                         },oldtempscore,tempscore,6,function(){
                             nextQuestion();
                         });
@@ -644,8 +644,8 @@ ModeDisOrDat.prototype.start = function() {
                         var oldtempscore = tempscore;
                         tempscore -= thisMode.options.value;
                         animateValue(thisMode.TempScoreWrongStart, thisMode.TempScoreWrong, thisMode.TempScoreWrongStop, function(newvalue) {
-                            thisMode.game.font.strings['1470'] = newvalue;
-                            thisMode.game.font.strings['1475'] = newvalue;
+                            thisMode.game.font.strings[1470] = newvalue;
+                            thisMode.game.font.strings[1475] = newvalue;
                         }, oldtempscore,tempscore,6,function(){
                             nextQuestion();
                         });
@@ -823,8 +823,8 @@ ModeDisOrDat.prototype.start = function() {
             buttonsAnswer[i].Ready.play();
         }
 
-        thisMode.game.font.strings['1470'] = thisMode.game.displayCurrency(0).replace('_','&thinsp;');
-        thisMode.game.font.strings['1475'] = thisMode.game.font.strings['1470'];
+        thisMode.game.font.strings[1470] = thisMode.game.displayCurrency(0).replace('_','&thinsp;');
+        thisMode.game.font.strings[1475] = thisMode.game.font.strings[1470];
         thisMode.TempScoreShow.play();
 
         var prepareGame = function() {
@@ -1065,19 +1065,20 @@ ModeDisOrDat.prototype.start = function() {
         thisMode.ShowCategory.play();
     });
 
-    this.game.font.strings['1100'] = getSTRfromID(thisMode.STR,'STR',1);
-    this.game.font.strings['1400'] = this.game.font.strings['1100'];
-    this.game.font.strings['1410'] = getSTRfromID(thisMode.STR,'STR',2);
+    this.game.font.resetTextStyle(1100);
+    this.game.font.strings[1100] = getSTRfromID(thisMode.STR,'STR',1);
+    this.game.font.strings[1400] = this.game.font.strings[1100];
+    this.game.font.strings[1410] = getSTRfromID(thisMode.STR,'STR',2);
     var str = getSTRfromID(thisMode.STR,'STR#',3);
-    this.game.font.strings['1430'] = str[0];
-    this.game.font.strings['1435'] = this.game.font.strings['1430'];
-    this.game.font.strings['1440'] = str[1];
-    this.game.font.strings['1445'] = this.game.font.strings['1440'];
+    this.game.font.strings[1430] = str[0];
+    this.game.font.strings[1435] = this.game.font.strings[1430];
+    this.game.font.strings[1440] = str[1];
+    this.game.font.strings[1445] = this.game.font.strings[1440];
 
-    this.game.font.strings['1487'] = this.game.players[this.chooseplayer-1].name;
-    this.game.font.strings['1491'] = this.game.font.strings['1487'];
-    this.game.font.strings['1492'] = this.game.displayCurrency(this.game.players[this.chooseplayer-1].score);
-    this.game.font.strings['1497'] = this.game.font.strings['1492'];
+    this.game.font.strings[1487] = this.game.players[this.chooseplayer-1].name;
+    this.game.font.strings[1491] = this.game.font.strings[1487];
+    this.game.font.strings[1492] = this.game.displayCurrency(this.game.players[this.chooseplayer-1].score);
+    this.game.font.strings[1497] = this.game.font.strings[1492];
 
     this.Intro.ended(function() {
         this.free();

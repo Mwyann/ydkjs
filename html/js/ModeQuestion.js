@@ -584,6 +584,9 @@ ModeQuestion.prototype.start = function() {
     this.game.font.strings[130] = this.game.players[2].name;
     this.game.font.strings[135] = this.game.displayCurrency(this.game.players[2].score);
 
+    this.game.font.resetTextStyle(1100);
+    this.game.font.resetTextStyle(1210);
+    this.game.font.resetTextStyle(1215);
     this.game.font.strings[1100] = getSTRfromID(thisMode.STR,'STR',1);
     this.game.font.strings[1200] = this.game.font.strings[1100];
     this.game.font.strings[1205] = thisMode.game.displayCurrency(thisMode.options.value);
