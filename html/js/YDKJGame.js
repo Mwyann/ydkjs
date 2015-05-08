@@ -95,7 +95,7 @@ YDKJGame.prototype.displayCurrency = function(value) {
     value = Math.abs(value).toString();
 
     if (this.locale == 'fr_FR') {
-        return minus+value+'_F';
+        return minus+value+' F';
     }
     if (this.locale == 'en_GB') {
         return minus+'£'+thousandSeparator(value,',');
@@ -104,7 +104,7 @@ YDKJGame.prototype.displayCurrency = function(value) {
         return minus+'$'+value.toString();
     }
     if (this.locale == 'de_DE') {
-        return minus+'<span style="font-size:70%">DM</span>'+value.toString();
+        return minus+'<span¤style="font-size:70%">DM</span>'+value.toString(); // The ¤ symbol will be replaced by a space later.
     }
     return value.toString();
 };

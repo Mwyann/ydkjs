@@ -43,11 +43,11 @@ ModeIntro.prototype.start = function() {
     var thisMode = this;
 
     this.game.font.strings[310] = this.game.players[0].name;
-    this.game.font.strings[315] = this.game.displayCurrency(this.game.players[0].score).replace('_','&nbsp;');
+    this.game.font.strings[315] = this.game.displayCurrency(this.game.players[0].score);
     this.game.font.strings[320] = this.game.players[1].name;
-    this.game.font.strings[325] = this.game.displayCurrency(this.game.players[1].score).replace('_','&nbsp;');
+    this.game.font.strings[325] = this.game.displayCurrency(this.game.players[1].score);
     this.game.font.strings[330] = this.game.players[2].name;
-    this.game.font.strings[335] = this.game.displayCurrency(this.game.players[2].score).replace('_','&nbsp;');
+    this.game.font.strings[335] = this.game.displayCurrency(this.game.players[2].score);
 
     if (this.game.demomode) {
         var skiplistener = 0;

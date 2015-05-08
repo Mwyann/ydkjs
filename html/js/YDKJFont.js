@@ -287,7 +287,7 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val, d
                 'left': left + 'px',
                 'top': top + 'px',
                 'font': (fontsize) + 'px/' + (fontsize) + 'px "' + font + '"'
-            }).html(string.replace(/(\n)+/g, '<br />').replace(/ /g, '&#8197;')); // Line breaks and thin spaces
+            }).html(string.replace(/(\n)+/g, '<br />').replace(/ /g, '&#8197;').replace(/¤/g,' ')); // Line breaks and thin spaces and forced spaces
 
             if ((textdata.sizeid === undefined) && (textdata.size.length > 1)) { // Try to find the best fitting font size, once and for all
                 var tmpdiv = div.clone();

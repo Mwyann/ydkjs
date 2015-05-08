@@ -270,7 +270,7 @@ ModeQuestion.prototype.start = function() {
         thisMode.SFXPlayerLose.delay(100,function() {
             var currentPlayer = thisMode.currentPlayer;
             thisMode.game.players[currentPlayer-1].score = parseInt(thisMode.game.players[currentPlayer-1].score) - parseInt(thisMode.options.value);
-            thisMode.game.font.strings[10*thisMode.currentPlayer+105] = thisMode.game.displayCurrency(thisMode.game.players[thisMode.currentPlayer-1].score).replace('_','&nbsp;');
+            thisMode.game.font.strings[10*thisMode.currentPlayer+105] = thisMode.game.displayCurrency(thisMode.game.players[thisMode.currentPlayer-1].score);
 
             var PlayerWrong, PlayerAnswerLoop;
             switch (currentPlayer) {
@@ -404,7 +404,7 @@ ModeQuestion.prototype.start = function() {
             }
 
             thisMode.game.players[thisMode.currentPlayer-1].score = parseInt(thisMode.game.players[thisMode.currentPlayer-1].score) + parseInt(thisMode.options.value);
-            thisMode.game.font.strings[10*thisMode.currentPlayer+105] = thisMode.game.displayCurrency(thisMode.game.players[thisMode.currentPlayer-1].score).replace('_','&nbsp;');
+            thisMode.game.font.strings[10*thisMode.currentPlayer+105] = thisMode.game.displayCurrency(thisMode.game.players[thisMode.currentPlayer-1].score);
 
             thisMode.SFXPlayerCorrect.play();
             unbindKeyListener(thisMode.listener);
@@ -578,15 +578,15 @@ ModeQuestion.prototype.start = function() {
     });
 
     this.game.font.strings[110] = this.game.players[0].name;
-    this.game.font.strings[115] = this.game.displayCurrency(this.game.players[0].score).replace('_','&nbsp;');
+    this.game.font.strings[115] = this.game.displayCurrency(this.game.players[0].score);
     this.game.font.strings[120] = this.game.players[1].name;
-    this.game.font.strings[125] = this.game.displayCurrency(this.game.players[1].score).replace('_','&nbsp;');
+    this.game.font.strings[125] = this.game.displayCurrency(this.game.players[1].score);
     this.game.font.strings[130] = this.game.players[2].name;
-    this.game.font.strings[135] = this.game.displayCurrency(this.game.players[2].score).replace('_','&nbsp;');
+    this.game.font.strings[135] = this.game.displayCurrency(this.game.players[2].score);
 
     this.game.font.strings[1100] = getSTRfromID(thisMode.STR,'STR',1);
     this.game.font.strings[1200] = this.game.font.strings[1100];
-    this.game.font.strings[1205] = thisMode.game.displayCurrency(thisMode.options.value).replace('_','&nbsp;');
+    this.game.font.strings[1205] = thisMode.game.displayCurrency(thisMode.options.value);
     this.game.font.strings[1210] = getSTRfromID(thisMode.STR,'STR',2);
     this.game.font.strings[1211] = getSTRfromID(thisMode.STR,'STR',3);
     this.game.font.strings[1212] = getSTRfromID(thisMode.STR,'STR',4);

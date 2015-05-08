@@ -1076,7 +1076,7 @@ ModeDisOrDat.prototype.start = function() {
 
     this.game.font.strings['1487'] = this.game.players[this.chooseplayer-1].name;
     this.game.font.strings['1491'] = this.game.font.strings['1487'];
-    this.game.font.strings['1492'] = this.game.displayCurrency(this.game.players[this.chooseplayer-1].score).replace('_','&nbsp;');
+    this.game.font.strings['1492'] = this.game.displayCurrency(this.game.players[this.chooseplayer-1].score);
     this.game.font.strings['1497'] = this.game.font.strings['1492'];
 
     this.Intro.ended(function() {
