@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta charset="UTF-8">
+<title></title>
+<script src="../js/jquery-1.11.3.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+
+    function loadJS(jsfile, callback) {
+        jQuery.ajax({
+            url: jsfile,
+            type: 'get',
+            dataType: 'text',
+            success: function (html, status, xhr) {
+                var res = [];
+                eval(html);
+                callback(jsfile, res);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                //displayLoader(false);
+            }
+        });
+    }
+
+    loadJS('../res-full/JATTACK2/off4/15000.js',function(jsfile,res) {
+        var frames = res['frames'];
+        var i = 484;
+        var inAnim = 0;
+        var currentStart = 0;
+        var list = '';
+        while (i < 2443) {
+            if (frames[i].n) {
+                if (!inAnim) currentStart = i;
+                inAnim = 1;
+            } else {
+                if (inAnim) list = list + currentStart.toString() + ';' + i.toString() + '<br/>';
+                inAnim = 0;
+            }
+            i++;
+        }
+        $('body').append($('<div />').html(list));
+    });
+
+    var i = 1;
+    var t = '';
+    while (i < 100) {
+        t = t + 'Answer' + i.toString() + '.1<br/>Answer' + i.toString() + '.2<br/>';
+        i++;
+    }
+    $('body').append($('<div />').html(t));
+
+});
+</script>
+</head>
+<body>
+
+</body>
+</html>

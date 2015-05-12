@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta charset="UTF-8">
+<title></title>
+<script src="../js/jquery-1.11.3.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    var fontList = [
+        '4018.js', // JackInput
+        '4024.js', // JackInput
+        '4030.js', // JackInput
+        '5018.js', // JackRoman
+        '5020.js', // JackRoman
+        '5024.js', // JackRoman
+        '5030.js', // JackRoman
+        '5040.js', // JackRoman
+        '5048.js', // JackRoman
+        '5064.js', // JackRoman
+        '5092.js', // JackRoman
+        '5128.js', // JackRoman
+        '5160.js', // JackRoman
+        '5324.js', // JackRoman italics
+        '5330.js', // JackRoman italics
+        '5340.js', // JackRoman italics
+        '5348.js', // JackRoman italics
+        '6020.js', // JackCondensed
+        '6024.js', // JackCondensed
+        '6036.js', // JackCondensed
+        '7018.js', // JackExtraCond
+        '7036.js', // JackExtraCond
+        '7048.js', // JackExtraCond
+        '7060.js', // JackExtraCond
+        '7072.js', // JackExtraCond
+        '7096.js', // JackExtraCond
+        '7128.js', // JackExtraCond
+        '7144.js', // JackExtraCond
+        '7336.js', // JackExtraCond italics
+        '7348.js', // JackExtraCond italics
+        '7372.js', // JackExtraCond italics
+        '7396.js', // JackExtraCond italics
+        '7428.js'  // JackExtraCond italics
+    ];
+
+    function loadJS(jsfile, callback) {
+        jQuery.ajax({
+            url: jsfile,
+            type: 'get',
+            dataType: 'text',
+            success: function (html, status, xhr) {
+                var res = [];
+                eval(html);
+                callback(jsfile, res);
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                //displayLoader(false);
+            }
+        });
+    }
+
+    function loadNextFont() {
+        if (fontList.length > 0) {
+            loadJS('../res-full/FONTS/off4/'+fontList.shift(),function(fontfile, res) {
+                var frames = res['frames'];
+                var maxheight = 0;
+                for (var i in frames) if (frames.hasOwnProperty(i)) {
+                    var l = frames[i].l;
+                    for (var j in l) if (l.hasOwnProperty(j)) {
+                        if (l[j].b-l[j].t > maxheight) maxheight = l[j].b-l[j].t;
+                    }
+                }
+                $('body').append($('<div />').html(fontfile+' : '+maxheight+'px'));
+                loadNextFont();
+            });
+        }
+    }
+
+    loadNextFont();
+
+});
+</script>
+</head>
+<body>
+
+</body>
+</html>

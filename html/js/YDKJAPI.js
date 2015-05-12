@@ -755,6 +755,11 @@ YDKJAPI.prototype.initgame = function() {
             data['category'] = mode.options.category;
             data['id'] = mode.options.id;
         }
+        else if (mode instanceof ModeJackAttack) {
+            data['mode'] = 'JackAttack';
+            data['category'] = mode.options.category;
+            data['id'] = mode.options.id;
+        }
         else if (mode instanceof YDKJTimer) {
             data['mode'] = 'Timer'+mode.timerType;
         }
@@ -804,6 +809,12 @@ YDKJAPI.prototype.initgame = function() {
                     timer30ready(function(resources) {
                         mode.options.timer.preload(resources);
                     });
+                }
+
+                if (mode instanceof ModeJackAttack) {
+                    strtmp = [];
+                    eval('strtmp = '+reslist['STR']);
+                    mode.STR = strtmp;
                 }
 
                 ready = 1;

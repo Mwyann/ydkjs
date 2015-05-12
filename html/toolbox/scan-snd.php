@@ -10,7 +10,11 @@ $res = $DB->query("SELECT *
                    WHERE resfolder NOT LIKE '5QDemo/%'
                    AND resfolder NOT LIKE '%Mb84'
                    AND resfolder NOT LIKE '%Mb85'
-                   AND resfolder NOT LIKE '%Mh23'");
+                   AND resfolder NOT LIKE '%Mh23'
+                   AND resfolder NOT LIKE '%Me13'
+                   AND resfolder NOT LIKE '%Me21'
+                   AND resfolder NOT LIKE '%Me22'
+                   AND resfolder NOT LIKE '%Me23'");
 while ($rs = $res->fetch()) {
     $list = scandir('../res-full/'.$rs['resfolder']);
     if (sizeof($list)) {

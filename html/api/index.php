@@ -147,20 +147,26 @@ function resources() {
 
         $reslist['questiontitles'] = array();
 
-        if (($questionnumber % 4) != 0) {
+        if ($questionnumber == 7) {
             $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".qhdr
-                           WHERE qtype = 'Question'
-                           AND qsubtype = 'Normal'
-                           AND NOT EXISTS (SELECT * FROM ".$DBsta.".qhdr a WHERE qhdr.id = a.forcenext)
-                           ORDER BY RAND()
-                           LIMIT 0,3");
+                               FROM ".$DBsta.".qhdr
+                               WHERE qtype = 'JackAttack'
+                               ORDER BY RAND()
+                               LIMIT 0,3");
+        } elseif ($questionnumber == 4) {
+            $res = $DB->query("SELECT *
+                               FROM ".$DBsta.".qhdr
+                               WHERE qtype = 'DisOrDat'
+                               ORDER BY RAND()
+                               LIMIT 0,3");
         } else {
             $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".qhdr
-                           WHERE qtype = 'DisOrDat'
-                           ORDER BY RAND()
-                           LIMIT 0,3");
+                               FROM ".$DBsta.".qhdr
+                               WHERE qtype = 'Question'
+                               AND qsubtype = 'Normal'
+                               AND NOT EXISTS (SELECT * FROM ".$DBsta.".qhdr a WHERE qhdr.id = a.forcenext)
+                               ORDER BY RAND()
+                               LIMIT 0,3");
         }
         $c = 0;
         while ($rs = $res->fetch()) {
@@ -389,6 +395,88 @@ function resources() {
         $reslist['DisOrDat/RestartSkipped'] = $reslist['DisOrDat/RestartSkipped'.rand(1,2)];
         unset($reslist['DisOrDat/RestartSkipped1']);
         unset($reslist['DisOrDat/RestartSkipped2']);
+
+        $reslist['STR'] = $qhdr['strings'];
+    }
+
+    if ($mode == 'JackAttack') {
+        if (!isset($_POST['category'])) die('Resources 2');
+        $category = $_POST['category'];
+        if (!isset($_POST['id'])) die('Resources 2');
+        $id = $_POST['id'];
+
+        $res = $DB->query("SELECT *
+                           FROM ".$DBsta.".qhdr q, ".$DBsta.".strings s
+                           WHERE id = '".addslashes($id)."'
+                           AND q.folder = s.folder");
+        $qhdr = $res->fetch();
+
+        $reslist = array();
+        $res = $DB->query("SELECT *
+                           FROM ".$DBsta.".resani a, ".$DBsta.".resfiles f
+                           WHERE a.resid = f.resid
+                           AND grp = 'JackAttack'");
+        while ($rs = $res->fetch()) {
+            $r = array(
+                'urlGif' => uriToUid('res-full/'.$rs['filename'].'.gif'),
+                'urlJS' => uriToUid('res-full/'.$rs['filename'].'.js'),
+                'framestart' => $rs['framestart']
+            );
+            if ($rs['framestop'] !== null) $r['framestop'] = $rs['framestop'];
+            if ($rs['loopani']) $r['loop'] = $rs['loopani'];
+            $reslist[$rs['grp'].'/'.$rs['name']] = $r;
+        }
+
+        $res = $DB->query("SELECT *
+                           FROM ".$DBsta.".ressnd
+                           WHERE grp = 'JackAttack'");
+        while ($rs = $res->fetch()) {
+            $names = array($rs['name']);
+            if ($rs['name'] == 'PlayersScream') $names = array('PlayersScream1', 'PlayersScream2', 'PlayersScream3');
+
+            $possiblevalues = explode(',',$rs['val']);
+            if (sizeof($possiblevalues) > 1) shuffle($possiblevalues);
+
+            foreach($names as $idname => $name) {
+                $key = $rs['grp'] . '/' . $name;
+                if (!isset($reslist[$key])) {
+                    if ((substr($name, 0, 3) == 'SFX') && (isset($reslist[$rs['grp'] . '/' . substr($name, 3)]))) $key = $rs['grp'] . '/' . substr($name, 3);
+                    else $reslist[$key] = array();
+                }
+
+                $reslist[$key]['urlAudio'] = uriToUid('res-full/' . $rs['resfolder'] . '/' . $possiblevalues[$idname]);
+                if ($rs['loopsnd']) $reslist[$key]['loop'] = $rs['loopsnd'];
+            }
+        }
+
+
+        $reslist['JackAttack/RipBG'] = $reslist['JackAttack/RipBG'.rand(1,2)];
+        unset($reslist['JackAttack/RipBG1']);
+        unset($reslist['JackAttack/RipBG2']);
+
+        $reslist['JackAttack/IntroLaunch'] = $reslist['JackAttack/IntroLaunch1'];
+        unset($reslist['JackAttack/IntroLaunch1']);
+        unset($reslist['JackAttack/IntroLaunch2']);
+        unset($reslist['JackAttack/IntroLaunch3']);
+
+        $reslist['JackAttack/IntroRound'] = $reslist['JackAttack/IntroRound1.'.rand(1,3)];
+        unset($reslist['JackAttack/IntroRound1.1']);
+        unset($reslist['JackAttack/IntroRound1.2']);
+        unset($reslist['JackAttack/IntroRound1.3']);
+        unset($reslist['JackAttack/IntroRound3.1']);
+        unset($reslist['JackAttack/IntroRound3.2']);
+        unset($reslist['JackAttack/IntroRound3.3']);
+
+        $reslist['JackAttack/Example'] = $reslist['JackAttack/Example.'.rand(1,3)];
+        unset($reslist['JackAttack/Example1']);
+        unset($reslist['JackAttack/Example2']);
+        unset($reslist['JackAttack/Example3']);
+
+        $reslist['JackAttack/NoExplain'] = $reslist['JackAttack/NoExplain1Player'];
+        unset($reslist['JackAttack/NoExplain1Player']);
+        unset($reslist['JackAttack/NoExplain23Players']);
+
+        //$reslist['DisOrDat/PlayersScream1'] = $reslist['DisOrDat/PlayersScream']; // TODO
 
         $reslist['STR'] = $qhdr['strings'];
     }

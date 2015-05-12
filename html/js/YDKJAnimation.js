@@ -111,7 +111,7 @@ function YDKJAnimation(resource) {
 
     this.newScreen = function() {
         if (!this.tmpdiv) this.tmpdiv = jQuery('<div />');
-        this.tmpdiv.html('');
+        //this.tmpdiv.html('');
     };
 
     this.addTile = function(tileid, x, y) {
@@ -206,15 +206,20 @@ function YDKJAnimation(resource) {
         return val;
     };
 
-    this.nextScreen = function() {
-        // Ne pas remplacer tout le screen (uniquement supprimer lorsqu'on destroy l'animation (pas stop, on peut vouloir stopper sans supprimer))
-        //var screen = jQuery('#screen');
+    this.createDiv = function() {
         if (!this.div) {
             this.div = jQuery('<div />').css({
-                'position':'absolute'
+                'position': 'absolute',
+                'width': '640px',
+                'height': '480px'
             });
             this.div.appendTo(this.html.screen);
         }
+    };
+
+    this.nextScreen = function() {
+        // Ne pas remplacer tout le screen (uniquement supprimer lorsqu'on destroy l'animation (pas stop, on peut vouloir stopper sans supprimer))
+        this.createDiv();
         this.html.screen.find('.markedAsRemoved').remove(); // Supprimer les éléments marqués
 
         //this.div.html(this.tmpdiv.html()); // Méthode simple et rapide mais ne gère pas les évènements javascript on...
@@ -226,8 +231,14 @@ function YDKJAnimation(resource) {
         this.div = newdiv;
         */
 
+        /*
         this.div.replaceWith(this.tmpdiv);
         this.div = this.tmpdiv;
+        this.tmpdiv = 0;
+        */
+
+        this.div.children().remove();
+        this.tmpdiv.appendTo(this.div);
         this.tmpdiv = 0;
 
         this.newScreen();
@@ -487,4 +498,10 @@ YDKJAnimation.prototype.length = function() {
     }
 
     return maxlength;
+};
+
+YDKJAnimation.prototype.getDiv = function() {
+    if (this.urlGif == '') return false;
+    this.createDiv();
+    return this.div;
 };

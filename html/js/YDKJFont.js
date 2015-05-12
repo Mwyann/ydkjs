@@ -52,15 +52,23 @@ function YDKJFont() {
         1492:{font:'JackRoman',size:23,color:['#FFF','#AAA','#666']}, // Player's score
         1497:{font:'JackRoman',size:39,color:['#0F0','#F00']}, // Player's new score
         // JackAttack
-        1499:{font:'JackCondensed',size:40,color:['#FFF','#666','#AAA']}, // Hint TODO: check real font size
-        1510:{font:'JackCondensed',size:28,color:['#FFF','#666','#AAA']}, // Answers TODO: check real font size
-        1511:{font:'JackCondensed',size:28,color:'#FFF'},
-        1512:{font:'JackCondensed',size:28,color:'#FFF',opacity:0.40},
-        1513:{font:'JackCondensed',size:28,color:'#FFF',opacity:0.15},
-        211:{font:'JackRoman',size:20,color:['#FFF','#AAA']}, // Players names when lost TODO: check real font size
+        1499:{font:'JackCondensed',size:40,color:['#F00','#600','#A00']}, // Clue TODO: check real font size
+        1500:{font:'JackRoman',size:28,color:['#999','#666','#333']}, // Question TODO: check real font size
+        1510:{font:'JackCondensed',size:28,color:['#F00','#600','#A00']}, // Answers TODO: check real font size
+        1511:{font:'JackCondensed',size:28,color:'#F00'},
+        1512:{font:'JackCondensed',size:28,color:'#F00',opacity:0.40},
+        1513:{font:'JackCondensed',size:28,color:'#F00',opacity:0.15},
+        1520:{font:'JackCondensed',size:28,color:'#F00',opacity:0.15}, // Correct answer TODO: check real font size
+        210:{font:'JackRoman',size:20,color:['#FFF','#AAA']}, // Players names when correct TODO: check real font size
+        220:{font:'JackRoman',size:20,color:['#FFF','#AAA']},
+        230:{font:'JackRoman',size:20,color:['#FFF','#AAA']},
+        215:{font:'JackRoman',size:20,color:['#0F0','#0A0','#060']}, // 2000F when correct TODO: check real font size
+        225:{font:'JackRoman',size:20,color:['#0F0','#0A0','#060']},
+        235:{font:'JackRoman',size:20,color:['#0F0','#0A0','#060']},
+        211:{font:'JackRoman',size:20,color:['#FFF','#AAA']}, // Players names when wrong TODO: check real font size
         221:{font:'JackRoman',size:20,color:['#FFF','#AAA']},
         231:{font:'JackRoman',size:20,color:['#FFF','#AAA']},
-        216:{font:'JackRoman',size:20,color:['#F00','#A00','#600']}, // 2000F when lost TODO: check real font size
+        216:{font:'JackRoman',size:20,color:['#F00','#A00','#600']}, // 2000F when wrong TODO: check real font size
         226:{font:'JackRoman',size:20,color:['#F00','#A00','#600']},
         236:{font:'JackRoman',size:20,color:['#F00','#A00','#600']},
     };
