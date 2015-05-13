@@ -75,6 +75,7 @@ function SeamlessLoop() {
 	this.dropOld = new Boolean();
 	this.old;
 	this._volume = 1;
+	this._playing = 0;
 
 	var t = this;
 	this._eventCanplaythrough = function(audBool) {
@@ -117,6 +118,7 @@ function SeamlessLoop() {
 	};
 
 	this.doLoop = function(looped) {
+		if (!this._playing) return false;
 		var key = (this.next == 1 ? "_1" : "_2");
 		var antikey = (this.next == 1 ? "_2" : "_1");
 
@@ -135,6 +137,7 @@ function SeamlessLoop() {
 }
 
 SeamlessLoop.prototype.start = function(id) {
+	this._playing = 1;
 	if(id != "") {
 		this.actual = this.audios[id];
 	}
@@ -152,14 +155,15 @@ SeamlessLoop.prototype.volume = function(vol) {
 };
 
 SeamlessLoop.prototype.stop = function() {
+	this._playing = 0;
 	clearTimeout(this.timeout);
 	if (this.actual._1) {
-	  if (this.actual._1.currentTime) this.actual._1.currentTime = 0;
-	this.actual._1.pause();
+        if (this.actual._1.currentTime) this.actual._1.currentTime = 0;
+        this.actual._1.pause();
 	}
 	if (this.actual._2) {
-	  if (this.actual._2.currentTime) this.actual._2.currentTime = 0;
-	this.actual._2.pause();
+        if (this.actual._2.currentTime) this.actual._2.currentTime = 0;
+        this.actual._2.pause();
 	}
 };
 
@@ -167,22 +171,6 @@ SeamlessLoop.prototype.callback = function(cb_loaded) {
 	this.cb_loaded = cb_loaded;
 	if(this.isLoaded() == true) cb_loaded();
 	else this.cb_loaded_flag = true;
-};
-
-SeamlessLoop.prototype.update = function(id, sync) {
-	//var key = (this.next == 1 ? "_1" : "_2");
-	var antikey = (this.next == 1 ? "_2" : "_1");
-
-	this.old = this.actual[antikey];
-	this.actual = this.audios[id];
-	if(sync == false) {
-		if(this.old.paused == false) {
-			this.dropOld = true;
-			if(this.is.opera) this.old.pause();
-		}
-		clearTimeout(this.timeout);
-		this.doLoop(true);
-	}
 };
 
 SeamlessLoop.prototype.addUri = function(uri, length, id) {

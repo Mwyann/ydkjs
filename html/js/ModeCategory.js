@@ -124,6 +124,11 @@ ModeCategory.prototype.start = function() {
         thisMode.LoopCategory3.click(function(){chooseCategory(3)});
         this.free();
         thisMode.CategoryTitles.play();
+        thisMode.CategoryTitles.click(function(i){
+            if (i == 1010) chooseCategory(1);
+            if (i == 1020) chooseCategory(2);
+            if (i == 1030) chooseCategory(3);
+        })
     });
 
     this.game.font.strings[1010] = this.questiontitles[0];

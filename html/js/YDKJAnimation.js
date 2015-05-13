@@ -49,6 +49,8 @@ function YDKJAnimation(resource) {
     this.audiostopTimer = 0;
     this.html = {};
     this.font = 0;
+    this.speed = 66;
+    if (typeof animationSpeed !== 'undefined') this.speed = animationSpeed;
 
     this.preloaded = 0;
     this.readyFunctions = [];
@@ -161,7 +163,7 @@ function YDKJAnimation(resource) {
             'top':y+'px'
         }).on('mousedown',(function() {
             for(var i = 0; i < thisAnim.clickFunctions.length; i++) {
-                thisAnim.clickFunctions[i].call(thisAnim);
+                thisAnim.clickFunctions[i].call(thisAnim, textid);
             }
         }));
         if (thisAnim.html.debug) ourdiv.attr('title',textid+'/'+transform+'/'+val);
@@ -209,9 +211,7 @@ function YDKJAnimation(resource) {
     this.createDiv = function() {
         if (!this.div) {
             this.div = jQuery('<div />').css({
-                'position': 'absolute',
-                'width': '640px',
-                'height': '480px'
+                'position': 'absolute'
             });
             this.div.appendTo(this.html.screen);
         }
@@ -309,6 +309,7 @@ YDKJAnimation.prototype.play = function() {
     var thisAnim = this;
 
     var setupEnd = function() { // this.triggerEnd lorsque l'animation est terminée, basée sur this.length()
+        if ((thisAnim.loop) && (thisAnim.seamlessLoop)) return false; // Les boucles seamlessLoop ont leur propre trigger de fin
         var lth = thisAnim.length();
         for(var i = 0; i < thisAnim.endedFunctions.length; i++) {
             (function(i){
@@ -319,9 +320,6 @@ YDKJAnimation.prototype.play = function() {
 
     if (this.urlGif != '') {
         this.newScreen();
-
-        var speed;
-        if (typeof animationSpeed == 'undefined') speed = 66; else speed = animationSpeed;
 
         var framenum = this.framestart;
         var framestop = this.frames.length-1;
@@ -349,12 +347,12 @@ YDKJAnimation.prototype.play = function() {
             }
         };
 
-        intervaltimer = setInterval(runanim,speed); // Pourrait être calculé depuis frames[x].f/frames[x].g
+        intervaltimer = setInterval(runanim,this.speed); // Pourrait être calculé depuis frames[x].f/frames[x].g
         runanim();
         this.intervalTimer = intervaltimer;
 
         YDKJAnimation.prototype.position = function() {
-            return (framenum-thisAnim.framestart)*speed;
+            return (framenum-thisAnim.framestart)*thisAnim.speed;
         };
     }
 
@@ -436,6 +434,7 @@ YDKJAnimation.prototype.reset = function(fullreset) {
 
 YDKJAnimation.prototype.free = function() {
     this.stop();
+    this.ended(false);
     var gif = this.gif; this.gif = false;
     var js = this.js; this.js = false;
     var audio = this.audio; this.audio = false;
@@ -474,9 +473,6 @@ YDKJAnimation.prototype.length = function() {
     var maxlength = 0;
     var length;
     if (this.urlGif != '') {
-        var speed;
-        if (typeof animationSpeed == 'undefined') speed = 66; else speed = animationSpeed;
-
         var framestart = this.framestart;
         var framestop = this.frames.length-1;
         if (this.framestop >= 0) framestop = this.framestop;
@@ -484,7 +480,7 @@ YDKJAnimation.prototype.length = function() {
         for(var frameid = framestart; ((frameid<framestop) && ((val & 16) == 0)); frameid++) {
             val = this.getFrameVal(frameid);
         }
-        length = (frameid-framestart+1)*speed;
+        length = (frameid-framestart+1)*this.speed;
         if (length > maxlength) maxlength = length;
     }
 

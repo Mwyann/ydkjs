@@ -902,6 +902,9 @@ begin
   if (ftype='STR') then result:='string';
   if (ftype='STRL') then result:='stringlist';
   if (ftype='Wrds') then result:='stringlist1';
+  if (ftype='Dcoy') then result:='stringlist';
+  if (ftype='Mtch') then result:='stringlist';
+  if (ftype='Root') then result:='stringlist';
   // Utilisés pour le Couci-Couça, entre autres
   if (ftype='ANS#') then result:='answers';
   if (ftype='STR#') then result:='stringlist2';

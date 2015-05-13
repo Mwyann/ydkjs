@@ -411,7 +411,7 @@ function resources() {
                            AND q.folder = s.folder");
         $qhdr = $res->fetch();
 
-        $reslist = array();
+        $reslist = array('title' => $qhdr['title']);
         $res = $DB->query("SELECT *
                            FROM ".$DBsta.".resani a, ".$DBsta.".resfiles f
                            WHERE a.resid = f.resid
@@ -467,7 +467,7 @@ function resources() {
         unset($reslist['JackAttack/IntroRound3.2']);
         unset($reslist['JackAttack/IntroRound3.3']);
 
-        $reslist['JackAttack/Example'] = $reslist['JackAttack/Example.'.rand(1,3)];
+        $reslist['JackAttack/Example'] = $reslist['JackAttack/Example'.rand(1,3)];
         unset($reslist['JackAttack/Example1']);
         unset($reslist['JackAttack/Example2']);
         unset($reslist['JackAttack/Example3']);
@@ -476,7 +476,23 @@ function resources() {
         unset($reslist['JackAttack/NoExplain1Player']);
         unset($reslist['JackAttack/NoExplain23Players']);
 
-        //$reslist['DisOrDat/PlayersScream1'] = $reslist['DisOrDat/PlayersScream']; // TODO
+        $reslist['JackAttack/TheClue'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/2'));
+
+        $answers = array();
+        for($i = 0; $i < 14; $i++) {
+            $anslist = array();
+            for($j = 0; $j < 9; $j++) {
+                $r = -1;
+                while ($r == -1) {
+                    $r = rand(1,54);
+                    for ($jj = max(0,$j - 2); $jj < $j; $jj++) if ($anslist[$jj] == $r) $r = -1;
+                }
+                array_push($anslist,$r);
+            }
+            array_push($anslist,rand(1,9));
+            array_push($answers,$anslist);
+        }
+        $reslist['answers'] = $answers;
 
         $reslist['STR'] = $qhdr['strings'];
     }
