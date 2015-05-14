@@ -75,9 +75,11 @@ ModeJackAttack.prototype.start = function() {
     var thisMode = this;
 
     var availableQuestions = [1,2,3,4,5,6,7];
-    var answers = this.options.answers; // 9 à choisir
+    var answerseeds = this.options.answerseeds;
+    var answers = []; // 9 à choisir
     var currentQuestion = 0;
     var currentAnswer = 0;
+    var randomness = new MersenneTwister(); // Grâce à cette classe, tous les joueurs auront les mêmes probabilités d'affichage
 
     var BGMusicPlayed = 0;
     var BGMusicPos = 1;
@@ -91,18 +93,18 @@ ModeJackAttack.prototype.start = function() {
 
     var nextAnswer = function() {
         if (currentAnswer >= 9) return false;
-        currentAnswerAnim = 'ShowAnswer' + (Math.floor(Math.random()*10)+1).toString();
+        var c = currentAnswerAnim;
+        while (c == currentAnswerAnim) c = 'ShowAnswer' + (randomness.integer(1,7)+(7*(BGMusicPos-1))).toString();
+        currentAnswerAnim = c;
         currentAnswer++;
         thisMode.game.font.resetTextStyle(1510);
         thisMode.game.font.resetTextStyle(1511);
         thisMode.game.font.resetTextStyle(1512);
         thisMode.game.font.resetTextStyle(1513);
-        thisMode.game.font.resetTextStyle(1520);
-        thisMode.game.font.strings[1510] = ansList[answers[currentQuestion-1][currentAnswer-1] % ansList.length];
+        thisMode.game.font.strings[1510] = ansList[answers[currentAnswer-1]];
         thisMode.game.font.strings[1511] = thisMode.game.font.strings[1510];
         thisMode.game.font.strings[1512] = thisMode.game.font.strings[1510];
         thisMode.game.font.strings[1513] = thisMode.game.font.strings[1510];
-        thisMode.game.font.strings[1520] = thisMode.game.font.strings[1510];
         var div = thisMode[currentAnswerAnim+'.2'].getDiv();
         div.css({
             'opacity': '0'
@@ -134,7 +136,29 @@ ModeJackAttack.prototype.start = function() {
         currentQuestion++;
         currentAnswer = 0;
         thisMode.game.font.resetTextStyle(1500);
+        thisMode.game.font.resetTextStyle(1520);
         thisMode.game.font.strings[1500] = questionList[q-1];
+        thisMode.game.font.strings[1520] = matchList[q-1];
+        randomness.init_genrand(answerseeds[currentQuestion-1]);
+        answers = [];
+        while (answers.length < 9) answers.push(-1); // Initialiser le tableau avec des éléments à -1
+        var r;
+        r = randomness.integer(0,8);
+        answers[r] = ansList.length - 8 + q; // On place la bonne réponse au hasard
+        if (r == 0) answers[randomness.integer(3,8)] = ansList.length - 8 + q; // Si on la place en toute première place, ne soyons pas vaches, plaçons-la un peu plus tard ailleurs aussi
+        var i, j, c;
+        for(i = 0; i < 9; i++) if (answers[i] == -1) {
+            r = -1;
+            while (r == -1) {
+                r = randomness.integer(1,ansList.length)-1;
+                for (j = i - 2; j < i + 2; j++) if ((i >= 0) && (i < 9)) if (answers[j] == r) r = -1; // Pas la même réponse 2 avant ni 2 après
+                c = 0;
+                for (j = 0; j < i; j++) if (answers[j] == r) c++; // Pas la même réponse plus de 2 fois
+                if (c == 2) r = -1;
+            }
+            answers[i] = r;
+        }
+        randomness.init_genrand(answerseeds[currentQuestion-1]+1);
         thisMode.ShowQuestion.reset();
         thisMode.ShowQuestion.speed = Math.floor(thisMode['BGMusic' + BGMusicPos].length()/105);
         thisMode.ShowQuestion.delay(thisMode.ShowQuestion.speed*9,function(){nextAnswer()});
@@ -142,7 +166,7 @@ ModeJackAttack.prototype.start = function() {
     };
 
     var nextQuestion = function() {
-        availableQuestions.push(availableQuestions.shift());
+
         thisMode.ShowQuestion.delay(400,function(){playQuestion()});
     };
 
@@ -159,16 +183,23 @@ ModeJackAttack.prototype.start = function() {
             }
         }
         if ((BGMusicPlayed == 0) || (BGMusicPlayed == 2)) {
-            nextQuestion();
+            if (availableQuestions.length > 1) {
+                availableQuestions.push(availableQuestions.shift()); // On remet la question à la fin
+                nextQuestion();
+            } else { // Fin du jeu
+                return;
+            }
         }
     };
 
-    for(var b = 1; b <= 7; b++) this['BGMusic' + b].ended(BGMusicEnded);
-    for(var b = 1; b <= 6; b++) {
+    var b;
+    for(b = 1; b <= 7; b++) this['BGMusic' + b].ended(BGMusicEnded);
+    for(b = 1; b <= 6; b++) {
         thisMode['SFXCorrect' + b].ended(function(){
             BGMusicPos++;
             BGMusicPlayed = 0;
             thisMode['BGMusic' + BGMusicPos].play();
+            availableQuestions.shift(); // On enlève la question répondue
             nextQuestion();
         });
     }
@@ -187,59 +218,61 @@ ModeJackAttack.prototype.start = function() {
         thisMode.AudienceWrong.play();
     });
 
-
     var startGame = function() {
         thisMode.listener = bindKeyListener(function(choice) {
+            if (currentAnswer > 50) return false; // Dès qu'on a trouvé la bonne réponse on ignore les appuis sur les touches
             var buzzPlayer = 0;
             if (choice == thisMode.game.players[0].keycode) buzzPlayer = 1; // Joueur 1
             if (choice == thisMode.game.players[1].keycode) buzzPlayer = 2; // Joueur 2
             if (choice == thisMode.game.players[2].keycode) buzzPlayer = 3; // Joueur 3
 
             if (buzzPlayer) {
-                var divWrong = thisMode[currentAnswerAnim+'.2'].getDiv();
+                var Wrong;
+                var Scream;
+                var Correct;
                 if (buzzPlayer == 1) {
-                    thisMode.Player1Wrong.reset();
-                    thisMode.PlayersScream1.reset();
-                    thisMode.Player1Wrong.play();
-                    thisMode.PlayersScream1.play();
-                    divWrong.stop(true).css({
-                        'opacity': 0.8
-                    }).animate({'opacity': 0},300);
+                    Wrong = thisMode.Player1Wrong;
+                    Scream = thisMode.PlayersScream1;
+                    Correct = thisMode.Player1Correct;
                 }
                 if (buzzPlayer == 2) {
-                    thisMode.Player2Wrong.reset();
-                    thisMode.PlayersScream2.reset();
-                    thisMode.Player2Wrong.play();
-                    thisMode.PlayersScream2.play();
-                    divWrong.stop(true).css({
-                        'opacity': 0.8
-                    }).animate({'opacity': 0},300);
+                    Wrong = thisMode.Player2Wrong;
+                    Scream = thisMode.PlayersScream2;
+                    Correct = thisMode.Player2Correct;
                 }
 
                 if (buzzPlayer == 3) {
+                    Wrong = thisMode.Player3Wrong;
+                    Scream = thisMode.PlayersScream3;
+                    Correct = thisMode.Player3Correct;
+                }
+
+                if (thisMode.game.font.strings[1510] == thisMode.game.font.strings[1520]) { // Bonne réponse !
+                    if (currentAnswer > 50) return false; // On revérifie, on ne sait jamais...
+                    currentAnswer = 99;
+                    thisMode.game.players[buzzPlayer-1].score = parseInt(thisMode.game.players[buzzPlayer-1].score) + 2000;
                     thisMode['BGMusic' + BGMusicPos].free();
                     thisMode['SFXCorrect' + BGMusicPos].play();
                     thisMode.ShowQuestion.reset();
                     thisMode[currentAnswerAnim+'.1'].reset();
                     thisMode[currentAnswerAnim+'.2'].reset();
-                    currentAnswer = 99;
                     thisMode.game.font.resetTextStyle(1500);
                     thisMode.QuestionCorrect.play();
                     thisMode.AnswerCorrect.play();
-                    thisMode.Player3Correct.play();
+                    Correct.play();
                     thisMode.AudienceCorrect.reset();
                     thisMode.AudienceCorrect.play();
-                }
-
-                /*if (buzzPlayer == 3) {
-                    thisMode.Player3Wrong.reset();
-                    thisMode.PlayersScream3.reset();
-                    thisMode.Player3Wrong.play();
-                    thisMode.PlayersScream3.play();
+                } else {
+                    thisMode.game.players[buzzPlayer-1].score = parseInt(thisMode.game.players[buzzPlayer-1].score) - 2000;
+                    var divWrong = thisMode[currentAnswerAnim+'.2'].getDiv();
+                    Wrong.reset();
+                    Scream.reset();
+                    Wrong.play();
+                    Scream.play();
                     divWrong.stop(true).css({
                         'opacity': 0.8
-                    }).animate({'opacity': 0},300);
-                }*/
+                    }).delay(200).animate({'opacity': 0},100);
+                }
             }
         });
         thisMode.BGMusic1.play();
@@ -255,7 +288,7 @@ ModeJackAttack.prototype.start = function() {
         })
     });
 
-    //this.TheClue.ended(-800,function(){ // En dernier recours, tant pis, on fait un petit blanc pour éviter de retartir dans la boucle
+    //this.TheClue.ended(-800,function(){ // TODO En dernier recours, tant pis, on fait un petit blanc pour éviter de repartir dans la boucle
     //    thisMode.IntroLoopMusic.ended(false);
     //});
 

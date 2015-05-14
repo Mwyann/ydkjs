@@ -816,7 +816,7 @@ YDKJAPI.prototype.initgame = function() {
                     eval('strtmp = '+reslist['STR']);
                     mode.STR = strtmp;
                     mode.options.title = reslist['title'];
-                    mode.options.answers = reslist['answers'];
+                    mode.options.answerseeds = reslist['answerseeds'];
                 }
 
                 ready = 1;

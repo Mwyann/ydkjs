@@ -478,21 +478,16 @@ function resources() {
 
         $reslist['JackAttack/TheClue'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/2'));
 
-        $answers = array();
+        $answerseeds = array();
         for($i = 0; $i < 14; $i++) {
-            $anslist = array();
-            for($j = 0; $j < 9; $j++) {
-                $r = -1;
-                while ($r == -1) {
-                    $r = rand(1,54);
-                    for ($jj = max(0,$j - 2); $jj < $j; $jj++) if ($anslist[$jj] == $r) $r = -1;
-                }
-                array_push($anslist,$r);
+            $r = -1;
+            while ($r == -1) {
+                $r = rand(1,9999999);
+                for($j = 0; $j < $i; $j++) if ($answerseeds[$j] == $r) $r = -1;
             }
-            array_push($anslist,rand(1,9));
-            array_push($answers,$anslist);
+            array_push($answerseeds,$r);
         }
-        $reslist['answers'] = $answers;
+        $reslist['answerseeds'] = $answerseeds;
 
         $reslist['STR'] = $qhdr['strings'];
     }
