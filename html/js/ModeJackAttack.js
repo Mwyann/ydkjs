@@ -75,10 +75,10 @@ ModeJackAttack.prototype.start = function() {
 
     var availableQuestions = [1,2,3,4,5,6,7];
     var answerseeds = this.options.answerseeds;
-    var answers = []; // 9 à choisir
+    var answers = []; // 9 Ã  choisir
     var currentQuestion = 0;
     var currentAnswer = 0;
-    var randomness = new MersenneTwister(); // Grâce à cette classe, tous les joueurs auront les mêmes probabilités d'affichage
+    var randomness = new MersenneTwister(); // GrÃ¢ce Ã  cette classe, tous les joueurs auront les mÃªmes probabilitÃ©s d'affichage
 
     var BGMusicPlayed = 0;
     var BGMusicPos = 1;
@@ -147,19 +147,19 @@ ModeJackAttack.prototype.start = function() {
         thisMode.game.font.strings[1520] = matchList[q-1];
         randomness.init_genrand(answerseeds[currentQuestion-1]);
         answers = [];
-        while (answers.length < 9) answers.push(-1); // Initialiser le tableau avec des éléments à -1
+        while (answers.length < 9) answers.push(-1); // Initialiser le tableau avec des Ã©lÃ©ments Ã  -1
         var r;
         r = randomness.integer(0,8);
-        answers[r] = ansList.length - 8 + q; // On place la bonne réponse au hasard
-        if (r == 0) answers[randomness.integer(3,8)] = ansList.length - 8 + q; // Si on la place en toute première place, ne soyons pas vaches, plaçons-la un peu plus tard ailleurs aussi
+        answers[r] = ansList.length - 8 + q; // On place la bonne rÃ©ponse au hasard
+        if (r == 0) answers[randomness.integer(3,8)] = ansList.length - 8 + q; // Si on la place en toute premiÃ¨re place, ne soyons pas vaches, plaÃ§ons-la un peu plus tard ailleurs aussi
         var i, j, c;
         for(i = 0; i < 9; i++) if (answers[i] == -1) {
             r = -1;
             while (r == -1) {
                 r = randomness.integer(1,ansList.length)-1;
-                for (j = i - 2; j < i + 2; j++) if ((i >= 0) && (i < 9)) if (answers[j] == r) r = -1; // Pas la même réponse 2 avant ni 2 après
+                for (j = i - 2; j < i + 2; j++) if ((i >= 0) && (i < 9)) if (answers[j] == r) r = -1; // Pas la mÃªme rÃ©ponse 2 avant ni 2 aprÃ¨s
                 c = 0;
-                for (j = 0; j < i; j++) if (answers[j] == r) c++; // Pas la même réponse plus de 2 fois
+                for (j = 0; j < i; j++) if (answers[j] == r) c++; // Pas la mÃªme rÃ©ponse plus de 2 fois
                 if (c == 2) r = -1;
             }
             answers[i] = r;
@@ -190,7 +190,7 @@ ModeJackAttack.prototype.start = function() {
         }
         if ((BGMusicPlayed == 0) || (BGMusicPlayed == 2)) {
             if (availableQuestions.length > 1) {
-                availableQuestions.push(availableQuestions.shift()); // On remet la question à la fin
+                availableQuestions.push(availableQuestions.shift()); // On remet la question Ã  la fin
                 nextQuestion();
             } else { // Fin du jeu
                 endGame();
@@ -206,7 +206,7 @@ ModeJackAttack.prototype.start = function() {
             BGMusicPos++;
             BGMusicPlayed = 0;
             thisMode['BGMusic' + BGMusicPos].play();
-            availableQuestions.shift(); // On enlève la question répondue
+            availableQuestions.shift(); // On enlÃ¨ve la question rÃ©pondue
             nextQuestion();
         });
     }
@@ -227,7 +227,7 @@ ModeJackAttack.prototype.start = function() {
 
     var startGame = function() {
         thisMode.listener = bindKeyListener(function(choice) {
-            if (currentAnswer > 50) return false; // Dès qu'on a trouvé la bonne réponse on ignore les appuis sur les touches
+            if (currentAnswer > 50) return false; // DÃ¨s qu'on a trouvÃ© la bonne rÃ©ponse on ignore les appuis sur les touches
             var buzzPlayer = 0;
             if (choice == thisMode.game.players[0].keycode) buzzPlayer = 1; // Joueur 1
             if (choice == thisMode.game.players[1].keycode) buzzPlayer = 2; // Joueur 2
@@ -254,8 +254,8 @@ ModeJackAttack.prototype.start = function() {
                     Correct = thisMode.Player3Correct;
                 }
 
-                if (thisMode.game.font.strings[1510] == thisMode.game.font.strings[1520]) { // Bonne réponse !
-                    if (currentAnswer > 50) return false; // On revérifie, on ne sait jamais...
+                if (thisMode.game.font.strings[1510] == thisMode.game.font.strings[1520]) { // Bonne rÃ©ponse !
+                    if (currentAnswer > 50) return false; // On revÃ©rifie, on ne sait jamais...
                     currentAnswer = 99;
                     thisMode.game.players[buzzPlayer-1].score = parseInt(thisMode.game.players[buzzPlayer-1].score) + 2000;
                     thisMode['BGMusic' + BGMusicPos].free();
@@ -306,7 +306,7 @@ ModeJackAttack.prototype.start = function() {
         })
     });
 
-    this.TheClue.ended(-800,function(){ // TODO En dernier recours, tant pis, on fait un petit blanc pour éviter de repartir dans la boucle
+    this.TheClue.ended(-800,function(){ // TODO En dernier recours, tant pis, on fait un petit blanc pour Ã©viter de repartir dans la boucle
         thisMode.IntroLoopMusic.ended(false);
         thisMode.IntroLoopMusic.ended(function(){
             this.stop();
@@ -343,7 +343,7 @@ ModeJackAttack.prototype.start = function() {
     this.ExplainRules.ended(300,endOfRules2);
     this.SkipRules.ended(300,endOfRules2);
 
-    var endOfRules1 = function(){ // On ne joue plus l'animation "drapeau" juste avant de passer à l'énoncé de l'indice
+    var endOfRules1 = function(){ // On ne joue plus l'animation "drapeau" juste avant de passer Ã  l'Ã©noncÃ© de l'indice
         thisMode.LogoAnimation1.ended(false);
         thisMode.LogoAnimation1.ended(function(){
             this.reset();
@@ -415,7 +415,7 @@ ModeJackAttack.prototype.start = function() {
     });
 
     var ripBG = function() {
-        thisMode.game.html.screen.find('.markedAsRemoved').removeClass('markedAsRemoved'); // Ne rien enlever automatiquement, ce sera fait à la fin de l'animation
+        thisMode.game.html.screen.find('.markedAsRemoved').removeClass('markedAsRemoved'); // Ne rien enlever automatiquement, ce sera fait Ã  la fin de l'animation
         var ripdiv = thisMode.RipBG.getDiv();
         ripdiv.css({
             'width': '0px',
@@ -478,9 +478,9 @@ ModeJackAttack.prototype.start = function() {
         ripBG();
     });
 
-    endgameready = this.game.api.gamemode(this); // Préchargement de la fin du jeu
+    endgameready = this.game.api.gamemode(this); // PrÃ©chargement de la fin du jeu
 
-    if (false) {
+    if (false) { // DEBUG : false = on affiche tout le jeu, y compris les explications, true = on zappe l'intro et on passe directement au jeu
         thisMode.game.html.screen.html('');
         startGame();
     } else this.CategorySelected.play();
