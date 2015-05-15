@@ -206,8 +206,13 @@ ModeJackAttack.prototype.start = function() {
             BGMusicPos++;
             BGMusicPlayed = 0;
             thisMode['BGMusic' + BGMusicPos].play();
-            availableQuestions.shift(); // On enlève la question répondue
-            nextQuestion();
+            if (availableQuestions.length > 1) {
+                availableQuestions.shift(); // On enlève la question répondue
+                nextQuestion();
+            } else { // Fin du jeu
+                endGame();
+                return;
+            }
         });
     }
 
