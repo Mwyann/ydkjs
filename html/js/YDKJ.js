@@ -70,3 +70,22 @@ YDKJ.prototype.fullscreen = function(f) {
         this.game.fullscreen(f);
     });
 };
+
+(function() {
+    var oldWindowError = window.onerror;
+    window.onerror = function(msg, url, line, col, error) {
+        jQuery.ajax({
+            url: 'api/report-error.php',
+            type: 'post',
+            data: {msg:msg, url:url, line:line, col:col, error:error},
+            success: function(html, status, xhr) {
+                console.log('YDKJS: An error has been found and has been reported to the developer.');
+            },
+            error: function (xhr, ajaxOptions, thrownError){
+                console.log('YDKJS: An error has been found but couldn\'t be reported.');
+            }
+        });
+        if (oldWindowError) oldWindowError.apply(this,arguments);
+    };
+})();
+

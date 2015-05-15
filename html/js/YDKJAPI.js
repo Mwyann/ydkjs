@@ -666,7 +666,7 @@ YDKJAPI.prototype.initdemo = function() {
         return function(f) {f(reslist)}
     };
 
-    YDKJAPI.prototype.players = function() {
+    YDKJAPI.prototype.gameinfo = function() {
         var playernames = shuffle(['David','Marité','Marjorie','Frédéric','Olivier','Mathieu','Alicia','Fabrice','Jackqueline','Bruno','Natacha','Jeff','Henri','Barbara','Christophe','Luc','Danièle','Serge','Anita','Alain','Denise','Marcel','Lucette','Gilles','Julien','Adrienne','Camille','Anna','Laurel','Diane','Michelle']);
         var players = [
             {name:playernames[0],score:0,keycode:113},
@@ -674,7 +674,7 @@ YDKJAPI.prototype.initdemo = function() {
             {name:playernames[2],score:0,keycode:112}
         ];
 
-        return function(f) {f(players)}
+        return function(f) {f({players: players, locale:'fr_FR', engineVersion: 2})}
     };
 };
 
@@ -843,10 +843,10 @@ YDKJAPI.prototype.initgame = function() {
         };
     };
 
-    YDKJAPI.prototype.players = function() {
-        var data = {call: 'players'};
+    YDKJAPI.prototype.gameinfo = function() {
+        var data = {call: 'gameinfo'};
 
-        var players;
+        var gamedata;
         var ready = 0;
         var readyfunctions = [];
 
@@ -855,13 +855,11 @@ YDKJAPI.prototype.initgame = function() {
             type: 'post',
             data: data,
             success: function(html, status, xhr) {
-                var data = getHeaderJSON(xhr);
-
-                players = data['players'];
+                gamedata = getHeaderJSON(xhr);
 
                 ready = 1;
                 for(var i = 0; i < readyfunctions.length; i++) {
-                    readyfunctions[i].call(this,players);
+                    readyfunctions[i].call(this,gamedata);
                 }
             },
             error: function (xhr, ajaxOptions, thrownError){
@@ -870,7 +868,7 @@ YDKJAPI.prototype.initgame = function() {
         });
 
         return function(f) {
-            if (!ready) readyfunctions.push(f); else f.call(this,players);
+            if (!ready) readyfunctions.push(f); else f.call(this,gamedata);
         };
     };
 };

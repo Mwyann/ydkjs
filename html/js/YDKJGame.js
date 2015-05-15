@@ -7,12 +7,10 @@ function YDKJGame(html, demomode) {
     this.api = new YDKJAPI(this, demomode);
     this.font = new YDKJFont();
     this.demomode = demomode;
-    //this.engineVersion = 2;
     jQuery.fx.interval = 66;
-    this.playersready = this.api.players();
+    this.gameinfoready = this.api.gameinfo();
     this.gamemodeready = this.api.gamemode();
     this.currentmode = 0;
-    this.locale = 'fr_FR';
 
     // Gestion du fullscreen
     var onresize = function() {};
@@ -69,8 +67,10 @@ function YDKJGame(html, demomode) {
 YDKJGame.prototype.start = function() {
     var thisGame = this;
     this.font.preload(function () {
-        thisGame.playersready(function (players) {
-            thisGame.players = players;
+        thisGame.gameinfoready(function (gameinfo) {
+            thisGame.players = gameinfo.players;
+            thisGame.locale = gameinfo.locale;
+            thisGame.engineVersion = gameinfo.engineVersion;
             thisGame.gamemodeready(function (gamemode) {
                 gamemode.start();
             });

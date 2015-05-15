@@ -146,7 +146,7 @@ $(document).ready(function() {
 
     // Set the font
     var font = 'JackRoman'; // ['JackCondensed','JackExtraCond','JackInput','JackRoman']
-    var string = "2000 F";
+    var string = "+ 2000F";
 
     function checkFontHeight(string, totalheight) {
         var sp = string.split("\n");
@@ -177,7 +177,7 @@ $(document).ready(function() {
     waitForWebfonts([font], function() {
                 checkFontHeight(string, 19);
                 checkFontHeight("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!", 23);
-                //checkFontHeight("giItT1WQy@!-/#", 23);
+                //checkFontHeight("giItT1WQy@!-/’#", 23);
         }
     );
 

@@ -1,6 +1,7 @@
 <?php
 
 require_once 'mysql.inc.php';
+require_once 'local/config.inc.php';
 
 if (!isset($_POST['call'])) die('API ready 1');
 $call = $_POST['call'];
@@ -9,6 +10,45 @@ function uriToUid($uri) {
     global $GETsalt;
     $base64 = base64_encode($uri);
     return 'api/get.php?uid='.$base64.sha1($base64.$GETsalt).'&type=';
+}
+
+function gameinfo() {
+    global $VERSION;
+    $players = array();
+    $locale = '';
+    $engineVersion = 2;
+    switch($VERSION) {
+        case 'fr': $players = array(
+                        array('name' => 'Joueur 1','score' => 0,'keycode' => 113),
+                        array('name' => 'Joueur 2','score' => 0,'keycode' => 98),
+                        array('name' => 'Joueur 3','score' => 0,'keycode' => 112)
+                    );
+                    $locale = 'fr_FR';
+                    $engineVersion = 2;
+                    break;
+        case 'uk': $players = array(
+                        array('name' => 'Player 1','score' => 0,'keycode' => 113),
+                        array('name' => 'Player 2','score' => 0,'keycode' => 98),
+                        array('name' => 'Player 3','score' => 0,'keycode' => 112)
+                    );
+                    $locale = 'en_GB';
+                    $engineVersion = 2;
+                    break;
+        case 'de1': $players = array(
+                        array('name' => 'Kandidat 1','score' => 0,'keycode' => 113),
+                        array('name' => 'Kandidat 2','score' => 0,'keycode' => 98),
+                        array('name' => 'Kandidat 3','score' => 0,'keycode' => 112)
+                    );
+                    $locale = 'de_DE';
+                    $engineVersion = 2;
+                    break;
+    }
+
+    header('X-JSON: '.json_encode(array(
+            'players' => $players,
+            'locale' => $locale,
+            'engineVersion' => $engineVersion
+        )));
 }
 
 function gamemode() {
@@ -32,7 +72,7 @@ function gamemode() {
 }
 
 function resources() {
-    global $DB, $DBsta;
+    global $DB, $DBsta, $DEMOMODE, $VERSION;
     $reslist = array();
 
     if (!isset($_POST['mode'])) die('Resources 1');
@@ -148,23 +188,48 @@ function resources() {
 
         $reslist['questiontitles'] = array();
 
+        $demo = '';
         if ($questionnumber == 7) {
+            if ($DEMOMODE) {
+                switch ($VERSION) {
+                    case 'fr': $demo = "AND id LIKE 'JC_'"; break;
+                    case 'uk': $demo = "AND id LIKE 'JG_'"; break;
+                    case 'de1': $demo = "AND id LIKE 'JC_'"; break;
+                }
+            }
             $res = $DB->query("SELECT *
                                FROM ".$DBsta.".qhdr
                                WHERE qtype = 'JackAttack'
+                               ".$demo."
                                ORDER BY RAND()
                                LIMIT 0,3");
         } elseif ($questionnumber == 4) {
+            if ($DEMOMODE) {
+                switch ($VERSION) {
+                    case 'fr': $demo = "AND id LIKE 'DB_'"; break;
+                    case 'uk': $demo = "AND id LIKE 'DD_'"; break;
+                    case 'de1': $demo = "AND id LIKE 'PB_'"; break;
+                }
+            }
             $res = $DB->query("SELECT *
                                FROM ".$DBsta.".qhdr
                                WHERE qtype = 'DisOrDat'
+                               ".$demo."
                                ORDER BY RAND()
                                LIMIT 0,3");
         } else {
+            if ($DEMOMODE) {
+                switch ($VERSION) {
+                    case 'fr': $demo = "AND (id LIKE 'AA_' OR id LIKE 'AB_')"; break;
+                    case 'uk': $demo = "AND (id LIKE 'AA_' OR id LIKE 'AB_')"; break;
+                    case 'de1': $demo = "AND (id LIKE 'AA_' OR id LIKE 'AB_')"; break;
+                }
+            }
             $res = $DB->query("SELECT *
                                FROM ".$DBsta.".qhdr
                                WHERE qtype = 'Question'
                                AND qsubtype = 'Normal'
+                               ".$demo."
                                AND NOT EXISTS (SELECT * FROM ".$DBsta.".qhdr a WHERE qhdr.id = a.forcenext)
                                ORDER BY RAND()
                                LIMIT 0,3");
@@ -698,20 +763,9 @@ function resources() {
         )));
 }
 
-function players() {
-    $players = array(
-        array('name' => 'Joueur 1','score' => 0,'keycode' => 113),
-        array('name' => 'Joueur 2','score' => 0,'keycode' => 98),
-        array('name' => 'Joueur 3','score' => 0,'keycode' => 112)
-    );
-    header('X-JSON: '.json_encode(array(
-            'players' => $players
-        )));
-}
-
 switch ($call) {
+    case 'gameinfo': gameinfo(); break;
     case 'gamemode': gamemode(); break;
     case 'resources': resources(); break;
-    case 'players': players(); break;
     default: die('API ready 2');
 }

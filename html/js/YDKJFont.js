@@ -52,27 +52,27 @@ function YDKJFont() {
         1492:{font:'JackRoman',size:23,color:['#FFF','#AAA','#666']}, // Player's score
         1497:{font:'JackRoman',size:39,color:['#0F0','#F00']}, // Player's new score
         // JackAttack
-        1499:{font:'JackCondensed',size:40,color:['#F00','#600','#A00']}, // Clue TODO: check real font size
-        1500:{font:'JackRoman',size:[61,38,29,23],color:['#999','#666','#333']}, // Question TODO: check real font size
-        1510:{font:'JackCondensed',size:[32,28,22],color:['#F00','#600','#A00']}, // Answers TODO: check real font size
-        1511:{font:'JackCondensed',size:[32,28,22],color:'#F00'},
-        1512:{font:'JackCondensed',size:[32,28,22],color:'#F00',opacity:0.40},
-        1513:{font:'JackCondensed',size:[32,28,22],color:'#F00',opacity:0.15},
-        1520:{font:'JackCondensed',size:[32,28,22],color:'#F00'}, // Correct answer TODO: check real font size
-        210:{font:'JackRoman',size:20,color:['#FFF','#AAA']}, // Players names when correct TODO: check real font size
-        220:{font:'JackRoman',size:20,color:['#FFF','#AAA']},
-        230:{font:'JackRoman',size:20,color:['#FFF','#AAA']},
-        215:{font:'JackRoman',size:20,color:['#0F0','#0A0','#060']}, // 2000F when correct TODO: check real font size
-        225:{font:'JackRoman',size:20,color:['#0F0','#0A0','#060']},
-        235:{font:'JackRoman',size:20,color:['#0F0','#0A0','#060']},
-        211:{font:'JackRoman',size:20,color:['#FFF','#666']}, // Players names when wrong TODO: check real font size
-        221:{font:'JackRoman',size:20,color:['#FFF','#666']},
-        231:{font:'JackRoman',size:20,color:['#FFF','#666']},
-        216:{font:'JackRoman',size:20,color:['#F00','#A00','#600']}, // 2000F when wrong TODO: check real font size
-        226:{font:'JackRoman',size:20,color:['#F00','#A00','#600']},
-        236:{font:'JackRoman',size:20,color:['#F00','#A00','#600']},
+        1499:{font:'JackExtraCond',size:64,color:['#F00','#600','#A00']}, // Clue
+        1500:{font:'JackRoman',size:[61,38,29,23],color:['#999','#666','#333']}, // Question
+        1510:{font:'JackExtraCond',size:[64,42,32],color:['#F00','#600','#A00']}, // Answers
+        1511:{font:'JackExtraCond',size:[64,42,32],color:'#F00'},
+        1512:{font:'JackExtraCond',size:[64,42,32],color:'#F00',opacity:0.40},
+        1513:{font:'JackExtraCond',size:[64,42,32],color:'#F00',opacity:0.15},
+        1520:{font:'JackExtraCond',size:[64,42,32],color:'#F00'}, // Correct answer
+        210:{font:'JackRoman',size:39,color:['#FFF','#AAA']}, // Players names when correct
+        220:{font:'JackRoman',size:39,color:['#FFF','#AAA']},
+        230:{font:'JackRoman',size:39,color:['#FFF','#AAA']},
+        215:{font:'JackRoman',size:23,color:['#0F0','#0A0','#060']}, // 2000F when correct
+        225:{font:'JackRoman',size:23,color:['#0F0','#0A0','#060']},
+        235:{font:'JackRoman',size:23,color:['#0F0','#0A0','#060']},
+        211:{font:'JackRoman',size:39,color:['#FFF','#666']}, // Players names when wrong
+        221:{font:'JackRoman',size:39,color:['#FFF','#666']},
+        231:{font:'JackRoman',size:39,color:['#FFF','#666']},
+        216:{font:'JackRoman',size:23,color:['#F00','#A00','#600']}, // 2000F when wrong
+        226:{font:'JackRoman',size:23,color:['#F00','#A00','#600']},
+        236:{font:'JackRoman',size:23,color:['#F00','#A00','#600']},
         // End
-        1610:{font:'JackRoman',size:[61,38,29,23],color:'#FFF'}, // TODO: check real font size
+        1610:{font:'JackRoman',size:[61,38,29,23],color:'#FFF'}, // TODO: check real font sizes
         1611:{font:'JackRoman',size:[61,38,29,23],color:'#FFF'},
         1615:{font:'JackRoman',size:[61,38,29,23],color:'#FFF'},
         1616:{font:'JackRoman',size:[61,38,29,23],color:'#FFF'},

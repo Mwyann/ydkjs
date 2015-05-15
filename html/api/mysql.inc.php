@@ -1,6 +1,6 @@
 <?php
 
-require_once 'mysql-data.inc.php';
+require_once 'local/mysql-data.inc.php';
 
 // Connexion bdd PDO
 try{

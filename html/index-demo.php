@@ -5,15 +5,16 @@
 <title>You Don't Know Jack® DEMO FR</title>
 <link href="css/ydkj.css" rel="stylesheet"/>
 <script src="js/jquery-1.11.3.min.js" type="text/javascript"></script>
-<script src="js/YDKJ.js?ver=3" type="text/javascript"></script>
+<script src="js/YDKJ.js?ver=4" type="text/javascript"></script>
 
 <script type="text/javascript">
 
 jQuery(document).ready(function() {
-  jQuery('#startbutton').val("J'ai compris, commencer le jeu");
+    jQuery('#startbuttondemo').val("J'ai compris, commencer le jeu (démo originale, 4 questions disponibles, 3 Couci-Couça)");
+    jQuery('#startbuttonnewdemo').val("Ou bien, jouer à une démo en 7 questions (avec plus de questions disponibles, et le JackAttack)");
 });
 
-function startgame() {
+function startgame(demo) {
     var screen = jQuery('#screen');
     jQuery('#warning').hide();
     screen.show();
@@ -27,7 +28,7 @@ function startgame() {
         });
         return false;
     });
-    game.demo();
+    if (demo) game.demo(); else game.start();
 }
 
 </script>
@@ -55,7 +56,8 @@ function startgame() {
      <br/>
      <u>UK version available</u>! Try the demo : <a style="color:#F00" href="http://demo.ydkj.co.uk/">demo.ydkj.co.uk</a>
     </p>
-    <p style="text-align:center"><br/><input type="button" onclick="startgame()" value="Chargement..." id="startbutton" /><br/>
+    <p style="text-align:center"><br/><input type="button" onclick="startgame(true)" value="Chargement..." id="startbuttondemo" />
+        <br/><input type="button" onclick="startgame(false)" value="Chargement..." id="startbuttonnewdemo" /><br/>
         <span style="font-size:12px">Super, <span style="color:#FF0"><?php include 'count.txt'; ?></span> personnes ont osé essayer !</span></p>
   </div>
   <div id="screen" style="display:none;margin-left:auto;margin-right:auto">
