@@ -187,7 +187,7 @@ if (!isset($_SESSION['id'])) {
         ?>
         <div style="text-align:center;font-size:26px">Alpha-test disponible (questions QCM du jeu original) !<br/>Inscription : envoyez un mail à <a href="mailto:alpha@ydkj.fr">alpha@ydkj.fr</a></div>
         <div style="text-align:center;font-size:20px;margin:20px">Vous possédez déjà un compte ? <a href="?login=1">Connectez-vous !</a></div>
-        <div style="text-align:center;font-size:20px;margin:20px">Testez la démo du jeu (4 questions) : <a href="http://demo.ydkj.fr/">demo.ydkj.fr</a></div>
+        <div style="text-align:center;font-size:20px;margin:20px">Testez la démo du jeu : <a href="http://demo.ydkj.fr/">demo.ydkj.fr</a></div>
         <div id="warning" style="border:#F00 1px solid; background-color:#300;color:#FFF;margin:50px;padding:20px;font-family:JackCondensed;font-size:18px">
             <p style="text-align:center;font-size:24px;font-weight:bold">ATTENTION : A LIRE AVANT DE JOUER ! <span style="font-size:20px">(Si si, vraiment, au moins ce qui est <u>souligné</u>)</span></p>
             <p>

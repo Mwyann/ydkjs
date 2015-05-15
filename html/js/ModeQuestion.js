@@ -100,7 +100,6 @@ ModeQuestion.prototype.start = function() {
 
     var nextcategoryready = 0;
 
-
     var pressKey = function(choice) {
         if (thisMode.currentPlayer == 0) {
             if (thisMode.buzzPlayer != 0) return false; // On a déjà un joueur en attente
@@ -174,7 +173,6 @@ ModeQuestion.prototype.start = function() {
                         break;
                 }
                 thisMode.JingleTimer.stop();
-                thisMode.SFXPlayerKey.reset();
                 thisMode.SFXPlayerKey.play();
             }
         }
