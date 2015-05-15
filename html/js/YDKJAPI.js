@@ -701,6 +701,7 @@ YDKJAPI.prototype.initgame = function() {
         if (currentmode === undefined) data['currentmode'] = 'None';
         if (currentmode instanceof ModeIntro) data['currentmode'] = 'Intro';
         if ((currentmode instanceof ModeQuestion) || (currentmode instanceof ModeDisOrDat)) {data['currentmode'] = 'Category'; data['category'] = 1; data['questionnumber'] = parseInt(currentmode.options.questionnumber)+1;}
+        if (currentmode instanceof ModeJackAttack) data['currentmode'] = 'JackAttack';
 
         var newmode;
         var ready = 0;
@@ -717,6 +718,7 @@ YDKJAPI.prototype.initgame = function() {
 
                 if (newmodedata['mode'] == 'Intro') newmode = new YDKJMode(thisAPI.game, 'Intro', {});
                 if (newmodedata['mode'] == 'Category') newmode = new YDKJMode(thisAPI.game, 'Category', {category: newmodedata['category'], questionnumber: newmodedata['questionnumber'], chooseplayer: newmodedata['chooseplayer']});
+                if (newmodedata['mode'] == 'End') newmode = new YDKJMode(thisAPI.game, 'End', {});
 
                 ready = 1;
                 for(var i = 0; i < readyfunctions.length; i++) {
@@ -759,6 +761,9 @@ YDKJAPI.prototype.initgame = function() {
             data['mode'] = 'JackAttack';
             data['category'] = mode.options.category;
             data['id'] = mode.options.id;
+        }
+        else if (mode instanceof ModeEnd) {
+            data['mode'] = 'End';
         }
         else if (mode instanceof YDKJTimer) {
             data['mode'] = 'Timer'+mode.timerType;
@@ -817,6 +822,10 @@ YDKJAPI.prototype.initgame = function() {
                     mode.STR = strtmp;
                     mode.options.title = reslist['title'];
                     mode.options.answerseeds = reslist['answerseeds'];
+                }
+
+                if (mode instanceof ModeEnd) {
+                    mode.options.highscores = reslist['highscores'];
                 }
 
                 ready = 1;

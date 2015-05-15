@@ -587,14 +587,14 @@ ModeQuestion.prototype.start = function() {
     this.game.font.resetTextStyle(1100);
     this.game.font.resetTextStyle(1210);
     this.game.font.resetTextStyle(1215);
-    this.game.font.strings[1100] = getSTRfromID(thisMode.STR,'STR',1);
+    this.game.font.strings[1100] = getSTRfromID(this.STR,'STR',1);
     this.game.font.strings[1200] = this.game.font.strings[1100];
-    this.game.font.strings[1205] = thisMode.game.displayCurrency(thisMode.options.value);
-    this.game.font.strings[1210] = getSTRfromID(thisMode.STR,'STR',2);
-    this.game.font.strings[1211] = getSTRfromID(thisMode.STR,'STR',3);
-    this.game.font.strings[1212] = getSTRfromID(thisMode.STR,'STR',4);
-    this.game.font.strings[1213] = getSTRfromID(thisMode.STR,'STR',5);
-    this.game.font.strings[1214] = getSTRfromID(thisMode.STR,'STR',6);
+    this.game.font.strings[1205] = this.game.displayCurrency(this.options.value);
+    this.game.font.strings[1210] = getSTRfromID(this.STR,'STR',2);
+    this.game.font.strings[1211] = getSTRfromID(this.STR,'STR',3);
+    this.game.font.strings[1212] = getSTRfromID(this.STR,'STR',4);
+    this.game.font.strings[1213] = getSTRfromID(this.STR,'STR',5);
+    this.game.font.strings[1214] = getSTRfromID(this.STR,'STR',6);
     this.game.font.strings[1215] = this.game.font.strings[1210+parseInt(this.correctanswer)];
 
     this.ShowCategory.ended(150,function() {
@@ -616,9 +616,9 @@ ModeQuestion.prototype.start = function() {
         });
     });
 
-    thisMode.game.html.screen.html(''); // Je vide manuellement l'écran.
+    this.game.html.screen.html(''); // Je vide manuellement l'écran.
 
     this.JingleQuestion.play();
 
-    nextcategoryready = this.game.api.gamemode(thisMode); // Préchargement de la prochaine catégorie
+    nextcategoryready = this.game.api.gamemode(this); // Préchargement de la prochaine catégorie
 };

@@ -29,7 +29,6 @@ ModeJackAttack.prototype.preload = function(resources) {
     this.SFXCorrect5 = new YDKJAnimation(resources['JackAttack/SFXCorrect5']);
     this.SFXCorrect6 = new YDKJAnimation(resources['JackAttack/SFXCorrect6']);
     this.SFXCorrect7 = new YDKJAnimation(resources['JackAttack/SFXCorrect7']);
-    this.EndMusic = new YDKJAnimation(resources['JackAttack/EndMusic']);
 
     this.AudienceCorrect = new YDKJAnimation(resources['JackAttack/AudienceCorrect']);
     this.AudienceCorrect.volume(50);
@@ -90,6 +89,13 @@ ModeJackAttack.prototype.start = function() {
     jQuery.merge(ansList, matchList);
 
     var currentAnswerAnim;
+    var endgameready;
+
+    var endGame = function() {
+        endgameready(function(endgame) {
+            endgame.start();
+        });
+    };
 
     var nextAnswer = function() {
         if (currentAnswer >= 9) return false;
@@ -166,7 +172,6 @@ ModeJackAttack.prototype.start = function() {
     };
 
     var nextQuestion = function() {
-
         thisMode.ShowQuestion.delay(400,function(){playQuestion()});
     };
 
@@ -179,6 +184,7 @@ ModeJackAttack.prototype.start = function() {
                 BGMusicPlayed = 0;
                 thisMode['BGMusic' + BGMusicPos].play();
             } else { // Fin du jeu
+                endGame();
                 return;
             }
         }
@@ -187,6 +193,7 @@ ModeJackAttack.prototype.start = function() {
                 availableQuestions.push(availableQuestions.shift()); // On remet la question à la fin
                 nextQuestion();
             } else { // Fin du jeu
+                endGame();
                 return;
             }
         }
@@ -256,6 +263,13 @@ ModeJackAttack.prototype.start = function() {
                     thisMode.ShowQuestion.reset();
                     thisMode[currentAnswerAnim+'.1'].reset();
                     thisMode[currentAnswerAnim+'.2'].reset();
+                    thisMode.Player1Wrong.reset();
+                    thisMode.PlayersScream1.reset();
+                    thisMode.Player2Wrong.reset();
+                    thisMode.PlayersScream2.reset();
+                    thisMode.Player3Wrong.reset();
+                    thisMode.PlayersScream3.reset();
+                    thisMode.AudienceWrong.reset();
                     thisMode.game.font.resetTextStyle(1500);
                     thisMode.QuestionCorrect.play();
                     thisMode.AnswerCorrect.play();
@@ -281,19 +295,27 @@ ModeJackAttack.prototype.start = function() {
 
     this.ShowClue.ended(function(){
         thisMode.TheClue.ended(function(){
-            thisMode.IntroLoopMusic.ended(function(){
-                this.free();
+            var st = function() {
+                thisMode.IntroLoopMusic.free();
                 startGame();
-            });
+            };
+            if (thisMode.IntroLoopMusic.isplaying) {
+                thisMode.IntroLoopMusic.ended(false);
+                thisMode.IntroLoopMusic.ended(st);
+            } else st();
         })
     });
 
-    //this.TheClue.ended(-800,function(){ // TODO En dernier recours, tant pis, on fait un petit blanc pour éviter de repartir dans la boucle
-    //    thisMode.IntroLoopMusic.ended(false);
-    //});
+    this.TheClue.ended(-800,function(){ // TODO En dernier recours, tant pis, on fait un petit blanc pour éviter de repartir dans la boucle
+        thisMode.IntroLoopMusic.ended(false);
+        thisMode.IntroLoopMusic.ended(function(){
+            this.stop();
+        })
+    });
 
     var explainRules = 2;
     var showClue = 0;
+    var skiplistener = 0;
 
     this.LogoHide.ended(200,function(){
         this.free();
@@ -301,25 +323,36 @@ ModeJackAttack.prototype.start = function() {
         thisMode.TheClue.play();
     });
 
-    this.ExplainRules.ended(300,function(){
+    thisMode.HideSkipText.ended(function(){
+        this.free();
+    });
+
+    var endOfRules2 = function(){
         showClue = function() {
+            if (skiplistener) unbindKeyListener(skiplistener);
             thisMode.ShowSkipText.free();
             thisMode.LogoAnimation1.free();
             thisMode.LogoAnimation2.free();
-            //thisMode.HideSkipText.play();
+            thisMode.HideSkipText.play();
             thisMode.LogoHide.play();
             thisMode.Thunder.play();
         };
         if (thisMode.LogoAnimation1.isplaying) showClue();
-    });
+    };
 
-    this.ExplainRules.ended(-400,function(){ // On ne joue plus l'animation "drapeau" juste avant de passer à l'énoncé de l'indice
+    this.ExplainRules.ended(300,endOfRules2);
+    this.SkipRules.ended(300,endOfRules2);
+
+    var endOfRules1 = function(){ // On ne joue plus l'animation "drapeau" juste avant de passer à l'énoncé de l'indice
         thisMode.LogoAnimation1.ended(false);
         thisMode.LogoAnimation1.ended(function(){
             this.reset();
             this.play();
         });
-    });
+    };
+
+    this.ExplainRules.ended(-400,endOfRules1);
+    this.SkipRules.ended(-400,endOfRules1);
 
     this.RememberTheClue.ended(function(){
         this.free();
@@ -339,7 +372,20 @@ ModeJackAttack.prototype.start = function() {
         this.reset();
         thisMode.LogoAnimation2.play();
         if (explainRules == 2) {
-            //thisMode.ShowSkipText.play();
+            var skipexplanations = function() {
+                unbindKeyListener(skiplistener);
+                thisMode.ShowSkipText.free();
+                thisMode.ExplainRules.free();
+                thisMode.RememberTheClue.free();
+                thisMode.Example.free();
+                thisMode.HideSkipText.play();
+                thisMode.SkipRules.play();
+            };
+
+            skiplistener = bindKeyListener(function(choice) {
+                if (choice == 32) skipexplanations(); // Barre espace = on passe les explications
+            });
+            thisMode.ShowSkipText.play();
             thisMode.ExplainRules.play();
             thisMode.Example.play();
         }
@@ -431,6 +477,8 @@ ModeJackAttack.prototype.start = function() {
         thisMode.SFXRip.play();
         ripBG();
     });
+
+    endgameready = this.game.api.gamemode(this); // Préchargement de la fin du jeu
 
     if (false) {
         thisMode.game.html.screen.html('');

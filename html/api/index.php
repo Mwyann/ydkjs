@@ -24,6 +24,7 @@ function gamemode() {
             if (!isset($_POST['questionnumber'])) die('Gamemode 2');
             $questionnumber = $_POST['questionnumber'];
             $newmode = array('mode' => 'Category', 'category' => $category, 'questionnumber' => $questionnumber); break;
+        case 'JackAttack': $newmode = array('mode' => 'End'); break;
     }
     header('X-JSON: '.json_encode(array(
             'newmode' => $newmode
@@ -404,6 +405,7 @@ function resources() {
         $category = $_POST['category'];
         if (!isset($_POST['id'])) die('Resources 2');
         $id = $_POST['id'];
+        $skiprules = rand(1,12);
 
         $res = $DB->query("SELECT *
                            FROM ".$DBsta.".qhdr q, ".$DBsta.".strings s
@@ -417,6 +419,12 @@ function resources() {
                            WHERE a.resid = f.resid
                            AND grp = 'JackAttack'");
         while ($rs = $res->fetch()) {
+            if ((substr($rs['name'],0,12) == 'ShowSkipText') || (substr($rs['name'],0,12) == 'HideSkipText')) {
+                if ($rs['name'] == 'ShowSkipText'.$skiprules) $rs['name'] = 'ShowSkipText';
+                elseif ($rs['name'] == 'HideSkipText'.$skiprules) $rs['name'] = 'HideSkipText';
+                else continue;
+            }
+
             $r = array(
                 'urlGif' => uriToUid('res-full/'.$rs['filename'].'.gif'),
                 'urlJS' => uriToUid('res-full/'.$rs['filename'].'.js'),
@@ -490,6 +498,47 @@ function resources() {
         $reslist['answerseeds'] = $answerseeds;
 
         $reslist['STR'] = $qhdr['strings'];
+    }
+
+    if ($mode == 'End') {
+        $reslist = array();
+        $res = $DB->query("SELECT *
+                           FROM ".$DBsta.".resani a, ".$DBsta.".resfiles f
+                           WHERE a.resid = f.resid
+                           AND grp = 'End'");
+        while ($rs = $res->fetch()) {
+            $r = array(
+                'urlGif' => uriToUid('res-full/'.$rs['filename'].'.gif'),
+                'urlJS' => uriToUid('res-full/'.$rs['filename'].'.js'),
+                'framestart' => $rs['framestart']
+            );
+            if ($rs['framestop'] !== null) $r['framestop'] = $rs['framestop'];
+            if ($rs['loopani']) $r['loop'] = $rs['loopani'];
+            $reslist[$rs['grp'].'/'.$rs['name']] = $r;
+        }
+
+        $res = $DB->query("SELECT *
+                           FROM ".$DBsta.".ressnd
+                           WHERE grp = 'End'");
+        while ($rs = $res->fetch()) {
+            $names = array($rs['name']);
+
+            $possiblevalues = explode(',',$rs['val']);
+            if (sizeof($possiblevalues) > 1) shuffle($possiblevalues);
+
+            foreach($names as $idname => $name) {
+                $key = $rs['grp'] . '/' . $name;
+                if (!isset($reslist[$key])) {
+                    if ((substr($name, 0, 3) == 'SFX') && (isset($reslist[$rs['grp'] . '/' . substr($name, 3)]))) $key = $rs['grp'] . '/' . substr($name, 3);
+                    else $reslist[$key] = array();
+                }
+
+                $reslist[$key]['urlAudio'] = uriToUid('res-full/' . $rs['resfolder'] . '/' . $possiblevalues[$idname]);
+                if ($rs['loopsnd']) $reslist[$key]['loop'] = $rs['loopsnd'];
+            }
+        }
+
+        $reslist['highscores'] = array();
     }
 
     if ($mode == 'Timer10') {

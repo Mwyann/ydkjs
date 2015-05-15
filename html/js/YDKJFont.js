@@ -71,6 +71,20 @@ function YDKJFont() {
         216:{font:'JackRoman',size:20,color:['#F00','#A00','#600']}, // 2000F when wrong TODO: check real font size
         226:{font:'JackRoman',size:20,color:['#F00','#A00','#600']},
         236:{font:'JackRoman',size:20,color:['#F00','#A00','#600']},
+        // End
+        1610:{font:'JackRoman',size:[61,38,29,23],color:'#FFF'}, // TODO: check real font size
+        1611:{font:'JackRoman',size:[61,38,29,23],color:'#FFF'},
+        1615:{font:'JackRoman',size:[61,38,29,23],color:'#FFF'},
+        1616:{font:'JackRoman',size:[61,38,29,23],color:'#FFF'},
+        1620:{font:'JackRoman',size:[38,29,23],color:'#AAA'},
+        1621:{font:'JackRoman',size:[38,29,23],color:'#AAA'},
+        1622:{font:'JackRoman',size:[38,29,23],color:'#AAA'},
+        1625:{font:'JackRoman',size:[38,29,23],color:'#AAA'},
+        1626:{font:'JackRoman',size:[38,29,23],color:'#AAA'},
+        1627:{font:'JackRoman',size:[38,29,23],color:'#AAA'},
+        1630:{font:'JackRoman',size:[29,23],color:'#666'},
+        1635:{font:'JackRoman',size:[29,23],color:'#666'},
+
     };
 }
 
@@ -383,12 +397,12 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val, d
             });
             container.css({
                 'position': 'relative',
-                'left': (0-((fullwidth-width)/2).toFixed(0))+'px',
-                'top': (0-((fullheight-height)/2).toFixed(0))+'px',
+                'left': (0-((fullwidth-width)/2).toFixed(1))+'px',
+                'top': (0-((fullheight-height)/2).toFixed(1))+'px',
                 'width': fullwidth+'px',
                 'height': fullheight+'px',
                 'line-height': fullheight+'px',
-                'transform': 'scale('+(side*width/fullwidth).toFixed(2)+','+(height/fullheight).toFixed(2)+')',
+                'transform': 'scale('+(side*width/fullwidth).toFixed(4)+','+(height/fullheight).toFixed(4)+')',
                 'display': 'inline-block'
             });
 
