@@ -1,11 +1,14 @@
 <?php
 
-session_start();
+require_once 'local/config.inc.php';
 
-if (!isset($_SESSION['id'])) die('Not logged in');
+if (!$DEMOMODE) {
+    session_start();
+    if (!isset($_SESSION['id'])) die('Not logged in');
+    session_write_close();
+}
+
 if (!isset($_GET['uid'])) die('No uid');
-
-session_write_close();
 
 require_once 'mysql.inc.php';
 
