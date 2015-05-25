@@ -201,12 +201,12 @@ ModeJackAttack.prototype.start = function() {
 
     var b;
     for(b = 1; b <= 7; b++) this['BGMusic' + b].ended(BGMusicEnded);
-    for(b = 1; b <= 6; b++) {
+    for(b = 1; b <= 7; b++) {
         thisMode['SFXCorrect' + b].ended(function(){
             BGMusicPos++;
             BGMusicPlayed = 0;
-            thisMode['BGMusic' + BGMusicPos].play();
             if (availableQuestions.length > 1) {
+                thisMode['BGMusic' + BGMusicPos].play();
                 availableQuestions.shift(); // On enlève la question répondue
                 nextQuestion();
             } else { // Fin du jeu
@@ -259,6 +259,7 @@ ModeJackAttack.prototype.start = function() {
                     Correct = thisMode.Player3Correct;
                 }
 
+                thisMode.game.font.strings[1510] = thisMode.game.font.strings[1520] ;
                 if (thisMode.game.font.strings[1510] == thisMode.game.font.strings[1520]) { // Bonne réponse !
                     if (currentAnswer > 50) return false; // On revérifie, on ne sait jamais...
                     currentAnswer = 99;
@@ -485,7 +486,7 @@ ModeJackAttack.prototype.start = function() {
 
     endgameready = this.game.api.gamemode(this); // Préchargement de la fin du jeu
 
-    if (false) { // DEBUG : false = on affiche tout le jeu, y compris les explications, true = on zappe l'intro et on passe directement au jeu
+    if (true) { // DEBUG : false = on affiche tout le jeu, y compris les explications, true = on zappe l'intro et on passe directement au jeu
         thisMode.game.html.screen.html('');
         startGame();
     } else this.CategorySelected.play();
