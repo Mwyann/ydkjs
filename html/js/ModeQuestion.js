@@ -454,8 +454,9 @@ ModeQuestion.prototype.start = function() {
         this.free();
         thisMode.JingleReadQuestion.delay(100,function(){
             thisMode.JingleReadQuestion.free();
-            thisMode.JingleTimer.play();
             thisMode.PrepareTimer.free();
+            thisMode.JingleTimer.play();
+            thisMode.Timer.playTimer(10);
             thisMode.timerTimeout = setTimeout(timerRunning,500);
         });
     });
