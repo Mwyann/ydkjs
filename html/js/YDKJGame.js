@@ -9,7 +9,6 @@ function YDKJGame(html, demomode) {
     this.demomode = demomode;
     jQuery.fx.interval = 66;
     this.gameinfoready = this.api.gameinfo();
-    this.gamemodeready = this.api.gamemode();
     this.currentmode = 0;
 
     // Gestion du fullscreen
@@ -71,7 +70,7 @@ YDKJGame.prototype.start = function() {
             thisGame.players = gameinfo.players;
             thisGame.locale = gameinfo.locale;
             thisGame.engineVersion = gameinfo.engineVersion;
-            thisGame.gamemodeready(function (gamemode) {
+            (thisGame.api.gamemode())(function (gamemode) {
                 gamemode.start();
             });
         });

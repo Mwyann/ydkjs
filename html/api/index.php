@@ -71,6 +71,7 @@ function gamemode() {
         )));
 }
 
+// Fonction qui renvoie un tableau JSON avec la liste des ressources et des URLS à aller chercher
 function resources() {
     global $DB, $DBsta, $DEMOMODE, $VERSION;
     $reslist = array();
@@ -78,6 +79,7 @@ function resources() {
     if (!isset($_POST['mode'])) die('Resources 1');
     $mode = $_POST['mode'];
 
+    /*********** MODE INTRO ***********/
     if ($mode == 'Intro') {
         $intro = rand(1,4);
         $pretitle = rand(1,11);
@@ -139,6 +141,7 @@ function resources() {
         }
     }
 
+    /********** CHOIX D'UNE CATEGORIE ***********/
     if ($mode == 'Category') {
         if (!isset($_POST['category'])) die('Resources 2');
         $category = $_POST['category'];
@@ -243,6 +246,7 @@ function resources() {
         }
     }
 
+    /********** QUESTION *********/
     if ($mode == 'Question') {
         if (!isset($_POST['category'])) die('Resources 2');
         $category = $_POST['category'];
@@ -250,6 +254,7 @@ function resources() {
         $questionnumber = $_POST['questionnumber'];
         if (!isset($_POST['id'])) die('Resources 2');
         $id = $_POST['id'];
+        $nbplayers = 3; // CONSTANTE POUR LE MOMENT
 
         $res = $DB->query("SELECT *
                            FROM ".$DBsta.".qhdr q, ".$DBsta.".strings s
@@ -282,6 +287,13 @@ function resources() {
 
             if (strpos($rs['name'], 'AnnounceValue') === 0) if ($rs['name'] != 'AnnounceValue'.$value.'F') continue; else $rs['name'] = 'AnnounceValue';
             if (strpos($rs['name'], 'HideValue') === 0) if ($rs['name'] != 'HideValue'.$value.'F') continue; else $rs['name'] = 'HideValue';
+
+            if (strpos($rs['name'], 'Player1on1') === 0) if ($nbplayers != 1) continue; else $rs['name'] = str_replace('Player1on1', 'Player1', $rs['name']);
+            if (strpos($rs['name'], 'Player1on2') === 0) if ($nbplayers != 2) continue; else $rs['name'] = str_replace('Player1on2', 'Player1', $rs['name']);
+            if (strpos($rs['name'], 'Player2on2') === 0) if ($nbplayers != 2) continue; else $rs['name'] = str_replace('Player2on2', 'Player2', $rs['name']);
+            if (strpos($rs['name'], 'Player1on3') === 0) if ($nbplayers != 3) continue; else $rs['name'] = str_replace('Player1on3', 'Player1', $rs['name']);
+            if (strpos($rs['name'], 'Player2on3') === 0) if ($nbplayers != 3) continue; else $rs['name'] = str_replace('Player2on3', 'Player2', $rs['name']);
+            if (strpos($rs['name'], 'Player3on3') === 0) if ($nbplayers != 3) continue; else $rs['name'] = str_replace('Player3on3', 'Player3', $rs['name']);
 
             $r = array(
                 'urlGif' => uriToUid('res-full/'.$rs['filename'].'.gif'),
@@ -386,6 +398,7 @@ function resources() {
         $reslist['correctanswer'] = $qhdr['answer'];
     }
 
+    /********* COUCI-COUCA **********/
     if ($mode == 'DisOrDat') {
         if (!isset($_POST['category'])) die('Resources 2');
         $category = $_POST['category'];
@@ -465,6 +478,7 @@ function resources() {
         $reslist['STR'] = $qhdr['strings'];
     }
 
+    /*********** JACK ATTACK ************/
     if ($mode == 'JackAttack') {
         if (!isset($_POST['category'])) die('Resources 2');
         $category = $_POST['category'];
@@ -565,6 +579,7 @@ function resources() {
         $reslist['STR'] = $qhdr['strings'];
     }
 
+    /*********** SCORES ***********/
     if ($mode == 'End') {
         $reslist = array();
         $res = $DB->query("SELECT *
@@ -606,6 +621,7 @@ function resources() {
         $reslist['highscores'] = array();
     }
 
+    /******** BOULE TIMER 10 SECONDES **********/
     if ($mode == 'Timer10') {
         $resName = 'res-full/10TIMER/off4/8018';
         $reslist = array('Common/Timer10' => array('urlGif' => uriToUid($resName.'.gif'), 'urlJS' => uriToUid($resName.'.js'), 'framestart' => 73, 'loop' => 0, 'framestop' => 75),
@@ -652,6 +668,7 @@ function resources() {
                          ));
     }
 
+    /******** BOULE TIMER 30 SECONDES **********/
     if ($mode == 'Timer30') {
         $resName = 'res-full/30TIMER/off4/8021';
         $reslist = array('Common/Timer30' => array('urlGif' => uriToUid($resName.'.gif'), 'urlJS' => uriToUid($resName.'.js'), 'framestart' => 79, 'loop' => 0, 'framestop' => 79),

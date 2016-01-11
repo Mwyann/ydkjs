@@ -35,23 +35,27 @@ ModeQuestion.prototype.preload = function(resources) {
     this.PlayerBuzzedPlayer1 = new YDKJAnimation(resources['Question/PlayerBuzzedPlayer1']);
     this.Player1Correct = new YDKJAnimation(resources['Question/Player1Correct']);
     this.Player1Wrong = new YDKJAnimation(resources['Question/Player1Wrong']);
-    this.Player1Cancel = new YDKJAnimation(resources['Question/Player1Cancel']);
+    this.Player1LostScrew = new YDKJAnimation(resources['Question/Player1LostScrew']);
 
-    this.ShowPlayer2Key = new YDKJAnimation(resources['Question/ShowPlayer2Key']);
-    this.Player2Answer = new YDKJAnimation(resources['Question/Player2Answer']);
-    this.Player2AnswerLoop = new YDKJAnimation(resources['Question/Player2AnswerLoop']);
-    this.PlayerBuzzedPlayer2 = new YDKJAnimation(resources['Question/PlayerBuzzedPlayer2']);
-    this.Player2Correct = new YDKJAnimation(resources['Question/Player2Correct']);
-    this.Player2Wrong = new YDKJAnimation(resources['Question/Player2Wrong']);
-    this.Player2Cancel = new YDKJAnimation(resources['Question/Player2Cancel']);
+    if (this.game.players.length > 1) {
+        this.ShowPlayer2Key = new YDKJAnimation(resources['Question/ShowPlayer2Key']);
+        this.Player2Answer = new YDKJAnimation(resources['Question/Player2Answer']);
+        this.Player2AnswerLoop = new YDKJAnimation(resources['Question/Player2AnswerLoop']);
+        this.PlayerBuzzedPlayer2 = new YDKJAnimation(resources['Question/PlayerBuzzedPlayer2']);
+        this.Player2Correct = new YDKJAnimation(resources['Question/Player2Correct']);
+        this.Player2Wrong = new YDKJAnimation(resources['Question/Player2Wrong']);
+        this.Player2LostScrew = new YDKJAnimation(resources['Question/Player2LostScrew']);
+    }
 
-    this.ShowPlayer3Key = new YDKJAnimation(resources['Question/ShowPlayer3Key']);
-    this.Player3Answer = new YDKJAnimation(resources['Question/Player3Answer']);
-    this.Player3AnswerLoop = new YDKJAnimation(resources['Question/Player3AnswerLoop']);
-    this.PlayerBuzzedPlayer3 = new YDKJAnimation(resources['Question/PlayerBuzzedPlayer3']);
-    this.Player3Correct = new YDKJAnimation(resources['Question/Player3Correct']);
-    this.Player3Wrong = new YDKJAnimation(resources['Question/Player3Wrong']);
-    this.Player3Cancel = new YDKJAnimation(resources['Question/Player3Cancel']);
+    if (this.game.players.length > 2) {
+        this.ShowPlayer3Key = new YDKJAnimation(resources['Question/ShowPlayer3Key']);
+        this.Player3Answer = new YDKJAnimation(resources['Question/Player3Answer']);
+        this.Player3AnswerLoop = new YDKJAnimation(resources['Question/Player3AnswerLoop']);
+        this.PlayerBuzzedPlayer3 = new YDKJAnimation(resources['Question/PlayerBuzzedPlayer3']);
+        this.Player3Correct = new YDKJAnimation(resources['Question/Player3Correct']);
+        this.Player3Wrong = new YDKJAnimation(resources['Question/Player3Wrong']);
+        this.Player3LostScrew = new YDKJAnimation(resources['Question/Player3LostScrew']);
+    }
 
     this.ShowAnswer1 = new YDKJAnimation(resources['Question/ShowAnswer1']);
     this.ShowAnswer2 = new YDKJAnimation(resources['Question/ShowAnswer2']);

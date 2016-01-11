@@ -11,7 +11,7 @@ YDKJAPI.prototype.initdemo = function() {
     YDKJAPI.prototype.gamemode = function(currentmode) {
         var newmode;
         if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Intro', {});
-        //if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 2}); // Ligne DEBUG
+        //if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1}); // Ligne DEBUG
         if (currentmode instanceof ModeIntro) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1, chooseplayer: 3});
         if ((currentmode instanceof ModeQuestion) || (currentmode instanceof ModeDisOrDat)) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: currentmode.options.questionnumber+1});
 
@@ -157,21 +157,21 @@ YDKJAPI.prototype.initdemo = function() {
                 'Question/PlayerBuzzedPlayer1': 0,
                 'Question/Player1Correct': 0,
                 'Question/Player1Wrong': 0,
-                'Question/Player1Cancel': 0,
+                'Question/Player1LostScrew': 0,
                 'Question/ShowPlayer2Key': 0,
                 'Question/Player2Answer': 0,
                 'Question/Player2AnswerLoop': 0,
                 'Question/PlayerBuzzedPlayer2': 0,
                 'Question/Player2Correct': 0,
                 'Question/Player2Wrong': 0,
-                'Question/Player2Cancel': 0,
+                'Question/Player2LostScrew': 0,
                 'Question/ShowPlayer3Key': 0,
                 'Question/Player3Answer': 0,
                 'Question/Player3AnswerLoop': 0,
                 'Question/PlayerBuzzedPlayer3': 0,
                 'Question/Player3Correct': 0,
                 'Question/Player3Wrong': 0,
-                'Question/Player3Cancel': 0,
+                'Question/Player3LostScrew': 0,
                 'Question/ShowAnswer1': 0,
                 'Question/ShowAnswer2': 0,
                 'Question/ShowAnswer3': 0,
@@ -699,6 +699,7 @@ YDKJAPI.prototype.initgame = function() {
         var data = {call: 'gamemode'};
 
         if (currentmode === undefined) data['currentmode'] = 'None';
+        //if (currentmode === undefined) data['currentmode'] = 'Intro'; // Ligne DEBUG
         if (currentmode instanceof ModeIntro) data['currentmode'] = 'Intro';
         if ((currentmode instanceof ModeQuestion) || (currentmode instanceof ModeDisOrDat)) {data['currentmode'] = 'Category'; data['category'] = 1; data['questionnumber'] = parseInt(currentmode.options.questionnumber)+1;}
         if (currentmode instanceof ModeJackAttack) data['currentmode'] = 'JackAttack';
