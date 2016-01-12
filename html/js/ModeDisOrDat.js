@@ -3,9 +3,13 @@
 function ModeDisOrDat() {}
 
 ModeDisOrDat.prototype.preload = function(resources) {
-    this.ChoicePlayer1on3 = new YDKJAnimation(resources['DisOrDat/ChoicePlayer1on3']);
-    this.ChoicePlayer2on3 = new YDKJAnimation(resources['DisOrDat/ChoicePlayer2on3']);
-    this.ChoicePlayer3on3 = new YDKJAnimation(resources['DisOrDat/ChoicePlayer3on3']);
+    this.anslist = getSTRfromID(this.STR,'ANS#',4);
+    this.nbchoices = 2;
+    for(var a = 0; a < this.anslist.length; a++) if (this.anslist[a] == 3) this.nbchoices = 3;
+
+    this.ChoicePlayer1 = new YDKJAnimation(resources['DisOrDat/ChoicePlayer1']);
+    if (this.game.players.length >= 2) this.ChoicePlayer2 = new YDKJAnimation(resources['DisOrDat/ChoicePlayer2']);
+    if (this.game.players.length == 3) this.ChoicePlayer3 = new YDKJAnimation(resources['DisOrDat/ChoicePlayer3']);
 
     this.AnnounceCategory = new YDKJAnimation(resources['DisOrDat/AnnounceCategory']);
     this.TimerComesIn = new YDKJAnimation(resources['DisOrDat/TimerComesIn']);
@@ -40,12 +44,12 @@ ModeDisOrDat.prototype.preload = function(resources) {
     this.QuestionAnswer2 = new YDKJAnimation(resources['DisOrDat/QuestionAnswer2']);
     this.RulesExplainBoth = new YDKJAnimation(resources['DisOrDat/RulesExplainBoth']);
     this.RulesExplainSkip = new YDKJAnimation(resources['DisOrDat/RulesExplainSkip']);
-    this.RulesExplainCorrect = new YDKJAnimation(resources['DisOrDat/RulesExplain500FCorrect']); // Il faudra choisir la ressource en fonction de la valeur de la question
-    this.RulesExplainWrong = new YDKJAnimation(resources['DisOrDat/RulesExplain500FWrong']);
+    this.RulesExplainCorrect = new YDKJAnimation(resources['DisOrDat/RulesExplainCorrect']);
+    this.RulesExplainWrong = new YDKJAnimation(resources['DisOrDat/RulesExplainWrong']);
     this.RulesSkipExplain = new YDKJAnimation(resources['DisOrDat/RulesSkipExplain']);
-    this.ValueComesIn = new YDKJAnimation(resources['DisOrDat/Value500FComesIn']);
-    this.ValueMinus = new YDKJAnimation(resources['DisOrDat/Value500FMinus']);
-    this.ValueLeave = new YDKJAnimation(resources['DisOrDat/Value500FLeave']);
+    this.ValueComesIn = new YDKJAnimation(resources['DisOrDat/ValueComesIn']);
+    this.ValueMinus = new YDKJAnimation(resources['DisOrDat/ValueMinus']);
+    this.ValueLeave = new YDKJAnimation(resources['DisOrDat/ValueLeave']);
     this.SFXShowPriceCorrect = new YDKJAnimation(resources['DisOrDat/SFXShowPriceCorrect']);
     this.SFXShowPriceWrong = new YDKJAnimation(resources['DisOrDat/SFXShowPriceWrong']);
     this.SFXHidePrice = new YDKJAnimation(resources['DisOrDat/SFXHidePrice']);
@@ -55,47 +59,31 @@ ModeDisOrDat.prototype.preload = function(resources) {
 
     this.SFXShowKey = new YDKJAnimation(resources['DisOrDat/SFXShowKey']);
     this.SFXKeyPress = new YDKJAnimation(resources['DisOrDat/SFXKeyPress']);
-    this.Button1of4ComesIn = new YDKJAnimation(resources['DisOrDat/Button1of4ComesIn']);
-    this.Button1of4StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button1of4StandbyLoop']);
-    this.Button1of4Ready = new YDKJAnimation(resources['DisOrDat/Button1of4Ready']);
-    this.Button1of4Push = new YDKJAnimation(resources['DisOrDat/Button1of4Push']);
-    this.Button1of4Leave = new YDKJAnimation(resources['DisOrDat/Button1of4Leave']);
+    this.Button1ComesIn = new YDKJAnimation(resources['DisOrDat/Button1ComesIn']);
+    this.Button1StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button1StandbyLoop']);
+    this.Button1Ready = new YDKJAnimation(resources['DisOrDat/Button1Ready']);
+    this.Button1Push = new YDKJAnimation(resources['DisOrDat/Button1Push']);
+    this.Button1Leave = new YDKJAnimation(resources['DisOrDat/Button1Leave']);
 
-    this.Button2of4ComesIn = new YDKJAnimation(resources['DisOrDat/Button2of4ComesIn']);
-    this.Button2of4StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button2of4StandbyLoop']);
-    this.Button2of4Ready = new YDKJAnimation(resources['DisOrDat/Button2of4Ready']);
-    this.Button2of4Push = new YDKJAnimation(resources['DisOrDat/Button2of4Push']);
-    this.Button2of4Leave = new YDKJAnimation(resources['DisOrDat/Button2of4Leave']);
+    this.Button2ComesIn = new YDKJAnimation(resources['DisOrDat/Button2ComesIn']);
+    this.Button2StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button2StandbyLoop']);
+    this.Button2Ready = new YDKJAnimation(resources['DisOrDat/Button2Ready']);
+    this.Button2Push = new YDKJAnimation(resources['DisOrDat/Button2Push']);
+    this.Button2Leave = new YDKJAnimation(resources['DisOrDat/Button2Leave']);
 
-    this.Button3of4ComesIn = new YDKJAnimation(resources['DisOrDat/Button3of4ComesIn']);
-    this.Button3of4StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button3of4StandbyLoop']);
-    this.Button3of4Ready = new YDKJAnimation(resources['DisOrDat/Button3of4Ready']);
-    this.Button3of4Push = new YDKJAnimation(resources['DisOrDat/Button3of4Push']);
-    this.Button3of4Leave = new YDKJAnimation(resources['DisOrDat/Button3of4Leave']);
+    if (this.nbchoices == 3) {
+        this.Button3ComesIn = new YDKJAnimation(resources['DisOrDat/Button3ComesIn']);
+        this.Button3StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button3StandbyLoop']);
+        this.Button3Ready = new YDKJAnimation(resources['DisOrDat/Button3Ready']);
+        this.Button3Push = new YDKJAnimation(resources['DisOrDat/Button3Push']);
+        this.Button3Leave = new YDKJAnimation(resources['DisOrDat/Button3Leave']);
+    }
 
-    this.Button4of4ComesIn = new YDKJAnimation(resources['DisOrDat/Button4of4ComesIn']);
-    this.Button4of4StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button4of4StandbyLoop']);
-    this.Button4of4Ready = new YDKJAnimation(resources['DisOrDat/Button4of4Ready']);
-    this.Button4of4Push = new YDKJAnimation(resources['DisOrDat/Button4of4Push']);
-    this.Button4of4Leave = new YDKJAnimation(resources['DisOrDat/Button4of4Leave']);
-
-    this.Button1of3ComesIn = new YDKJAnimation(resources['DisOrDat/Button1of3ComesIn']);
-    this.Button1of3StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button1of3StandbyLoop']);
-    this.Button1of3Ready = new YDKJAnimation(resources['DisOrDat/Button1of3Ready']);
-    this.Button1of3Push = new YDKJAnimation(resources['DisOrDat/Button1of3Push']);
-    this.Button1of3Leave = new YDKJAnimation(resources['DisOrDat/Button1of3Leave']);
-
-    this.Button2of3ComesIn = new YDKJAnimation(resources['DisOrDat/Button2of3ComesIn']);
-    this.Button2of3StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button2of3StandbyLoop']);
-    this.Button2of3Ready = new YDKJAnimation(resources['DisOrDat/Button2of3Ready']);
-    this.Button2of3Push = new YDKJAnimation(resources['DisOrDat/Button2of3Push']);
-    this.Button2of3Leave = new YDKJAnimation(resources['DisOrDat/Button2of3Leave']);
-
-    this.Button4of3ComesIn = new YDKJAnimation(resources['DisOrDat/Button4of3ComesIn']);
-    this.Button4of3StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button4of3StandbyLoop']);
-    this.Button4of3Ready = new YDKJAnimation(resources['DisOrDat/Button4of3Ready']);
-    this.Button4of3Push = new YDKJAnimation(resources['DisOrDat/Button4of3Push']);
-    this.Button4of3Leave = new YDKJAnimation(resources['DisOrDat/Button4of3Leave']);
+    this.Button4ComesIn = new YDKJAnimation(resources['DisOrDat/Button4ComesIn']);
+    this.Button4StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button4StandbyLoop']);
+    this.Button4Ready = new YDKJAnimation(resources['DisOrDat/Button4Ready']);
+    this.Button4Push = new YDKJAnimation(resources['DisOrDat/Button4Push']);
+    this.Button4Leave = new YDKJAnimation(resources['DisOrDat/Button4Leave']);
 
     this.Player1ComesIn = new YDKJAnimation(resources['DisOrDat/Player1ComesIn']);
     this.Player1WinGrow = new YDKJAnimation(resources['DisOrDat/Player1WinGrow']);
@@ -191,8 +179,8 @@ ModeDisOrDat.prototype.preload = function(resources) {
     this.SFXTimeOut1 = new YDKJAnimation(resources['DisOrDat/SFXTimeOut1']);
     this.MusicPlayEnd = new YDKJAnimation(resources['DisOrDat/MusicPlayEnd']);
     this.TimeOut = new YDKJAnimation(resources['DisOrDat/TimeOut']);
-    this.TimeOutLoseMoreQuestions = new YDKJAnimation(resources['DisOrDat/TimeOutLose500FMoreQuestions']); // Idem ici, il faudra choisir la ressource en fonction de la valeur de la question
-    this.TimeOutLoseOneQuestion = new YDKJAnimation(resources['DisOrDat/TimeOutLose500FOneQuestion']);
+    this.TimeOutLoseMoreQuestions = new YDKJAnimation(resources['DisOrDat/TimeOutLoseMoreQuestions']);
+    this.TimeOutLoseOneQuestion = new YDKJAnimation(resources['DisOrDat/TimeOutLoseOneQuestion']);
     this.ShowFinalScore = new YDKJAnimation(resources['DisOrDat/ShowFinalScore']);
 
     this.Timer = this.options.timer;
@@ -205,7 +193,7 @@ ModeDisOrDat.prototype.start = function() {
     var nextcategoryready;
 
     if (this.chooseplayer == 1) {
-        this.ChoicePlayer = this.ChoicePlayer1on3;
+        this.ChoicePlayer = this.ChoicePlayer1;
         this.PlayerComesIn = this.Player1ComesIn;
         this.PlayerWinGrow = this.Player1WinGrow;
         this.PlayerWinBig = this.Player1WinBig;
@@ -215,7 +203,7 @@ ModeDisOrDat.prototype.start = function() {
         this.PlayerLose = this.Player1Lose;
     }
     if (this.chooseplayer == 2) {
-        this.ChoicePlayer = this.ChoicePlayer2on3;
+        this.ChoicePlayer = this.ChoicePlayer2;
         this.PlayerComesIn = this.Player2ComesIn;
         this.PlayerWinGrow = this.Player2WinGrow;
         this.PlayerWinBig = this.Player2WinBig;
@@ -225,7 +213,7 @@ ModeDisOrDat.prototype.start = function() {
         this.PlayerLose = this.Player2Lose;
     }
     if (this.chooseplayer == 3) {
-        this.ChoicePlayer = this.ChoicePlayer3on3;
+        this.ChoicePlayer = this.ChoicePlayer3;
         this.PlayerComesIn = this.Player3ComesIn;
         this.PlayerWinGrow = this.Player3WinGrow;
         this.PlayerWinBig = this.Player3WinBig;
@@ -234,10 +222,6 @@ ModeDisOrDat.prototype.start = function() {
         this.PlayerLoseBig = this.Player3LoseBig;
         this.PlayerLose = this.Player3Lose;
     }
-
-    var anslist = getSTRfromID(thisMode.STR,'ANS#',4);
-    var nbchoices = 2;
-    for(var a = 0; a < anslist.length; a++) if (anslist[a] == 3) nbchoices = 3;
 
     var tempscore = 0;
 
@@ -612,7 +596,7 @@ ModeDisOrDat.prototype.start = function() {
                     nextQuestion();
                 };
             } else {
-                if (b == anslist[currentQuestion]) { // Bonne réponse !
+                if (b == thisMode.anslist[currentQuestion]) { // Bonne réponse !
                     currentAnswers[currentQuestion] = 1;
                     thisMode.ShowQuestion.reset();
                     thisMode.HideQuestionCorrect.play();
@@ -748,7 +732,7 @@ ModeDisOrDat.prototype.start = function() {
             var chosed = 0;
             if (choice == 49) chosed = 1;
             else if (choice == 50) chosed = 2;
-            else if ((choice == 51) && (nbchoices == 3)) chosed = 3;
+            else if ((choice == 51) && (thisMode.nbchoices == 3)) chosed = 3;
             else if (choice == 52) chosed = 4;
             if (chosed > 0) pressButton(chosed);
         });
@@ -896,7 +880,7 @@ ModeDisOrDat.prototype.start = function() {
     });
 
     thisMode.QuestionAnswer2.ended(800,function(){
-        if (nbchoices == 2) {
+        if (thisMode.nbchoices == 2) {
             rulesExplainSkip();
         } else {
             thisMode.RulesExplainBoth.play();
@@ -979,17 +963,11 @@ ModeDisOrDat.prototype.start = function() {
             });
             this.play();
 
-            if (nbchoices == 2) {
-                addStandBy(thisMode.Button1of3ComesIn, thisMode.Button1of3StandbyLoop, thisMode.Button1of3Push, thisMode.Button1of3Ready, thisMode.Button1of3Leave);
-                addStandBy(thisMode.Button2of3ComesIn, thisMode.Button2of3StandbyLoop, thisMode.Button2of3Push, thisMode.Button2of3Ready, thisMode.Button2of3Leave);
-                buttonsAnswer.push(0); // Rien pour le bouton 3
-                addStandBy(thisMode.Button4of3ComesIn, thisMode.Button4of3StandbyLoop, thisMode.Button4of3Push, thisMode.Button4of3Ready, thisMode.Button4of3Leave);
-            } else {
-                addStandBy(thisMode.Button1of4ComesIn, thisMode.Button1of4StandbyLoop, thisMode.Button1of4Push, thisMode.Button1of4Ready, thisMode.Button1of4Leave);
-                addStandBy(thisMode.Button2of4ComesIn, thisMode.Button2of4StandbyLoop, thisMode.Button2of4Push, thisMode.Button2of4Ready, thisMode.Button2of4Leave);
-                addStandBy(thisMode.Button3of4ComesIn, thisMode.Button3of4StandbyLoop, thisMode.Button3of4Push, thisMode.Button3of4Ready, thisMode.Button3of4Leave);
-                addStandBy(thisMode.Button4of4ComesIn, thisMode.Button4of4StandbyLoop, thisMode.Button4of4Push, thisMode.Button4of4Ready, thisMode.Button4of4Leave);
-            }
+            addStandBy(thisMode.Button1ComesIn, thisMode.Button1StandbyLoop, thisMode.Button1Push, thisMode.Button1Ready, thisMode.Button1Leave);
+            addStandBy(thisMode.Button2ComesIn, thisMode.Button2StandbyLoop, thisMode.Button2Push, thisMode.Button2Ready, thisMode.Button2Leave);
+            if (thisMode.nbchoices == 2) buttonsAnswer.push(0); // Rien pour le bouton 3
+            else addStandBy(thisMode.Button3ComesIn, thisMode.Button3StandbyLoop, thisMode.Button3Push, thisMode.Button3Ready, thisMode.Button3Leave);
+            addStandBy(thisMode.Button4ComesIn, thisMode.Button4StandbyLoop, thisMode.Button4Push, thisMode.Button4Ready, thisMode.Button4Leave);
 
             // Setup des boutons pour les explications
 
@@ -1007,14 +985,14 @@ ModeDisOrDat.prototype.start = function() {
                 });
             });
 
-            buttonsAnswer[nbchoices].ComesIn.ended(function(){
+            buttonsAnswer[thisMode.nbchoices].ComesIn.ended(function(){
                 this.delay(300,function(){
                     MusicLoopRules2();
                 });
                 readAnswers();
             });
 
-            if (nbchoices == 3) {
+            if (thisMode.nbchoices == 3) {
                 buttonsAnswer[2].ComesIn.ended(function(){
                     this.delay(300,function(){
                         buttonsAnswer[3].ComesIn.play();

@@ -56,10 +56,14 @@ ModeJackAttack.prototype.preload = function(resources) {
     this.ShowQuestion = new YDKJAnimation(resources['JackAttack/ShowQuestion']);
     this.Player1Correct = new YDKJAnimation(resources['JackAttack/Player1Correct']);
     this.Player1Wrong = new YDKJAnimation(resources['JackAttack/Player1Wrong']);
-    this.Player2Correct = new YDKJAnimation(resources['JackAttack/Player2Correct']);
-    this.Player2Wrong = new YDKJAnimation(resources['JackAttack/Player2Wrong']);
-    this.Player3Correct = new YDKJAnimation(resources['JackAttack/Player3Correct']);
-    this.Player3Wrong = new YDKJAnimation(resources['JackAttack/Player3Wrong']);
+    if (this.game.players.length >= 2) {
+        this.Player2Correct = new YDKJAnimation(resources['JackAttack/Player2Correct']);
+        this.Player2Wrong = new YDKJAnimation(resources['JackAttack/Player2Wrong']);
+    }
+    if (this.game.players.length == 3) {
+        this.Player3Correct = new YDKJAnimation(resources['JackAttack/Player3Correct']);
+        this.Player3Wrong = new YDKJAnimation(resources['JackAttack/Player3Wrong']);
+    }
     this.QuestionCorrect = new YDKJAnimation(resources['JackAttack/QuestionCorrect']);
     this.AnswerCorrect = new YDKJAnimation(resources['JackAttack/AnswerCorrect']);
 
@@ -136,8 +140,8 @@ ModeJackAttack.prototype.start = function() {
         thisMode.QuestionCorrect.reset();
         thisMode.AnswerCorrect.reset();
         thisMode.Player1Correct.reset();
-        thisMode.Player2Correct.reset();
-        thisMode.Player3Correct.reset();
+        if (thisMode.game.players.length >= 2) thisMode.Player2Correct.reset();
+        if (thisMode.game.players.length == 3) thisMode.Player3Correct.reset();
         var q = availableQuestions[0];
         currentQuestion++;
         currentAnswer = 0;
@@ -235,8 +239,8 @@ ModeJackAttack.prototype.start = function() {
             if (currentAnswer > 50) return false; // Dès qu'on a trouvé la bonne réponse on ignore les appuis sur les touches
             var buzzPlayer = 0;
             if (choice == thisMode.game.players[0].keycode) buzzPlayer = 1; // Joueur 1
-            if (choice == thisMode.game.players[1].keycode) buzzPlayer = 2; // Joueur 2
-            if (choice == thisMode.game.players[2].keycode) buzzPlayer = 3; // Joueur 3
+            if (thisMode.game.players.length >= 2) if (choice == thisMode.game.players[1].keycode) buzzPlayer = 2; // Joueur 2
+            if (thisMode.game.players.length == 3) if (choice == thisMode.game.players[2].keycode) buzzPlayer = 3; // Joueur 3
 
             if (buzzPlayer) {
                 var Wrong;
@@ -270,10 +274,14 @@ ModeJackAttack.prototype.start = function() {
                     thisMode[currentAnswerAnim+'.2'].reset();
                     thisMode.Player1Wrong.reset();
                     thisMode.PlayersScream1.reset();
-                    thisMode.Player2Wrong.reset();
-                    thisMode.PlayersScream2.reset();
-                    thisMode.Player3Wrong.reset();
-                    thisMode.PlayersScream3.reset();
+                    if (thisMode.game.players.length >= 2) {
+                        thisMode.Player2Wrong.reset();
+                        thisMode.PlayersScream2.reset();
+                    }
+                    if (thisMode.game.players.length == 3) {
+                        thisMode.Player3Wrong.reset();
+                        thisMode.PlayersScream3.reset();
+                    }
                     thisMode.AudienceWrong.reset();
                     thisMode.game.font.resetTextStyle(1500);
                     thisMode.QuestionCorrect.play();
@@ -461,18 +469,28 @@ ModeJackAttack.prototype.start = function() {
         interval = setInterval(loopRip,40);
     };
 
-    this.game.font.strings[210] = this.game.players[0].name;
-    this.game.font.strings[211] = this.game.font.strings[210];
-    this.game.font.strings[215] = '+ '+thisMode.game.displayCurrency(2000);
-    this.game.font.strings[216] = '- '+thisMode.game.displayCurrency(2000);
-    this.game.font.strings[220] = this.game.players[1].name;
-    this.game.font.strings[221] = this.game.font.strings[220];
-    this.game.font.strings[225] = this.game.font.strings[215];
-    this.game.font.strings[226] = this.game.font.strings[216];
-    this.game.font.strings[230] = this.game.players[2].name;
-    this.game.font.strings[231] = this.game.font.strings[230];
-    this.game.font.strings[235] = this.game.font.strings[215];
-    this.game.font.strings[236] = this.game.font.strings[216];
+    var indexPlayer1 = 210;
+    var indexPlayer2 = 220;
+    var indexPlayer3 = 230;
+    if (this.game.players.length == 1) indexPlayer1 = 220;
+    if (this.game.players.length == 2) indexPlayer2 = 230;
+
+    this.game.font.strings[indexPlayer1] = this.game.players[0].name;
+    this.game.font.strings[indexPlayer1 + 1] = this.game.font.strings[indexPlayer1];
+    this.game.font.strings[indexPlayer1 + 5] = '+ '+thisMode.game.displayCurrency(2000);
+    this.game.font.strings[indexPlayer1 + 6] = '- '+thisMode.game.displayCurrency(2000);
+    if (this.game.players.length >= 2) {
+        this.game.font.strings[indexPlayer2] = this.game.players[1].name;
+        this.game.font.strings[indexPlayer2 + 1] = this.game.font.strings[indexPlayer2];
+        this.game.font.strings[indexPlayer2 + 5] = this.game.font.strings[indexPlayer1 + 5];
+        this.game.font.strings[indexPlayer2 + 6] = this.game.font.strings[indexPlayer1 + 6];
+    }
+    if (this.game.players.length == 3) {
+        this.game.font.strings[indexPlayer3] = this.game.players[2].name;
+        this.game.font.strings[indexPlayer3 + 1] = this.game.font.strings[indexPlayer3];
+        this.game.font.strings[indexPlayer3 + 5] = this.game.font.strings[indexPlayer1 + 5];
+        this.game.font.strings[indexPlayer3 + 6] = this.game.font.strings[indexPlayer1 + 6];
+    }
 
     this.game.font.strings[1499] = this.options.title;
     this.game.font.strings[1200] = this.game.font.strings[1100];

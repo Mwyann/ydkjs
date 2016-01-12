@@ -30,7 +30,9 @@ while ($rs = $res->fetch()) {
             $DB->query("UPDATE ressnd
                         SET val = '" . addslashes($IDlist) . "'
                         WHERE grp = '" . addslashes($rs['grp']) . "'
-                        AND name = '" . addslashes($rs['name']) . "'");
+                        AND name = '" . addslashes($rs['name']) . "'
+                        AND variantType = '".addslashes($rs['variantType'])."'
+                        AND variantValue = '".addslashes($rs['variantValue'])."'");
         }
     } else echo $rs['resfolder']." doesn't exists;";
 }

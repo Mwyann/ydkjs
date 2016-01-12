@@ -26,16 +26,11 @@ ModeIntro.prototype.preload = function(resources) {
         this.IntroJackTitle = new YDKJAnimation(resources['Intro/IntroJackTitle']);
 
         this.Welcome = new YDKJAnimation(resources['Intro/Welcome']);
-        this.Welcome1Player = new YDKJAnimation(resources['Intro/Welcome1Player']);
-        this.Welcome2Players = new YDKJAnimation(resources['Intro/Welcome2Players']);
-        this.Welcome3Players = new YDKJAnimation(resources['Intro/Welcome3Players']);
+        this.WelcomePlayers = new YDKJAnimation(resources['Intro/WelcomePlayers']);
 
-        this.Player1on1 = new YDKJAnimation(resources['Intro/Player1on1']);
-        this.Player1on2 = new YDKJAnimation(resources['Intro/Player1on2']);
-        this.Player2on2 = new YDKJAnimation(resources['Intro/Player2on2']);
-        this.Player1on3 = new YDKJAnimation(resources['Intro/Player1on3']);
-        this.Player2on3 = new YDKJAnimation(resources['Intro/Player2on3']);
-        this.Player3on3 = new YDKJAnimation(resources['Intro/Player3on3']);
+        this.Player1 = new YDKJAnimation(resources['Intro/Player1']);
+        if (this.game.players.length >= 2) this.Player2 = new YDKJAnimation(resources['Intro/Player2']);
+        if (this.game.players.length == 3) this.Player3 = new YDKJAnimation(resources['Intro/Player3']);
     }
 };
 
@@ -44,10 +39,14 @@ ModeIntro.prototype.start = function() {
 
     this.game.font.strings[310] = this.game.players[0].name;
     this.game.font.strings[315] = this.game.displayCurrency(this.game.players[0].score);
-    this.game.font.strings[320] = this.game.players[1].name;
-    this.game.font.strings[325] = this.game.displayCurrency(this.game.players[1].score);
-    this.game.font.strings[330] = this.game.players[2].name;
-    this.game.font.strings[335] = this.game.displayCurrency(this.game.players[2].score);
+    if (this.game.players.length >= 2) {
+        this.game.font.strings[320] = this.game.players[1].name;
+        this.game.font.strings[325] = this.game.displayCurrency(this.game.players[1].score);
+    }
+    if (this.game.players.length == 3) {
+        this.game.font.strings[330] = this.game.players[2].name;
+        this.game.font.strings[335] = this.game.displayCurrency(this.game.players[2].score);
+    }
 
     if (this.game.demomode) {
         var skiplistener = 0;
@@ -94,10 +93,6 @@ ModeIntro.prototype.start = function() {
 
         this.IntroPreTitle.play();
     } else {
-        if (this.game.players.length == 1) this.WelcomePlayers = this.Welcome1Player;
-        if (this.game.players.length == 2) this.WelcomePlayers = this.Welcome2Players;
-        if (this.game.players.length == 3) this.WelcomePlayers = this.Welcome3Players;
-
         this.WelcomePlayers.ended(300, function () {
             thisMode.MusicJack.free();
             thisMode.IntroJack.free();
@@ -110,16 +105,14 @@ ModeIntro.prototype.start = function() {
             thisMode.WelcomePlayers.play();
         });
 
-        this.Player2on3.ended(1000,function(){
-            thisMode.Player3on3.play();
-        });
+        if (this.game.players.length >= 2) {
+            this.Player2.ended(1000,function(){
+                if (thisMode.game.players.length == 3) thisMode.Player3.play();
+            });
+        }
 
-        this.Player1on3.ended(1000,function(){
-            thisMode.Player2on3.play();
-        });
-
-        this.Player1on2.ended(1000,function(){
-            thisMode.Player2on2.play();
+        this.Player1.ended(1000,function(){
+            if (thisMode.game.players.length >= 2) thisMode.Player2.play();
         });
 
         this.IntroJackTitle.ended(300, function () {
@@ -134,9 +127,7 @@ ModeIntro.prototype.start = function() {
                 thisMode.MusicJack.volume(50);
                 thisMode.IntroJackTitle.play();
                 this.delay(500,function(){
-                    if (thisMode.game.players.length == 1) thisMode.Player1on1.play();
-                    if (thisMode.game.players.length == 2) thisMode.Player1on2.play();
-                    if (thisMode.game.players.length == 3) thisMode.Player1on3.play();
+                    thisMode.Player1.play();
                 });
             });
         });

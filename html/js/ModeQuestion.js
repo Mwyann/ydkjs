@@ -29,29 +29,29 @@ ModeQuestion.prototype.preload = function(resources) {
     this.SFXPlayerCorrect = new YDKJAnimation(resources['Question/SFXPlayerCorrect']);
     this.DefaultRevealLastAnswer = new YDKJAnimation(resources['Question/DefaultRevealLastAnswer']);
 
-    this.ShowPlayer1Key = new YDKJAnimation(resources['Question/ShowPlayer1Key']);
+    this.Player1ShowKey = new YDKJAnimation(resources['Question/Player1ShowKey']);
     this.Player1Answer = new YDKJAnimation(resources['Question/Player1Answer']);
     this.Player1AnswerLoop = new YDKJAnimation(resources['Question/Player1AnswerLoop']);
-    this.PlayerBuzzedPlayer1 = new YDKJAnimation(resources['Question/PlayerBuzzedPlayer1']);
+    this.Player1Buzzed = new YDKJAnimation(resources['Question/Player1Buzzed']);
     this.Player1Correct = new YDKJAnimation(resources['Question/Player1Correct']);
     this.Player1Wrong = new YDKJAnimation(resources['Question/Player1Wrong']);
     this.Player1LostScrew = new YDKJAnimation(resources['Question/Player1LostScrew']);
 
-    if (this.game.players.length > 1) {
-        this.ShowPlayer2Key = new YDKJAnimation(resources['Question/ShowPlayer2Key']);
+    if (this.game.players.length >= 2) {
+        this.Player2ShowKey = new YDKJAnimation(resources['Question/Player2ShowKey']);
         this.Player2Answer = new YDKJAnimation(resources['Question/Player2Answer']);
         this.Player2AnswerLoop = new YDKJAnimation(resources['Question/Player2AnswerLoop']);
-        this.PlayerBuzzedPlayer2 = new YDKJAnimation(resources['Question/PlayerBuzzedPlayer2']);
+        this.Player2Buzzed = new YDKJAnimation(resources['Question/Player2Buzzed']);
         this.Player2Correct = new YDKJAnimation(resources['Question/Player2Correct']);
         this.Player2Wrong = new YDKJAnimation(resources['Question/Player2Wrong']);
         this.Player2LostScrew = new YDKJAnimation(resources['Question/Player2LostScrew']);
     }
 
-    if (this.game.players.length > 2) {
-        this.ShowPlayer3Key = new YDKJAnimation(resources['Question/ShowPlayer3Key']);
+    if (this.game.players.length == 3) {
+        this.Player3ShowKey = new YDKJAnimation(resources['Question/Player3ShowKey']);
         this.Player3Answer = new YDKJAnimation(resources['Question/Player3Answer']);
         this.Player3AnswerLoop = new YDKJAnimation(resources['Question/Player3AnswerLoop']);
-        this.PlayerBuzzedPlayer3 = new YDKJAnimation(resources['Question/PlayerBuzzedPlayer3']);
+        this.Player3Buzzed = new YDKJAnimation(resources['Question/Player3Buzzed']);
         this.Player3Correct = new YDKJAnimation(resources['Question/Player3Correct']);
         this.Player3Wrong = new YDKJAnimation(resources['Question/Player3Wrong']);
         this.Player3LostScrew = new YDKJAnimation(resources['Question/Player3LostScrew']);
@@ -74,12 +74,18 @@ ModeQuestion.prototype.preload = function(resources) {
     this.WrongAnswer3 = new YDKJAnimation(resources['Question/WrongAnswer3']);
     this.WrongAnswer4 = new YDKJAnimation(resources['Question/WrongAnswer4']);
 
-    this.LastPlayer1 = new YDKJAnimation(resources['Question/LastPlayer1']);
-    this.LastPlayer2 = new YDKJAnimation(resources['Question/LastPlayer2']);
-    this.LastPlayer3 = new YDKJAnimation(resources['Question/LastPlayer3']);
-    this.LastPlayers12 = new YDKJAnimation(resources['Question/LastPlayers12']);
-    this.LastPlayers13 = new YDKJAnimation(resources['Question/LastPlayers13']);
-    this.LastPlayers23 = new YDKJAnimation(resources['Question/LastPlayers23']);
+    if (this.game.players.length >= 2) {
+        this.LastPlayer1 = new YDKJAnimation(resources['Question/LastPlayer1']);
+        this.LastPlayer2 = new YDKJAnimation(resources['Question/LastPlayer2']);
+        this.PlayerMissKey1 = new YDKJAnimation(resources['Question/PlayerMissKey1']);
+        this.PlayerMissKey2 = new YDKJAnimation(resources['Question/PlayerMissKey2']);
+    }
+    if (this.game.players.length == 3) {
+        this.LastPlayer3 = new YDKJAnimation(resources['Question/LastPlayer3']);
+        this.LastPlayers12 = new YDKJAnimation(resources['Question/LastPlayers12']);
+        this.LastPlayers13 = new YDKJAnimation(resources['Question/LastPlayers13']);
+        this.LastPlayers23 = new YDKJAnimation(resources['Question/LastPlayers23']);
+    }
 
     this.correctanswer = this.options.correctanswer;
 
@@ -103,16 +109,25 @@ ModeQuestion.prototype.start = function() {
     var thisMode = this;
 
     var nextcategoryready = 0;
+    var misskeyallowed = 0;
+
+    if (this.game.players.length >= 2) {
+        this.PlayerMissKey1.ended(1000, function() {
+            misskeyallowed = 1;
+        });
+    }
 
     var pressKey = function(choice) {
         if (thisMode.currentPlayer == 0) {
             if (thisMode.buzzPlayer != 0) return false; // On a déjà un joueur en attente
             if (choice == thisMode.game.players[0].keycode) thisMode.buzzPlayer = 1; // Joueur 1
-            if (choice == thisMode.game.players[1].keycode) thisMode.buzzPlayer = 2; // Joueur 2
-            if (choice == thisMode.game.players[2].keycode) thisMode.buzzPlayer = 3; // Joueur 3
+            if (thisMode.game.players.length >= 2) {
+                if (choice == thisMode.game.players[1].keycode) thisMode.buzzPlayer = 2; // Joueur 2
+            }
+            if (thisMode.game.players.length == 3) {
+                if (choice == thisMode.game.players[2].keycode) thisMode.buzzPlayer = 3; // Joueur 3
+            }
             if (!thisMode.availPlayers[thisMode.buzzPlayer]) thisMode.buzzPlayer = 0;
-
-            // Si réponses 1 à 4 : 1 seul joueur = réponse directe, 2 ou 3 joueurs : "On appuie d'abord sur la lettre !"
 
             if (thisMode.buzzPlayer) {
                 clearTimeout(thisMode.timerTimeout);
@@ -123,19 +138,39 @@ ModeQuestion.prototype.start = function() {
                 thisMode.JingleTimer.stop();
                 thisMode.SFXPlayerBuzz.reset();
                 thisMode.SFXPlayerBuzz.play();
+                misskeyallowed = 1;
                 switch (thisMode.buzzPlayer) {
                     case 1:
-                        thisMode.ShowPlayer1Key.free();
+                        thisMode.Player1ShowKey.free();
                         thisMode.Player1Answer.play();
                         break;
                     case 2:
-                        thisMode.ShowPlayer2Key.free();
+                        thisMode.Player2ShowKey.free();
                         thisMode.Player2Answer.play();
                         break;
                     case 3:
-                        thisMode.ShowPlayer3Key.free();
+                        thisMode.Player3ShowKey.free();
                         thisMode.Player3Answer.play();
                         break;
+                }
+            } else {
+                if ((choice >= 49) && (choice <= 52)) { // Si réponses 1 à 4 : 1 seul joueur = réponse directe, 2 ou 3 joueurs : "On appuie d'abord sur la lettre !"
+                    if (thisMode.game.players.length == 1) {
+                        thisMode.currentPlayer = 1;
+                        clearTimeout(thisMode.timerTimeout);
+                        thisMode.Question.free();
+                        thisMode.Answers.free();
+                        thisMode.JingleReadQuestion.free();
+                        thisMode.JingleTimer.stop();
+
+                        thisMode.Player1ShowKey.free();
+                        thisMode.Player1AnswerLoop.play();
+                        pressKey(choice);
+                    } else if (misskeyallowed) {
+                        // Il faudrait arrêter les LastPlayer ici ?
+                        if (!thisMode.PlayerMissKey1.played) thisMode.PlayerMissKey1.play(); else if (!thisMode.PlayerMissKey2.played) thisMode.PlayerMissKey2.play();
+                        misskeyallowed = 0;
+                    }
                 }
             }
         } else if (thisMode.currentAns == 0) { // Réponse d'un joueur
@@ -149,13 +184,13 @@ ModeQuestion.prototype.start = function() {
                 clearTimeout(thisMode.timerTimeout);
                 switch (thisMode.currentPlayer) {
                     case 1:
-                        thisMode.PlayerBuzzedPlayer1.free();
+                        thisMode.Player1Buzzed.free();
                         break;
                     case 2:
-                        thisMode.PlayerBuzzedPlayer2.free();
+                        thisMode.Player2Buzzed.free();
                         break;
                     case 3:
-                        thisMode.PlayerBuzzedPlayer3.free();
+                        thisMode.Player3Buzzed.free();
                         break;
                 }
                 switch(thisMode.currentAns){
@@ -423,14 +458,18 @@ ModeQuestion.prototype.start = function() {
         this.free();
         thisMode.Player1AnswerLoop.play();
     });
-    this.Player2Answer.ended(function(){
-        this.free();
-        thisMode.Player2AnswerLoop.play();
-    });
-    this.Player3Answer.ended(function(){
-        this.free();
-        thisMode.Player3AnswerLoop.play();
-    });
+    if (this.game.players.length >= 2) {
+        this.Player2Answer.ended(function () {
+            this.free();
+            thisMode.Player2AnswerLoop.play();
+        });
+    }
+    if (this.game.players.length == 3) {
+        this.Player3Answer.ended(function () {
+            this.free();
+            thisMode.Player3AnswerLoop.play();
+        });
+    }
 
     this.SFXPlayerBuzz.ended(150,function(){
         // Remise du compteur à 10
@@ -444,13 +483,13 @@ ModeQuestion.prototype.start = function() {
 
         // Vas-y joueur X
         if (thisMode.currentPlayer == 1) {
-            thisMode.PlayerBuzzedPlayer1.play();
+            thisMode.Player1Buzzed.play();
         }
         if (thisMode.currentPlayer == 2) {
-            thisMode.PlayerBuzzedPlayer2.play();
+            thisMode.Player2Buzzed.play();
         }
         if (thisMode.currentPlayer == 3) {
-            thisMode.PlayerBuzzedPlayer3.play();
+            thisMode.Player3Buzzed.play();
         }
     });
 
@@ -462,6 +501,7 @@ ModeQuestion.prototype.start = function() {
             thisMode.JingleTimer.play();
             thisMode.Timer.playTimer(10);
             thisMode.timerTimeout = setTimeout(timerRunning,500);
+            misskeyallowed = 1;
         });
     });
 
@@ -530,23 +570,26 @@ ModeQuestion.prototype.start = function() {
         });
 
         thisMode.availPlayers = [];
-        thisMode.ShowPlayer1Key.ended(function(){
+        thisMode.Player1ShowKey.ended(function(){
             thisMode.availPlayers[1] = 1;
         });
-        thisMode.ShowPlayer2Key.ended(function(){
-            thisMode.availPlayers[2] = 1;
-        });
-        thisMode.ShowPlayer3Key.ended(function(){
-            thisMode.availPlayers[3] = 1;
-        });
-
-        thisMode.ShowPlayer1Key.delay(200,function(){
+        if (thisMode.game.players.length >= 2) {
+            thisMode.Player2ShowKey.ended(function () {
+                thisMode.availPlayers[2] = 1;
+            });
+        }
+        if (thisMode.game.players.length == 3) {
+            thisMode.Player3ShowKey.ended(function () {
+                thisMode.availPlayers[3] = 1;
+            });
+        }
+        thisMode.Player1ShowKey.delay(200,function(){
             this.play();
             this.click(function(){pressKey(thisMode.game.players[0].keycode)});
-            if (thisMode.game.players.length >= 2) thisMode.ShowPlayer2Key.delay(90,function(){
+            if (thisMode.game.players.length >= 2) thisMode.Player2ShowKey.delay(90,function(){
                 this.play();
                 this.click(function(){pressKey(thisMode.game.players[1].keycode)});
-                if (thisMode.game.players.length == 3) thisMode.ShowPlayer3Key.delay(90,function(){
+                if (thisMode.game.players.length == 3) thisMode.Player3ShowKey.delay(90,function(){
                     this.play();
                     this.click(function(){pressKey(thisMode.game.players[2].keycode)});
                 });
@@ -582,10 +625,14 @@ ModeQuestion.prototype.start = function() {
 
     this.game.font.strings[110] = this.game.players[0].name;
     this.game.font.strings[115] = this.game.displayCurrency(this.game.players[0].score);
-    this.game.font.strings[120] = this.game.players[1].name;
-    this.game.font.strings[125] = this.game.displayCurrency(this.game.players[1].score);
-    this.game.font.strings[130] = this.game.players[2].name;
-    this.game.font.strings[135] = this.game.displayCurrency(this.game.players[2].score);
+    if (thisMode.game.players.length >= 2) {
+        this.game.font.strings[120] = this.game.players[1].name;
+        this.game.font.strings[125] = this.game.displayCurrency(this.game.players[1].score);
+    }
+    if (thisMode.game.players.length == 3) {
+        this.game.font.strings[130] = this.game.players[2].name;
+        this.game.font.strings[135] = this.game.displayCurrency(this.game.players[2].score);
+    }
 
     this.game.font.resetTextStyle(1100);
     this.game.font.resetTextStyle(1210);

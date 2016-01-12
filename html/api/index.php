@@ -1,7 +1,8 @@
 <?php
 
-require_once 'mysql.inc.php';
 require_once 'local/config.inc.php';
+require_once 'mysql.inc.php';
+require_once 'JSON.php';
 
 if (!isset($_POST['call'])) die('API ready 1');
 $call = $_POST['call'];
@@ -12,33 +13,65 @@ function uriToUid($uri) {
     return 'api/get.php?uid='.$base64.sha1($base64.$GETsalt).'&type=';
 }
 
+$nbplayers = 3; // CONSTANTE POUR LE MOMENT
+
 function gameinfo() {
-    global $VERSION;
+    global $VERSION, $nbplayers;
     $players = array();
     $locale = '';
     $engineVersion = 2;
     switch($VERSION) {
-        case 'fr': $players = array(
-                        array('name' => 'Joueur 1','score' => 0,'keycode' => 113),
-                        array('name' => 'Joueur 2','score' => 0,'keycode' => 98),
-                        array('name' => 'Joueur 3','score' => 0,'keycode' => 112)
-                    );
+        case 'fr':  if ($nbplayers == 1)
+                        $players = array(
+                            array('name' => 'Joueur 1','score' => 0,'keycode' => 98),
+                        );
+                    if ($nbplayers == 2)
+                        $players = array(
+                            array('name' => 'Joueur 1','score' => 0,'keycode' => 113),
+                            array('name' => 'Joueur 2','score' => 0,'keycode' => 112)
+                        );
+                    if ($nbplayers == 3)
+                        $players = array(
+                            array('name' => 'Joueur 1','score' => 0,'keycode' => 113),
+                            array('name' => 'Joueur 2','score' => 0,'keycode' => 98),
+                            array('name' => 'Joueur 3','score' => 0,'keycode' => 112)
+                        );
                     $locale = 'fr_FR';
                     $engineVersion = 2;
                     break;
-        case 'uk': $players = array(
-                        array('name' => 'Player 1','score' => 0,'keycode' => 113),
-                        array('name' => 'Player 2','score' => 0,'keycode' => 98),
-                        array('name' => 'Player 3','score' => 0,'keycode' => 112)
-                    );
+        case 'uk':  if ($nbplayers == 1)
+                        $players = array(
+                            array('name' => 'Player 1','score' => 0,'keycode' => 98),
+                        );
+                    if ($nbplayers == 2)
+                        $players = array(
+                            array('name' => 'Player 1','score' => 0,'keycode' => 113),
+                            array('name' => 'Player 2','score' => 0,'keycode' => 112)
+                        );
+                    if ($nbplayers == 3)
+                        $players = array(
+                            array('name' => 'Player 1','score' => 0,'keycode' => 113),
+                            array('name' => 'Player 2','score' => 0,'keycode' => 98),
+                            array('name' => 'Player 3','score' => 0,'keycode' => 112)
+                        );
                     $locale = 'en_GB';
                     $engineVersion = 2;
                     break;
-        case 'de1': $players = array(
-                        array('name' => 'Kandidat 1','score' => 0,'keycode' => 113),
-                        array('name' => 'Kandidat 2','score' => 0,'keycode' => 98),
-                        array('name' => 'Kandidat 3','score' => 0,'keycode' => 112)
-                    );
+        case 'de1': if ($nbplayers == 1)
+                        $players = array(
+                            array('name' => 'Kandidat 1','score' => 0,'keycode' => 98),
+                        );
+                    if ($nbplayers == 2)
+                        $players = array(
+                            array('name' => 'Kandidat 1','score' => 0,'keycode' => 113),
+                            array('name' => 'Kandidat 2','score' => 0,'keycode' => 112)
+                        );
+                    if ($nbplayers == 3)
+                        $players = array(
+                            array('name' => 'Kandidat 1','score' => 0,'keycode' => 113),
+                            array('name' => 'Kandidat 2','score' => 0,'keycode' => 98),
+                            array('name' => 'Kandidat 3','score' => 0,'keycode' => 112)
+                        );
                     $locale = 'de_DE';
                     $engineVersion = 2;
                     break;
@@ -51,13 +84,16 @@ function gameinfo() {
         )));
 }
 
+// Retourne les paramètres du prochain mode de jeu
 function gamemode() {
+    global $nbplayers;
     if (!isset($_POST['currentmode'])) die('Gamemode 1');
     $currentmode = $_POST['currentmode'];
     $newmode = array();
     switch ($currentmode) {
         case 'None': $newmode = array('mode' => 'Intro'); break;
-        case 'Intro': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 1, 'chooseplayer' => rand(1,3)); break;
+        //case 'None': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 7, 'chooseplayer' => rand(1,$nbplayers)); break; // Ligne DEBUG
+        case 'Intro': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 1, 'chooseplayer' => rand(1,$nbplayers)); break;
         case 'Category':
             if (!isset($_POST['category'])) die('Gamemode 2');
             $category = $_POST['category'];
@@ -73,7 +109,7 @@ function gamemode() {
 
 // Fonction qui renvoie un tableau JSON avec la liste des ressources et des URLS à aller chercher
 function resources() {
-    global $DB, $DBsta, $DEMOMODE, $VERSION;
+    global $DB, $DBsta, $DEMOMODE, $VERSION, $nbplayers;
     $reslist = array();
 
     if (!isset($_POST['mode'])) die('Resources 1');
@@ -81,21 +117,37 @@ function resources() {
 
     /*********** MODE INTRO ***********/
     if ($mode == 'Intro') {
-        $intro = rand(1,4);
-        $pretitle = rand(1,11);
+        $intro = rand(1,4); // Choix aléatoire parmi 4 intros différentes (le Jack qui casse)
+        $pretitle = rand(1,11); // Choix aléatoire parmi 11 pré-titres différents (les deux lignes avant le logo)
 
         $reslist = array();
+
+        // Sélection des animations
         $res = $DB->query("SELECT *
                            FROM ".$DBsta.".resani a, ".$DBsta.".resfiles f
                            WHERE a.resid = f.resid
                            AND grp = 'Intro'");
         while ($rs = $res->fetch()) {
+            if (($rs['variantType'] == 'NumberOfPlayers') && ($rs['variantValue'] != $nbplayers)) continue; // Ignorer ce qui ne correspond pas au bon nombre de joueurs
+
+            // Sélection du pré-titre
             if (substr($rs['name'],0,13) == 'IntroPreTitle') {
                 if ($rs['name'] == 'IntroPreTitle'.$pretitle.'.1') $rs['name'] = 'IntroPreTitle1';
                 elseif ($rs['name'] == 'IntroPreTitle'.$pretitle.'.2') $rs['name'] = 'IntroPreTitle2';
                 else continue;
             }
 
+            // Sélection de l'intro
+            if (substr($rs['name'],0,9) == 'IntroJack') {
+                if ($rs['name'] == 'IntroJack'.$intro) $rs['name'] = 'IntroJack';
+                else continue;
+            }
+            if (substr($rs['name'],0,8) == 'JackLogo') {
+                if ($rs['name'] == 'JackLogo'.$intro) $rs['name'] = 'JackLogo';
+                else continue;
+            }
+
+            // Construction du tableau correspondant à l'animation
             $r = array(
                 'urlGif' => uriToUid('res-full/'.$rs['filename'].'.gif'),
                 'urlJS' => uriToUid('res-full/'.$rs['filename'].'.js'),
@@ -106,21 +158,14 @@ function resources() {
             $reslist[$rs['grp'].'/'.$rs['name']] = $r;
         }
 
-        $reslist['Intro/IntroJack'] = $reslist['Intro/IntroJack'.$intro];
-        $reslist['Intro/JackLogo'] = $reslist['Intro/JackLogo'.$intro];
-        unset($reslist['Intro/IntroJack1']);
-        unset($reslist['Intro/IntroJack2']);
-        unset($reslist['Intro/IntroJack3']);
-        unset($reslist['Intro/IntroJack4']);
-        unset($reslist['Intro/JackLogo1']);
-        unset($reslist['Intro/JackLogo2']);
-        unset($reslist['Intro/JackLogo3']);
-        unset($reslist['Intro/JackLogo4']);
-
+        // Sélection des sons
         $res = $DB->query("SELECT *
                            FROM ".$DBsta.".ressnd
                            WHERE grp = 'Intro'");
         while ($rs = $res->fetch()) {
+            if (($rs['variantType'] == 'NumberOfPlayers') && ($rs['variantValue'] != $nbplayers)) continue; // Ignorer ce qui ne correspond pas au bon nombre de joueurs
+
+            // Choisir une valeur au hasard parmi la liste de choix possibles.
             $names = array($rs['name']);
 
             $possiblevalues = explode(',',$rs['val']);
@@ -147,6 +192,8 @@ function resources() {
         $category = $_POST['category'];
         if (!isset($_POST['questionnumber'])) die('Resources 2');
         $questionnumber = $_POST['questionnumber'];
+        $playersolo = 0;
+        if ($nbplayers == 1) $playersolo = 1;
 
         $reslist = array();
         $res = $DB->query("SELECT *
@@ -154,9 +201,8 @@ function resources() {
                            WHERE a.resid = f.resid
                            AND grp = 'Category'");
         while ($rs = $res->fetch()) {
-            if ((strpos($rs['name'],'.C1') !== FALSE) && ($category != 1)) continue; else $rs['name'] = str_replace('.C1','',$rs['name']);
-            if ((strpos($rs['name'],'.C2') !== FALSE) && ($category != 2)) continue; else $rs['name'] = str_replace('.C2','',$rs['name']);
-            if ((strpos($rs['name'],'.C3') !== FALSE) && ($category != 3)) continue; else $rs['name'] = str_replace('.C3','',$rs['name']);
+            if (($rs['variantType'] == 'CategoryNumber') && ($rs['variantValue'] != $category)) continue; // On ne prend que ce qui correspond au numéro de catégorie en cours
+
             $r = array(
                 'urlGif' => uriToUid('res-full/'.$rs['filename'].'.gif'),
                 'urlJS' => uriToUid('res-full/'.$rs['filename'].'.js'),
@@ -173,6 +219,8 @@ function resources() {
                            FROM ".$DBsta.".ressnd
                            WHERE grp = 'Category'");
         while ($rs = $res->fetch()) {
+            if (($rs['variantType'] == 'PlayerSolo') && ($rs['variantValue'] != $playersolo)) continue; // Uniquement ce qui correspond à un joueur
+
             $possiblevalues = explode(',',$rs['val']);
             if (sizeof($possiblevalues) > 1) shuffle($possiblevalues);
 
@@ -254,46 +302,36 @@ function resources() {
         $questionnumber = $_POST['questionnumber'];
         if (!isset($_POST['id'])) die('Resources 2');
         $id = $_POST['id'];
-        $nbplayers = 3; // CONSTANTE POUR LE MOMENT
 
         $res = $DB->query("SELECT *
                            FROM ".$DBsta.".qhdr q, ".$DBsta.".strings s
                            WHERE id = '".addslashes($id)."'
                            AND q.folder = s.folder");
         $qhdr = $res->fetch();
-        $value = number_format(1000*$qhdr['value']*$category,0,'','');
+        $questionvalue = number_format(1000*$qhdr['value']*$category,0,'','');
+        $questionnumbertmp = $questionnumber;
+        if ($questionnumber > 10) $questionnumbertmp = 10;
+        $playersolo = 0;
+        if ($nbplayers == 1) $playersolo = 1;
 
+        // Choix parmi les 2-3 jingles
         if ($questionnumber <= 6) $jinglequestion = rand(1,3); else $jinglequestion = rand(1,2);
-        $music = rand(1,6);
+        $music = rand(1,6); // Choix parmi les 6 musiques
 
-        $reslist = array('value' => $value);
+        $reslist = array('value' => $questionvalue);
         $res = $DB->query("SELECT *
                            FROM ".$DBsta.".resani a, ".$DBsta.".resfiles f
                            WHERE a.resid = f.resid
                            AND grp = 'Question'");
         while ($rs = $res->fetch()) {
-            if ((strpos($rs['name'],'.Q10') !== FALSE) && ($questionnumber < 10)) continue; else $rs['name'] = str_replace('.Q10','',$rs['name']);
-            if ((strpos($rs['name'],'.Q1') !== FALSE) && ($questionnumber != 1)) continue; else $rs['name'] = str_replace('.Q1','',$rs['name']);
-            if ((strpos($rs['name'],'.Q2') !== FALSE) && ($questionnumber != 2)) continue; else $rs['name'] = str_replace('.Q2','',$rs['name']);
-            if ((strpos($rs['name'],'.Q3') !== FALSE) && ($questionnumber != 3)) continue; else $rs['name'] = str_replace('.Q3','',$rs['name']);
-            if ((strpos($rs['name'],'.Q4') !== FALSE) && ($questionnumber != 4)) continue; else $rs['name'] = str_replace('.Q4','',$rs['name']);
-            if ((strpos($rs['name'],'.Q5') !== FALSE) && ($questionnumber != 5)) continue; else $rs['name'] = str_replace('.Q5','',$rs['name']);
-            if ((strpos($rs['name'],'.Q6') !== FALSE) && ($questionnumber != 6)) continue; else $rs['name'] = str_replace('.Q6','',$rs['name']);
-            if ((strpos($rs['name'],'.Q7') !== FALSE) && ($questionnumber != 7)) continue; else $rs['name'] = str_replace('.Q7','',$rs['name']);
-            if ((strpos($rs['name'],'.Q8') !== FALSE) && ($questionnumber != 8)) continue; else $rs['name'] = str_replace('.Q8','',$rs['name']);
-            if ((strpos($rs['name'],'.Q9') !== FALSE) && ($questionnumber != 9)) continue; else $rs['name'] = str_replace('.Q9','',$rs['name']);
+            if ($rs['variantType'] == 'QuestionDemo') continue;
+            if ($rs['variantType'] == 'QuestionNumber') if ($rs['variantValue'] != $questionnumbertmp) continue;
+            if (($rs['variantType'] == 'QuestionValue') && ($rs['variantValue'] != $questionvalue)) continue;
+            if (($rs['variantType'] == 'NumberOfPlayers') && ($rs['variantValue'] != $nbplayers)) continue;
+
+            // Choix parmi les 2-3 jingles
             if (strpos($rs['name'], 'JingleQuestion') === 0) if ($rs['name'] != 'JingleQuestion'.$jinglequestion) continue; else $rs['name'] = 'JingleQuestion';
             if (strpos($rs['name'], 'BGQuestion') === 0) if ($rs['name'] != 'BGQuestion'.$jinglequestion) continue; else $rs['name'] = 'BGQuestion';
-
-            if (strpos($rs['name'], 'AnnounceValue') === 0) if ($rs['name'] != 'AnnounceValue'.$value.'F') continue; else $rs['name'] = 'AnnounceValue';
-            if (strpos($rs['name'], 'HideValue') === 0) if ($rs['name'] != 'HideValue'.$value.'F') continue; else $rs['name'] = 'HideValue';
-
-            if (strpos($rs['name'], 'Player1on1') === 0) if ($nbplayers != 1) continue; else $rs['name'] = str_replace('Player1on1', 'Player1', $rs['name']);
-            if (strpos($rs['name'], 'Player1on2') === 0) if ($nbplayers != 2) continue; else $rs['name'] = str_replace('Player1on2', 'Player1', $rs['name']);
-            if (strpos($rs['name'], 'Player2on2') === 0) if ($nbplayers != 2) continue; else $rs['name'] = str_replace('Player2on2', 'Player2', $rs['name']);
-            if (strpos($rs['name'], 'Player1on3') === 0) if ($nbplayers != 3) continue; else $rs['name'] = str_replace('Player1on3', 'Player1', $rs['name']);
-            if (strpos($rs['name'], 'Player2on3') === 0) if ($nbplayers != 3) continue; else $rs['name'] = str_replace('Player2on3', 'Player2', $rs['name']);
-            if (strpos($rs['name'], 'Player3on3') === 0) if ($nbplayers != 3) continue; else $rs['name'] = str_replace('Player3on3', 'Player3', $rs['name']);
 
             $r = array(
                 'urlGif' => uriToUid('res-full/'.$rs['filename'].'.gif'),
@@ -309,19 +347,11 @@ function resources() {
                            FROM ".$DBsta.".ressnd
                            WHERE grp = 'Question'");
         while ($rs = $res->fetch()) {
-            if ((strpos($rs['name'],'.Q10') !== FALSE) && ($questionnumber < 10)) continue; else $rs['name'] = str_replace('.Q10','',$rs['name']);
-            if ((strpos($rs['name'],'.Q1') !== FALSE) && ($questionnumber != 1)) continue; else $rs['name'] = str_replace('.Q1','',$rs['name']);
-            if ((strpos($rs['name'],'.Q2') !== FALSE) && ($questionnumber != 2)) continue; else $rs['name'] = str_replace('.Q2','',$rs['name']);
-            if ((strpos($rs['name'],'.Q3') !== FALSE) && ($questionnumber != 3)) continue; else $rs['name'] = str_replace('.Q3','',$rs['name']);
-            if ((strpos($rs['name'],'.Q4') !== FALSE) && ($questionnumber != 4)) continue; else $rs['name'] = str_replace('.Q4','',$rs['name']);
-            if ((strpos($rs['name'],'.Q5') !== FALSE) && ($questionnumber != 5)) continue; else $rs['name'] = str_replace('.Q5','',$rs['name']);
-            if ((strpos($rs['name'],'.Q6') !== FALSE) && ($questionnumber != 6)) continue; else $rs['name'] = str_replace('.Q6','',$rs['name']);
-            if ((strpos($rs['name'],'.Q7') !== FALSE) && ($questionnumber != 7)) continue; else $rs['name'] = str_replace('.Q7','',$rs['name']);
-            if ((strpos($rs['name'],'.Q8') !== FALSE) && ($questionnumber != 8)) continue; else $rs['name'] = str_replace('.Q8','',$rs['name']);
-            if ((strpos($rs['name'],'.Q9') !== FALSE) && ($questionnumber != 9)) continue; else $rs['name'] = str_replace('.Q9','',$rs['name']);
+            if ($rs['variantType'] == 'QuestionNumber') if ($rs['variantValue'] != $questionnumbertmp) continue;
             if (strpos($rs['name'], 'JingleQuestion') === 0) if ($rs['name'] != 'JingleQuestion'.$jinglequestion) continue; else $rs['name'] = 'JingleQuestion';
-
-            if (strpos($rs['name'], 'VoiceAnnounceValue') === 0) if ($rs['name'] != 'VoiceAnnounceValue'.$value.'F') continue; else $rs['name'] = 'VoiceAnnounceValue';
+            if (($rs['variantType'] == 'NumberOfPlayers') && ($rs['variantValue'] != $nbplayers)) continue;
+            if (($rs['variantType'] == 'PlayerSolo') && ($rs['variantValue'] != $playersolo)) continue;
+            if (($rs['variantType'] == 'QuestionValue') && ($rs['variantValue'] != $questionvalue)) continue;
 
             if (($rs['name'] == 'JingleReadQuestion') || ($rs['name'] == 'JingleTimer')) $possiblevalues = array($music);
             else {
@@ -410,14 +440,23 @@ function resources() {
                            WHERE id = '".addslashes($id)."'
                            AND q.folder = s.folder");
         $qhdr = $res->fetch();
-        $value = number_format(500*$category,0,'','');
+        $questionvalue = number_format(500*$category,0,'','');
+        $json = new Services_JSON();
+        $strings = $json->decode($qhdr['strings']);
+        $nbanswers = 2;
+        foreach($strings as $str) if ($str->id == 4) {
+            foreach($str->data as $d) if ($d == 3) $nbanswers = 3;
+        }
 
-        $reslist = array('value' => $value);
+        $reslist = array('value' => $questionvalue);
         $res = $DB->query("SELECT *
                            FROM ".$DBsta.".resani a, ".$DBsta.".resfiles f
                            WHERE a.resid = f.resid
                            AND grp = 'DisOrDat'");
         while ($rs = $res->fetch()) {
+            if (($rs['variantType'] == 'NumberOfAnswers') && ($rs['variantValue'] != $nbanswers)) continue;
+            if (($rs['variantType'] == 'QuestionValue') && ($rs['variantValue'] != $questionvalue)) continue;
+
             $r = array(
                 'urlGif' => uriToUid('res-full/'.$rs['filename'].'.gif'),
                 'urlJS' => uriToUid('res-full/'.$rs['filename'].'.js'),
@@ -433,6 +472,9 @@ function resources() {
                            WHERE grp = 'DisOrDat'
                            OR (grp = 'Question' AND name IN ('SFXPlayerCorrect','SFXPlayerLose'))");
         while ($rs = $res->fetch()) {
+            if (($rs['variantType'] == 'NumberOfPlayers') && ($rs['variantValue'] != $nbplayers)) continue;
+            if (($rs['variantType'] == 'QuestionValue') && ($rs['variantValue'] != $questionvalue)) continue;
+
             $names = array($rs['name']);
 
             $possiblevalues = explode(',',$rs['val']);
@@ -485,6 +527,8 @@ function resources() {
         if (!isset($_POST['id'])) die('Resources 2');
         $id = $_POST['id'];
         $skiprules = rand(1,12);
+        $playersolo = 0;
+        if ($nbplayers == 1) $playersolo = 1;
 
         $res = $DB->query("SELECT *
                            FROM ".$DBsta.".qhdr q, ".$DBsta.".strings s
@@ -498,6 +542,15 @@ function resources() {
                            WHERE a.resid = f.resid
                            AND grp = 'JackAttack'");
         while ($rs = $res->fetch()) {
+            if (($rs['variantType'] == 'CategoryNumber') && ($rs['variantValue'] != $category)) continue;
+
+            // Cas particulier pour les joueurs : en mode solo, on prend le joueur du milieu (Player2), en deux joueurs on prend les extrémités (Player1 et Player3), et en 3 joueurs bah on prend les 3 bien sûr.
+            if ((substr($rs['name'],0,7) == 'Player1') && ($nbplayers == 1)) continue; // On ignore le Player1 en mode un joueur (dingue non ?)
+            if ((substr($rs['name'],0,7) == 'Player2') && ($nbplayers == 2)) continue; // On ignore le Player2 en mode deux joueurs (ce mec est fou)
+            if ((substr($rs['name'],0,7) == 'Player2') && ($nbplayers == 1)) $rs['name'] = str_replace('Player2','Player1',$rs['name']); // Mais en mode solo, le Player2 devient le Player1.
+            if ((substr($rs['name'],0,7) == 'Player3') && ($nbplayers == 1)) continue; // On ignore le Player3 en solo (ha enfin quelque chose de sensé)
+            if ((substr($rs['name'],0,7) == 'Player3') && ($nbplayers == 2)) $rs['name'] = str_replace('Player3','Player2',$rs['name']); // Et enfin, à deux, le Player3 devient le Player2.
+
             if ((substr($rs['name'],0,12) == 'ShowSkipText') || (substr($rs['name'],0,12) == 'HideSkipText')) {
                 if ($rs['name'] == 'ShowSkipText'.$skiprules) $rs['name'] = 'ShowSkipText';
                 elseif ($rs['name'] == 'HideSkipText'.$skiprules) $rs['name'] = 'HideSkipText';
@@ -518,6 +571,8 @@ function resources() {
                            FROM ".$DBsta.".ressnd
                            WHERE grp = 'JackAttack'");
         while ($rs = $res->fetch()) {
+            if (($rs['variantType'] == 'PlayerSolo') && ($rs['variantValue'] != $playersolo)) continue;
+
             $names = array($rs['name']);
             if ($rs['name'] == 'PlayersScream') $names = array('PlayersScream1', 'PlayersScream2', 'PlayersScream3');
 
@@ -546,13 +601,10 @@ function resources() {
         unset($reslist['JackAttack/IntroLaunch2']);
         unset($reslist['JackAttack/IntroLaunch3']);
 
-        $reslist['JackAttack/IntroRound'] = $reslist['JackAttack/IntroRound1.'.rand(1,3)];
-        unset($reslist['JackAttack/IntroRound1.1']);
-        unset($reslist['JackAttack/IntroRound1.2']);
-        unset($reslist['JackAttack/IntroRound1.3']);
-        unset($reslist['JackAttack/IntroRound3.1']);
-        unset($reslist['JackAttack/IntroRound3.2']);
-        unset($reslist['JackAttack/IntroRound3.3']);
+        $reslist['JackAttack/IntroRound'] = $reslist['JackAttack/IntroRound'.rand(1,3)];
+        unset($reslist['JackAttack/IntroRound1']);
+        unset($reslist['JackAttack/IntroRound2']);
+        unset($reslist['JackAttack/IntroRound3']);
 
         $reslist['JackAttack/Example'] = $reslist['JackAttack/Example'.rand(1,3)];
         unset($reslist['JackAttack/Example1']);
