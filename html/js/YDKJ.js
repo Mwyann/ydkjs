@@ -28,6 +28,7 @@ function YDKJ(screen, debug) {
         jQuery.getScript(scriptname+'?rand='+Math.random(),scriptsready);
     };
 
+    loadScript('js/HackTimer.min.js'); // https://github.com/turuslan/HackTimer
     if (typeof YDKJGame == "undefined") loadScript('js/YDKJGame.js');
     if (typeof YDKJFont == "undefined") loadScript('js/YDKJFont.js');
     if (typeof YDKJMode == "undefined") loadScript('js/YDKJMode.js');
