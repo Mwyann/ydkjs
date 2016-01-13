@@ -1,6 +1,8 @@
 /********** Quelques fonctions pour le son **********/
 
 function AudioSpecs() {
+    this.mobile = (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile/i.test(navigator.userAgent)) ;
+
     this.is = {
         ff: Boolean(!(window.mozInnerScreenX == null) && /firefox/.test( navigator.userAgent.toLowerCase() )),
         ie: Boolean(document.all && !window.opera),
@@ -10,10 +12,20 @@ function AudioSpecs() {
     };
     this.playDelay = -30; // IE 1500
     this.stopDelay = 30;  // IE 20
+    this.lengthOffset = 0;
     this.maxVolume = 1;
-    if(this.is.chrome) this.playDelay = -25;
-    if(this.is.chrome) this.stopDelay = 25;
-    if(this.is.chrome) this.maxVolume = 0.5;
+    if(this.is.chrome) {
+        if(!this.mobile) { // Chrome Desktop
+            this.playDelay = -25;
+            this.stopDelay = 25;
+            this.maxVolume = 0.5;
+        } else { // Chrome Mobile
+            this.playDelay = -300;
+            this.stopDelay = -200;
+            this.maxVolume = 0.5;
+            this.lengthOffset = -600;
+        }
+    }
     if(this.is.ff) this.playDelay = -25;
     if(this.is.ff) this.stopDelay = 85;
     if(this.is.opera) this.playDelay = 5;

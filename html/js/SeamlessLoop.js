@@ -41,13 +41,7 @@
  */
 
 function SeamlessLoop() {
-	this.is = {
-			  ff: Boolean(!(window.mozInnerScreenX == null) && /firefox/.test( navigator.userAgent.toLowerCase() )),
-			  ie: Boolean(document.all && !window.opera),
-			  opera: Boolean(window.opera),
-			  chrome: Boolean(window.chrome),
-			  safari: Boolean(!window.chrome && /safari/.test( navigator.userAgent.toLowerCase() ) && window.getComputedStyle && !window.globalStorage && !window.opera)
-			};
+	this.is = audiospecs.is;
 	/*
 	console.debug("ff: " + this.is.ff);
 	console.debug("ie: " + this.is.ie);
@@ -60,16 +54,11 @@ function SeamlessLoop() {
 	this.cb_loaded;
 	this.cb_loaded_flag = new Boolean();
 	this.timeout;
-	this.playDelay = -30; // IE 1500
-	this.stopDelay = 30;  // IE 20
-	if(this.is.chrome) this.playDelay = -25;
-	if(this.is.chrome) this.stopDelay = 25;
-	if(this.is.ff) this.playDelay = -25;
-	if(this.is.ff) this.stopDelay = 85;
-	if(this.is.opera) this.playDelay = 5;
-	if(this.is.opera) this.stopDelay = 0;
+	this.playDelay = audiospecs.playDelay;
+	this.stopDelay = audiospecs.stopDelay;
 	//console.debug(this.playDelay + ", " + this.stopDelay);
 	this.next = 1;
+	this.res = new Array();
 	this.audios = new Array();
 	this.actual = new Array();
 	this.dropOld = new Boolean();
@@ -174,15 +163,23 @@ SeamlessLoop.prototype.callback = function(cb_loaded) {
 };
 
 SeamlessLoop.prototype.addUri = function(uri, length, id) {
+	this.res[id] = new Array();
 	this.audios[id] = new Array();
 	this.audios[id]._length = length;
 	var t = this;
 	this.audios[id]._1_isLoaded = new Boolean();
 	this.audios[id]._2_isLoaded = new Boolean();
-	this.audios[id]._1 = new Audio();
-	this.audios[id]._2 = new Audio();
-	if (this.audios[id]._1.canPlayType('audio/ogg')) this.audios[id]._1.src = uri+'.ogg'; else this.audios[id]._1.src = uri+'.mp3';
-	if (this.audios[id]._2.canPlayType('audio/ogg')) this.audios[id]._2.src = uri+'.ogg'; else this.audios[id]._2.src = uri+'.mp3';
+	this.res[id]._1 = YDKJaudiomanager.lease();
+	this.res[id]._2 = YDKJaudiomanager.lease();
+	this.audios[id]._1 = this.res[id]._1.get(0);
+	this.audios[id]._2 = this.res[id]._2.get(0);
+
+	var addSource = function(element, url, type) {
+		jQuery(element).append('<source />').children().last().attr('type',type).attr('src',url);
+	};
+
+	if (this.audios[id]._1.canPlayType('audio/ogg')) addSource(this.audios[id]._1, uri+'.ogg', 'audio/ogg'); else addSource(this.audios[id]._1, uri+'.mp3', 'audio/mp3');
+	if (this.audios[id]._2.canPlayType('audio/ogg')) addSource(this.audios[id]._2, uri+'.ogg', 'audio/ogg'); else addSource(this.audios[id]._2, uri+'.mp3', 'audio/mp3');
 	this._total++;
 	this.audios[id]._1.addEventListener("canplaythrough", function() {t._eventCanplaythrough(t.audios[id]._1_isLoaded);});
 	this.audios[id]._2.addEventListener("canplaythrough", function() {t._eventCanplaythrough(t.audios[id]._2_isLoaded);});
@@ -194,4 +191,13 @@ SeamlessLoop.prototype.addUri = function(uri, length, id) {
 	this.audios[id]._2.load();
 	this.audios[id]._1.volume = this._volume;
 	this.audios[id]._2.volume = this._volume;
+};
+
+SeamlessLoop.prototype.free = function(id) {
+	if (this.res[id]) {
+		this.res[id]._1.release();
+		this.res[id]._2.release();
+		this.res[id] = 0;
+		this.audios[id] = 0;
+	}
 };

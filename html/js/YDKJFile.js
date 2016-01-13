@@ -57,9 +57,8 @@ YDKJFile.prototype.preload = function(f) {
     }
 
     if (this.filetype == 'audio') {
-        this.res = jQuery('<audio />');
-        preloaddiv.append(this.res);
-        var a = this.res.get(0);
+        this.res = YDKJaudiomanager.lease();
+        var a = this.res.get(0); // Hope that we got a lease here...
         if (a.canPlayType('audio/ogg')) this.res.append('<source />').children().last().attr('type','audio/ogg').attr('src',this.url+'.ogg');
         else if (a.canPlayType('audio/mpeg')) this.res.append('<source />').children().last().attr('type','audio/mpeg').attr('src',this.url+'.mp3');
         else {
@@ -77,7 +76,10 @@ YDKJFile.prototype.ready = function(f) {
 YDKJFile.prototype.free = function() {
     preloadpool[this.url].used--;
     if (preloadpool[this.url].used <= 0) {
-        if ((this.res) && ((this.filetype == 'gif') || (this.filetype == 'audio'))) this.res.remove();
+        if (this.res) {
+            if (this.filetype == 'gif') this.res.remove();
+            if (this.filetype == 'audio') YDKJaudiomanager.release(this.res);
+        }
         this.res = 0;
         preloadpool[this.url] = 0;
     }

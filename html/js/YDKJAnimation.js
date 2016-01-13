@@ -81,7 +81,9 @@ function YDKJAnimation(resource) {
             if (audiofile) {
                 var audioelem = audiofile.get(0);
                 thisAnim.seamlessLoop = new SeamlessLoop();
-                thisAnim.seamlessLoop.addUri(thisAnim.urlAudio,audioelem.duration*1000,1);
+                var length = audiospecs.lengthOffset+(audioelem.duration*1000);
+                if (length < 0) length = 0;
+                thisAnim.seamlessLoop.addUri(thisAnim.urlAudio,length,1);
                 var doLoopOriginal = thisAnim.seamlessLoop.doLoop;
                 thisAnim.seamlessLoop.doLoop = function(looped) { // Petit hack pour maintenir les fonctions ended en boucle synchro
                     if (!looped) doLoopOriginal.call(thisAnim.seamlessLoop,looped);
@@ -448,9 +450,11 @@ YDKJAnimation.prototype.free = function() {
     var audio = this.audio; this.audio = false;
     var div = this.div; this.div = false;
     var tmpdiv = this.tmpdiv; this.tmpdiv = false;
+    var seamlessLoop = this.seamlessLoop; this.seamlessLoop = false;
     if (gif) gif.free();
     if (js) js.free();
     if (audio) audio.free();
+    if (seamlessLoop) seamlessLoop.free();
     if (div) div.addClass('markedAsRemoved'); // Sera retiré réellement à la prochaine animation (pour éviter les écrans noirs entre animations)
     if (tmpdiv) tmpdiv.remove();
 };
@@ -496,7 +500,8 @@ YDKJAnimation.prototype.length = function() {
         var audiofile = this.audio.res;
         if (audiofile) {
             var audioelem = audiofile.get(0);
-            length = (audioelem.duration*1000).toFixed(0);
+            length = (audiospecs.lengthOffset+(audioelem.duration*1000)).toFixed(0);
+            if (length < 0) length = 0;
             if (length > maxlength) maxlength = length;
         }
     }

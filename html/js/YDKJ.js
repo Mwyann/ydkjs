@@ -29,6 +29,7 @@ function YDKJ(screen, debug) {
     };
 
     loadScript('js/HackTimer.min.js'); // https://github.com/turuslan/HackTimer
+    if (typeof AudioManager == "undefined") loadScript('js/AudioManager.js');
     if (typeof YDKJGame == "undefined") loadScript('js/YDKJGame.js');
     if (typeof YDKJFont == "undefined") loadScript('js/YDKJFont.js');
     if (typeof YDKJMode == "undefined") loadScript('js/YDKJMode.js');

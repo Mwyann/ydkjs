@@ -209,7 +209,7 @@ ModeJackAttack.prototype.start = function() {
         thisMode['SFXCorrect' + b].ended(function(){
             BGMusicPos++;
             BGMusicPlayed = 0;
-            if (availableQuestions.length > 1) {
+            if ((availableQuestions.length > 1) && (BGMusicPos <= 7)) {
                 thisMode['BGMusic' + BGMusicPos].play();
                 availableQuestions.shift(); // On enlève la question répondue
                 nextQuestion();

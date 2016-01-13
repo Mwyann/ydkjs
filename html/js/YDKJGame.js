@@ -1,5 +1,7 @@
 /********** YDKJGame **********/
 
+var YDKJaudiomanager = new AudioManager();
+
 function YDKJGame(html, demomode) {
     var thisGame = this;
     if (!demomode) demomode = false;
@@ -66,14 +68,29 @@ function YDKJGame(html, demomode) {
 YDKJGame.prototype.start = function() {
     var thisGame = this;
     this.font.preload(function () {
-        thisGame.gameinfoready(function (gameinfo) {
-            thisGame.players = gameinfo.players;
-            thisGame.locale = gameinfo.locale;
-            thisGame.engineVersion = gameinfo.engineVersion;
-            (thisGame.api.gamemode())(function (gamemode) {
-                gamemode.start();
+        var useraction = 0;
+        if (!YDKJaudiomanager.init(512,function() {
+            if (useraction) useraction.remove();
+            thisGame.gameinfoready(function (gameinfo) {
+                thisGame.players = gameinfo.players;
+                thisGame.locale = gameinfo.locale;
+                thisGame.engineVersion = gameinfo.engineVersion;
+                (thisGame.api.gamemode())(function (gamemode) {
+                    gamemode.start();
+                });
             });
-        });
+        })) {
+            useraction = jQuery('<div />');
+            useraction.html('Mobile user: please touch the screen to start the game').css({
+                'color': 'white',
+                'background-color': 'black',
+                'position': 'absolute',
+                'z-index': '99999',
+                'top': '50%',
+                'left': '30%'
+            });
+            useraction.appendTo('body');
+        }
     });
 };
 
