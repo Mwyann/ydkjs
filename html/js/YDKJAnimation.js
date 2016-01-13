@@ -237,6 +237,14 @@ function YDKJAnimation(resource) {
         this.tmpdiv = 0;
         */
 
+        /*
+        this.tmpdiv.css('display','none').addClass('tmpDoNotRemove');
+        this.tmpdiv.appendTo(this.div);
+        this.div.children().not('.tmpDoNotRemove').css('display','none');
+        this.tmpdiv.css('display','').removeClass('tmpDoNotRemove');
+        this.tmpdiv = 0;
+        */
+
         this.div.children().remove();
         this.tmpdiv.appendTo(this.div);
         this.tmpdiv = 0;
