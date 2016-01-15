@@ -617,16 +617,7 @@ function resources() {
 
         $reslist['JackAttack/TheClue'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/2'));
 
-        $answerseeds = array();
-        for($i = 0; $i < 14; $i++) {
-            $r = -1;
-            while ($r == -1) {
-                $r = rand(1,9999999);
-                for($j = 0; $j < $i; $j++) if ($answerseeds[$j] == $r) $r = -1;
-            }
-            array_push($answerseeds,$r);
-        }
-        $reslist['answerseeds'] = $answerseeds;
+        $reslist['randseed'] = rand(1,9999999); // TODO Deviendra globale à la partie et sera probablement identique au session ID (qui est déjà random)
 
         $reslist['STR'] = $qhdr['strings'];
     }

@@ -77,12 +77,23 @@ ModeJackAttack.prototype.preload = function(resources) {
 ModeJackAttack.prototype.start = function() {
     var thisMode = this;
 
+    var randomness = new MersenneTwister(); // Grâce à cette classe, tous les joueurs auront les mêmes probabilités d'affichage
+
     var availableQuestions = [1,2,3,4,5,6,7];
-    var answerseeds = this.options.answerseeds;
+    var randseed = this.options.randseed;
+    randomness.init_genrand(randseed);
+    var answerseeds = [];
+    for(var j = 0; j < 14; j++) {
+        var r = -1;
+        while (r == -1) {
+            r = randomness.integer(0,999999);
+            for(var k = 0;k < j; k++) if (answerseeds[k] == r) r = -1;
+        }
+        answerseeds.push(r);
+    }
     var answers = []; // 9 à choisir
     var currentQuestion = 0;
     var currentAnswer = 0;
-    var randomness = new MersenneTwister(); // Grâce à cette classe, tous les joueurs auront les mêmes probabilités d'affichage
 
     var BGMusicPlayed = 0;
     var BGMusicPos = 1;
