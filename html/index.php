@@ -152,6 +152,7 @@ if (!isset($_SESSION['id'])) {
         } else echo "<div style=\"text-align:center;font-size:28px\">L'invitation n'existe pas.<br/>Contactez <a href=\"mailto:alpha@ydkj.fr\">alpha@ydkj.fr</a> pour en obtenir une.</div>";
     } else if (isset($_GET['invitation'])) {
         require_once 'api/mysql.inc.php';
+        connectMysql('dyn');
         $invitation = $_GET['invitation'];
         $res = $DB->query("SELECT *
                            FROM ".$DBdyn.".invitations
@@ -163,6 +164,7 @@ if (!isset($_SESSION['id'])) {
         } else echo "<div style=\"text-align:center;font-size:28px\">L'invitation n'existe pas.<br/>Contactez <a href=\"mailto:alpha@ydkj.fr\">alpha@ydkj.fr</a> pour en obtenir une.</div>";
     } else if (isset($_POST['login'])) {
         require_once 'api/mysql.inc.php';
+        connectMysql('dyn');
         $login = $_POST['login'];
         $password = $_POST['password'];
         $res = $DB->query("SELECT *
