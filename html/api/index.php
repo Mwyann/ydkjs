@@ -4,6 +4,23 @@ require_once 'local/config.inc.php';
 require_once 'mysql.inc.php';
 require_once 'JSON.php';
 
+// Gestion de la session
+session_start();
+// Numéro de session et mode de la session (local ou en ligne)
+$session_id = -1;
+$localMode = 0;
+if (isset($_SESSION['session_id'])) $session_id = intval($_SESSION['session_id']);
+if ($session_id <= 0) {
+    $session_id = rand(0,999999999);
+    $localMode = 1;
+}
+// Nombre de joueurs
+$nbplayers = 3; // CONSTANTE POUR LE MOMENT
+if (isset($_SESSION['nbplayers'])) $nbplayers = $_SESSION['nbplayers'];
+if ($nbplayers == 1) $localMode = 1; // 1 joueur = mode local forcé, pas besoin de faire appel au serveur quand on joue en solo...
+session_write_close();
+srand($session_id*130);
+
 if (!isset($_POST['call'])) die('API ready 1');
 $call = $_POST['call'];
 
@@ -13,74 +30,59 @@ function uriToUid($uri) {
     return 'api/get.php?uid='.$base64.sha1($base64.$GETsalt).'&type=';
 }
 
-$nbplayers = 3; // CONSTANTE POUR LE MOMENT
+function shuffle_rand(&$array) {
+    $newarray = [];
+    $oldarray = array_values($array); // Clean keys
+    while (sizeof($oldarray) > 1) {
+        $rand = rand(0,sizeof($oldarray)-1);
+        array_push($newarray,$oldarray[$rand]);
+        array_splice($oldarray,$rand,1);
+    }
+    if (sizeof($oldarray) > 0) array_push($newarray,$oldarray[0]);
+    $array = $newarray;
+}
 
 function gameinfo() {
-    global $VERSION, $nbplayers;
+    global $VERSION, $nbplayers, $localMode;
     $players = array();
     $locale = '';
     $engineVersion = 2;
+    $noms = array('Player 1', 'Player 2', 'Player 3');
     switch($VERSION) {
-        case 'fr':  if ($nbplayers == 1)
-                        $players = array(
-                            array('name' => 'Joueur 1','score' => 0,'keycode' => 98),
-                        );
-                    if ($nbplayers == 2)
-                        $players = array(
-                            array('name' => 'Joueur 1','score' => 0,'keycode' => 113),
-                            array('name' => 'Joueur 2','score' => 0,'keycode' => 112)
-                        );
-                    if ($nbplayers == 3)
-                        $players = array(
-                            array('name' => 'Joueur 1','score' => 0,'keycode' => 113),
-                            array('name' => 'Joueur 2','score' => 0,'keycode' => 98),
-                            array('name' => 'Joueur 3','score' => 0,'keycode' => 112)
-                        );
+        case 'fr':  $noms = array('Joueur 1', 'Joueur 2', 'Joueur 3');
                     $locale = 'fr_FR';
                     $engineVersion = 2;
                     break;
-        case 'uk':  if ($nbplayers == 1)
-                        $players = array(
-                            array('name' => 'Player 1','score' => 0,'keycode' => 98),
-                        );
-                    if ($nbplayers == 2)
-                        $players = array(
-                            array('name' => 'Player 1','score' => 0,'keycode' => 113),
-                            array('name' => 'Player 2','score' => 0,'keycode' => 112)
-                        );
-                    if ($nbplayers == 3)
-                        $players = array(
-                            array('name' => 'Player 1','score' => 0,'keycode' => 113),
-                            array('name' => 'Player 2','score' => 0,'keycode' => 98),
-                            array('name' => 'Player 3','score' => 0,'keycode' => 112)
-                        );
+        case 'uk':  $noms = array('Player 1', 'Player 2', 'Player 3');
                     $locale = 'en_GB';
                     $engineVersion = 2;
                     break;
-        case 'de1': if ($nbplayers == 1)
-                        $players = array(
-                            array('name' => 'Kandidat 1','score' => 0,'keycode' => 98),
-                        );
-                    if ($nbplayers == 2)
-                        $players = array(
-                            array('name' => 'Kandidat 1','score' => 0,'keycode' => 113),
-                            array('name' => 'Kandidat 2','score' => 0,'keycode' => 112)
-                        );
-                    if ($nbplayers == 3)
-                        $players = array(
-                            array('name' => 'Kandidat 1','score' => 0,'keycode' => 113),
-                            array('name' => 'Kandidat 2','score' => 0,'keycode' => 98),
-                            array('name' => 'Kandidat 3','score' => 0,'keycode' => 112)
-                        );
+        case 'de1': $noms = array('Kandidat 1', 'Kandidat 2', 'Kandidat 3');
                     $locale = 'de_DE';
                     $engineVersion = 2;
                     break;
     }
+    if ($nbplayers == 1)
+        $players = array(
+            array('name' => $noms[0],'score' => 0,'keycode' => 98), // Si on fournit un keycode, cela veut dire que le joueur est contrôlable en local (sinon, renvoyer "0" ou rien du tout)
+        );
+    if ($nbplayers == 2)
+        $players = array(
+            array('name' => $noms[0],'score' => 0,'keycode' => 113), // Ou alors on met un nouveau paramètre 'localplayer', plus explicite, au choix.
+            array('name' => $noms[1],'score' => 0,'keycode' => 112)
+        );
+    if ($nbplayers == 3)
+        $players = array(
+            array('name' => $noms[0],'score' => 0,'keycode' => 113),
+            array('name' => $noms[1],'score' => 0,'keycode' => 98),
+            array('name' => $noms[2],'score' => 0,'keycode' => 112)
+        );
 
     header('X-JSON: '.json_encode(array(
             'players' => $players,
             'locale' => $locale,
-            'engineVersion' => $engineVersion
+            'engineVersion' => $engineVersion,
+            'localMode' => $localMode
         )));
 }
 
@@ -109,8 +111,9 @@ function gamemode() {
 
 // Fonction qui renvoie un tableau JSON avec la liste des ressources et des URLS à aller chercher
 function resources() {
-    global $DB, $DBsta, $DEMOMODE, $VERSION, $nbplayers;
+    global $DB, $DBsta, $DBdyn, $DEMOMODE, $VERSION, $nbplayers, $session_id;
     $reslist = array();
+    connectMysql();
 
     if (!isset($_POST['mode'])) die('Resources 1');
     $mode = $_POST['mode'];
@@ -169,7 +172,7 @@ function resources() {
             $names = array($rs['name']);
 
             $possiblevalues = explode(',',$rs['val']);
-            if (sizeof($possiblevalues) > 1) shuffle($possiblevalues);
+            if (sizeof($possiblevalues) > 1) shuffle_rand($possiblevalues);
 
             foreach($names as $idname => $name) {
                 $key = $rs['grp'] . '/' . $name;
@@ -192,6 +195,7 @@ function resources() {
         $category = $_POST['category'];
         if (!isset($_POST['questionnumber'])) die('Resources 2');
         $questionnumber = $_POST['questionnumber'];
+        srand(($session_id+99)*$questionnumber); // Initialisation du générateur de nombre aléatoire de la même manière pour tout le monde
         $playersolo = 0;
         if ($nbplayers == 1) $playersolo = 1;
 
@@ -222,7 +226,7 @@ function resources() {
             if (($rs['variantType'] == 'PlayerSolo') && ($rs['variantValue'] != $playersolo)) continue; // Uniquement ce qui correspond à un joueur
 
             $possiblevalues = explode(',',$rs['val']);
-            if (sizeof($possiblevalues) > 1) shuffle($possiblevalues);
+            if (sizeof($possiblevalues) > 1) shuffle_rand($possiblevalues);
 
             if (strpos($rs['resfolder'], 'GROOVES/GROOVE%') === 0) {
                 $rs['resfolder'] = str_replace('%',str_pad($grooves,2,'0',STR_PAD_LEFT),$rs['resfolder']);
@@ -252,7 +256,7 @@ function resources() {
                                FROM ".$DBsta.".qhdr
                                WHERE qtype = 'JackAttack'
                                ".$demo."
-                               ORDER BY RAND()
+                               ORDER BY MD5(CONCAT(id,".rand(1,999999)."))
                                LIMIT 0,3");
         } elseif ($questionnumber == 4) {
             if ($DEMOMODE) {
@@ -266,7 +270,7 @@ function resources() {
                                FROM ".$DBsta.".qhdr
                                WHERE qtype = 'DisOrDat'
                                ".$demo."
-                               ORDER BY RAND()
+                               ORDER BY MD5(CONCAT(id,".rand(1,999999)."))
                                LIMIT 0,3");
         } else {
             if ($DEMOMODE) {
@@ -282,7 +286,7 @@ function resources() {
                                AND qsubtype = 'Normal'
                                ".$demo."
                                AND NOT EXISTS (SELECT * FROM ".$DBsta.".qhdr a WHERE qhdr.id = a.forcenext)
-                               ORDER BY RAND()
+                               ORDER BY MD5(CONCAT(id,".rand(1,999999)."))
                                LIMIT 0,3");
         }
         $c = 0;
@@ -300,6 +304,7 @@ function resources() {
         $category = $_POST['category'];
         if (!isset($_POST['questionnumber'])) die('Resources 2');
         $questionnumber = $_POST['questionnumber'];
+        srand(($session_id+50)*$questionnumber); // Initialisation du générateur de nombre aléatoire de la même manière pour tout le monde
         if (!isset($_POST['id'])) die('Resources 2');
         $id = $_POST['id'];
 
@@ -356,7 +361,7 @@ function resources() {
             if (($rs['name'] == 'JingleReadQuestion') || ($rs['name'] == 'JingleTimer')) $possiblevalues = array($music);
             else {
                 $possiblevalues = explode(',',$rs['val']);
-                if (sizeof($possiblevalues) > 1) shuffle($possiblevalues);
+                if (sizeof($possiblevalues) > 1) shuffle_rand($possiblevalues);
             }
 
             $names = array($rs['name']);
@@ -388,7 +393,7 @@ function resources() {
                                AND name = '".addslashes($type)."'");
             while ($rs = $res->fetch()) {
                 $possiblevalues = explode(',',$rs['val']);
-                if (sizeof($possiblevalues) > 1) shuffle($possiblevalues);
+                if (sizeof($possiblevalues) > 1) shuffle_rand($possiblevalues);
 
                 $result['urlAudio'] = uriToUid('res-full/'.$rs['resfolder'].'/'.$possiblevalues[0]);
                 if ($rs['loopsnd']) $result['loop'] = $rs['loopsnd'];
@@ -478,7 +483,7 @@ function resources() {
             $names = array($rs['name']);
 
             $possiblevalues = explode(',',$rs['val']);
-            if (sizeof($possiblevalues) > 1) shuffle($possiblevalues);
+            if (sizeof($possiblevalues) > 1) shuffle_rand($possiblevalues);
 
             foreach($names as $idname => $name) {
                 $key = $rs['grp'] . '/' . $name;
@@ -577,7 +582,7 @@ function resources() {
             if ($rs['name'] == 'PlayersScream') $names = array('PlayersScream1', 'PlayersScream2', 'PlayersScream3');
 
             $possiblevalues = explode(',',$rs['val']);
-            if (sizeof($possiblevalues) > 1) shuffle($possiblevalues);
+            if (sizeof($possiblevalues) > 1) shuffle_rand($possiblevalues);
 
             foreach($names as $idname => $name) {
                 $key = $rs['grp'] . '/' . $name;
@@ -617,7 +622,7 @@ function resources() {
 
         $reslist['JackAttack/TheClue'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/2'));
 
-        $reslist['randseed'] = rand(1,9999999); // TODO Deviendra globale à la partie et sera probablement identique au session ID (qui est déjà random)
+        $reslist['randseed'] = rand(1,9999999);
 
         $reslist['STR'] = $qhdr['strings'];
     }
@@ -647,7 +652,7 @@ function resources() {
             $names = array($rs['name']);
 
             $possiblevalues = explode(',',$rs['val']);
-            if (sizeof($possiblevalues) > 1) shuffle($possiblevalues);
+            if (sizeof($possiblevalues) > 1) shuffle_rand($possiblevalues);
 
             foreach($names as $idname => $name) {
                 $key = $rs['grp'] . '/' . $name;
@@ -823,9 +828,114 @@ function resources() {
         )));
 }
 
+function getSocket() {
+    global $session_id;
+    @$socket = stream_socket_client('unix:///tmp/YDKJ'.$session_id.'.sock',$errno,$errstr,1);
+
+    if (!$socket) {
+        exec('/usr/bin/php syncdaemon.php '.$session_id.' > /dev/null &');
+        $trials = 50;
+        while ((!$socket) && ($trials)) {
+            $trials--;
+            @$socket = stream_socket_client('unix:///tmp/YDKJ' . $session_id . '.sock', $errno, $errstr, 1);
+            if (!$socket) usleep(50000);
+        }
+        if (!$trials) {
+            header('X-JSON: ' . json_encode(array(
+                    'error' => 'Couldn\'t connect to the local daemon',
+                )));
+            die();
+        }
+    }
+    return $socket;
+}
+
+function subscribe() {
+    global $DB, $session_id;
+
+    // Check en base s'il y a une nouvelle action
+    connectMysql('dyn');
+    $lastid = intval($_POST['lastid']);
+    $actions = array();
+    $res = $DB->query("SELECT *
+                       FROM actions
+                       WHERE session_id = ".$session_id."
+                       AND action_id > ".$lastid."
+                       LIMIT 0,20");
+    if ($res->rowCount() == 0) {
+        $DB = null;
+        $socket = getSocket();
+
+        stream_set_timeout($socket, 10); // Timeout de 10 secondes.
+        fwrite($socket,'0'); // 0 = On se met juste en attente.
+        @fread($socket,1); // On attend une action sur le serveur
+        @fclose($socket);
+
+        // Check en base s'il y a une nouvelle action
+        connectMysql('dyn');
+        $lastid = intval($_POST['lastid']);
+        $actions = array();
+        $res = $DB->query("SELECT *
+                           FROM actions
+                           WHERE session_id = ".$session_id."
+                           AND action_id > ".$lastid."
+                           LIMIT 0,20");
+    }
+    while ($action = $res->fetch()) {
+        $data = json_decode($action['actiondata'],true);
+        $data['id'] = $action['action_id'];
+        array_push($actions,$data);
+    }
+
+    header('X-JSON: ' . json_encode(array(
+            'actions' => $actions
+    )));
+
+    die();
+}
+
+function postaction() {
+    global $DB, $session_id, $nbplayers;
+    $data = $_POST['data'];
+    // TODO Vérifier l'action (à développer dans un second temps)
+
+    if ($data['action'] == 'sync') { // Gérer l'action 'sync'
+        $socket = getSocket();
+        stream_set_timeout($socket, 10); // Timeout de 10 secondes.
+        fwrite($socket,$nbplayers); // n > 1 = On débloque tout le monde dès que n connexions ont envoyé un nombre > 1
+        if (fread($socket,1) == $nbplayers) { // On est le dernier : on ajoute l'action en base
+            connectMysql('dyn');
+            $DB->query("INSERT INTO actions (session_id, dateaction, actiondata) VALUES (".$session_id.", NOW(), '".addslashes(json_encode($data))."')");
+        }
+        fwrite($socket,'1'); // On valide l'action
+        @fclose($socket);
+        die();
+    }
+
+    // Ajouter l'action en base
+    connectMysql('dyn');
+
+    $DB->query("INSERT INTO actions (session_id, dateaction, actiondata) VALUES (".$session_id.", NOW(), '".addslashes(json_encode($data))."')");
+    $action_id = $DB->lastInsertId();
+
+    // "Réveiller" les autres joueurs pour leur indiquer qu'il y a une nouvelle action à lire
+    $socket = getSocket();
+    stream_set_timeout($socket, 10); // Timeout de 10 secondes.
+    fwrite($socket,'1'); // 1 = On débloque tout le monde immédiatement !
+    @fclose($socket);
+
+    header('X-JSON: ' . json_encode(array(
+            'id' => $action_id
+        )));
+
+    die();
+}
+
 switch ($call) {
     case 'gameinfo': gameinfo(); break;
     case 'gamemode': gamemode(); break;
     case 'resources': resources(); break;
+    case 'subscribe': subscribe(); break;
+    case 'postaction': postaction(); break;
     default: die('API ready 2');
 }

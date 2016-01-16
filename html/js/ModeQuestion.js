@@ -117,7 +117,10 @@ ModeQuestion.prototype.start = function() {
         });
     }
 
-    var pressKey = function(choice) {
+    var doPressKey = function(choice) {
+        thisMode.game.api.registeraction('pressKey', function(data){
+            if (!data.selfpost) doPressKey(parseInt(data.value));
+        });
         if (thisMode.currentPlayer == 0) {
             if (thisMode.buzzPlayer != 0) return false; // On a déjà un joueur en attente
             if (choice == thisMode.game.players[0].keycode) thisMode.buzzPlayer = 1; // Joueur 1
@@ -165,7 +168,7 @@ ModeQuestion.prototype.start = function() {
 
                         thisMode.Player1ShowKey.free();
                         thisMode.Player1AnswerLoop.play();
-                        pressKey(choice);
+                        doPressKey(choice);
                     } else if (misskeyallowed) {
                         // Il faudrait arrêter les LastPlayer ici ?
                         if (!thisMode.PlayerMissKey1.played) thisMode.PlayerMissKey1.play(); else if (!thisMode.PlayerMissKey2.played) thisMode.PlayerMissKey2.play();
@@ -217,6 +220,11 @@ ModeQuestion.prototype.start = function() {
         }
     };
 
+    var pressKey = function(choice) {
+        thisMode.game.api.postaction({action: 'pressKey', value: choice});
+        doPressKey(choice);
+    };
+
     this.EndQuestion.ended(function(){
         nextcategoryready(function(nextcategory) {
             nextcategory.modeObj.MusicChooseCategoryStart.delay(Math.max(500,2500-thisMode.EndQuestion.length()),function () {
@@ -264,6 +272,7 @@ ModeQuestion.prototype.start = function() {
     var gameover = function() {
         // Plus aucun joueur ne peut jouer (timer ou tous les joueurs ont participé)
         unbindKeyListener(thisMode.listener);
+        thisMode.game.api.registeraction('pressKey', function(data){}); // Fonction qui ne fait rien.
         pressKey = function(choice){};
 
         var revealAnswer;
@@ -290,17 +299,19 @@ ModeQuestion.prototype.start = function() {
     };
 
     this.SFXPlayerLose.ended(200,function(){
-        thisMode.currentPlayer = 0;
-        thisMode.currentAns = 0;
+        thisMode.game.api.synchronize(function() {
+            thisMode.currentPlayer = 0;
+            thisMode.currentAns = 0;
 
-        if (thisMode.LastPlayers)  {
-            // Remise du compteur à 10
-            thisMode.Timer.playTimer(10);
-            thisMode.JingleTimer.reset();
-            thisMode.JingleTimer.play();
-            thisMode.timerTimeout = setTimeout(timerRunning,500);
-            thisMode.LastPlayers.play();
-        } else gameover();
+            if (thisMode.LastPlayers) {
+                // Remise du compteur à 10
+                thisMode.Timer.playTimer(10);
+                thisMode.JingleTimer.reset();
+                thisMode.JingleTimer.play();
+                thisMode.timerTimeout = setTimeout(timerRunning, 500);
+                thisMode.LastPlayers.play();
+            } else gameover();
+        });
     });
 
     var wrong1 = function(){
@@ -445,6 +456,8 @@ ModeQuestion.prototype.start = function() {
 
             thisMode.SFXPlayerCorrect.play();
             unbindKeyListener(thisMode.listener);
+            thisMode.game.api.registeraction('pressKey', function(data){}); // Fonction qui ne fait rien.
+            pressKey = function(choice){};
         }
         return true;
     };
@@ -552,6 +565,9 @@ ModeQuestion.prototype.start = function() {
         thisMode.listener = bindKeyListener(function(choice) {
             pressKey(choice);
         });
+        thisMode.game.api.registeraction('pressKey', function(data){
+            if (!data.selfpost) doPressKey(parseInt(data.value));
+        });
     });
 
     this.ShowQuestion.ended(500,function(){
@@ -562,10 +578,12 @@ ModeQuestion.prototype.start = function() {
     this.ShowHeader.ended(function(){
         thisMode.PreQuestion.ended(function(){
             this.free();
-            thisMode.ShowQuestion.play();
-            thisMode.JingleReadQuestion.play();
-            thisMode.JingleReadQuestion.delay(300,function() {
-                thisMode.Question.play();
+            thisMode.game.api.synchronize(function(){
+                thisMode.ShowQuestion.play();
+                thisMode.JingleReadQuestion.play();
+                thisMode.JingleReadQuestion.delay(300, function () {
+                    thisMode.Question.play();
+                });
             });
         });
 

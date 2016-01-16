@@ -75,6 +75,8 @@ YDKJGame.prototype.start = function() {
                 thisGame.players = gameinfo.players;
                 thisGame.locale = gameinfo.locale;
                 thisGame.engineVersion = gameinfo.engineVersion;
+                thisGame.api.localMode = gameinfo.localMode;
+                thisGame.api.subscribe();
                 (thisGame.api.gamemode())(function (gamemode) {
                     gamemode.start();
                 });

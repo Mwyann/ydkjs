@@ -11,6 +11,7 @@ if (!$DEMOMODE) {
 if (!isset($_GET['uid'])) die('No uid');
 
 require_once 'mysql.inc.php';
+//connectMysql();
 
 $hash = substr($_GET['uid'],-40);
 $uid = substr($_GET['uid'],0,-40);

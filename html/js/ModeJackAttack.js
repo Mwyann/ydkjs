@@ -107,6 +107,7 @@ ModeJackAttack.prototype.start = function() {
     var endgameready;
 
     var endGame = function() {
+        thisMode.game.api.registeraction('pressKey', function(data){});
         endgameready(function(endgame) {
             endgame.start();
         });
@@ -245,73 +246,86 @@ ModeJackAttack.prototype.start = function() {
         thisMode.AudienceWrong.play();
     });
 
-    var startGame = function() {
-        thisMode.listener = bindKeyListener(function(choice) {
-            if (currentAnswer > 50) return false; // Dès qu'on a trouvé la bonne réponse on ignore les appuis sur les touches
-            var buzzPlayer = 0;
-            if (choice == thisMode.game.players[0].keycode) buzzPlayer = 1; // Joueur 1
-            if (thisMode.game.players.length >= 2) if (choice == thisMode.game.players[1].keycode) buzzPlayer = 2; // Joueur 2
-            if (thisMode.game.players.length == 3) if (choice == thisMode.game.players[2].keycode) buzzPlayer = 3; // Joueur 3
+    var doPressKey = function(choice) {
+        thisMode.game.api.registeraction('pressKey', function(data){
+            if (!data.selfpost) doPressKey(parseInt(data.value));
+        });
+        if (currentAnswer > 50) return false; // Dès qu'on a trouvé la bonne réponse on ignore les appuis sur les touches
+        var buzzPlayer = 0;
+        if (choice == thisMode.game.players[0].keycode) buzzPlayer = 1; // Joueur 1
+        if (thisMode.game.players.length >= 2) if (choice == thisMode.game.players[1].keycode) buzzPlayer = 2; // Joueur 2
+        if (thisMode.game.players.length == 3) if (choice == thisMode.game.players[2].keycode) buzzPlayer = 3; // Joueur 3
 
-            if (buzzPlayer) {
-                var Wrong;
-                var Scream;
-                var Correct;
-                if (buzzPlayer == 1) {
-                    Wrong = thisMode.Player1Wrong;
-                    Scream = thisMode.PlayersScream1;
-                    Correct = thisMode.Player1Correct;
-                }
-                if (buzzPlayer == 2) {
-                    Wrong = thisMode.Player2Wrong;
-                    Scream = thisMode.PlayersScream2;
-                    Correct = thisMode.Player2Correct;
-                }
-
-                if (buzzPlayer == 3) {
-                    Wrong = thisMode.Player3Wrong;
-                    Scream = thisMode.PlayersScream3;
-                    Correct = thisMode.Player3Correct;
-                }
-
-                if (thisMode.game.font.strings[1510] == thisMode.game.font.strings[1520]) { // Bonne réponse !
-                    if (currentAnswer > 50) return false; // On revérifie, on ne sait jamais...
-                    currentAnswer = 99;
-                    thisMode.game.players[buzzPlayer-1].score = parseInt(thisMode.game.players[buzzPlayer-1].score) + 2000;
-                    thisMode['BGMusic' + BGMusicPos].free();
-                    thisMode['SFXCorrect' + BGMusicPos].play();
-                    thisMode.ShowQuestion.reset();
-                    thisMode[currentAnswerAnim+'.1'].reset();
-                    thisMode[currentAnswerAnim+'.2'].reset();
-                    thisMode.Player1Wrong.reset();
-                    thisMode.PlayersScream1.reset();
-                    if (thisMode.game.players.length >= 2) {
-                        thisMode.Player2Wrong.reset();
-                        thisMode.PlayersScream2.reset();
-                    }
-                    if (thisMode.game.players.length == 3) {
-                        thisMode.Player3Wrong.reset();
-                        thisMode.PlayersScream3.reset();
-                    }
-                    thisMode.AudienceWrong.reset();
-                    thisMode.game.font.resetTextStyle(1500);
-                    thisMode.QuestionCorrect.play();
-                    thisMode.AnswerCorrect.play();
-                    Correct.play();
-                    thisMode.AudienceCorrect.reset();
-                    thisMode.AudienceCorrect.play();
-                } else {
-                    thisMode.game.players[buzzPlayer-1].score = parseInt(thisMode.game.players[buzzPlayer-1].score) - 2000;
-                    var divWrong = thisMode[currentAnswerAnim+'.2'].getDiv();
-                    Wrong.reset();
-                    Scream.reset();
-                    Wrong.play();
-                    Scream.play();
-                    divWrong.stop(true).css({
-                        'opacity': 0.8
-                    }).delay(200).animate({'opacity': 0},100);
-                }
+        if (buzzPlayer) {
+            var Wrong;
+            var Scream;
+            var Correct;
+            if (buzzPlayer == 1) {
+                Wrong = thisMode.Player1Wrong;
+                Scream = thisMode.PlayersScream1;
+                Correct = thisMode.Player1Correct;
             }
+            if (buzzPlayer == 2) {
+                Wrong = thisMode.Player2Wrong;
+                Scream = thisMode.PlayersScream2;
+                Correct = thisMode.Player2Correct;
+            }
+
+            if (buzzPlayer == 3) {
+                Wrong = thisMode.Player3Wrong;
+                Scream = thisMode.PlayersScream3;
+                Correct = thisMode.Player3Correct;
+            }
+
+            if (thisMode.game.font.strings[1510] == thisMode.game.font.strings[1520]) { // Bonne réponse !
+                if (currentAnswer > 50) return false; // On revérifie, on ne sait jamais...
+                currentAnswer = 99;
+                thisMode.game.players[buzzPlayer-1].score = parseInt(thisMode.game.players[buzzPlayer-1].score) + 2000;
+                thisMode['BGMusic' + BGMusicPos].free();
+                thisMode['SFXCorrect' + BGMusicPos].play();
+                thisMode.ShowQuestion.reset();
+                thisMode[currentAnswerAnim+'.1'].reset();
+                thisMode[currentAnswerAnim+'.2'].reset();
+                thisMode.Player1Wrong.reset();
+                thisMode.PlayersScream1.reset();
+                if (thisMode.game.players.length >= 2) {
+                    thisMode.Player2Wrong.reset();
+                    thisMode.PlayersScream2.reset();
+                }
+                if (thisMode.game.players.length == 3) {
+                    thisMode.Player3Wrong.reset();
+                    thisMode.PlayersScream3.reset();
+                }
+                thisMode.AudienceWrong.reset();
+                thisMode.game.font.resetTextStyle(1500);
+                thisMode.QuestionCorrect.play();
+                thisMode.AnswerCorrect.play();
+                Correct.play();
+                thisMode.AudienceCorrect.reset();
+                thisMode.AudienceCorrect.play();
+            } else {
+                thisMode.game.players[buzzPlayer-1].score = parseInt(thisMode.game.players[buzzPlayer-1].score) - 2000;
+                var divWrong = thisMode[currentAnswerAnim+'.2'].getDiv();
+                Wrong.reset();
+                Scream.reset();
+                Wrong.play();
+                Scream.play();
+                divWrong.stop(true).css({
+                    'opacity': 0.8
+                }).delay(200).animate({'opacity': 0},100);
+            }
+        }
+    };
+
+    var pressKey = function(choice) {
+        thisMode.game.api.postaction({action: 'pressKey', value: choice});
+        doPressKey(choice);
+    };
+
+    var startGame = function() {
+        thisMode.listener = bindKeyListener(pressKey);
+        thisMode.game.api.registeraction('pressKey', function(data){
+            if (!data.selfpost) doPressKey(parseInt(data.value));
         });
         thisMode.BGMusic1.play();
         playQuestion();
@@ -343,8 +357,10 @@ ModeJackAttack.prototype.start = function() {
 
     this.LogoHide.ended(200,function(){
         this.free();
-        thisMode.ShowClue.play();
-        thisMode.TheClue.play();
+        thisMode.game.api.synchronize(function(){
+            thisMode.ShowClue.play();
+            thisMode.TheClue.play();
+        });
     });
 
     thisMode.HideSkipText.ended(function(){
@@ -354,6 +370,7 @@ ModeJackAttack.prototype.start = function() {
     var endOfRules2 = function(){
         showClue = function() {
             if (skiplistener) unbindKeyListener(skiplistener);
+            thisMode.game.api.registeraction('skipexplanations', function(data){});
             thisMode.ShowSkipText.free();
             thisMode.LogoAnimation1.free();
             thisMode.LogoAnimation2.free();
@@ -396,8 +413,9 @@ ModeJackAttack.prototype.start = function() {
         this.reset();
         thisMode.LogoAnimation2.play();
         if (explainRules == 2) {
-            var skipexplanations = function() {
+            var doskipexplanations = function() {
                 unbindKeyListener(skiplistener);
+                thisMode.game.api.registeraction('skipexplanations', function(data){});
                 thisMode.ShowSkipText.free();
                 thisMode.ExplainRules.free();
                 thisMode.RememberTheClue.free();
@@ -405,9 +423,16 @@ ModeJackAttack.prototype.start = function() {
                 thisMode.HideSkipText.play();
                 thisMode.SkipRules.play();
             };
+            var skipexplanations = function() {
+                thisMode.game.api.postaction({action: 'skipexplanations'});
+                doskipexplanations();
+            };
 
             skiplistener = bindKeyListener(function(choice) {
                 if (choice == 32) skipexplanations(); // Barre espace = on passe les explications
+            });
+            thisMode.game.api.registeraction('skipexplanations', function(data){
+                if (!data.selfpost) doskipexplanations();
             });
             thisMode.ShowSkipText.play();
             thisMode.ExplainRules.play();

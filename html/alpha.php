@@ -1,4 +1,19 @@
-<!DOCTYPE html>
+<?php
+session_start();
+
+if (isset($_GET['session_id'])) {
+  $session_id = intval($_GET['session_id']);
+  if ($session_id > 0) $_SESSION['session_id'] = $session_id;
+} else unset($_SESSION['session_id']);
+
+if (isset($_GET['nbplayers'])) {
+  $nbplayers = intval($_GET['nbplayers']);
+  if (($nbplayers > 0) && ($nbplayers < 4)) $_SESSION['nbplayers'] = $nbplayers;
+} else unset($_SESSION['nbplayers']);
+
+session_write_close();
+
+?><!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8" />

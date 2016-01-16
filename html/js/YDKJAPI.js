@@ -638,7 +638,53 @@ YDKJAPI.prototype.initdemo = function() {
             {name:playernames[2],score:0,keycode:112}
         ];
 
-        return function(f) {f({players: players, locale:'fr_FR', engineVersion: 2})}
+        return function(f) {f({players: players, locale:'fr_FR', engineVersion: 2, localMode: 1})}
+    };
+
+    // Emulation de l'API bien sûr
+
+    this.registered = {}; // Handlers d'actions
+    this.actionlist = []; // Liste des actions à exécuter
+
+    YDKJAPI.prototype.registeraction = function(actionname, callback) {
+        if (thisAPI.actionlist.length > 0) {
+            var data = thisAPI.actionlist[0]; // On travaille toujours sur le premier élément uniquement
+            if (data.action == actionname) { // Si l'action est celle qu'on cherche
+                thisAPI.actionlist.shift(); // On enlève le premier élément
+                data.selfpost = 1; // Toujours un loopback
+                callback(data); // Exécuter l'action avec les données
+                if (thisAPI.actionlist.length > 0) window.setTimeout(thisAPI.runactions, 50); // Retenter le reste de la liste
+                return; // Et on arrête direct
+            }
+        }
+        thisAPI.registered[actionname] = callback;
+    };
+
+    YDKJAPI.prototype.runactions = function() {
+        if (thisAPI.actionlist.length > 0) {
+            var data = thisAPI.actionlist[0]; // On travaille toujours sur le premier élément uniquement
+            if (thisAPI.registered[data.action]) { // Si on a une action exécutable
+                var callback = thisAPI.registered[data.action]; // Récupérer la fonction
+                thisAPI.registered[data.action] = 0; // Effacer
+                thisAPI.actionlist.shift(); // On enlève le premier élément
+                data.selfpost = 1; // Toujours un loopback
+                callback(data); // Exécuter l'action avec les données
+                if (thisAPI.actionlist.length > 0) window.setTimeout(thisAPI.runactions, 50); // S'il en reste, essayer encore un peu plus tard...
+            }
+        }
+    };
+
+    YDKJAPI.prototype.subscribe = function() {
+        // Fake call
+    };
+
+    YDKJAPI.prototype.postaction = function(actiondata) {
+        thisAPI.actionlist.push(actiondata); // On push l'action en loopback
+        thisAPI.runactions(); // Exécuter l'action immédiatement
+    };
+
+    YDKJAPI.prototype.synchronize = function(callback) {
+        callback(); // C'est fait, on est synchro avec nous-même ;-)
     };
 };
 
@@ -835,5 +881,96 @@ YDKJAPI.prototype.initgame = function() {
         return function(f) {
             if (!ready) readyfunctions.push(f); else f.call(this,gamedata);
         };
+    };
+
+    this.localMode = 1; // Mode loopback activé
+    this.registered = {}; // Handlers d'actions
+    this.lastid = 0; // Dernier ID d'action reçu
+    this.actionlist = []; // Liste des actions à exécuter
+    this.postid = []; // ID d'actions postées
+
+    var callaction = function(data, callback) {
+        thisAPI.actionlist.shift(); // On enlève le premier élément
+        for(var i = 0; i < thisAPI.postid.length; i++) if (thisAPI.postid[i] == data.id) data.selfpost = 1; // selfpost = 1 si on reconnait l'ID (loopback)
+        callback(data); // Exécuter l'action avec les données
+        if (thisAPI.actionlist.length > 0) window.setTimeout(thisAPI.runactions, 50); // Retenter le reste de la liste
+    };
+
+    YDKJAPI.prototype.registeraction = function(actionname, callback) {
+        if (thisAPI.actionlist.length > 0) {
+            var data = thisAPI.actionlist[0]; // On travaille toujours sur le premier élément uniquement
+            if (data.action == actionname) { // Si l'action est celle qu'on cherche
+                callaction(data, callback);
+                return; // Et on arrête direct, pas besoin d'ajouter le callback
+            }
+        }
+        thisAPI.registered[actionname] = callback;
+    };
+
+    YDKJAPI.prototype.runactions = function() {
+        if (thisAPI.actionlist.length > 0) {
+            var data = thisAPI.actionlist[0]; // On travaille toujours sur le premier élément uniquement
+            if (thisAPI.registered[data.action]) { // Si on a une action exécutable
+                var callback = thisAPI.registered[data.action]; // Récupérer la fonction
+                thisAPI.registered[data.action] = 0; // Effacer le callback
+                callaction(data, callback);
+            }
+        }
+    };
+
+    YDKJAPI.prototype.subscribe = function() {
+        if (thisAPI.localMode) return;
+
+        var data = {call: 'subscribe', lastid: thisAPI.lastid};
+
+        jQuery.ajax({
+            url: 'api/',
+            type: 'post',
+            data: data,
+            success: function (html, status, xhr) {
+                var data = getHeaderJSON(xhr);
+                if (data.error) {
+                    alert(data.error); // TODO gérer un système de code d'erreur en cas de non-permission ou session abandonnée etc.
+                    return;
+                }
+                if ((data.actions) && (data.actions.length > 0)) {
+                    for(var i = 0; i < data.actions.length; i++) {
+                        thisAPI.actionlist.push(data.actions[i]);
+                        if (data.actions[i].id > thisAPI.lastid) thisAPI.lastid = data.actions[i].id; // Devrait être toujours vrai mais dans le doute...
+                    }
+                    while ((thisAPI.postid.length > 0) && (thisAPI.postid[0] < thisAPI.lastid)) thisAPI.postid.shift(); // On nettoie la liste des postid régulièrement
+                    thisAPI.runactions(); // Exécuter les actions
+                }
+                if (!data.endgame) thisAPI.subscribe(); // Loop again
+            }
+        });
+    };
+
+    YDKJAPI.prototype.postaction = function(actiondata) {
+        if (thisAPI.localMode) {
+            thisAPI.lastid++;
+            actiondata.id = thisAPI.lastid; // On génère un id fictif
+            thisAPI.postid = [thisAPI.lastid];
+            thisAPI.actionlist.push(actiondata); // On push l'action en loopback
+            thisAPI.runactions(); // Exécuter l'action immédiatement
+            return; // Et on ne touche pas au serveur
+        }
+
+        var data = {call: 'postaction', data: actiondata};
+
+        jQuery.ajax({
+            url: 'api/',
+            type: 'post',
+            data: data,
+            success: function (html, status, xhr) {
+                var data = getHeaderJSON(xhr);
+                if (!thisAPI.localMode) thisAPI.postid.push(data.id); // On garde l'ID de l'action, pour détecter le loopback
+            }
+        });
+    };
+
+    YDKJAPI.prototype.synchronize = function(callback) {
+        thisAPI.registeraction('sync',callback);
+        thisAPI.postaction({action: 'sync'});
     };
 };

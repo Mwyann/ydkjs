@@ -341,7 +341,7 @@ ModeDisOrDat.prototype.start = function() {
         var i;
         clearInterval(thisMode.timerTimeout);
         unbindKeyListener(buttonslistener);
-
+        thisMode.game.api.registeraction('pressButton', function(data){});
         var totalButtons = 0;
         var tempscoreLeave = function() {
             totalButtons--;
@@ -485,7 +485,10 @@ ModeDisOrDat.prototype.start = function() {
 
     var RestartSkipped = this.RestartSkipped;
 
-    var pressButton = function(b) { // Appuie sur les boutons. Fonction pour gérer les animations, sons et styles CSS
+    var doPressButton = function(b) { // Appuie sur les boutons. Fonction pour gérer les animations, sons et styles CSS
+        thisMode.game.api.registeraction('pressButton', function(data){
+            if (!data.selfpost) doPressButton(parseInt(data.value));
+        });
         if (!canPress) return false;
         var nbquestions = 0;
         for(var i = 0; i < currentAnswers.length; i++) if (currentAnswers[i] == 0) nbquestions++;
@@ -649,6 +652,11 @@ ModeDisOrDat.prototype.start = function() {
         */
     };
 
+    var pressButton = function(b) {
+        thisMode.game.api.postaction({action: 'pressButton', value: b});
+        doPressButton(b);
+    };
+
     this.MusicLoopPlay4.ended(function(){
         this.reset();
         thisMode.MusicLoopPlay1.play();
@@ -684,6 +692,7 @@ ModeDisOrDat.prototype.start = function() {
 
             clearInterval(thisMode.timerTimeout);
             unbindKeyListener(buttonslistener);
+            thisMode.game.api.registeraction('pressButton', function(data){});
             for(var i = 0; i < buttonsAnswer.length; i++) if (buttonsAnswer[i]) {
                 buttonsAnswer[i].Ready.click(false);
                 buttonsAnswer[i].Push.click(false);
@@ -736,6 +745,9 @@ ModeDisOrDat.prototype.start = function() {
             else if (choice == 52) chosed = 4;
             if (chosed > 0) pressButton(chosed);
         });
+        thisMode.game.api.registeraction('pressButton', function(data){
+            if (!data.selfpost) doPressButton(parseInt(data.value));
+        });
 
         timerRunning();
 
@@ -750,8 +762,10 @@ ModeDisOrDat.prototype.start = function() {
     });
 
     this.GameStart.ended(100,function(){
-        thisMode.MusicLoopRules1.stop();
-        thisMode.JingleStartPlay1.play();
+        thisMode.game.api.synchronize(function() {
+            thisMode.MusicLoopRules1.stop();
+            thisMode.JingleStartPlay1.play();
+        });
     });
 
     this.PrepareTimer.ended(300,function(){
@@ -1011,8 +1025,9 @@ ModeDisOrDat.prototype.start = function() {
                 });
             });
 
-            var skipexplanations = function() {
+            var doskipexplanations = function() {
                 unbindKeyListener(skiplistener);
+                thisMode.game.api.registeraction('skipexplanations', function(data){});
                 thisMode.MessageSpaceBarComesIn.free();
                 thisMode.MessageSpaceBarLeave.play();
                 thisMode.RulesSkipExplain.play();
@@ -1021,8 +1036,16 @@ ModeDisOrDat.prototype.start = function() {
                 endOfRules();
             };
 
+            var skipexplanations = function() {
+                thisMode.game.api.postaction({action: 'skipexplanations'});
+                doskipexplanations();
+            };
+
             skiplistener = bindKeyListener(function(choice) {
                 if (choice == 32) skipexplanations(); // Barre espace = on passe les explications
+            });
+            thisMode.game.api.registeraction('skipexplanations', function(data){
+                if (!data.selfpost) doskipexplanations();
             });
 
             thisMode.MessageSpaceBarComesIn.click(skipexplanations);

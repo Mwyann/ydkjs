@@ -157,10 +157,12 @@ ModeIntro.prototype.start = function() {
             thisMode.IntroPreTitle2.play();
         });
 
-        this.IntroPreTitle.play();
-        thisMode.game.html.screen.html('');
-        setTimeout(function(){
-            thisMode.IntroPreTitle1.play();
-        },2800);
+        this.game.api.synchronize(function() {
+            thisMode.IntroPreTitle.play();
+            thisMode.game.html.screen.html('');
+            setTimeout(function(){
+                thisMode.IntroPreTitle1.play();
+            },2800);
+        });
     }
 };

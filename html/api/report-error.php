@@ -1,6 +1,7 @@
 <?php
 
 require_once 'mysql.inc.php';
+connectMysql();
 
 if (!isset($_POST['msg'])) die();
 if (!isset($_POST['url'])) die();

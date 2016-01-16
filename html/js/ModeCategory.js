@@ -55,14 +55,14 @@ ModeCategory.prototype.start = function() {
     if (this.chooseplayer == 3) this.ChooseCategoryPlayer = this.ChooseCategoryPlayer3;
 
     var listener;
-    var chooseCategory = function(chosed) {
+    var doChooseCategory = function(chosen) {
         var choice;
         var nextquestion = 0;
-        if (chosed == -1) { // Timeout
-            // A gérer
+        if (chosen == -1) { // Timeout
+            // TODO A gérer
         }
-        if (chosed) {
-            switch (chosed) {
+        if (chosen) {
+            switch (chosen) {
                 case 1:
                     choice = thisMode.ChoiceCategory1;
                     nextquestion = thisMode.question1;
@@ -97,6 +97,12 @@ ModeCategory.prototype.start = function() {
         }
     };
 
+    var chooseCategory = function(chosen) {
+        thisMode.game.api.registeraction('selectCategory', function(data){}); // Fonction qui ne fait rien, puisqu'on va recevoir l'action en loopback
+        thisMode.game.api.postaction({action: 'selectCategory', value: chosen});
+        doChooseCategory(chosen);
+    };
+
     this.SFXChoiceCategory.ended(100,function(){
         thisMode.ChooseCategoryPlayer.play();
         thisMode.SFXChoiceCategory.reset(true);
@@ -107,6 +113,9 @@ ModeCategory.prototype.start = function() {
             else if (choice == 51) chosed = 3;
             chooseCategory(chosed);
         },10000); // 10 secondes de timeout
+        thisMode.game.api.registeraction('selectCategory', function(data){
+            doChooseCategory(parseInt(data.value));
+        });
     });
 
     this.game.font.strings[100] = this.game.players[thisMode.chooseplayer-1].name;
@@ -136,16 +145,16 @@ ModeCategory.prototype.start = function() {
     this.game.font.strings[1030] = this.questiontitles[2];
 
     this.ChooseCategory.ended(300,function(){
-        thisMode.ShowCategories.play();
+        thisMode.game.api.synchronize(function() {
+            thisMode.ShowCategories.play();
+        });
     });
 
     this.SFXShowCategoryScreen.ended(function(){
         if ((!thisMode.MusicChooseCategoryStart.isplaying) && (!thisMode.MusicChooseCategoryLoop.isplaying)) thisMode.MusicChooseCategoryStart.play();
     });
 
-    this.SFXShowCategoryScreen.play();
     // Jouer l'animation du zoom bleu
-
     var blueZoom = function() {
         var step=0;
         var sizes=[{x:40,y:30}, // Tailles d'origine du jeu, svp
@@ -181,6 +190,8 @@ ModeCategory.prototype.start = function() {
         interval = setInterval(nextStep,40);
     };
 
+
+    this.SFXShowCategoryScreen.play();
     blueZoom();
     this.MusicChooseCategoryStart.volume(100);
     this.MusicChooseCategoryLoop.volume(100);
