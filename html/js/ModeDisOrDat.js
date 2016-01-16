@@ -485,10 +485,10 @@ ModeDisOrDat.prototype.start = function() {
 
     var RestartSkipped = this.RestartSkipped;
 
+    var registerPressButton = 0; // Déclaré plus tard
+
     var doPressButton = function(b) { // Appuie sur les boutons. Fonction pour gérer les animations, sons et styles CSS
-        thisMode.game.api.registeraction('pressButton', function(data){
-            if (!data.selfpost) doPressButton(parseInt(data.value));
-        });
+        registerPressButton();
         if (!canPress) return false;
         var nbquestions = 0;
         for(var i = 0; i < currentAnswers.length; i++) if (currentAnswers[i] == 0) nbquestions++;
@@ -652,6 +652,12 @@ ModeDisOrDat.prototype.start = function() {
         */
     };
 
+    registerPressButton = function() {
+        thisMode.game.api.registeraction('pressButton', function(data){
+            if (!data.selfpost) doPressButton(parseInt(data.value)); else registerPressButton();
+        });
+    };
+
     var pressButton = function(b) {
         thisMode.game.api.postaction({action: 'pressButton', value: b});
         doPressButton(b);
@@ -745,9 +751,7 @@ ModeDisOrDat.prototype.start = function() {
             else if (choice == 52) chosed = 4;
             if (chosed > 0) pressButton(chosed);
         });
-        thisMode.game.api.registeraction('pressButton', function(data){
-            if (!data.selfpost) doPressButton(parseInt(data.value));
-        });
+        registerPressButton();
 
         timerRunning();
 
@@ -890,7 +894,7 @@ ModeDisOrDat.prototype.start = function() {
     });
 
     thisMode.RulesExplainBoth.ended(-350,function(){
-        pressButton(3);
+        doPressButton(3);
     });
 
     thisMode.QuestionAnswer2.ended(800,function(){
@@ -902,7 +906,7 @@ ModeDisOrDat.prototype.start = function() {
     });
 
     thisMode.QuestionAnswer2.ended(-350,function(){
-        pressButton(2);
+        doPressButton(2);
     });
 
     thisMode.QuestionAnswer1.ended(800,function(){
@@ -919,7 +923,7 @@ ModeDisOrDat.prototype.start = function() {
     });
 
     thisMode.QuestionAnswer1.ended(-350,function(){
-        pressButton(1);
+        doPressButton(1);
     });
 
     var readAnswers = function() {
@@ -995,7 +999,7 @@ ModeDisOrDat.prototype.start = function() {
             buttonsAnswer[4].ComesIn.ended(function(){
                 this.delay(300,function(){
                     buttonsAnswer[4].ComesIn.free();
-                    pressButton(4);
+                    doPressButton(4);
                 });
             });
 

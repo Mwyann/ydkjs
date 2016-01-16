@@ -84,12 +84,14 @@ YDKJGame.prototype.start = function() {
         })) {
             useraction = jQuery('<div />');
             useraction.html('Mobile user: please touch the screen to start the game').css({
+                'text-align': 'center',
+                'width': '100%',
                 'color': 'white',
                 'background-color': 'black',
                 'position': 'absolute',
                 'z-index': '99999',
                 'top': '50%',
-                'left': '30%'
+                'left': '0'
             });
             useraction.appendTo('body');
         }

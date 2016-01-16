@@ -1,11 +1,12 @@
 <?php
 
 require_once 'local/config.inc.php';
+require_once 'common.inc.php';
 require_once 'mysql.inc.php';
 require_once 'JSON.php';
 
 // Gestion de la session
-session_start();
+session_readonly();
 // Numéro de session et mode de la session (local ou en ligne)
 $session_id = -1;
 $localMode = 0;
@@ -18,7 +19,15 @@ if ($session_id <= 0) {
 $nbplayers = 3; // CONSTANTE POUR LE MOMENT
 if (isset($_SESSION['nbplayers'])) $nbplayers = $_SESSION['nbplayers'];
 if ($nbplayers == 1) $localMode = 1; // 1 joueur = mode local forcé, pas besoin de faire appel au serveur quand on joue en solo...
-session_write_close();
+
+$player1 = '';
+if (isset($_SESSION['player1'])) $player1 = htmlspecialchars(substr(trim($_SESSION['player1']),0,20));
+$player2 = '';
+if (isset($_SESSION['player2'])) $player2 = htmlspecialchars(substr(trim($_SESSION['player2']),0,20));
+$player3 = '';
+if (isset($_SESSION['player3'])) $player3 = htmlspecialchars(substr(trim($_SESSION['player3']),0,20));
+
+//session_write_close();
 srand($session_id*130);
 
 if (!isset($_POST['call'])) die('API ready 1');
@@ -43,7 +52,7 @@ function shuffle_rand(&$array) {
 }
 
 function gameinfo() {
-    global $VERSION, $nbplayers, $localMode;
+    global $VERSION, $nbplayers, $localMode, $player1, $player2, $player3;
     $players = array();
     $locale = '';
     $engineVersion = 2;
@@ -62,6 +71,9 @@ function gameinfo() {
                     $engineVersion = 2;
                     break;
     }
+    if ($player1 != '') $noms[0] = $player1;
+    if ($player2 != '') $noms[1] = $player2;
+    if ($player3 != '') $noms[2] = $player3;
     if ($nbplayers == 1)
         $players = array(
             array('name' => $noms[0],'score' => 0,'keycode' => 98), // Si on fournit un keycode, cela veut dire que le joueur est contrôlable en local (sinon, renvoyer "0" ou rien du tout)
@@ -909,6 +921,10 @@ function postaction() {
         }
         fwrite($socket,'1'); // On valide l'action
         @fclose($socket);
+
+        header('X-JSON: ' . json_encode(array(
+                'id' => 0
+            )));
         die();
     }
 

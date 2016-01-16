@@ -246,10 +246,10 @@ ModeJackAttack.prototype.start = function() {
         thisMode.AudienceWrong.play();
     });
 
+    var registerPressKey = 0; // Déclaré plus tard
+
     var doPressKey = function(choice) {
-        thisMode.game.api.registeraction('pressKey', function(data){
-            if (!data.selfpost) doPressKey(parseInt(data.value));
-        });
+        registerPressKey();
         if (currentAnswer > 50) return false; // Dès qu'on a trouvé la bonne réponse on ignore les appuis sur les touches
         var buzzPlayer = 0;
         if (choice == thisMode.game.players[0].keycode) buzzPlayer = 1; // Joueur 1
@@ -317,6 +317,12 @@ ModeJackAttack.prototype.start = function() {
         }
     };
 
+    registerPressKey = function() {
+        thisMode.game.api.registeraction('pressKey', function(data){
+            if (!data.selfpost) doPressKey(parseInt(data.value)); else registerPressKey();
+        });
+    };
+
     var pressKey = function(choice) {
         thisMode.game.api.postaction({action: 'pressKey', value: choice});
         doPressKey(choice);
@@ -324,9 +330,7 @@ ModeJackAttack.prototype.start = function() {
 
     var startGame = function() {
         thisMode.listener = bindKeyListener(pressKey);
-        thisMode.game.api.registeraction('pressKey', function(data){
-            if (!data.selfpost) doPressKey(parseInt(data.value));
-        });
+        registerPressKey();
         thisMode.BGMusic1.play();
         playQuestion();
     };

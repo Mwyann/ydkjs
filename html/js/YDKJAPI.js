@@ -891,12 +891,18 @@ YDKJAPI.prototype.initgame = function() {
 
     var callaction = function(data, callback) {
         thisAPI.actionlist.shift(); // On enlève le premier élément
-        for(var i = 0; i < thisAPI.postid.length; i++) if (thisAPI.postid[i] == data.id) data.selfpost = 1; // selfpost = 1 si on reconnait l'ID (loopback)
+        while ((thisAPI.postid.length > 0) && (thisAPI.postid[0] < data.id)) thisAPI.postid.shift(); // On nettoie la liste des postid régulièrement
+        if ((thisAPI.postid.length > 0) && (thisAPI.postid[0] == data.id)) { // Si le post actuel est envoyé par nous-même on met l'info selfpost
+            thisAPI.postid.shift();
+            data.selfpost = 1;
+        }
+        //console.log('Calling action #'+data.id+': '+data.action);
         callback(data); // Exécuter l'action avec les données
         if (thisAPI.actionlist.length > 0) window.setTimeout(thisAPI.runactions, 50); // Retenter le reste de la liste
     };
 
     YDKJAPI.prototype.registeraction = function(actionname, callback) {
+        //console.log('Registered action '+actionname);
         if (thisAPI.actionlist.length > 0) {
             var data = thisAPI.actionlist[0]; // On travaille toujours sur le premier élément uniquement
             if (data.action == actionname) { // Si l'action est celle qu'on cherche
@@ -935,10 +941,11 @@ YDKJAPI.prototype.initgame = function() {
                 }
                 if ((data.actions) && (data.actions.length > 0)) {
                     for(var i = 0; i < data.actions.length; i++) {
+                        data.actions[i].id = parseInt(data.actions[i].id);
+                        //console.log('Received action #'+data.actions[i].id+': '+data.actions[i].action);
                         thisAPI.actionlist.push(data.actions[i]);
                         if (data.actions[i].id > thisAPI.lastid) thisAPI.lastid = data.actions[i].id; // Devrait être toujours vrai mais dans le doute...
                     }
-                    while ((thisAPI.postid.length > 0) && (thisAPI.postid[0] < thisAPI.lastid)) thisAPI.postid.shift(); // On nettoie la liste des postid régulièrement
                     thisAPI.runactions(); // Exécuter les actions
                 }
                 if (!data.endgame) thisAPI.subscribe(); // Loop again
@@ -947,10 +954,12 @@ YDKJAPI.prototype.initgame = function() {
     };
 
     YDKJAPI.prototype.postaction = function(actiondata) {
+        //console.log('Post action '+actiondata.action);
         if (thisAPI.localMode) {
             thisAPI.lastid++;
             actiondata.id = thisAPI.lastid; // On génère un id fictif
-            thisAPI.postid = [thisAPI.lastid];
+            //console.log('Post action #'+actiondata.id);
+            if (actiondata.action != 'sync') thisAPI.postid = [thisAPI.lastid];
             thisAPI.actionlist.push(actiondata); // On push l'action en loopback
             thisAPI.runactions(); // Exécuter l'action immédiatement
             return; // Et on ne touche pas au serveur
@@ -964,13 +973,37 @@ YDKJAPI.prototype.initgame = function() {
             data: data,
             success: function (html, status, xhr) {
                 var data = getHeaderJSON(xhr);
-                if (!thisAPI.localMode) thisAPI.postid.push(data.id); // On garde l'ID de l'action, pour détecter le loopback
+                if ((actiondata.action != 'sync') && (!thisAPI.localMode)) thisAPI.postid.push(data.id); // On garde l'ID de l'action, pour détecter le loopback
+                //console.log('Post action #'+data.id);
             }
         });
     };
 
     YDKJAPI.prototype.synchronize = function(callback) {
-        thisAPI.registeraction('sync',callback);
+        var syncwaiting = 0;
+        var syncdiv = 0;
+
+        thisAPI.registeraction('sync',function() {
+            if (syncwaiting) window.clearTimeout(syncwaiting);
+            if (syncdiv) syncdiv.remove();
+            callback();
+        });
+
+        syncwaiting = window.setTimeout(function() {
+            syncdiv = jQuery('<div />');
+            syncdiv.html('Waiting for players...').css({
+                'text-align': 'center',
+                'width': '100%',
+                'color': 'white',
+                'background-color': 'black',
+                'position': 'absolute',
+                'z-index': '99999',
+                'top': '50%',
+                'left': '0'
+            });
+            syncdiv.appendTo('body');
+        },2000);
+
         thisAPI.postaction({action: 'sync'});
     };
 };

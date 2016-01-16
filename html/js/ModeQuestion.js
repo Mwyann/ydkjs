@@ -117,10 +117,10 @@ ModeQuestion.prototype.start = function() {
         });
     }
 
+    var registerPressKey = 0; // Déclaré plus tard
+
     var doPressKey = function(choice) {
-        thisMode.game.api.registeraction('pressKey', function(data){
-            if (!data.selfpost) doPressKey(parseInt(data.value));
-        });
+        registerPressKey();
         if (thisMode.currentPlayer == 0) {
             if (thisMode.buzzPlayer != 0) return false; // On a déjà un joueur en attente
             if (choice == thisMode.game.players[0].keycode) thisMode.buzzPlayer = 1; // Joueur 1
@@ -218,6 +218,12 @@ ModeQuestion.prototype.start = function() {
                 thisMode.SFXPlayerKey.play();
             }
         }
+    };
+
+    registerPressKey = function() {
+        thisMode.game.api.registeraction('pressKey', function(data){
+            if (!data.selfpost) doPressKey(parseInt(data.value)); else registerPressKey();
+        });
     };
 
     var pressKey = function(choice) {
@@ -565,9 +571,7 @@ ModeQuestion.prototype.start = function() {
         thisMode.listener = bindKeyListener(function(choice) {
             pressKey(choice);
         });
-        thisMode.game.api.registeraction('pressKey', function(data){
-            if (!data.selfpost) doPressKey(parseInt(data.value));
-        });
+        registerPressKey();
     });
 
     this.ShowQuestion.ended(500,function(){

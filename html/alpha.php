@@ -3,14 +3,25 @@ session_start();
 
 if (isset($_GET['session_id'])) {
   $session_id = intval($_GET['session_id']);
-  if ($session_id > 0) $_SESSION['session_id'] = $session_id;
-} else unset($_SESSION['session_id']);
-
-if (isset($_GET['nbplayers'])) {
-  $nbplayers = intval($_GET['nbplayers']);
-  if (($nbplayers > 0) && ($nbplayers < 4)) $_SESSION['nbplayers'] = $nbplayers;
-} else unset($_SESSION['nbplayers']);
-
+  if ($session_id > 0) {
+    require 'api/mysql.inc.php';
+    connectMysql('dyn');
+    $res = $DB->query("SELECT * FROM sessions WHERE id = " . $session_id);
+    if ($session = $res->fetch()) {
+      $_SESSION['session_id'] = $session_id;
+      $_SESSION['nbplayers'] = $session['nbplayers'];
+      $_SESSION['player1'] = $session['nick1'];
+      $_SESSION['player2'] = $session['nick2'];
+      $_SESSION['player3'] = $session['nick3'];
+    } else die('Session ID unknown');
+  } else die('Session ID incorrect');
+} else {
+  unset($_SESSION['session_id']);
+  unset($_SESSION['nbplayers']);
+  unset($_SESSION['player1']);
+  unset($_SESSION['player2']);
+  unset($_SESSION['player3']);
+}
 session_write_close();
 
 ?><!DOCTYPE html>
