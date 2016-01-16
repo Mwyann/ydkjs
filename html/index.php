@@ -119,6 +119,7 @@ if (isset($_SESSION['id'])) {
 if (!isset($_SESSION['id'])) {
     if (isset($_POST['invitation'])) {
         require_once 'api/mysql.inc.php';
+        connectMysql('dyn');
         $invitation = $_POST['invitation'];
         $res = $DB->query("SELECT *
                            FROM ".$DBdyn.".invitations
