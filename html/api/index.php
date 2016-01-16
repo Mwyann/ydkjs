@@ -31,7 +31,7 @@ function uriToUid($uri) {
 }
 
 function shuffle_rand(&$array) {
-    $newarray = [];
+    $newarray = array();
     $oldarray = array_values($array); // Clean keys
     while (sizeof($oldarray) > 1) {
         $rand = rand(0,sizeof($oldarray)-1);
