@@ -1,6 +1,6 @@
 /********** YDKJGame **********/
 
-var YDKJaudiomanager = new AudioManager();
+var YDKJaudiomanager = 0;
 
 function YDKJGame(html, demomode) {
     var thisGame = this;
@@ -12,6 +12,7 @@ function YDKJGame(html, demomode) {
     jQuery.fx.interval = 66;
     this.gameinfoready = this.api.gameinfo();
     this.currentmode = 0;
+    if (!YDKJaudiomanager) YDKJaudiomanager = new AudioManager();
 
     // Gestion du fullscreen
     var onresize = function() {};
