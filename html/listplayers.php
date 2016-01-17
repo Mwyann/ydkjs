@@ -3,12 +3,12 @@
 require 'api/local/config.inc.php';
 require 'api/common.inc.php';
 require 'api/mysql.inc.php';
-connectMysql('dyn');
 
 session_readonly();
 
 if (!isset($_SESSION['player_id'])) die('Connect to a session first');
 
+connectMysql('dyn');
 $player_id = $_SESSION['player_id'];
 $res = $DB->query("SELECT * FROM players WHERE id = " . $player_id);
 if ($rs = $res->fetch()) {

@@ -254,7 +254,7 @@ session_write_close();
                         }
                     });
                 };
-                window.setTimeout(function(){updatePlayers(true);},200); // Attendre un petit peu pour s'assurer d'avoir bien créé les infos de session
+                window.setTimeout(function(){updatePlayers(true);},500); // Attendre un petit peu pour s'assurer d'avoir bien créé les infos de session
             });
         })();
     </script>

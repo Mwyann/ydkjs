@@ -190,7 +190,7 @@ if (!isset($_SESSION['id'])) {
         displaylogin();
     } else {
         ?>
-        <div style="text-align:center;font-size:26px">Alpha-test disponible (questions QCM du jeu original) !<br/>Inscription : envoyez un mail à <a href="mailto:alpha@ydkj.fr">alpha@ydkj.fr</a></div>
+        <div style="text-align:center;font-size:26px">Alpha-test disponible : questions QCM du jeu original + multi-joueur en ligne !<br/>Inscription : envoyez un mail à <a href="mailto:alpha@ydkj.fr">alpha@ydkj.fr</a></div>
         <div style="text-align:center;font-size:20px;margin:20px">Vous possédez déjà un compte ? <a href="?login=1">Connectez-vous !</a></div>
         <div style="text-align:center;font-size:20px;margin:20px">Testez la démo du jeu : <a href="http://demo.ydkj.fr/">demo.ydkj.fr</a></div>
         <div style="text-align:center;font-size:20px;margin:20px"><form action="joinsession.php" method="post">Rejoindre une partie multi-joueurs : <input type="text" name="session_id" size="4" maxlength="4" /> <input type="submit" value="Go" /></form></div>
