@@ -31,7 +31,6 @@ if (isset($_SESSION['player2'])) $player2 = htmlspecialchars(substr(trim($_SESSI
 $player3 = '';
 if (isset($_SESSION['player3'])) $player3 = htmlspecialchars(substr(trim($_SESSION['player3']),0,20));
 
-//session_write_close();
 srand($session_id*130);
 
 if (!isset($_POST['call'])) die('API ready 1');
@@ -845,15 +844,15 @@ function resources() {
 }
 
 function getSocket() {
-    global $session_id;
-    @$socket = stream_socket_client('unix:///tmp/YDKJ'.$session_id.'.sock',$errno,$errstr,1);
+    global $VERSION, $session_id;
+    @$socket = stream_socket_client('unix:///tmp/YDKJ'.$VERSION.$session_id.'.sock',$errno,$errstr,1);
 
     if (!$socket) {
         exec('/usr/bin/php syncdaemon.php '.$session_id.' > /dev/null &');
         $trials = 50;
         while ((!$socket) && ($trials)) {
             $trials--;
-            @$socket = stream_socket_client('unix:///tmp/YDKJ' . $session_id . '.sock', $errno, $errstr, 1);
+            @$socket = stream_socket_client('unix:///tmp/YDKJ'.$VERSION.$session_id.'.sock', $errno, $errstr, 1);
             if (!$socket) usleep(50000);
         }
         if (!$trials) {
