@@ -11,14 +11,18 @@ session_readonly();
 $session_id = -1;
 $localMode = 0;
 if (isset($_SESSION['session_id'])) $session_id = intval($_SESSION['session_id']);
-if ($session_id <= 0) {
+if ($session_id <= 0) { // Si pas de numéro de session renseigné, on en génère un aléatoirement et on reste en mode local
     $session_id = rand(0,999999999);
     $localMode = 1;
 }
+$player_id = 0;
+if (isset($_SESSION['player_id'])) $player_id = intval($_SESSION['player_id']);
+$players_ids = '';
+if (isset($_SESSION['players_ids'])) $players_ids = $_SESSION['players_ids'];
 // Nombre de joueurs
 $nbplayers = 3; // CONSTANTE POUR LE MOMENT
 if (isset($_SESSION['nbplayers'])) $nbplayers = $_SESSION['nbplayers'];
-if ($nbplayers == 1) $localMode = 1; // 1 joueur = mode local forcé, pas besoin de faire appel au serveur quand on joue en solo...
+if (($nbplayers == 1) && ($players_ids == '')) $localMode = 1; // 1 joueur, pas de mode spectateur = mode local forcé, pas besoin de faire appel au serveur quand on joue en solo...
 
 $player1 = '';
 if (isset($_SESSION['player1'])) $player1 = htmlspecialchars(substr(trim($_SESSION['player1']),0,20));
@@ -907,8 +911,18 @@ function subscribe() {
 }
 
 function postaction() {
-    global $DB, $session_id, $nbplayers;
+    global $DB, $session_id, $player_id, $players_ids, $nbplayers;
     $data = $_POST['data'];
+
+    if ($players_ids != '') {
+        if (strpos($players_ids, '#' . $player_id . '#') === false) { // Si on ne fait pas partie des "joueurs" (donc on est un spectateur), alors on ne participe pas activement à l'action.
+            header('X-JSON: ' . json_encode(array(
+                    'id' => -1
+                )));
+            die();
+        }
+    }
+
     // TODO Vérifier l'action (à développer dans un second temps)
 
     if ($data['action'] == 'sync') { // Gérer l'action 'sync'

@@ -1,18 +1,19 @@
 <?php
 session_start();
 
-if (isset($_GET['session_id'])) {
-  $session_id = intval($_GET['session_id']);
+if (isset($_SESSION['session_id'])) {
+  $session_id = intval($_SESSION['session_id']);
   if ($session_id > 0) {
     require 'api/mysql.inc.php';
     connectMysql('dyn');
-    $res = $DB->query("SELECT * FROM sessions WHERE id = " . $session_id);
+    $res = $DB->query("SELECT * FROM sessions WHERE status = 2 AND nbplayers > 0 AND id = " . $session_id);
     if ($session = $res->fetch()) {
       $_SESSION['session_id'] = $session_id;
       $_SESSION['nbplayers'] = $session['nbplayers'];
       $_SESSION['player1'] = $session['nick1'];
       $_SESSION['player2'] = $session['nick2'];
       $_SESSION['player3'] = $session['nick3'];
+      $_SESSION['players_ids'] = '#'.$session['player1'].'#'.$session['player2'].'#'.$session['player3'].'#';
     } else die('Session ID unknown');
   } else die('Session ID incorrect');
 } else {
@@ -21,6 +22,7 @@ if (isset($_GET['session_id'])) {
   unset($_SESSION['player1']);
   unset($_SESSION['player2']);
   unset($_SESSION['player3']);
+  unset($_SESSION['players_ids']);
 }
 session_write_close();
 

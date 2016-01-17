@@ -983,12 +983,6 @@ YDKJAPI.prototype.initgame = function() {
         var syncwaiting = 0;
         var syncdiv = 0;
 
-        thisAPI.registeraction('sync',function() {
-            if (syncwaiting) window.clearTimeout(syncwaiting);
-            if (syncdiv) syncdiv.remove();
-            callback();
-        });
-
         syncwaiting = window.setTimeout(function() {
             syncdiv = jQuery('<div />');
             syncdiv.html('Waiting for players...').css({
@@ -1003,6 +997,12 @@ YDKJAPI.prototype.initgame = function() {
             });
             syncdiv.appendTo('body');
         },2000);
+
+        thisAPI.registeraction('sync',function() {
+            if (syncwaiting) window.clearTimeout(syncwaiting);
+            if (syncdiv) syncdiv.remove();
+            callback();
+        });
 
         thisAPI.postaction({action: 'sync'});
     };

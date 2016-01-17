@@ -53,7 +53,9 @@ function invited() {
 function loggedin() {
 ?>
     <div style="text-align:center;font-size:28px">Bienvenue, <?php echo $_SESSION['nickname']?> !</div>
-    <div style="text-align:center;font-size:24px;margin:10px"><a href="alpha.php">Jouer à Jack !</a></div>
+    <div style="text-align:center;font-size:20px;margin:20px"><form action="joinsession.php" method="post">Rejoindre une partie multi-joueurs : <input type="text" name="session_id" size="4" maxlength="4" /> <input type="submit" value="Go" /></form></div>
+    <div style="text-align:center;font-size:24px;margin:10px"><a href="solo.php">Jouer à Jack (3 joueurs en local) !</a></div>
+    <div style="text-align:center;font-size:24px;margin:10px"><a href="joinsession.php">Commencer une partie multi-joueur !</a></div>
     <div style="text-align:center;font-size:20px;margin:10px"><a href="?help=1">Aide, news, astuces</a></div>
     <div style="text-align:center;font-size:20px;margin:10px"><a href="?logout=1">Déconnexion</a></div>
 <?php
@@ -191,6 +193,7 @@ if (!isset($_SESSION['id'])) {
         <div style="text-align:center;font-size:26px">Alpha-test disponible (questions QCM du jeu original) !<br/>Inscription : envoyez un mail à <a href="mailto:alpha@ydkj.fr">alpha@ydkj.fr</a></div>
         <div style="text-align:center;font-size:20px;margin:20px">Vous possédez déjà un compte ? <a href="?login=1">Connectez-vous !</a></div>
         <div style="text-align:center;font-size:20px;margin:20px">Testez la démo du jeu : <a href="http://demo.ydkj.fr/">demo.ydkj.fr</a></div>
+        <div style="text-align:center;font-size:20px;margin:20px"><form action="joinsession.php" method="post">Rejoindre une partie multi-joueurs : <input type="text" name="session_id" size="4" maxlength="4" /> <input type="submit" value="Go" /></form></div>
         <div id="warning" style="border:#F00 1px solid; background-color:#300;color:#FFF;margin:50px;padding:20px;font-family:JackCondensed;font-size:18px">
             <p style="text-align:center;font-size:24px;font-weight:bold">ATTENTION : A LIRE AVANT DE JOUER ! <span style="font-size:20px">(Si si, vraiment, au moins ce qui est <u>souligné</u>)</span></p>
             <p>
