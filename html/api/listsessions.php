@@ -18,6 +18,7 @@ if ($rs = $res->fetch()) {
     loadPlayer();
     $_SESSION['session_id'] = $session_id;
     session_write_close();
+    $DB->query("UPDATE players SET session_id = ".$session_id." WHERE id = " . $_SESSION['player_id']);
 } else {
     if ($session_id > 0) {
         session_start();

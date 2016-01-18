@@ -45,7 +45,7 @@ function loadPlayer() {
         $player_id = $_SESSION['player_id'];
         $res = $DB->query("SELECT * FROM players WHERE id = " . $player_id);
         if ($rs = $res->fetch()) {
-            if ($rs['session_id'] > 0) $_SESSION['session_id'] = $rs['session_id'];
+            $_SESSION['session_id'] = $rs['session_id'];
             $player_nick = $rs['nicknames'];
         } else {
             unset($_SESSION['session_id']);
