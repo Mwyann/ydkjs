@@ -6,7 +6,7 @@ if (sizeof($argv) != 2) die('Hmmm no.');
 $session_id = intval($argv[1]);
 if ($session_id <= 0) die('Bad session ID');
 
-$filename = '/tmp/YDKJ'.$VERSION.$session_id.'.sock';
+$filename = $SOCKETPATH.'/YDKJ'.$VERSION.$session_id.'.sock';
 @unlink($filename);
 $listen = stream_socket_server('unix://'.$filename,$errno,$errstr);
 if ($listen) {

@@ -844,15 +844,15 @@ function resources() {
 }
 
 function getSocket() {
-    global $VERSION, $session_id;
-    @$socket = stream_socket_client('unix:///tmp/YDKJ'.$VERSION.$session_id.'.sock',$errno,$errstr,1);
+    global $VERSION, $SOCKETPATH, $session_id;
+    @$socket = stream_socket_client('unix://'.$SOCKETPATH.'/YDKJ'.$VERSION.$session_id.'.sock',$errno,$errstr,1);
 
     if (!$socket) {
         exec('/usr/bin/php syncdaemon.php '.$session_id.' > /dev/null &');
         $trials = 50;
         while ((!$socket) && ($trials)) {
             $trials--;
-            @$socket = stream_socket_client('unix:///tmp/YDKJ'.$VERSION.$session_id.'.sock', $errno, $errstr, 1);
+            @$socket = stream_socket_client('unix://'.$SOCKETPATH.'/YDKJ'.$VERSION.$session_id.'.sock', $errno, $errstr, 1);
             if (!$socket) usleep(50000);
         }
         if (!$trials) {
