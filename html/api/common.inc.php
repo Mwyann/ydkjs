@@ -61,7 +61,7 @@ function loadPlayer() {
             $res = $DB->query("SELECT * FROM players WHERE id = " . $player_id);
             if ($res->fetch()) $player_id = 0;
         }
-        $DB->query("INSERT INTO players (id, last_ping) VALUES(" . $player_id . ",NOW())");
+        $DB->query("INSERT INTO players (id, ip, last_ping) VALUES(" . $player_id . ",'".addslashes($_SERVER['REMOTE_ADDR'])."',NOW())");
         $_SESSION['player_id'] = $player_id;
         unset($_SESSION['session_id']);
     }
