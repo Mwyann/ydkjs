@@ -12,7 +12,7 @@ connectMysql('dyn');
 $player_id = $_SESSION['player_id'];
 $res = $DB->query("SELECT * FROM players WHERE id = " . $player_id);
 if ($rs = $res->fetch()) {
-    $session_id = $rs['session_id'];
+    $_SESSION['session_id'] = $rs['session_id'];
 } else {
     session_start();
     unset($_SESSION['session_id']);
@@ -36,9 +36,9 @@ if ($rs = $res->fetch()) {
 $sql = '';
 if (isset($_POST['player_nick'])) $sql = ", nicknames = '".addslashes(trim($_POST['player_nick']))."'";
 
+// Mise à jour du last_ping
 $DB->query("UPDATE players SET last_ping = NOW() ".$sql." WHERE id = " . $player_id);
-$DB->query("DELETE FROM players WHERE last_ping < DATE_ADD(NOW(), INTERVAL -3 SECOND)
-                                AND session_id NOT IN (SELECT id FROM sessions WHERE status = 2)"); // Nettoyage des joueurs qui ne pinguent plus et qui ne sont pas en cours de jeu
+cleanSessions();
 
 $is_host = 0;
 if ($player_host == $player_id) $is_host = 1;

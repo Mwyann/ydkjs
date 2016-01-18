@@ -1,6 +1,7 @@
 <?php
 
-require_once 'api/local/config.inc.php';
+require 'api/local/config.inc.php';
+require 'api/common.inc.php';
 require 'api/mysql.inc.php';
 connectMysql('dyn');
 
@@ -44,7 +45,7 @@ if (isset($_POST['session_id'])) $_SESSION['session_id'] = intval($_POST['sessio
 $player_host = 0;
 if (isset($_SESSION['session_id'])) {
     $session_id = $_SESSION['session_id'];
-    $res = $DB->query("SELECT * FROM sessions WHERE status < 2 AND id = " . $session_id); // On ignore les sessions qui ont déjà commencé
+    $res = $DB->query("SELECT * FROM sessions WHERE status < 2 AND id = " . $session_id); // On ignore les sessions qui ont déjà démarré
     if ($rs = $res->fetch()) {
         $player_host = $rs['player_host'];
     } else {
@@ -54,7 +55,7 @@ if (isset($_SESSION['session_id'])) {
 
 // Si la session n'existe pas (ou plus) on la créée
 if (!isset($_SESSION['session_id'])) {
-    if (!$DEMOMODE) if (!isset($_SESSION['id'])) { // Uniquement les connectés
+    if ((!$DEMOMODE) && (!$ALLOWMULTI)) if (!isset($_SESSION['id'])) { // Uniquement les connectés
         header('Location: ./');
         die();
     }
@@ -73,7 +74,8 @@ if (!isset($_SESSION['session_id'])) {
 $is_host = 0;
 if ($player_host == $player_id) $is_host = 1;
 
-$DB->query("UPDATE players SET session_id = ".$session_id." WHERE id = ".$player_id);
+$DB->query("UPDATE players SET last_ping = NOW(), session_id = ".$session_id." WHERE id = ".$player_id);
+cleanSessions();
 
 session_write_close();
 
@@ -188,7 +190,7 @@ session_write_close();
                         success: function (html, status, xhr) {
                             var data = getHeaderJSON(xhr);
                             var list_has_changed = false;
-                            if (data.players) {
+                            if ((data.players) && (data.players.length > 0)) {
                                 for(var i = 0; i < data.players.length; i++) {
                                     var playerdata = data.players[i];
                                     var playerdiv = list_players.find('#player'+playerdata.id);
@@ -241,6 +243,8 @@ session_write_close();
                                 if (list_has_changed) start_game(false);
                             } else {
                                 list_players.html('<div>Aucun joueur<div>');
+                                alert('La session a fermé, veuillez recommencer.');
+                                window.location.href = './';
                             }
 
                             if (data.status != game_starting) {
@@ -254,7 +258,7 @@ session_write_close();
                         }
                     });
                 };
-                window.setTimeout(function(){updatePlayers(true);},500); // Attendre un petit peu pour s'assurer d'avoir bien créé les infos de session
+                updatePlayers(true);
             });
         })();
     </script>
