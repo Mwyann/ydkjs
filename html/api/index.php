@@ -930,7 +930,7 @@ function postaction() {
         fwrite($socket,$nbplayers); // n > 1 = On débloque tout le monde dès que n connexions ont envoyé un nombre > 1
         if (fread($socket,1) == $nbplayers) { // On est le dernier : on ajoute l'action en base
             connectMysql('dyn');
-            $DB->query("INSERT INTO actions (session_id, dateaction, actiondata) VALUES (".$session_id.", NOW(), '".addslashes(json_encode($data))."')");
+            $DB->query("INSERT INTO actions (session_id, player_id, dateaction, actiondata) VALUES (".$session_id.", ".$player_id.", NOW(), '".addslashes(json_encode($data))."')");
         }
         fwrite($socket,'1'); // On valide l'action
         @fclose($socket);
@@ -944,7 +944,7 @@ function postaction() {
     // Ajouter l'action en base
     connectMysql('dyn');
 
-    $DB->query("INSERT INTO actions (session_id, dateaction, actiondata) VALUES (".$session_id.", NOW(), '".addslashes(json_encode($data))."')");
+    $DB->query("INSERT INTO actions (session_id, player_id, dateaction, actiondata) VALUES (".$session_id.", ".$player_id.", NOW(), '".addslashes(json_encode($data))."')");
     $action_id = $DB->lastInsertId();
 
     // "Réveiller" les autres joueurs pour leur indiquer qu'il y a une nouvelle action à lire
