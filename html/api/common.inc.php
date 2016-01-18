@@ -34,3 +34,81 @@ function cleanSessions() {
     $DB->query("UPDATE players SET session_id = 0, spectator = 1 WHERE session_id NOT IN (SELECT id FROM sessions)");
 
 }
+
+function loadPlayer() {
+    global $DB;
+
+    // Chargement des infos du joueur si elles existent
+    $player_id = 0;
+    $player_nick = '';
+    if (isset($_SESSION['player_id'])) {
+        $player_id = $_SESSION['player_id'];
+        $res = $DB->query("SELECT * FROM players WHERE id = " . $player_id);
+        if ($rs = $res->fetch()) {
+            if ($rs['session_id'] > 0) $_SESSION['session_id'] = $rs['session_id'];
+            $player_nick = $rs['nicknames'];
+        } else {
+            unset($_SESSION['session_id']);
+            unset($_SESSION['player_id']);
+        }
+    }
+
+    // Si le joueur n'existe pas (ou plus) on le créée
+    if (!isset($_SESSION['player_id'])) {
+        $player_id = 0;
+        while ($player_id == 0) {
+            $player_id = rand(1, 999999999);
+            $res = $DB->query("SELECT * FROM players WHERE id = " . $player_id);
+            if ($res->fetch()) $player_id = 0;
+        }
+        $DB->query("INSERT INTO players (id, last_ping) VALUES(" . $player_id . ",NOW())");
+        $_SESSION['player_id'] = $player_id;
+        unset($_SESSION['session_id']);
+    }
+    return array('id' => $player_id, 'nick' => $player_nick);
+}
+
+function sendFile($file) {
+    $filesize = filesize($file);
+
+    $offset = 0;
+    $length = $filesize;
+
+    // Obligé de gérer le Range pour Chrome. Même en répondant en HTTP/1.0 (qui n'accepte pas le Range), il insiste.
+    if (isset($_SERVER['HTTP_RANGE'])) {
+        // if the HTTP_RANGE header is set we're dealing with partial content
+        $partialContent = true;
+        // find the requested range
+        // this might be too simplistic, apparently the client can request
+        // multiple ranges, which can become pretty complex, so ignore it for now
+        preg_match('/bytes=(\d+)-(\d+)?/', $_SERVER['HTTP_RANGE'], $matches);
+
+        $offset = intval($matches[1]);
+        if ((isset($matches[2])) && (intval($matches[2]) > 0)) $length = intval($matches[2]) - $offset + 1;
+        else $length = $filesize - $offset;
+    } else {
+        $partialContent = false;
+    }
+
+    $f = fopen($file, 'r');
+    // seek to the requested offset, this is 0 if it's not a partial content request
+    fseek($f, $offset);
+    $data = fread($f, $length);
+    fclose($f);
+
+    if ($partialContent) {
+        // output the right headers for partial content
+        header('HTTP/1.1 206 Partial Content');
+        header('Content-Range: bytes ' . $offset . '-' . ($offset + $length - 1) . '/' . $filesize);
+    }
+    header('Content-type: ' . mime_content_type($file));
+    header('Content-length: ' . $length);
+    header('Last-Modified: ' . gmdate('D, d M Y H:i:s T', time()));
+    header('Accept-Ranges: bytes');
+    header_remove('Cache-Control');
+    header_remove('Expires');
+    header_remove('Pragma');
+    header_remove('X-Powered-By');
+    print($data);
+    die();
+}

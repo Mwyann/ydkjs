@@ -4,6 +4,6 @@
 
 $VERSION = 'fr';
 $DEMOMODE = false;
-$ALLOWMULTI = false;
+$ALLOWMULTI = true;
 $SOCKETPATH = '/tmp';
 $GETsalt = 'random characters';

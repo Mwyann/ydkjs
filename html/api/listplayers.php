@@ -1,8 +1,8 @@
 <?php
 
-require 'api/local/config.inc.php';
-require 'api/common.inc.php';
-require 'api/mysql.inc.php';
+require 'local/config.inc.php';
+require 'common.inc.php';
+require 'mysql.inc.php';
 
 session_readonly();
 
@@ -26,6 +26,7 @@ $res = $DB->query("SELECT * FROM sessions WHERE id = " . $session_id);
 if ($rs = $res->fetch()) {
     $player_host = $rs['player_host'];
     $status = $rs['status'];
+    $public = $rs['public'];
 } else {
     session_start();
     unset($_SESSION['session_id']);
@@ -52,7 +53,8 @@ if (($is_host) && (!$readonly)) {
     if (($game_starting != 0) && ($game_starting != 1) && ($game_starting != 2)) $game_starting = 0;
     if (($status < 2) && ($game_starting < 2)) {
         $status = $game_starting;
-        $DB->query("UPDATE sessions SET status = ".$status." WHERE id = " . $session_id);
+        $public = intval($_POST['public']);
+        $DB->query("UPDATE sessions SET status = ".$status.", public = ".$public." WHERE id = " . $session_id);
     }
 
     $participants = array();
@@ -103,7 +105,8 @@ if (($game_starting == 2) && ($status != 2)) {
 
 header('X-JSON: '.json_encode(array(
         'players' => $players,
-        'status' => $status
+        'status' => $status,
+        'public' => $public
     )));
 
 die();

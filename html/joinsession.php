@@ -8,32 +8,9 @@ connectMysql('dyn');
 $user_id = 0;
 session_start();
 
-// Chargement des infos du joueur si elles existent
-$player_nick = '';
-if (isset($_SESSION['player_id'])) {
-    $player_id = $_SESSION['player_id'];
-    $res = $DB->query("SELECT * FROM players WHERE id = " . $player_id);
-    if ($rs = $res->fetch()) {
-        $_SESSION['session_id'] = $rs['session_id'];
-        $player_nick = $rs['nicknames'];
-    } else {
-        unset($_SESSION['session_id']);
-        unset($_SESSION['player_id']);
-    }
-}
-
-// Si le joueur n'existe pas (ou plus) on le créée
-if (!isset($_SESSION['player_id'])) {
-    $player_id = 0;
-    while ($player_id == 0) {
-        $player_id = rand(1,999999999);
-        $res = $DB->query("SELECT * FROM players WHERE id = " . $player_id);
-        if ($res->fetch()) $player_id = 0;
-    }
-    $DB->query("INSERT INTO players (id, last_ping) VALUES(" . $player_id . ",NOW())");
-    $_SESSION['player_id'] = $player_id;
-    unset($_SESSION['session_id']);
-}
+$player = loadPlayer();
+$player_id = $player['id'];
+$player_nick = $player['nick'];
 
 // On remplace le session_id par celui donné en POST s'il existe, ce qui permet à un joueur de rejoindre une autre partie.
 // TODO : il faut donner la possibilité à quelqu'un de pouvoir créer une nouvelle partie même s'il est déjà associé à une partie (par exemple si le player_host se barre avant de créer)
@@ -66,8 +43,8 @@ if (!isset($_SESSION['session_id'])) {
         if ($res->fetch()) $session_id = 0;
     }
     $player_host = $player_id;
-    $DB->query("INSERT INTO sessions (id, datecreated, player_host)
-                VALUES (".$session_id.",NOW(),".$player_host.")");
+    $DB->query("INSERT INTO sessions (id, datecreated, player_host, public)
+                VALUES (".$session_id.",NOW(),".$player_host.",".(isset($_GET['public'])?1:0).")");
     $_SESSION['session_id'] = $session_id;
 }
 
@@ -112,6 +89,7 @@ session_write_close();
                 var start_button = jQuery('#start_game');
                 var start_counter = 0;
                 var start_interval = 0;
+                var sound = 0;
 
                 jQuery('#change_nick').click(function() {
                     var p = jQuery('#player_nick');
@@ -182,9 +160,11 @@ session_write_close();
                         players_participants.push(jQuery(list_participants[i]).closest('.player').attr('id').replace('player',''));
                     }
                     if (readonly) players_participants = 0;
-                    var data = {player_nick: player_nick, readonly: (readonly?1:0), players_participants: players_participants, game_starting: game_starting};
+                    var publicgame = 0;
+                    if (jQuery('#public').is(':checked')) publicgame = 1;
+                    var data = {player_nick: player_nick, readonly: (readonly?1:0), players_participants: players_participants, game_starting: game_starting, 'public': publicgame};
                     jQuery.ajax({
-                        url: 'listplayers.php',
+                        url: 'api/listplayers.php',
                         type: 'post',
                         data: data,
                         success: function (html, status, xhr) {
@@ -205,6 +185,17 @@ session_write_close();
                                         jQuery('<span class="nick"/>').appendTo(playerdiv);
 
                                         playerdiv.appendTo(list_players);
+
+                                        if (jQuery('#sound').is(':checked')) {
+                                            if (!sound) {
+                                                sound = jQuery('<audio />');
+                                                sound.appendTo('body');
+                                            }
+                                            var audio = sound.get(0);
+                                            audio.pause();
+                                            sound.attr('src','api/soundeffect.php?sound=newplayer&num='+(Math.floor(Math.random()*999999))+'&type='+(audio.canPlayType('audio/ogg')?'ogg':'mp3'));
+                                            audio.play();
+                                        }
                                     }
 
                                     // Mise à jour des infos du joueur
@@ -252,9 +243,13 @@ session_write_close();
                                 if (data.status == '1') start_game(true);
                             }
                             if (data.status == '2') window.location.href = 'alpha.php';
+                            if ((readonly) || (!is_host)) if (data.public == '1') jQuery('#public').prop('checked', true); else jQuery('#public').prop('checked', false);
 
                             window.setTimeout(updatePlayers,1000);
-                            if (readonly) start_game(false);
+                            if (readonly) {
+                                if (is_host) jQuery('#public').removeAttr('disabled');
+                                start_game(false);
+                            }
                         }
                     });
                 };
@@ -280,8 +275,11 @@ session_write_close();
 <div>
     (Cochez les joueurs qui vont participer, les autres seront spectateurs)
 </div>
+<div style="margin:10px 0;font-size:80%">
+    <input type="checkbox" id="public" disabled="disabled" /> Partie publique <input type="checkbox" id="sound"/> Son à la connexion d'un nouveau joueur
+</div>
 <div style="margin:20px auto 10px auto; text-align:center"><input type="button" id="start_game" value="Chargement..." disabled/></div>
 </div>
-<div style="margin:20px auto 10px auto; text-align:center"><a href="./" style="color:#333">Retour à l'accueil</a></div>
+<div style="margin:20px auto 10px auto; text-align:center"><a href="findsession.php" style="color:#666">Trouver une autre partie publique</a> - <a href="./" style="color:#666">Retour à l'accueil</a></div>
 </body>
 </html>
