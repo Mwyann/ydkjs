@@ -30,7 +30,7 @@ function cleanSessions() {
                                     AND session_id NOT IN (SELECT id FROM sessions WHERE status = 2)");*/
 
     // Nettoyage des sessions dont le host s'est déconnecté
-    $DB->query("DELETE FROM sessions WHERE (player_host, id) NOT IN (SELECT id, session_id FROM players)");
+    $DB->query("DELETE FROM sessions WHERE status < 2 AND (player_host, id) NOT IN (SELECT id, session_id FROM players)");
     $DB->query("UPDATE players SET session_id = 0, spectator = 1 WHERE session_id NOT IN (SELECT id FROM sessions)");
 
 }

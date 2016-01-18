@@ -12,7 +12,7 @@ $session_id = -1;
 $localMode = 0;
 if (isset($_SESSION['session_id'])) $session_id = intval($_SESSION['session_id']);
 if ($session_id <= 0) { // Si pas de numéro de session renseigné, on en génère un aléatoirement et on reste en mode local
-    $session_id = rand(0,999999999);
+    $session_id = rand(1000000,999999999);
     $localMode = 1;
 }
 $player_id = 0;
