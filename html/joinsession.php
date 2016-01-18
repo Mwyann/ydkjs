@@ -269,7 +269,7 @@ session_write_close();
     Votre nom de joueur : <input type="text" value="" id="player_nick"/> <input type="button" id="change_nick" value="Changer" /> (nécessaire pour participer)
 </div>
 <div style="margin:20px 0">
-    Liste des joueurs connectés :
+    Liste des joueurs présents :
     <div id="list_players" style="font-family:JackInput;font-size: 80%;margin:5px"><div>Chargement...</div></div>
 </div>
 <div>

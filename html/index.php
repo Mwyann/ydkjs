@@ -54,8 +54,8 @@ function loggedin() {
 ?>
     <div style="text-align:center;font-size:28px">Bienvenue, <?php echo $_SESSION['nickname']?> !</div>
     <div style="text-align:center;font-size:20px;margin:20px"><form action="joinsession.php" method="post">Rejoindre une partie multi-joueurs : <input type="text" name="session_id" size="4" maxlength="4" /> <input type="submit" value="Go" /></form></div>
-    <div style="text-align:center;font-size:24px;margin:10px"><a href="solo.php">Jouer à Jack (3 joueurs en local) !</a></div>
-    <div style="text-align:center;font-size:24px;margin:10px"><a href="joinsession.php">Commencer une partie multi-joueur !</a></div>
+    <div style="text-align:center;font-size:24px;margin:10px"><a href="solo.php">Partie rapide (3 joueurs en local)</a></div>
+    <div style="text-align:center;font-size:24px;margin:10px"><a href="joinsession.php">Commencer une partie personnalisée</a></div>
     <div style="text-align:center;font-size:24px;margin:10px"><a href="findsession.php">Rejoindre une partie publique</a></div>
     <div style="text-align:center;font-size:20px;margin:10px"><a href="?help=1">Aide, news, astuces</a></div>
     <div style="text-align:center;font-size:20px;margin:10px"><a href="?logout=1">Déconnexion</a></div>
@@ -202,11 +202,13 @@ if (!isset($_SESSION['id'])) {
                 <br/>
                 <u>Je n'ai aucun lien avec Jackbox Games, et cette version du jeu n'est pas un développement officiel.</u> Il s'agit uniquement d'un travail de passionné. La seule version française existante ayant aujourd'hui plus de 15 ans, je souhaite juste en faire profiter les plus jeunes et rendre nostalgique les anciens joueurs.<br/>
                 <br/>
-                <u>Cette version est loin d'être finie</u>, beaucoup de choses ne sont pas fonctionnelles. J'ajouterai les éléments au fur et à mesure. Pour le moment, seules les questions simples de type QCM sont jouables. Vous pouvez tester la démo du jeu (4 questions) en cliquant sur <a style="color:#F00" href="http://demo.ydkj.fr/">ce lien</a>.<br/>
+                <u>Cette version est loin d'être finie</u>, beaucoup de choses ne sont pas fonctionnelles. J'ajouterai les éléments au fur et à mesure. Pour le moment, seules les questions simples de type QCM, les Couci-Couça et les JackAttack sont jouables. Vous pouvez tester la démo du jeu (4 questions et 7 questions) en cliquant sur <a style="color:#F00" href="http://demo.ydkj.fr/">ce lien</a>. Depuis début 2016, il est également possible de jouer à plusieurs en ligne !<br/>
                 <br/>
-                <u>Le jeu fonctionne le mieux dans Firefox et Chrome</u>. Il est possible de profiter du jeu en "plein écran", en cliquant sur le lien en haut de l'écran et en appuyant sur F11 (F11 et Echap pour revenir en mode normal). Internet Explorer ne gère pas les polices CSS3 et il a des soucis avec les sons qui s'arrêtent trop tôt. Les navigateurs mobiles quant à eux ont des problèmes avec la gestion des fichiers audio (permission de jouer un seul fichier audio à la fois, et uniquement suite à une action de l'utilisateur...).<br/>
+                <u>Le jeu fonctionne le mieux dans Firefox et Chrome</u>. Il est possible de profiter du jeu en "plein écran", en cliquant sur le lien en haut de l'écran et en appuyant sur F11 (F11 et Echap pour revenir en mode normal). Internet Explorer ne gère pas les polices CSS3 et il a des soucis avec les sons qui s'arrêtent trop tôt. Les navigateurs mobiles quant à eux ont des problèmes avec la gestion des fichiers audio etles animations, mais Chrome pour Android fonctionne plus ou moins.<br/>
                 <br/>
-                <u>Le but de ce projet est de transformer le jeu complet et d'y ajouter des fonctionnalités multi-joueurs en ligne</u>. Etant donné mon temps libre et le travail que cela va demander, ce n'est pas pour tout de suite, ni pour demain... mais à suivre ! Vous pouvez vous abonner au compte Twitter <a style="color:#F00" href="https://twitter.com/YdkjFr" target="_blank">@YdkjFr</a> associé pour connaître les dernières nouveautés.<br/>
+                <u>Le but de ce projet est de transformer le jeu complet et d'y ajouter des fonctionnalités multi-joueurs en ligne</u>. Il reste encore beaucoup de travail pour finir le portage du jeu, mais cela avance ! Vous pouvez vous abonner au compte Twitter <a style="color:#F00" href="https://twitter.com/YdkjFr" target="_blank">@YdkjFr</a> associé pour connaître les dernières nouveautés.<br/>
+                <br/>
+                Play the UK version: <a style="color:#F00" href="http://play.ydkj.co.uk/">play.ydkj.co.uk</a><br/>
             </p>
         </div>
     <?php
