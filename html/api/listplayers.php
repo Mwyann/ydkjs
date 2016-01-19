@@ -103,10 +103,8 @@ if (($game_starting == 2) && ($status != 2)) {
     }
 }
 
-header('X-JSON: '.json_encode(array(
+echo json_encode(array(
         'players' => $players,
         'status' => $status,
         'public' => $public
-    )));
-
-die();
+    ));

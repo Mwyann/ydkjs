@@ -691,20 +691,6 @@ YDKJAPI.prototype.initdemo = function() {
 YDKJAPI.prototype.initgame = function() {
     var thisAPI = this;
 
-    // Extrait les valeurs retournées par un appel Ajax
-    var getHeaderJSON = function(xhr) {
-        var json;
-        try { json = xhr.getResponseHeader('X-JSON') }
-        catch(e) {}
-
-        if (json) {
-            return JSON.parse(json);
-            //var data = eval('(' + json + ')'); // or JSON.parse or whatever you like
-            //return data
-        }
-        return [];
-    };
-
     YDKJAPI.prototype.gamemode = function(currentmode) {
         var data = {call: 'gamemode'};
 
@@ -722,9 +708,8 @@ YDKJAPI.prototype.initgame = function() {
             url: 'api/',
             type: 'post',
             data: data,
-            success: function(html, status, xhr) {
-                var data = getHeaderJSON(xhr);
-
+            dataType: 'json',
+            success: function(data, status, xhr) {
                 var newmodedata = data['newmode'];
 
                 if (newmodedata['mode'] == 'Intro') newmode = new YDKJMode(thisAPI.game, 'Intro', {});
@@ -788,8 +773,8 @@ YDKJAPI.prototype.initgame = function() {
             url: 'api/',
             type: 'post',
             data: data,
-            success: function(html, status, xhr) {
-                var data = getHeaderJSON(xhr);
+            dataType: 'json',
+            success: function(data, status, xhr) {
                 var strtmp;
 
                 reslist = data['reslist'];
@@ -865,12 +850,12 @@ YDKJAPI.prototype.initgame = function() {
             url: 'api/',
             type: 'post',
             data: data,
-            success: function(html, status, xhr) {
-                gamedata = getHeaderJSON(xhr);
-
+            dataType: 'json',
+            success: function(data, status, xhr) {
+                gamedata = data;
                 ready = 1;
                 for(var i = 0; i < readyfunctions.length; i++) {
-                    readyfunctions[i].call(this,gamedata);
+                    readyfunctions[i].call(this,data);
                 }
             },
             error: function (xhr, ajaxOptions, thrownError){
@@ -933,8 +918,8 @@ YDKJAPI.prototype.initgame = function() {
             url: 'api/',
             type: 'post',
             data: data,
-            success: function (html, status, xhr) {
-                var data = getHeaderJSON(xhr);
+            dataType: 'json',
+            success: function (data, status, xhr) {
                 if (data.error) {
                     alert(data.error); // TODO gérer un système de code d'erreur en cas de non-permission ou session abandonnée etc.
                     return;
@@ -971,8 +956,8 @@ YDKJAPI.prototype.initgame = function() {
             url: 'api/',
             type: 'post',
             data: data,
-            success: function (html, status, xhr) {
-                var data = getHeaderJSON(xhr);
+            dataType: 'json',
+            success: function (data, status, xhr) {
                 if ((actiondata.action != 'sync') && (!thisAPI.localMode)) thisAPI.postid.push(data.id); // On garde l'ID de l'action, pour détecter le loopback
                 //console.log('Post action #'+data.id);
             }

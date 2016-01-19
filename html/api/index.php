@@ -93,12 +93,12 @@ function gameinfo() {
             array('name' => $noms[2],'score' => 0,'keycode' => 112)
         );
 
-    header('X-JSON: '.json_encode(array(
+    echo json_encode(array(
             'players' => $players,
             'locale' => $locale,
             'engineVersion' => $engineVersion,
             'localMode' => $localMode
-        )));
+        ));
 }
 
 // Retourne les paramètres du prochain mode de jeu
@@ -119,9 +119,9 @@ function gamemode() {
             $newmode = array('mode' => 'Category', 'category' => $category, 'questionnumber' => $questionnumber); break;
         case 'JackAttack': $newmode = array('mode' => 'End'); break;
     }
-    header('X-JSON: '.json_encode(array(
+    echo json_encode(array(
             'newmode' => $newmode
-        )));
+        ));
 }
 
 // Fonction qui renvoie un tableau JSON avec la liste des ressources et des URLS à aller chercher
@@ -838,9 +838,9 @@ function resources() {
                          ));
     }
 
-    header('X-JSON: '.json_encode(array(
+    echo json_encode(array(
             'reslist' => $reslist,
-        )));
+        ));
 }
 
 function getSocket() {
@@ -856,9 +856,9 @@ function getSocket() {
             if (!$socket) usleep(50000);
         }
         if (!$trials) {
-            header('X-JSON: ' . json_encode(array(
+            echo json_encode(array(
                     'error' => 'Couldn\'t connect to the local daemon',
-                )));
+                ));
             die();
         }
     }
@@ -902,11 +902,9 @@ function subscribe() {
         array_push($actions,$data);
     }
 
-    header('X-JSON: ' . json_encode(array(
+    echo json_encode(array(
             'actions' => $actions
-    )));
-
-    die();
+    ));
 }
 
 function postaction() {
@@ -915,9 +913,9 @@ function postaction() {
 
     if ($players_ids != '') {
         if (strpos($players_ids, '#' . $player_id . '#') === false) { // Si on ne fait pas partie des "joueurs" (donc on est un spectateur), alors on ne participe pas activement à l'action.
-            header('X-JSON: ' . json_encode(array(
+            echo json_encode(array(
                     'id' => -1
-                )));
+                ));
             die();
         }
     }
@@ -935,9 +933,9 @@ function postaction() {
         fwrite($socket,'1'); // On valide l'action
         @fclose($socket);
 
-        header('X-JSON: ' . json_encode(array(
+        echo json_encode(array(
                 'id' => 0
-            )));
+            ));
         die();
     }
 
@@ -953,11 +951,9 @@ function postaction() {
     fwrite($socket,'1'); // 1 = On débloque tout le monde immédiatement !
     @fclose($socket);
 
-    header('X-JSON: ' . json_encode(array(
+    echo json_encode(array(
             'id' => $action_id
-        )));
-
-    die();
+        ));
 }
 
 switch ($call) {

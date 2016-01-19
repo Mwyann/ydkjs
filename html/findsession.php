@@ -20,29 +20,12 @@ if (!$ALLOWMULTI) {
     <script type="text/javascript">
         (function(){
             jQuery(document).ready(function() {
-                // Extrait les valeurs retournées par un appel Ajax
-                var getHeaderJSON = function (xhr) {
-                    var json;
-                    try {
-                        json = xhr.getResponseHeader('X-JSON')
-                    }
-                    catch (e) {
-                    }
-
-                    if (json) {
-                        return JSON.parse(json);
-                        //var data = eval('(' + json + ')'); // or JSON.parse or whatever you like
-                        //return data
-                    }
-                    return [];
-                };
-
                 var findSession = function() {
                     jQuery.ajax({
                         url: 'api/listsessions.php',
                         type: 'get',
-                        success: function (html, status, xhr) {
-                            var data = getHeaderJSON(xhr);
+                        dataType: 'json',
+                        success: function (data, status, xhr) {
                             if (data.found == '1') {
                                 window.location.href = './joinsession.php';
                             } else {

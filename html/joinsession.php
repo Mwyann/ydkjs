@@ -68,20 +68,6 @@ session_write_close();
     <script type="text/javascript">
         (function(){
             jQuery(document).ready(function() {
-                // Extrait les valeurs retournées par un appel Ajax
-                var getHeaderJSON = function(xhr) {
-                    var json;
-                    try { json = xhr.getResponseHeader('X-JSON') }
-                    catch(e) {}
-
-                    if (json) {
-                        return JSON.parse(json);
-                        //var data = eval('(' + json + ')'); // or JSON.parse or whatever you like
-                        //return data
-                    }
-                    return [];
-                };
-
                 var player_nick = <?php echo json_encode($player_nick); ?>;
                 var player_id = <?php echo $player_id; ?>;
                 var is_host = <?php echo $is_host; ?>;
@@ -167,8 +153,8 @@ session_write_close();
                         url: 'api/listplayers.php',
                         type: 'post',
                         data: data,
-                        success: function (html, status, xhr) {
-                            var data = getHeaderJSON(xhr);
+                        dataType: 'json',
+                        success: function (data, status, xhr) {
                             var list_has_changed = false;
                             if ((data.players) && (data.players.length > 0)) {
                                 for(var i = 0; i < data.players.length; i++) {

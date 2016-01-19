@@ -29,6 +29,6 @@ if ($rs = $res->fetch()) {
     }
 }
 
-header('X-JSON: '.json_encode(array(
+echo json_encode(array(
         'found' => ($session_id != 0?1:0),
-    )));
+    ));
