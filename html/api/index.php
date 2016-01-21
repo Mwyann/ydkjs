@@ -17,12 +17,12 @@ if ($session_id <= 0) { // Si pas de numéro de session renseigné, on en génè
 }
 $player_id = 0;
 if (isset($_SESSION['player_id'])) $player_id = intval($_SESSION['player_id']);
+// Liste des IDs des autres joueurs (entourés de #, exemple : #123#456#789#)
 $players_ids = '';
 if (isset($_SESSION['players_ids'])) $players_ids = $_SESSION['players_ids'];
 // Nombre de joueurs
-$nbplayers = 3; // CONSTANTE POUR LE MOMENT
+$nbplayers = 3; // Par défaut
 if (isset($_SESSION['nbplayers'])) $nbplayers = $_SESSION['nbplayers'];
-if (($nbplayers == 1) && ($players_ids == '')) $localMode = 1; // 1 joueur, pas de mode spectateur = mode local forcé, pas besoin de faire appel au serveur quand on joue en solo...
 
 $player1 = '';
 if (isset($_SESSION['player1'])) $player1 = htmlspecialchars(substr(trim($_SESSION['player1']),0,20));
@@ -866,7 +866,7 @@ function getSocket() {
 }
 
 function subscribe() {
-    global $DB, $session_id;
+    global $DB, $player_id, $session_id;
 
     // Check en base s'il y a une nouvelle action
     connectMysql('dyn');
@@ -882,7 +882,7 @@ function subscribe() {
         $socket = getSocket();
 
         stream_set_timeout($socket, 10); // Timeout de 10 secondes.
-        fwrite($socket,'0'); // 0 = On se met juste en attente.
+        fwrite($socket,$player_id.",0\n"); // 0 = On se met juste en attente.
         @fread($socket,1); // On attend une action sur le serveur
         @fclose($socket);
 
@@ -908,11 +908,11 @@ function subscribe() {
 }
 
 function postaction() {
-    global $DB, $session_id, $player_id, $players_ids, $nbplayers;
+    global $DB, $session_id, $player_id, $players_ids;
     $data = $_POST['data'];
 
     if ($players_ids != '') {
-        if (strpos($players_ids, '#' . $player_id . '#') === false) { // Si on ne fait pas partie des "joueurs" (donc on est un spectateur), alors on ne participe pas activement à l'action.
+        if (strpos($players_ids, '#'.$player_id.'#') === false) { // Si on ne fait pas partie des "joueurs" (donc on est un spectateur), alors on ne participe pas activement à l'action.
             echo json_encode(array(
                     'id' => -1
                 ));
@@ -925,8 +925,9 @@ function postaction() {
     if ($data['action'] == 'sync') { // Gérer l'action 'sync'
         $socket = getSocket();
         stream_set_timeout($socket, 10); // Timeout de 10 secondes.
-        fwrite($socket,$nbplayers); // n > 1 = On débloque tout le monde dès que n connexions ont envoyé un nombre > 1
-        if (fread($socket,1) == $nbplayers) { // On est le dernier : on ajoute l'action en base
+        $nbconnections = substr_count($players_ids, '#')-1;
+        fwrite($socket,$player_id.','.$nbconnections."\n"); // n > 1 = On débloque tout le monde dès que n connexions ont envoyé un nombre > 1
+        if (fread($socket,1) == $nbconnections) { // On est le dernier : on ajoute l'action en base
             connectMysql('dyn');
             $DB->query("INSERT INTO actions (session_id, player_id, dateaction, actiondata) VALUES (".$session_id.", ".$player_id.", NOW(), '".addslashes(json_encode($data))."')");
         }
@@ -948,7 +949,7 @@ function postaction() {
     // "Réveiller" les autres joueurs pour leur indiquer qu'il y a une nouvelle action à lire
     $socket = getSocket();
     stream_set_timeout($socket, 10); // Timeout de 10 secondes.
-    fwrite($socket,'1'); // 1 = On débloque tout le monde immédiatement !
+    fwrite($socket,$player_id.",1\n"); // 1 = On débloque tout le monde immédiatement !
     @fclose($socket);
 
     echo json_encode(array(

@@ -4,7 +4,7 @@ require 'local/config.inc.php';
 require 'common.inc.php';
 require 'mysql.inc.php';
 
-session_readonly();
+session_start();
 
 if (!isset($_SESSION['player_id'])) die('Connect to a session first');
 
@@ -14,7 +14,6 @@ $res = $DB->query("SELECT * FROM players WHERE id = " . $player_id);
 if ($rs = $res->fetch()) {
     $_SESSION['session_id'] = $rs['session_id'];
 } else {
-    session_start();
     unset($_SESSION['session_id']);
     unset($_SESSION['player_id']);
     session_write_close();
@@ -28,17 +27,23 @@ if ($rs = $res->fetch()) {
     $status = $rs['status'];
     $public = $rs['public'];
 } else {
-    session_start();
     unset($_SESSION['session_id']);
     session_write_close();
     die('Unknown session ID');
 }
 
 $sql = '';
-if (isset($_POST['player_nick'])) $sql = ", nicknames = '".addslashes(trim($_POST['player_nick']))."'";
+if (isset($_POST['player_nick'])) {
+    $player_nick = $_POST['player_nick'];
+    $sp = explode(',',$player_nick);
+    $nicks = array();
+    foreach($sp as $nick) if (trim($nick) != '') array_push($nicks, trim($nick));
+    $sql = ", nicknames = '".addslashes(implode(', ',$nicks))."'";
+}
 
 // Mise à jour du last_ping
 $DB->query("UPDATE players SET last_ping = NOW() ".$sql." WHERE id = " . $player_id);
+session_write_close();
 cleanSessions();
 
 $is_host = 0;
@@ -79,12 +84,15 @@ if (($game_starting == 2) && ($status != 2)) {
     // Démarrage de la partie !
     $nbplayers = 0;
     $playerids = array(0,0,0);
-    $nick = array('','','');
+    $nicks = array('','','');
     foreach($players as $player) if (!$player['spectator']) {
-        $playerids[$nbplayers] = $player['id'];
-        $nick[$nbplayers] = $player['nicknames'];
-        $nbplayers++;
-        if ($nbplayers == 3) break;
+        $sp = explode(',',$player['nicknames']);
+        foreach($sp as $nick) if (trim($nick) != '') {
+            $playerids[$nbplayers] = $player['id'];
+            $nicks[$nbplayers] = trim($nick);
+            $nbplayers++;
+            if ($nbplayers == 3) break;
+        }
     }
     if ($nbplayers == 0) {
         $status = 0;
@@ -94,11 +102,11 @@ if (($game_starting == 2) && ($status != 2)) {
         $DB->query("UPDATE sessions SET status = ".$status.",
                     nbplayers = ".$nbplayers.",
                     player1 = ".intval($playerids[0]).",
-                    nick1 = '".addslashes($nick[0])."',
+                    nick1 = '".addslashes($nicks[0])."',
                     player2 = ".intval($playerids[1]).",
-                    nick2 = '".addslashes($nick[1])."',
+                    nick2 = '".addslashes($nicks[1])."',
                     player3 = ".intval($playerids[2]).",
-                    nick3 = '".addslashes($nick[2])."'
+                    nick3 = '".addslashes($nicks[2])."'
                     WHERE id = " . $session_id);
     }
 }

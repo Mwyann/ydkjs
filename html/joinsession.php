@@ -99,6 +99,14 @@ session_write_close();
 
                     game_starting = (active?1:0);
 
+                    if (game_starting) {
+                        jQuery('#player_nick').attr('disabled','disabled');
+                        jQuery('#change_nick').attr('disabled','disabled');
+                    } else {
+                        jQuery('#player_nick').removeAttr('disabled');
+                        jQuery('#change_nick').removeAttr('disabled');
+                    }
+
                     if (!is_host) {
                         if (!game_starting) start_button.attr('disabled', 'disabled').val('En attente des autres joueurs...');
                         else {
@@ -123,12 +131,18 @@ session_write_close();
                         } else {
                             var list_participants = jQuery('#list_players').find('.participant:checked');
 
-                            if (list_participants.length == 0) {
+                            var nb_participants = 0;
+                            jQuery.each(list_participants, function(i, elem) {
+                                var names = jQuery(elem).closest('div').find('.nick').html();
+                                nb_participants += names.split(', ').length;
+                            });
+
+                            if (nb_participants == 0) {
                                 start_button.attr('disabled', 'disabled').val('Sélectionnez au moins un joueur');
-                            } else if (list_participants.length > 3) {
+                            } else if (nb_participants > 3) {
                                 start_button.attr('disabled', 'disabled').val('Sélectionnez moins de joueurs');
                             } else {
-                                start_button.removeAttr('disabled').val('Démarrer la partie ! ('+(list_participants.length)+' joueur'+(list_participants.length > 1 ? 's' : '')+')');
+                                start_button.removeAttr('disabled').val('Démarrer la partie ! ('+(nb_participants)+' joueur'+(nb_participants > 1 ? 's' : '')+')');
                             }
                         }
                     }
@@ -195,7 +209,7 @@ session_write_close();
                                     if (playerdata.nicknames == '') {
                                         if (playercheck.is(':checked')) {
                                             list_has_changed = true;
-                                            playercheck.removeAttr('checked');
+                                            playercheck.prop('checked', false);
                                         }
                                         playercheck.attr('disabled', 'disabled');
                                     }
@@ -203,7 +217,10 @@ session_write_close();
                                     var nicks = playerdata.nicknames;
                                     if (playerdata.nicknames == '') nicks = '<i>Joueur anonyme</i>';
                                     if (player_id == playerdata.id) nicks += ' <i style="color:#FF0">(c\'est vous)</i>';
-                                    playerdiv.find('.nick').html(nicks); // TODO souligner le joueur host ?
+                                    if (playerdiv.find('.nick').html() != nicks) {
+                                        playerdiv.find('.nick').html(nicks);
+                                        list_has_changed = true;
+                                    }
 
                                     playerdiv.addClass('ok'); // Ne pas supprimer ce joueur
                                 }
@@ -240,6 +257,7 @@ session_write_close();
                     });
                 };
                 updatePlayers(true);
+                jQuery('#sound').prop('checked', false);
             });
         })();
     </script>
@@ -252,7 +270,8 @@ session_write_close();
     <p style="text-align:center;font-size:28px;font-weight:bold;margin:10px 0 30px 0;color:#FF0">Nouvelle partie n° <span style="color:#F00"><?php echo $session_id; ?></span></p>
 
 <div style="margin:20px 0">
-    Votre nom de joueur : <input type="text" value="" id="player_nick"/> <input type="button" id="change_nick" value="Changer" /> (nécessaire pour participer)
+    Votre nom de joueur : <input type="text" value="" id="player_nick"/> <input type="button" id="change_nick" value="Changer" /> (nécessaire pour participer)<br/>
+    <span style="font-size:80%">Si vous êtes plusieurs sur le même ordinateur, séparez les noms par une virgule, exemple : Juju, Machin</span>
 </div>
 <div style="margin:20px 0">
     Liste des joueurs présents :
@@ -262,7 +281,7 @@ session_write_close();
     (Cochez les joueurs qui vont participer, les autres seront spectateurs)
 </div>
 <div style="margin:10px 0;font-size:80%">
-    <input type="checkbox" id="public" disabled="disabled" /> Partie publique <input type="checkbox" id="sound"/> Son à la connexion d'un nouveau joueur
+    <input type="checkbox" id="public" disabled="disabled" /> <label for="public">Partie publique</label> <input type="checkbox" id="sound"/> <label for="sound">Son à la connexion d'un nouveau joueur</label>
 </div>
 <div style="margin:20px auto 10px auto; text-align:center"><input type="button" id="start_game" value="Chargement..." disabled/></div>
 </div>

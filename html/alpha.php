@@ -13,7 +13,11 @@ if (isset($_SESSION['session_id'])) {
       $_SESSION['player1'] = $session['nick1'];
       $_SESSION['player2'] = $session['nick2'];
       $_SESSION['player3'] = $session['nick3'];
-      $_SESSION['players_ids'] = '#'.$session['player1'].'#'.$session['player2'].'#'.$session['player3'].'#';
+      $players_id = array();
+      if ($session['player1'] > 0) $players_id[$session['player1']] = 1;
+      if ($session['player2'] > 0) $players_id[$session['player2']] = 1;
+      if ($session['player3'] > 0) $players_id[$session['player3']] = 1;
+      $_SESSION['players_ids'] = '#'.implode('#',array_keys($players_id)).'#';
     } else die('Session ID unknown');
   } else die('Session ID incorrect');
 } else {
