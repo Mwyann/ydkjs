@@ -34,7 +34,7 @@ if ($listen) {
                 $sp = explode(',',$data);
                 $player_id = $sp[0];
                 $sockets[$player_id] = $socket;
-                $whatsup = intval($data[1]);
+                $whatsup = intval($sp[1]);
                 if ($whatsup > 0) { // Si la valeur est positive, on vérifie le nombre de connexions qui ont fait pareil, et si il y en a assez, on déco tout le monde !
                     $synclist[$player_id] = 1;
                     @fwrite($socket, sizeof($synclist)); // On renvoie à l'utilisateur le combientième il a été à nous envoyer l'info

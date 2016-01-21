@@ -142,7 +142,7 @@ session_write_close();
                             } else if (nb_participants > 3) {
                                 start_button.attr('disabled', 'disabled').val('Sélectionnez moins de joueurs');
                             } else {
-                                start_button.removeAttr('disabled').val('Démarrer la partie ! ('+(nb_participants)+' joueur'+(nb_participants > 1 ? 's' : '')+')');
+                                start_button.removeAttr('disabled').val('Démarrer la partie ! ('+nb_participants+' joueur'+(nb_participants > 1 ? 's' : '')+')');
                             }
                         }
                     }

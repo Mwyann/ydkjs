@@ -81,12 +81,12 @@ function gameinfo() {
         $players = array(
             array('name' => $noms[0],'score' => 0,'keycode' => 98), // Si on fournit un keycode, cela veut dire que le joueur est contrôlable en local (sinon, renvoyer "0" ou rien du tout)
         );
-    if ($nbplayers == 2)
+    elseif ($nbplayers == 2)
         $players = array(
             array('name' => $noms[0],'score' => 0,'keycode' => 113), // Ou alors on met un nouveau paramètre 'localplayer', plus explicite, au choix.
             array('name' => $noms[1],'score' => 0,'keycode' => 112)
         );
-    if ($nbplayers == 3)
+    elseif ($nbplayers == 3)
         $players = array(
             array('name' => $noms[0],'score' => 0,'keycode' => 113),
             array('name' => $noms[1],'score' => 0,'keycode' => 98),
