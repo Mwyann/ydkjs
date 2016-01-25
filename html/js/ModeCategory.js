@@ -111,7 +111,7 @@ ModeCategory.prototype.start = function() {
             if (choice == 49) chosed = 1;
             else if (choice == 50) chosed = 2;
             else if (choice == 51) chosed = 3;
-            chooseCategory(chosed);
+            if (chosed) chooseCategory(chosed);
         },10000); // 10 secondes de timeout
         thisMode.game.api.registeraction('selectCategory', function(data){
             doChooseCategory(parseInt(data.value));
