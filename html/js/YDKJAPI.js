@@ -933,7 +933,7 @@ YDKJAPI.prototype.initgame = function() {
                     }
                     thisAPI.runactions(); // Exécuter les actions
                 }
-                if (!data.endgame) thisAPI.subscribe(); // Loop again
+                if (data.endgame != '1') thisAPI.subscribe(); // Loop again
             }
         });
     };

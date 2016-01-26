@@ -896,14 +896,17 @@ function subscribe() {
                            AND action_id > ".$lastid."
                            LIMIT 0,20");
     }
+    $endgame = 0;
     while ($action = $res->fetch()) {
         $data = json_decode($action['actiondata'],true);
         $data['id'] = $action['action_id'];
+        if ($data['action'] == 'endGame') $endgame = 1;
         array_push($actions,$data);
     }
 
     echo json_encode(array(
-            'actions' => $actions
+            'actions' => $actions,
+            'endgame' => $endgame
     ));
 }
 

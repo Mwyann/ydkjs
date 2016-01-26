@@ -119,8 +119,7 @@ ModeQuestion.prototype.start = function() {
 
     var registerPressKey = 0; // Déclaré plus tard
 
-    var doPressKey = function(choice) {
-        registerPressKey();
+    var doPressKey = function(choice, post) {
         if (thisMode.currentPlayer == 0) {
             if (thisMode.buzzPlayer != 0) return false; // On a déjà un joueur en attente
             if (choice == thisMode.game.players[0].keycode) thisMode.buzzPlayer = 1; // Joueur 1
@@ -133,6 +132,7 @@ ModeQuestion.prototype.start = function() {
             if (!thisMode.availPlayers[thisMode.buzzPlayer]) thisMode.buzzPlayer = 0;
 
             if (thisMode.buzzPlayer) {
+                if (post) thisMode.game.api.postaction({action: 'pressKey', value: choice});
                 clearTimeout(thisMode.timerTimeout);
                 thisMode.Question.free();
                 thisMode.Answers.free();
@@ -159,6 +159,7 @@ ModeQuestion.prototype.start = function() {
             } else {
                 if ((choice >= 49) && (choice <= 52)) { // Si réponses 1 à 4 : 1 seul joueur = réponse directe, 2 ou 3 joueurs : "On appuie d'abord sur la lettre !"
                     if (thisMode.game.players.length == 1) {
+                        if (post) thisMode.game.api.postaction({action: 'pressKey', value: choice});
                         thisMode.currentPlayer = 1;
                         clearTimeout(thisMode.timerTimeout);
                         thisMode.Question.free();
@@ -184,6 +185,7 @@ ModeQuestion.prototype.start = function() {
             if (!thisMode.availAnswers[thisMode.currentAns]) thisMode.currentAns = 0;
 
             if (thisMode.currentAns) {
+                if (post) thisMode.game.api.postaction({action: 'pressKey', value: choice});
                 clearTimeout(thisMode.timerTimeout);
                 switch (thisMode.currentPlayer) {
                     case 1:
@@ -226,9 +228,15 @@ ModeQuestion.prototype.start = function() {
         });
     };
 
+    var registerPressKeyIgnore = function() { // Fonction qui ne fait rien, pour ignorer les appuis suivants TODO rendre ce genre de trucs plus propre
+        thisMode.game.api.registeraction('pressKey', function(data){
+            registerPressKeyIgnore();
+        });
+    };
+
     var pressKey = function(choice) {
-        thisMode.game.api.postaction({action: 'pressKey', value: choice});
-        doPressKey(choice);
+        //thisMode.game.api.postaction({action: 'pressKey', value: choice});
+        doPressKey(choice, true);
     };
 
     this.EndQuestion.ended(function(){
@@ -305,6 +313,7 @@ ModeQuestion.prototype.start = function() {
     };
 
     this.SFXPlayerLose.ended(200,function(){
+        registerPressKeyIgnore();
         thisMode.game.api.synchronize(function() {
             thisMode.currentPlayer = 0;
             thisMode.currentAns = 0;
@@ -316,6 +325,7 @@ ModeQuestion.prototype.start = function() {
                 thisMode.JingleTimer.play();
                 thisMode.timerTimeout = setTimeout(timerRunning, 500);
                 thisMode.LastPlayers.play();
+                registerPressKey();
             } else gameover();
         });
     });
@@ -462,7 +472,7 @@ ModeQuestion.prototype.start = function() {
 
             thisMode.SFXPlayerCorrect.play();
             unbindKeyListener(thisMode.listener);
-            thisMode.game.api.registeraction('pressKey', function(data){}); // Fonction qui ne fait rien.
+            registerPressKeyIgnore();
             pressKey = function(choice){};
         }
         return true;
@@ -499,6 +509,7 @@ ModeQuestion.prototype.start = function() {
         thisMode.timerTimeout = setTimeout(timerRunning,800);
         thisMode.currentPlayer = thisMode.buzzPlayer; // Le joueur peut enfin répondre
         thisMode.buzzPlayer = 0;
+        registerPressKey(); // Déplacé ici car si deux appuis trop rapides venant de l'API, le 2eme appui risque d'être ignoré à cause du return juste au dessus.
 
         // Vas-y joueur X
         if (thisMode.currentPlayer == 1) {

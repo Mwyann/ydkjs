@@ -55,28 +55,27 @@ ModeCategory.prototype.start = function() {
     if (this.chooseplayer == 3) this.ChooseCategoryPlayer = this.ChooseCategoryPlayer3;
 
     var listener;
+    var nextquestion = 0;
+
     var doChooseCategory = function(chosen) {
         var choice;
-        var nextquestion = 0;
         if (chosen == -1) { // Timeout
             // TODO A gérer
         }
         if (chosen) {
+            doChooseCategory = false;
+            unbindKeyListener(listener);
             switch (chosen) {
                 case 1:
                     choice = thisMode.ChoiceCategory1;
-                    nextquestion = thisMode.question1;
                     break;
                 case 2:
                     choice = thisMode.ChoiceCategory2;
-                    nextquestion = thisMode.question2;
                     break;
                 case 3:
                     choice = thisMode.ChoiceCategory3;
-                    nextquestion = thisMode.question3;
                     break;
             }
-            unbindKeyListener(listener);
             thisMode.ChooseCategoryPlayer.free();
             thisMode.MusicChooseCategoryLoop.free();
             thisMode.CategoryTitles.free();
@@ -85,11 +84,9 @@ ModeCategory.prototype.start = function() {
             thisMode.LoopCategory3.free();
 
             thisMode.SFXChoiceCategory.ended(function () {
-                this.free();
                 thisMode.ChooseCategory.free();
                 thisMode.ChooseCategoryText.free();
                 choice.free();
-                nextquestion.start(); // On démarre la question choisie
             });
 
             thisMode.SFXChoiceCategory.play();
@@ -98,9 +95,8 @@ ModeCategory.prototype.start = function() {
     };
 
     var chooseCategory = function(chosen) {
-        thisMode.game.api.registeraction('selectCategory', function(data){}); // Fonction qui ne fait rien, puisqu'on va recevoir l'action en loopback
         thisMode.game.api.postaction({action: 'selectCategory', value: chosen});
-        doChooseCategory(chosen);
+        if (doChooseCategory) doChooseCategory(chosen);
     };
 
     this.SFXChoiceCategory.ended(100,function(){
@@ -114,7 +110,30 @@ ModeCategory.prototype.start = function() {
             if (chosed) chooseCategory(chosed);
         },10000); // 10 secondes de timeout
         thisMode.game.api.registeraction('selectCategory', function(data){
-            doChooseCategory(parseInt(data.value));
+            data.value = parseInt(data.value);
+            if (data.value > 0) {
+                switch (data.value) {
+                    case 1:
+                        nextquestion = thisMode.question1;
+                        break;
+                    case 2:
+                        nextquestion = thisMode.question2;
+                        break;
+                    case 3:
+                        nextquestion = thisMode.question3;
+                        break;
+                }
+            } // TODO gérer le cas -1 (timeout)
+            if (doChooseCategory) doChooseCategory(data.value);
+            var registerSelectCategory = function() { // Fonction qui ne fait rien, puisqu'on va recevoir l'action en loopback
+                thisMode.game.api.registeraction('selectCategory', function(data){
+                    registerSelectCategory();
+                });
+            };
+            thisMode.SFXChoiceCategory.ended(function() {
+                this.free();
+                nextquestion.start();
+            });
         });
     });
 

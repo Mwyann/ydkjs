@@ -273,4 +273,5 @@ ModeEnd.prototype.start = function() {
 
     thisMode.game.html.screen.html('');
     this.EndMusic.play();
+    this.game.api.postaction({action: 'endGame'});
 };
