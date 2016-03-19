@@ -23,10 +23,19 @@ function YDKJ(screen, debug) {
         }
     };
 
-    var loadScript = function(scriptname) {
-        totalscripts++;
-        jQuery.getScript(scriptname+'?rand='+Math.random(),scriptsready);
-    };
+    var loadScript;
+
+    if (window.location.protocol == 'file:') {
+        loadScript = function(scriptname) {
+            totalscripts++;
+            loadScriptOldSchool(scriptname,scriptsready);
+        }
+    } else {
+        loadScript = function(scriptname) {
+            totalscripts++;
+            jQuery.getScript(scriptname+'?rand='+Math.random(),scriptsready);
+        };
+    }
 
     loadScript('js/HackTimer.min.js'); // https://github.com/turuslan/HackTimer
     if (typeof AudioManager == "undefined") loadScript('js/AudioManager.js');
@@ -72,6 +81,22 @@ YDKJ.prototype.fullscreen = function(f) {
         this.game.fullscreen(f);
     });
 };
+
+function loadScriptOldSchool(sScriptSrc, oCallback) {
+    var oHead = document.getElementsByTagName('head')[0];
+    var oScript = document.createElement('script');
+    oScript.type = 'text/javascript';
+    oScript.src = sScriptSrc;
+    // most browsers
+    oScript.onload = oCallback;
+    // IE 6 & 7
+    oScript.onreadystatechange = function() {
+        if (this.readyState == 'complete') {
+            oCallback();
+        }
+    };
+    oHead.appendChild(oScript);
+}
 
 (function() {
     var oldWindowError = window.onerror;

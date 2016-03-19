@@ -40,20 +40,28 @@ YDKJFile.prototype.preload = function(f) {
     }
 
     if (this.filetype == 'js') {
-        jQuery.ajax({
-            url: this.url,
-            type: 'get',
-            dataType: 'text',
-            success: function(html, status, xhr) {
-                var res = [];
-                eval(html);
+        if (window.location.protocol == 'file:') {
+            res = []; // Méthode qui semble fonctionner, mais si il y a une race condition, la variable va être écrasée...
+            loadScriptOldSchool(this.url,function() {
                 thisFile.res = res;
                 isready();
-            },
-            error: function (xhr, ajaxOptions, thrownError){
-                //displayLoader(false);
-            }
-        });
+            });
+        } else {
+            jQuery.ajax({
+                url: this.url,
+                type: 'get',
+                dataType: 'text',
+                success: function (html, status, xhr) {
+                    var res = [];
+                    eval(html);
+                    thisFile.res = res;
+                    isready();
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    //displayLoader(false);
+                }
+            });
+        }
     }
 
     if (this.filetype == 'audio') {
