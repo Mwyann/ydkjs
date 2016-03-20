@@ -2,7 +2,7 @@
 
 // Got from https://www.leaseweb.com/labs/2014/08/session-locking-non-blocking-read-sessions-php/
 function session_readonly() {
-    if (session_status() != PHP_SESSION_ACTIVE) {
+    if (!isset($_COOKIE[session_name()])) { // session_status() != PHP_SESSION_ACTIVE ne fonctionne pas, il faut ouvrir la session d'abord, donc intérêt zéro ici...
         $_SESSION = array();
         return;
     }
