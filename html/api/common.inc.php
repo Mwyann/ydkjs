@@ -1,8 +1,11 @@
 <?php
 
 // Got from https://www.leaseweb.com/labs/2014/08/session-locking-non-blocking-read-sessions-php/
-function session_readonly()
-{
+function session_readonly() {
+    if (session_status() != PHP_SESSION_ACTIVE) {
+        $_SESSION = array();
+        return;
+    }
     $session_name = preg_replace('/[^\da-z]/i', '', $_COOKIE[session_name()]);
     $session_data = file_get_contents(session_save_path().'/sess_'.$session_name);
 
