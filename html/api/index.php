@@ -73,6 +73,10 @@ function gameinfo() {
                     $locale = 'de_DE';
                     $engineVersion = 2;
                     break;
+        case 'us2':  $noms = array('Player 1', 'Player 2', 'Player 3');
+                    $locale = 'en_US';
+                    $engineVersion = 2;
+                    break;
     }
     if ($player1 != '') $noms[0] = $player1;
     if ($player2 != '') $noms[1] = $player2;
@@ -265,6 +269,7 @@ function resources() {
                     case 'fr': $demo = "AND id LIKE 'JC_'"; break;
                     case 'uk': $demo = "AND id LIKE 'JG_'"; break;
                     case 'de1': $demo = "AND id LIKE 'JC_'"; break;
+                    case 'us2': $demo = "AND id LIKE 'JB_'"; break;
                 }
             }
             $res = $DB->query("SELECT *
@@ -279,6 +284,7 @@ function resources() {
                     case 'fr': $demo = "AND id LIKE 'DB_'"; break;
                     case 'uk': $demo = "AND id LIKE 'DD_'"; break;
                     case 'de1': $demo = "AND id LIKE 'PB_'"; break;
+                    case 'us2': $demo = "AND id LIKE 'PB_'"; break;
                 }
             }
             $res = $DB->query("SELECT *
@@ -293,6 +299,7 @@ function resources() {
                     case 'fr': $demo = "AND (id LIKE 'AA_' OR id LIKE 'AB_')"; break;
                     case 'uk': $demo = "AND (id LIKE 'AA_' OR id LIKE 'AB_')"; break;
                     case 'de1': $demo = "AND (id LIKE 'AA_' OR id LIKE 'AB_')"; break;
+                    case 'us2': $demo = "AND (id LIKE 'AA_' OR id LIKE 'AB_')"; break;
                 }
             }
             $res = $DB->query("SELECT *
