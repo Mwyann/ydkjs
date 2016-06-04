@@ -52,5 +52,6 @@ if (!$ALLOWMULTI) {
     </div>
 </div>
 <div style="margin:20px auto 10px auto; text-align:center"><a href="./" style="color:#666">Retour à l'accueil</a></div>
+<?php require 'analytics.php'; ?>
 </body>
 </html>

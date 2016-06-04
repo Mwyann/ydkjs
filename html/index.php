@@ -191,10 +191,13 @@ if (!isset($_SESSION['id'])) {
         displaylogin();
     } else {
         ?>
-        <div style="text-align:center;font-size:26px">Alpha-test disponible : questions QCM du jeu original + multi-joueur en ligne !<br/>Inscription : envoyez un mail à <a href="mailto:alpha@ydkj.fr">alpha@ydkj.fr</a></div>
-        <div style="text-align:center;font-size:20px;margin:20px">Vous possédez déjà un compte ? <a href="?login=1">Connectez-vous !</a></div>
-        <div style="text-align:center;font-size:20px;margin:20px">Testez la démo du jeu : <a href="http://demo.ydkj.fr/">demo.ydkj.fr</a></div>
+        <div style="text-align:center;font-size:24px;margin:20px">Vous possédez déjà un compte alpha ? <a href="?login=1">Connectez-vous !</a></div>
+        <div style="text-align:center;font-size:30px;margin:30px"><a href="joinsession.php">Commencer une partie multi-joueurs</a></div>
         <div style="text-align:center;font-size:20px;margin:20px"><form action="joinsession.php" method="post">Rejoindre une partie multi-joueurs : <input type="text" name="session_id" size="4" maxlength="4" /> <input type="submit" value="Go" /> ou <a href="findsession.php">rejoindre une partie publique</a></form></div>
+        <div style="text-align:center;font-size:26px;margin:30px;color:#FF0">&Eacute;coutez <a href="http://www.ydkj.fr/itv/">l'interview exclusive de Walther Pépéka</a>, la voix de Jack !</div>
+        <div style="text-align:center;font-size:20px;margin:10px"><a href="demo.php">Testez la démo originale du jeu (4 questions)</a></div>
+        <div style="text-align:center;font-size:20px;margin:10px">Projet original : <a href="http://www.ydkjs.eu/">YDKJS</a></div>
+        <div style="text-align:center;font-size:20px">Contact : <a href="mailto:alpha@ydkj.fr">alpha@ydkj.fr</a></div>
         <div id="warning" style="border:#F00 1px solid; background-color:#300;color:#FFF;margin:50px;padding:20px;font-family:JackCondensed;font-size:18px">
             <p style="text-align:center;font-size:24px;font-weight:bold">ATTENTION : A LIRE AVANT DE JOUER ! <span style="font-size:20px">(Si si, vraiment, au moins ce qui est <u>souligné</u>)</span></p>
             <p>
@@ -202,20 +205,23 @@ if (!isset($_SESSION['id'])) {
                 <br/>
                 <u>Je n'ai aucun lien avec Jackbox Games, et cette version du jeu n'est pas un développement officiel.</u> Il s'agit uniquement d'un travail de passionné. La seule version française existante ayant aujourd'hui plus de 15 ans, je souhaite juste en faire profiter les plus jeunes et rendre nostalgique les anciens joueurs.<br/>
                 <br/>
-                <u>La voix de Jack est celle du <a href="http://www.wppk.fr/" style="color:#FFF">doubleur professionnel Luc Mitéran, dit <span style="color:#F00"><u>Walther Pépéka</u></span></a>.</u> Vous pouvez le contacter par e-mail : <a href="mailto:walther.pepeka@gmail.com" style="color:#F00">walther.pepeka@gmail.com</a>.<br/>Vous pouvez aussi écouter <a href="http://www.ydkj.fr/itv/" style="color:#0CF">l'interview exclusive de Walther Pépéka</a>, afin d'en apprendre plus sur le jeu et sur son travail de comédien !<br/>
+                <u>La voix de Jack est celle du <a href="http://www.wppk.fr/" style="color:#FFF">doubleur professionnel Luc Mitéran, dit <span style="color:#F00"><u>Walther Pépéka</u></span></a>.</u> Vous pouvez le contacter par e-mail : <a href="mailto:walther.pepeka@gmail.com" style="color:#F00">walther.pepeka@gmail.com</a>.<br/>Vous pouvez aussi écouter <a href="itv/" style="color:#0CF">l'interview exclusive de Walther Pépéka</a>, afin d'en apprendre plus sur le jeu et sur son travail de comédien !<br/>
                 <br/>
-                <u>Cette version est loin d'être finie</u>, beaucoup de choses ne sont pas fonctionnelles. J'ajouterai les éléments au fur et à mesure. Pour le moment, seules les questions simples de type QCM, les Couci-Couça et les JackAttack sont jouables. Vous pouvez tester la démo du jeu (4 questions et 7 questions) en cliquant sur <a style="color:#F00" href="http://demo.ydkj.fr/">ce lien</a>. Depuis début 2016, il est également possible de jouer à plusieurs en ligne !<br/>
+                <u>Cette version est loin d'être finie</u>, beaucoup de choses ne sont pas fonctionnelles. J'ajouterai les éléments au fur et à mesure. Pour le moment, seules les questions simples de type QCM, les Couci-Couça et les JackAttack sont jouables. Vous pouvez tester la démo du jeu (4 questions et 7 questions) en cliquant sur <a style="color:#F00" href="demo.php">ce lien</a>. Depuis début 2016, il est également possible de jouer à plusieurs en ligne !<br/>
                 <br/>
                 <u>Le jeu fonctionne le mieux dans Firefox et Chrome</u>. Il est possible de profiter du jeu en "plein écran", en cliquant sur le lien en haut de l'écran et en appuyant sur F11 (F11 et Echap pour revenir en mode normal). Internet Explorer ne gère pas les polices CSS3 et il a des soucis avec les sons qui s'arrêtent trop tôt. Les navigateurs mobiles quant à eux ont des problèmes avec la gestion des fichiers audio etles animations, mais Chrome pour Android fonctionne plus ou moins.<br/>
                 <br/>
                 <u>Le but de ce projet est de transformer le jeu complet et d'y ajouter des fonctionnalités multi-joueurs en ligne</u>. Il reste encore beaucoup de travail pour finir le portage du jeu, mais cela avance ! Vous pouvez vous abonner au compte Twitter <a style="color:#F00" href="https://twitter.com/YdkjFr" target="_blank">@YdkjFr</a> associé pour connaître les dernières nouveautés.<br/>
                 <br/>
-                Play the UK version: <a style="color:#F00" href="http://play.ydkj.co.uk/">play.ydkj.co.uk</a><br/>
+                Play the UK version: <a style="color:#F00" href="http://www.ydkj.co.uk/">www.ydkj.co.uk</a><br/>
+                Play the DE version: <a style="color:#F00" href="http://de.ydkj.eu/">de.ydkj.eu</a><br/>
             </p>
         </div>
     <?php
     }
 }
+
+require 'analytics.php';
 ?>
 </body>
 </html>

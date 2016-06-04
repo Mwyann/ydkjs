@@ -30,5 +30,6 @@ jQuery(document).ready(function() {
   <div id="screen" style="background-color:#000;position:relative;width:640px;height:480px;overflow:hidden;margin-left:auto;margin-right:auto;margin-top:15px">
     <img src="ajax-loader.gif" style="position:absolute;left:293px;top:212px" class="markedAsRemoved"/>
   </div> <!-- Couleur #EEE pour l'intro -->
+<?php require 'analytics.php'; ?>
 </body>
 </html>

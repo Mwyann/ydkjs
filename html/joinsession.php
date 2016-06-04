@@ -286,5 +286,6 @@ session_write_close();
 <div style="margin:20px auto 10px auto; text-align:center"><input type="button" id="start_game" value="Chargement..." disabled/></div>
 </div>
 <div style="margin:20px auto 10px auto; text-align:center"><a href="findsession.php" style="color:#666">Trouver une autre partie publique</a> - <a href="./" style="color:#666">Retour à l'accueil</a></div>
+<?php require 'analytics.php'; ?>
 </body>
 </html>

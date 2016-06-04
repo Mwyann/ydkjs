@@ -63,5 +63,6 @@ session_write_close();
   <div id="screen" style="margin-left:auto;margin-right:auto">
     <img src="ajax-loader.gif" style="position:absolute;left:293px;top:212px" class="markedAsRemoved"/>
   </div> <!-- Couleur #EEE pour l'intro -->
+  <?php require 'analytics.php'; ?>
 </body>
 </html>
