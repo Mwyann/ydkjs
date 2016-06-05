@@ -22,7 +22,7 @@ if (isset($_SESSION['session_id'])) {
   } else die('Session ID incorrect');
 } else {
   unset($_SESSION['session_id']);
-  unset($_SESSION['nbplayers']);
+  //unset($_SESSION['nbplayers']);
   unset($_SESSION['player1']);
   unset($_SESSION['player2']);
   unset($_SESSION['player3']);

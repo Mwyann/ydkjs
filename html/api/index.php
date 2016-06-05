@@ -22,7 +22,8 @@ $players_ids = '';
 if (isset($_SESSION['players_ids'])) $players_ids = $_SESSION['players_ids'];
 // Nombre de joueurs
 $nbplayers = 3; // Par défaut
-if (isset($_SESSION['nbplayers'])) $nbplayers = $_SESSION['nbplayers'];
+if (isset($_SESSION['nbplayers'])) $nbplayers = intval($_SESSION['nbplayers']);
+if (($nbplayers < 1) || ($nbplayers > 3)) $nbplayers = 3;
 
 $player1 = '';
 if (isset($_SESSION['player1'])) $player1 = htmlspecialchars(substr(trim($_SESSION['player1']),0,20));
