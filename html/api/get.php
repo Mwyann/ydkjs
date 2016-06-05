@@ -5,7 +5,7 @@ require_once 'common.inc.php';
 
 if (!$DEMOMODE) {
     session_readonly();
-    if (!isset($_SESSION['id']) && !isset($_SESSION['session_id'])) die('Not logged in'); // On autorise les joueurs ayant un session_id valide (invités d'un jeu multijoueur)
+    if (!isset($_SESSION['id']) && !isset($_SESSION['session_id']) && !isset($_SESSION['nbplayers'])) die('Not logged in'); // On autorise les joueurs ayant un session_id valide (invités d'un jeu multijoueur)
 }
 
 if (!isset($_GET['uid'])) die('No uid');
