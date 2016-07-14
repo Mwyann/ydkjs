@@ -220,6 +220,7 @@ if (!isset($_SESSION['id'])) {
                 Play the DE version: <a style="color:#F00" href="http://de.ydkj.eu/">de.ydkj.eu</a><br/>
             </p>
         </div>
+        <div style="text-align:center;font-size:16px;color:#666;font-family:JackCondensed">YOU DON’T KNOW JACK® Jackbox Games, Berkeley Systems, Jellyvision, Melog Productions Inc, BMG Interactive, Take-Two Interactive</div>
     <?php
     }
 }

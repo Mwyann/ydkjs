@@ -85,47 +85,6 @@ function unbindKeyListener(listener) {
     jQuery(window).unbind('keypress',listener);
 }
 
-/********** Animation de transformation **********/
-
-function animTransform(elem,fromx,tox,fromy,toy,speed,w,h,align,callback) {
-    var expandInterval = 0;
-    var expandValX = fromx;
-    var expandValY = fromy;
-    var expand = function() {
-        expandValX += (tox-fromx)*speed;
-        expandValY += (toy-fromy)*speed;
-
-        if (tox > fromx) {if (expandValX >= tox) expandValX = tox;} else {if (expandValX <= tox) expandValX = tox;}
-        if (toy > fromy) {if (expandValY >= toy) expandValY = toy;} else {if (expandValY <= toy) expandValY = toy;}
-
-        if ((expandValX == tox) && (expandValY == toy)) {
-            clearInterval(expandInterval);
-            if (callback) callback();
-        }
-
-        if (align == 'left') {
-            elem.css({
-                'left': (0 - ((w / 2) * (1 - expandValX))) + 'px',
-                'top': (0 - ((h / 2) * (1 - expandValY))) + 'px'
-            });
-        } else if (align == 'right') {
-            elem.css({
-                'left': (w - ((w / 2) * (1 - expandValX))) + 'px',
-                'top': (h - ((h / 2) * (1 - expandValY))) + 'px'
-            });
-        } // Sinon, toute autre valeur = centré (pour ne pas faire d'ambiguité, on peut mettre 'center')
-
-        elem.css({
-            '-webkit-transform':'scale('+expandValX+','+expandValY+')',
-            '-moz-transform':'scale('+expandValX+','+expandValY+')',
-            '-ms-transform':'scale('+expandValX+','+expandValY+')',
-            '-o-transform':'scale('+expandValX+','+expandValY+')',
-            'transform':'scale('+expandValX+','+expandValY+')'
-        });
-    };
-    expandInterval = setInterval(expand,66);
-}
-
 function getSTRfromID(STR,type,id) {
     for(var i = 0; i < STR.length; i++) if ((STR[i].type == type) && (STR[i].id == id)) return STR[i].data;
     return '';

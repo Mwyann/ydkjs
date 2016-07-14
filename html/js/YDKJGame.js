@@ -44,9 +44,8 @@ function YDKJGame(html, demomode) {
             body.css({
                 'background-color': '#000',
                 'overflow': 'hidden',
-                'zoom': zoom.toFixed(2),
-                '-moz-transform-origin': '50% 0',
-                '-moz-transform': 'scale('+zoom.toFixed(2)+','+zoom.toFixed(2)+')'}).css('zoom',(zoom*100).toFixed(0)+'%');
+                'transform-origin': '50% 0',
+                'transform': 'scale('+zoom.toFixed(2)+','+zoom.toFixed(2)+')'});
             thisGame.html.screen.css({
                 'top': centerup+'px'
             });
