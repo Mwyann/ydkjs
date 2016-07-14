@@ -639,10 +639,6 @@ function resources() {
         unset($reslist['JackAttack/Example2']);
         unset($reslist['JackAttack/Example3']);
 
-        $reslist['JackAttack/NoExplain'] = $reslist['JackAttack/NoExplain1Player'];
-        unset($reslist['JackAttack/NoExplain1Player']);
-        unset($reslist['JackAttack/NoExplain23Players']);
-
         $reslist['JackAttack/TheClue'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/2'));
 
         $reslist['randseed'] = rand(1,9999999);
