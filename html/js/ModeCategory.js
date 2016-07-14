@@ -109,6 +109,14 @@ ModeCategory.prototype.start = function() {
             else if (choice == 51) chosed = 3;
             if (chosed) chooseCategory(chosed);
         },10000); // 10 secondes de timeout
+        thisMode.LoopCategory1.click(function(){chooseCategory(1)});
+        thisMode.LoopCategory2.click(function(){chooseCategory(2)});
+        thisMode.LoopCategory3.click(function(){chooseCategory(3)});
+        thisMode.CategoryTitles.click(function(i){
+            if (i == 1010) chooseCategory(1);
+            if (i == 1020) chooseCategory(2);
+            if (i == 1030) chooseCategory(3);
+        });
         thisMode.game.api.registeraction('selectCategory', function(data){
             data.value = parseInt(data.value);
             if (data.value > 0) {
@@ -147,16 +155,8 @@ ModeCategory.prototype.start = function() {
         thisMode.LoopCategory1.play();
         thisMode.LoopCategory2.play();
         thisMode.LoopCategory3.play();
-        thisMode.LoopCategory1.click(function(){chooseCategory(1)});
-        thisMode.LoopCategory2.click(function(){chooseCategory(2)});
-        thisMode.LoopCategory3.click(function(){chooseCategory(3)});
         this.free();
         thisMode.CategoryTitles.play();
-        thisMode.CategoryTitles.click(function(i){
-            if (i == 1010) chooseCategory(1);
-            if (i == 1020) chooseCategory(2);
-            if (i == 1030) chooseCategory(3);
-        })
     });
 
     this.game.font.strings[1010] = this.questiontitles[0];

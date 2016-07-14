@@ -48,7 +48,7 @@ jQuery.fn.imagesLoaded = function(callback, fireOne) {
         elemsLen = elems.length - 1;
 
     elems
-        .bind('load', function(e) {
+        .on('load', function(e) {
             if (fireOne) {
                 !elemsLen-- && callback.call(elems, e);
             } else {
@@ -77,12 +77,12 @@ function waitForAudio(selector,callback) {
 function bindKeyListener(callback,timeout){
     if (typeof(timeout) === 'undefined') timeout = 0;
     var listener = function(event){callback(event.which)};
-    jQuery(window).bind('keypress',listener);
+    jQuery(window).on('keypress',listener);
     return listener;
 }
 
 function unbindKeyListener(listener) {
-    jQuery(window).unbind('keypress',listener);
+    jQuery(window).off('keypress',listener);
 }
 
 function getSTRfromID(STR,type,id) {

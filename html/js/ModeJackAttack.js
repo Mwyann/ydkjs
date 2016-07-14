@@ -494,11 +494,13 @@ ModeJackAttack.prototype.start = function() {
             rippos++;
             if (rippos <= 8) {
                 ripdiv.css({
-                    'width': (rippos * 80).toString() + 'px'
+                    'width': (rippos * 80).toString() + 'px',
+                    'z-index': 1999+rippos // Force le navigateur à redessiner complètement l'image, évite les bugs d'affichage
                 });
             } else if (rippos <= 16) {
                 blackDiv.css({
-                    'left': ((17-rippos) * 80).toString()+'px'
+                    'left': ((17-rippos) * 80).toString()+'px',
+                    'z-index': 1999+rippos // Idem au dessus
                 });
             } else {
                 clearInterval(interval);

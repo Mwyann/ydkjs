@@ -40,14 +40,17 @@ function YDKJGame(html, demomode) {
     this.fullscreen = function(f) {
         var autozoom = function() {
             var zoom = Math.min(jQuery(window).width()/640,jQuery(window).height()/480);
-            var centerup = Math.max(0,Math.round((jQuery(window).height()-(zoom*480))/4));
+            var centerup = Math.max(0,Math.round((jQuery(window).height()-(zoom*480))/2));
+            var centerleft = Math.max(0,Math.round((jQuery(window).width()-(zoom*640))/2));
             body.css({
                 'background-color': '#000',
-                'overflow': 'hidden',
-                'transform-origin': '50% 0',
-                'transform': 'scale('+zoom.toFixed(2)+','+zoom.toFixed(2)+')'});
+                'overflow': 'hidden'
+            });
             thisGame.html.screen.css({
-                'top': centerup+'px'
+                'top': centerup+'px',
+                'left': centerleft+'px',
+                'transform-origin': '0 0',
+                'transform': 'scale('+zoom.toFixed(2)+','+zoom.toFixed(2)+')'
             });
         };
         onfullscreenoff = f;
@@ -56,9 +59,7 @@ function YDKJGame(html, demomode) {
         thisGame.html.screen.css({
             'position': 'absolute',
             'top': '0',
-            'left': '0',
-            'right': '0',
-            'margin': '0 auto'});
+            'left': '0'});
 
         onresize = autozoom;
         autozoom();

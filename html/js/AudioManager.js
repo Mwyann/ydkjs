@@ -18,7 +18,7 @@ $().ready(function() {
             thisAM.audiostock = jQuery('<div />').attr('id','audiostock').css('display','none'); // Make the new stock
             thisAM.audiostock.appendTo('body'); // Append it to the DOM
             for(var i = 0; i < numberofelems; i++) { // Number of elements to initialize
-                var res = jQuery('<audio />').attr('id','audioelement'+i); // Create a new empty audio object
+                var res = jQuery('<audio />').attr('id','audioelement'+i).attr('preload','auto'); // Create a new empty audio object
                 thisAM.audiostock.append(res); // Append it to the DOM
                 thisAM.audioelements.push(res); // Push it to the global var
                 thisAM.leases.push(0);
