@@ -697,7 +697,7 @@ YDKJAPI.prototype.initgame = function() {
         if (currentmode === undefined) data['currentmode'] = 'None';
         //if (currentmode === undefined) data['currentmode'] = 'Intro'; // Ligne DEBUG
         if (currentmode instanceof ModeIntro) data['currentmode'] = 'Intro';
-        if ((currentmode instanceof ModeQuestion) || (currentmode instanceof ModeDisOrDat)) {data['currentmode'] = 'Category'; data['category'] = 1; data['questionnumber'] = parseInt(currentmode.options.questionnumber)+1;}
+        if ((currentmode instanceof ModeQuestion) || (currentmode instanceof ModeDisOrDat) || (currentmode instanceof ModeGibberish)) {data['currentmode'] = 'Category'; data['category'] = 1; data['questionnumber'] = parseInt(currentmode.options.questionnumber)+1;}
         if (currentmode instanceof ModeJackAttack) data['currentmode'] = 'JackAttack';
 
         var newmode;
@@ -750,6 +750,11 @@ YDKJAPI.prototype.initgame = function() {
         }
         else if (mode instanceof ModeDisOrDat) {
             data['mode'] = 'DisOrDat';
+            data['category'] = mode.options.category;
+            data['id'] = mode.options.id;
+        }
+        else if (mode instanceof ModeGibberish) {
+            data['mode'] = 'Gibberish';
             data['category'] = mode.options.category;
             data['id'] = mode.options.id;
         }
@@ -810,6 +815,13 @@ YDKJAPI.prototype.initgame = function() {
                     timer30ready(function(resources) {
                         mode.options.timer.preload(resources);
                     });
+                }
+
+                if (mode instanceof ModeGibberish) {
+                    strtmp = [];
+                    eval('strtmp = '+reslist['STR']);
+                    mode.STR = strtmp;
+                    mode.options.value = parseInt(reslist['value']);
                 }
 
                 if (mode instanceof ModeJackAttack) {

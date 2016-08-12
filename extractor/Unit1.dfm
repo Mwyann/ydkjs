@@ -114,7 +114,7 @@ object Form1: TForm1
     Width = 385
     Height = 21
     TabOrder = 4
-    Text = 'L:\Jeux\YDKJ\FullFR'
+    Text = 'J:\Jeux\YDKJ\FullFR'
   end
   object Edit2: TEdit
     Left = 64

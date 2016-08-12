@@ -4,6 +4,10 @@ function YDKJFont() {
     this.strings = {};
     this.fontdata = {};
     this.textdata = {
+        // Miscellaneous
+        9:   {font:'JackInput',size:23,color:'#000',halign:'l'}, // Player's name input TODO
+        11:  {font:'JackInput',size:23,color:['#FF3','#0F0','#F00']}, // Player's free answer input (Question, Gibberish) TODO
+        1315:{font:'JackInput',size:23,color:'#000'},                 // Correct free answer revealed TODO
         // Player's names and scores
         110: {font:'JackRoman',size:23,color:['#FFF','#0F0','#F00']}, // Player 1's name
         115: {font:'JackRoman',size:23,color:['#FFF','#0F0','#F00']}, // Player 1's score
@@ -35,6 +39,12 @@ function YDKJFont() {
         1213:{font:'JackCondensed',size:22,color:['#FC0','#F00'],halign:'l'}, // Answer 3
         1214:{font:'JackCondensed',size:22,color:['#FC0','#F00'],halign:'l'}, // Answer 4
         1215:{font:'JackRoman',size:[61,38,29,23],color:'#FC0'}, // Revealed answer (probably more than one size here, TODO check sizes like 38, 29, 23)
+        // Gibberish
+        1305:{font:'JackExtraCond',size:83,color:'#33F'}, // Current price
+        1310:{font:'JackExtraCond',size:[64,42],color:'#FFF'}, // Question
+        1311:{font:'JackCondensed',size:20,color:'#66F',halign:'r'}, // Clue 1 TODO
+        1312:{font:'JackCondensed',size:20,color:'#66F',halign:'r'}, // Clue 2 TODO
+        1313:{font:'JackCondensed',size:20,color:'#66F',halign:'r'}, // Clue 3 TODO
         // DisOrDat
         1400:{font:'JackRoman',size:20,color:'#33F',halign:'l'}, // Category title, header
         1410:{font:'JackRoman',size:29,color:'#FF0'}, // Subject
@@ -59,18 +69,18 @@ function YDKJFont() {
         1512:{font:'JackExtraCond',size:[64,42,32],color:'#F00',opacity:0.40},
         1513:{font:'JackExtraCond',size:[64,42,32],color:'#F00',opacity:0.15},
         1520:{font:'JackExtraCond',size:[64,42,32],color:'#F00'}, // Correct answer
-        210:{font:'JackRoman',size:39,color:['#FFF','#AAA']}, // Players names when correct
-        220:{font:'JackRoman',size:39,color:['#FFF','#AAA']},
-        230:{font:'JackRoman',size:39,color:['#FFF','#AAA']},
-        215:{font:'JackRoman',size:23,color:['#0F0','#0A0','#060']}, // 2000F when correct
-        225:{font:'JackRoman',size:23,color:['#0F0','#0A0','#060']},
-        235:{font:'JackRoman',size:23,color:['#0F0','#0A0','#060']},
-        211:{font:'JackRoman',size:39,color:['#FFF','#666']}, // Players names when wrong
-        221:{font:'JackRoman',size:39,color:['#FFF','#666']},
-        231:{font:'JackRoman',size:39,color:['#FFF','#666']},
-        216:{font:'JackRoman',size:23,color:['#F00','#A00','#600']}, // 2000F when wrong
-        226:{font:'JackRoman',size:23,color:['#F00','#A00','#600']},
-        236:{font:'JackRoman',size:23,color:['#F00','#A00','#600']},
+        210: {font:'JackRoman',size:39,color:['#FFF','#AAA']}, // Players names when correct
+        220: {font:'JackRoman',size:39,color:['#FFF','#AAA']},
+        230: {font:'JackRoman',size:39,color:['#FFF','#AAA']},
+        215: {font:'JackRoman',size:23,color:['#0F0','#0A0','#060']}, // 2000F when correct
+        225: {font:'JackRoman',size:23,color:['#0F0','#0A0','#060']},
+        235: {font:'JackRoman',size:23,color:['#0F0','#0A0','#060']},
+        211: {font:'JackRoman',size:39,color:['#FFF','#666']}, // Players names when wrong
+        221: {font:'JackRoman',size:39,color:['#FFF','#666']},
+        231: {font:'JackRoman',size:39,color:['#FFF','#666']},
+        216: {font:'JackRoman',size:23,color:['#F00','#A00','#600']}, // 2000F when wrong
+        226: {font:'JackRoman',size:23,color:['#F00','#A00','#600']},
+        236: {font:'JackRoman',size:23,color:['#F00','#A00','#600']},
         // End
         1610:{font:'JackRoman',size:[61,38,29,23],color:'#FFF'}, // TODO: check real font sizes
         1611:{font:'JackRoman',size:[61,38,29,23],color:'#FFF'},

@@ -1,10 +1,15 @@
 //--------------------------------------
 //--- 010 Editor v5.0 Binary Template
 //
-// File:
-// Author:
-// Revision:
-// Purpose:
+//      File: SRF.bt
+//    Author: Yann Le Brech
+//   Version: 1.0
+//   Purpose: Parse SRF archive files used in games like You Don't Know Jack.
+//  Category: Archive
+// File Mask: *.srf
+//  ID Bytes: 73 72 66 31 //srf1
+//   History:
+//   1.0   Yann Le Brech: Initial release
 //--------------------------------------
 
 /*
@@ -14,13 +19,13 @@ val1 :
 0, 12, 16, 167
 
 12 semble dire "stop"
-16 semble dire "r√©p√©ter cette frame √† la suivante" ou placer un marqueur, une pause au milieu d'une animation
+16 semble dire "rÈpÈter cette frame ‡ la suivante" ou placer un marqueur, une pause au milieu d'une animation
 32 ou 48 semble demander d'utiliser une autre ressource image (exemple le curseur de saisie)
 
 */
 
 typedef struct {
-    ubyte imgnum; // N¬∞ de l'image
+    ubyte imgnum; // N∞ de l'image
     ubyte val; // Flags binaires : 4 = ?, 8 = ?, 32 = texte.
     short left;
     short top;
@@ -30,12 +35,12 @@ typedef struct {
 } IMGDEF;
 
 typedef struct {
-    ushort sameoffset; // Si diff√©rent de 0, alors on prend les m√™mes images qu'√† l'offset indiqu√©
+    ushort sameoffset; // Si diffÈrent de 0, alors on prend les mÍmes images qu'‡ l'offset indiquÈ
     short left; // Position des images
     short top;
     short right;
     short bottom;
-    ushort nbimg; // Nombre d'images √† afficher
+    ushort nbimg; // Nombre d'images ‡ afficher
     local int64 currentpos4 = FTell();
     if (sameoffset != 0) FSeek(headersize+sameoffset*12);
     if (nbimg > 0) IMGDEF imgs[nbimg];
@@ -93,10 +98,10 @@ typedef struct {
 
 typedef struct {
     SetBackColor( cLtGreen );
-    ushort header1[14]; // Aucune diff√©rence, que ce soit un wav normal ou un AIFC...
+    ushort header1[14]; // Aucune diffÈrence, que ce soit un wav normal ou un AIFC...
     ushort bitrate; // 22050 a priori toujours
     ushort header2[6]; // header2[5] : FE3C (aifc) ou FF3C (wav)
-    long samples; // Nombre d'√©chantillons, √† 16 bits il faut donc multiplier par 2 (en aifc, cette valeur est utilis√©e dans le fichier aifc, position 0x24)
+    long samples; // Nombre d'Èchantillons, ‡ 16 bits il faut donc multiplier par 2 (en aifc, cette valeur est utilisÈe dans le fichier aifc, position 0x24)
     ushort header3[7];
     char compression[4]; // ima4 (aifc) ou rien (wav)
     ushort header4[10]; // header4[2] : 16 (wav) ou 0 (aifc), header4[6] : FFFF (aifc) ou 0 (wav), header4[9] : 16 (aifc) ou 0 (wav)
@@ -138,9 +143,9 @@ typedef struct {
     char u3;
     ubyte u4;
     ubyte QuestionValue; // 1 = 1000F, 2 = 2000F, 3 = 3000F
-    ubyte QuestionType; // 0 = Question normale, (1 inutilis√©), 2 = Giberrish, 3 = DisOrDat, 4 = JackAttack, 5 = Fiber (Drelin-Drelin)
+    ubyte QuestionType; // 0 = Question normale, (1 inutilisÈ), 2 = Giberrish, 3 = DisOrDat, 4 = JackAttack, 5 = Fiber (Drelin-Drelin)
     ubyte u5;
-    ubyte SubQuestionType; // 0 = pas une question normale, 1 = question normale, 2 = bouche-trou, 3 = qui c'est celui l√†, 4 = ouvrez les yeux
+    ubyte SubQuestionType; // 0 = pas une question normale, 1 = question normale, 2 = bouche-trou, 3 = qui c'est celui l‡, 4 = ouvrez les yeux
     ubyte u6[4] <optimize=false>;
     char title[64] <optimize=false>;
     char file[64] <optimize=false>;
@@ -173,7 +178,7 @@ typedef struct {
 
 typedef struct {
     SetBackColor( cLtGreen );
-    char filename[4] <open=suppress>; // Ma00 -> Ma99 (audio), Me/Mh... (audio), STRL = String List (s√©par√©es par des 0x00), off4 = images/animations
+    char filename[4] <open=suppress>; // Ma00 -> Ma99 (audio), Me/Mh... (audio), STRL = String List (sÈparÈes par des 0x00), off4 = images/animations
     ulong subcount;
     SUBFILE sub[subcount] <optimize=false>;
 } FILE;

@@ -5,7 +5,7 @@
 <title>Demo YDKJ</title>
 <link href="css/ydkj.css" rel="stylesheet"/>
 <script src="js/jquery-3.0.0.min.js" type="text/javascript"></script>
-<script src="js/YDKJ.js?ver=6" type="text/javascript"></script>
+<script src="js/YDKJ.js?ver=7" type="text/javascript"></script>
 
 <script type="text/javascript">
 

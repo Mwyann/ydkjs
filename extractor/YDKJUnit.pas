@@ -775,31 +775,35 @@ end;
 
 function exportStringlist1(ssf:subsubfile):string;
 var data:array[0..65535] of char;
-    js,s:string;
+    totaljs,js,s:string;
     i,nbw:word;
 
 begin
-  js:='';
+  totaljs:='';
   seek(SRFhandler,ssf.fileoffset);
   blockread(SRFhandler,data,ssf.filesize);
   s:='';
   i:=2;
-  nbw:=ord(data[1]);
-  while (i < ssf.filesize) and (nbw > 0) do begin
-    if (data[i] <> #00) then begin
-      s:=s+MactoUTF8(data[i]);
-    end else begin
-      if (s <> '') then begin
-        if (js <> '') then js:=js+',';
-        js:=js+''''+s+'''';
-        s:='';
-        dec(nbw);
+  while (i < ssf.filesize) do begin
+    nbw:=ord(data[1]);
+    js:='';
+    while (i < ssf.filesize) and (nbw > 0) do begin
+      if (data[i] <> #00) then begin
+        s:=s+MactoUTF8(data[i]);
+      end else begin
+        if (s <> '') then begin
+          if (js <> '') then js:=js+',';
+          js:=js+''''+s+'''';
+          s:='';
+          dec(nbw);
+        end;
       end;
+      inc(i);
     end;
-    inc(i);
+    if (totaljs <> '') then totaljs:=totaljs+',';
+    totaljs:=totaljs+'['+js+']';
   end;
-  js:='['+js+']';
-  exportStringlist1:=js;
+  exportStringlist1:='['+totaljs+']';
 end;
 
 // Export d'une stringlist avec nombre de mots et taille de chaine
@@ -908,7 +912,14 @@ begin
   // Utilisés pour le Couci-Couça, entre autres
   if (ftype='ANS#') then result:='answers';
   if (ftype='STR#') then result:='stringlist2';
-  if (ftype='qhdr') then result:='qheaders'; 
+  // Rimatologie
+  if (ftype='Ansr') then result:='string';
+  if (ftype='Gibr') then result:='string';
+  if (ftype='Gory') then result:='string';
+  if (ftype='Hnt1') then result:='string';
+  if (ftype='Hnt2') then result:='string';
+  if (ftype='Hnt3') then result:='string';
+  if (ftype='qhdr') then result:='qheaders';
 end;
 
 // Lecture du fichier SRF

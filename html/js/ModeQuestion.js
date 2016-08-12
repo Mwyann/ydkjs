@@ -685,9 +685,10 @@ ModeQuestion.prototype.start = function() {
     });
 
     this.AnnounceCategory.ended(function(){
+        this.free();
         thisMode.ShowCategory.play();
-        thisMode.AnnounceCategory.delay(100,function(){
-            thisMode.QuestionTitle.play();
+        thisMode.QuestionTitle.delay(100,function(){
+            this.play();
         });
     });
 

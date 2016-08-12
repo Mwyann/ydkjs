@@ -10,6 +10,7 @@ function YDKJMode(game, modename, options) {
     if (modename == 'Category') this.modeObj = new ModeCategory();
     if (modename == 'Question') this.modeObj = new ModeQuestion();
     if (modename == 'DisOrDat') this.modeObj = new ModeDisOrDat();
+    if (modename == 'Gibberish') this.modeObj = new ModeGibberish();
     if (modename == 'JackAttack') this.modeObj = new ModeJackAttack();
     if (modename == 'End') this.modeObj = new ModeEnd();
 

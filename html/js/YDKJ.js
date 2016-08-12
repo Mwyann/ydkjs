@@ -50,6 +50,7 @@ function YDKJ(screen, debug) {
     if (typeof ModeCategory == "undefined") loadScript('js/ModeCategory.js');
     if (typeof ModeQuestion == "undefined") loadScript('js/ModeQuestion.js');
     if (typeof ModeDisOrDat == "undefined") loadScript('js/ModeDisOrDat.js');
+    if (typeof ModeGibberish == "undefined") loadScript('js/ModeGibberish.js');
     if (typeof ModeJackAttack == "undefined") loadScript('js/ModeJackAttack.js');
     if (typeof ModeEnd == "undefined") loadScript('js/ModeEnd.js');
     if (typeof YDKJDemoSnd == "undefined") loadScript('js/demo-res.js');

@@ -113,8 +113,8 @@ function gamemode() {
     $currentmode = $_POST['currentmode'];
     $newmode = array();
     switch ($currentmode) {
-        case 'None': $newmode = array('mode' => 'Intro'); break;
-        //case 'None': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 7, 'chooseplayer' => rand(1,$nbplayers)); break; // Ligne DEBUG
+        //case 'None': $newmode = array('mode' => 'Intro'); break;
+        case 'None': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 4, 'chooseplayer' => rand(1,$nbplayers)); break; // Ligne DEBUG
         case 'Intro': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 1, 'chooseplayer' => rand(1,$nbplayers)); break;
         case 'Category':
             if (!isset($_POST['category'])) die('Gamemode 2');
@@ -140,8 +140,8 @@ function resources() {
 
     /*********** MODE INTRO ***********/
     if ($mode == 'Intro') {
-        $intro = rand(1,4); // Choix aléatoire parmi 4 intros différentes (le Jack qui casse)
         $pretitle = rand(1,11); // Choix aléatoire parmi 11 pré-titres différents (les deux lignes avant le logo)
+        $intro = rand(1,4); // Choix aléatoire parmi 4 intros différentes (le Jack qui casse)
 
         $reslist = array();
 
@@ -264,7 +264,7 @@ function resources() {
         $reslist['questiontitles'] = array();
 
         $demo = '';
-        if ($questionnumber == 7) {
+        if ($questionnumber == 7) { // JackAttack
             if ($DEMOMODE) {
                 switch ($VERSION) {
                     case 'fr': $demo = "AND id LIKE 'JC_'"; break;
@@ -279,22 +279,31 @@ function resources() {
                                ".$demo."
                                ORDER BY MD5(CONCAT(id,".rand(1,999999)."))
                                LIMIT 0,3");
-        } elseif ($questionnumber == 4) {
-            if ($DEMOMODE) {
-                switch ($VERSION) {
-                    case 'fr': $demo = "AND id LIKE 'DB_'"; break;
-                    case 'uk': $demo = "AND id LIKE 'DD_'"; break;
-                    case 'de1': $demo = "AND id LIKE 'PB_'"; break;
-                    case 'us2': $demo = "AND id LIKE 'PB_'"; break;
+        } elseif ($questionnumber == 4) { // Couci-Couça ou Rimatologie
+            if (1) {
+                $res = $DB->query("SELECT *
+                                   FROM ".$DBsta.".qhdr
+                                   WHERE qtype = 'Gibberish'
+                                   ".$demo."
+                                   ORDER BY MD5(CONCAT(id,".rand(1,999999)."))
+                                   LIMIT 0,3");
+            } else {
+                if ($DEMOMODE) {
+                    switch ($VERSION) {
+                        case 'fr': $demo = "AND id LIKE 'DB_'"; break;
+                        case 'uk': $demo = "AND id LIKE 'DD_'"; break;
+                        case 'de1': $demo = "AND id LIKE 'PB_'"; break;
+                        case 'us2': $demo = "AND id LIKE 'PB_'"; break;
+                    }
                 }
+                $res = $DB->query("SELECT *
+                                   FROM ".$DBsta.".qhdr
+                                   WHERE qtype = 'DisOrDat'
+                                   ".$demo."
+                                   ORDER BY MD5(CONCAT(id,".rand(1,999999)."))
+                                   LIMIT 0,3");
             }
-            $res = $DB->query("SELECT *
-                               FROM ".$DBsta.".qhdr
-                               WHERE qtype = 'DisOrDat'
-                               ".$demo."
-                               ORDER BY MD5(CONCAT(id,".rand(1,999999)."))
-                               LIMIT 0,3");
-        } else {
+        } else { // Toute autre question
             if ($DEMOMODE) {
                 switch ($VERSION) {
                     case 'fr': $demo = "AND (id LIKE 'AA_' OR id LIKE 'AB_')"; break;
@@ -544,6 +553,89 @@ function resources() {
         $reslist['DisOrDat/RestartSkipped'] = $reslist['DisOrDat/RestartSkipped'.rand(1,2)];
         unset($reslist['DisOrDat/RestartSkipped1']);
         unset($reslist['DisOrDat/RestartSkipped2']);
+
+        $reslist['STR'] = $qhdr['strings'];
+    }
+
+    /********* RIMATOLOGIE **********/
+    if ($mode == 'Gibberish') {
+        if (!isset($_POST['category'])) die('Resources 2');
+        $category = $_POST['category'];
+        if (!isset($_POST['id'])) die('Resources 2');
+        $id = $_POST['id'];
+
+        $res = $DB->query("SELECT *
+                           FROM ".$DBsta.".qhdr q, ".$DBsta.".strings s
+                           WHERE id = '".addslashes($id)."'
+                           AND q.folder = s.folder");
+        $qhdr = $res->fetch();
+        $questionvalue = number_format(5000*$category,0,'','');
+
+        $playersolo = 0;
+        if ($nbplayers == 1) $playersolo = 1;
+        $intro = rand(1,4);
+
+        $reslist = array('value' => $questionvalue);
+        $res = $DB->query("SELECT *
+                           FROM ".$DBsta.".resani a, ".$DBsta.".resfiles f
+                           WHERE a.resid = f.resid
+                           AND (grp = 'Gibberish'
+                           OR (grp = 'Question' AND name LIKE 'Player%'))");
+        while ($rs = $res->fetch()) {
+            if (($rs['variantType'] == 'Intro') && ($rs['variantValue'] != $intro)) continue;
+            if (($rs['variantType'] == 'CategoryNumber') && ($rs['variantValue'] != $category)) continue;
+            if (($rs['variantType'] == 'QuestionValue') && ($rs['variantValue'] != $questionvalue)) continue;
+
+            $r = array(
+                'urlGif' => uriToUid('res-full/'.$rs['filename'].'.gif'),
+                'urlJS' => uriToUid('res-full/'.$rs['filename'].'.js'),
+                'framestart' => $rs['framestart']
+            );
+            if ($rs['framestop'] !== null) $r['framestop'] = $rs['framestop'];
+            if ($rs['loopani']) $r['loop'] = $rs['loopani'];
+            $reslist[$rs['grp'].'/'.$rs['name']] = $r;
+        }
+
+        $res = $DB->query("SELECT *
+                           FROM ".$DBsta.".ressnd
+                           WHERE grp = 'Gibberish'");
+        while ($rs = $res->fetch()) {
+            if (($rs['variantType'] == 'FirstGibberish') && ($rs['variantValue'] != 1)) continue;
+            if (($rs['variantType'] == 'PlayerSolo') && ($rs['variantValue'] != $playersolo)) continue;
+            if (($rs['variantType'] == 'QuestionValue') && ($rs['variantValue'] != $questionvalue)) continue;
+
+            if ($rs['name'] == 'SFXIntro2') $rs['val'] = $intro; // Forcer la voix pour l'intro
+
+            $names = array($rs['name']);
+
+            $possiblevalues = explode(',',$rs['val']);
+            if (sizeof($possiblevalues) > 1) shuffle_rand($possiblevalues);
+
+            foreach($names as $idname => $name) {
+                $key = $rs['grp'] . '/' . $name;
+                if (!isset($reslist[$key])) {
+                    if ((substr($name, 0, 3) == 'SFX') && (isset($reslist[$rs['grp'] . '/' . substr($name, 3)]))) $key = $rs['grp'] . '/' . substr($name, 3);
+                    else $reslist[$key] = array();
+                }
+
+                $reslist[$key]['urlAudio'] = uriToUid('res-full/' . $rs['resfolder'] . '/' . $possiblevalues[$idname]);
+                if ($rs['loopsnd']) $reslist[$key]['loop'] = $rs['loopsnd'];
+            }
+        }
+
+        $reslist['Gibberish/QuestionTitle'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/1'));
+        $reslist['Gibberish/QuestionIntro1'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/2'));
+        $reslist['Gibberish/QuestionIntro2'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/3'));
+        $reslist['Gibberish/QuestionIntro3'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/4'));
+        $reslist['Gibberish/QuestionHint1.1'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/5'));
+        $reslist['Gibberish/QuestionHint1.2'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/6'));
+        $reslist['Gibberish/QuestionHint2.1'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/7'));
+        $reslist['Gibberish/QuestionHint2.2'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/8'));
+        $reslist['Gibberish/QuestionHint3.1'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/9'));
+        $reslist['Gibberish/QuestionHint3.2'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/10'));
+        $reslist['Gibberish/QuestionAnswer'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/13'));
+        $reslist['Gibberish/AboutToRevealAnswer'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/14'));
+        $reslist['Gibberish/RevealAnswer'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/16'));
 
         $reslist['STR'] = $qhdr['strings'];
     }
