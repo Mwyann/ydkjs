@@ -19,6 +19,7 @@ ModeGibberish.prototype.preload = function(resources) {
 
     this.TimerComesIn = new YDKJAnimation(resources['Gibberish/TimerComesIn']);
     this.TimerDance = new YDKJAnimation(resources['Gibberish/TimerDance']);
+    this.TimerStop = new YDKJAnimation(resources['Gibberish/TimerStop']);
     this.ExplainRules = new YDKJAnimation(resources['Gibberish/ExplainRules']);
     this.ShowHeader = new YDKJAnimation(resources['Gibberish/ShowHeader']);
     this.ShowPrice = new YDKJAnimation(resources['Gibberish/ShowPrice']);
@@ -33,6 +34,24 @@ ModeGibberish.prototype.preload = function(resources) {
     this.MusicPart1 = new YDKJAnimation(resources['Gibberish/MusicPart1']);
     this.MusicPart2 = new YDKJAnimation(resources['Gibberish/MusicPart2']);
     this.MusicPart3 = new YDKJAnimation(resources['Gibberish/MusicPart3']);
+
+    this.ShowHint1 = new YDKJAnimation(resources['Gibberish/ShowHint1']);
+    this.ShowHint2 = new YDKJAnimation(resources['Gibberish/ShowHint2']);
+    this.ShowHint3 = new YDKJAnimation(resources['Gibberish/ShowHint3']);
+    this.QuestionHint11 = new YDKJAnimation(resources['Gibberish/QuestionHint11']);
+    this.QuestionHint12 = new YDKJAnimation(resources['Gibberish/QuestionHint12']);
+    this.QuestionHint21 = new YDKJAnimation(resources['Gibberish/QuestionHint21']);
+    this.QuestionHint22 = new YDKJAnimation(resources['Gibberish/QuestionHint22']);
+    this.QuestionHint31 = new YDKJAnimation(resources['Gibberish/QuestionHint31']);
+    this.QuestionHint32 = new YDKJAnimation(resources['Gibberish/QuestionHint32']);
+
+    this.TimerTimeOut = new YDKJAnimation(resources['Question/TimerTimeOut']);
+
+    this.AboutToRevealAnswer = new YDKJAnimation(resources['Gibberish/AboutToRevealAnswer']);
+    this.ShowAnswerTyping = new YDKJAnimation(resources['Gibberish/ShowAnswerTyping']);
+    this.ShowAnswerTextFrame = new YDKJAnimation(resources['Gibberish/ShowAnswerTextFrame']);
+    this.RevealAnswer = new YDKJAnimation(resources['Gibberish/RevealAnswer']);
+    this.SFXShowAnswerAudience = new YDKJAnimation(resources['Gibberish/SFXShowAnswerAudience']);
 
     this.Player1ShowKey = new YDKJAnimation(resources['Question/Player1ShowKey']);
     this.Player1Answer = new YDKJAnimation(resources['Question/Player1Answer']);
@@ -79,6 +98,52 @@ ModeGibberish.prototype.start = function() {
         });
     };*/
 
+    thisMode.QuestionHint31.ended(300,function() {
+        this.free();
+        thisMode.QuestionHint32.play();
+    });
+
+    thisMode.QuestionHint21.ended(300,function() {
+        this.free();
+        thisMode.QuestionHint22.play();
+    });
+
+    thisMode.QuestionHint11.ended(300,function() {
+        this.free();
+        thisMode.QuestionHint12.play();
+    });
+
+    var currentpos = 0;
+    var decreasing = Math.round(thisMode.options.value/40);
+    var timerInterval;
+    var runTimer = function() {
+        currentpos++;
+        if (currentpos % 2 == 0) thisMode.game.font.strings[1305] = thisMode.game.displayCurrency(thisMode.options.value-currentpos*decreasing);
+        thisMode.ShowPrice.reset();
+        thisMode.ShowPrice.play();
+        if (currentpos == 9) { // Premier indice
+            thisMode.ShowHint1.play();
+            thisMode.QuestionHint11.play();
+        }
+        if (currentpos == 18) { // Deuxième indice
+            thisMode.ShowHint2.play();
+            thisMode.QuestionHint21.play();
+        }
+        if (currentpos == 27) { // Troisième indice
+            thisMode.ShowHint3.play();
+            thisMode.QuestionHint31.play();
+        }
+        if (currentpos == 40) { // Fin du temps !
+            clearInterval(timerInterval);
+            thisMode.MusicPart1.free();
+            thisMode.MusicPart2.free();
+            thisMode.MusicPart3.free();
+            thisMode.TimerDance.free();
+            thisMode.TimerTimeOut.play();
+            thisMode.TimerStop.play();
+        }
+    };
+
     this.QuestionIntro2.ended(100,function() {
         this.free();
         thisMode.QuestionIntro3.play();
@@ -99,11 +164,17 @@ ModeGibberish.prototype.start = function() {
         thisMode.MusicPart2.play();
     });
 
+    this.TimerDance.ended(100,function() {
+        thisMode.TimerDance.reset();
+        thisMode.TimerDance.play();
+    });
+
     this.ShowQuestion.ended(100,function() {
         thisMode.MusicPart1.play();
         thisMode.QuestionIntro2.play();
         thisMode.TimerComesIn.free();
         thisMode.TimerDance.play();
+        timerInterval = setInterval(runTimer,750);
     });
 
     this.QuestionIntro1.ended(100,function() {

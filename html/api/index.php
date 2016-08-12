@@ -584,6 +584,7 @@ function resources() {
         while ($rs = $res->fetch()) {
             if (($rs['variantType'] == 'Intro') && ($rs['variantValue'] != $intro)) continue;
             if (($rs['variantType'] == 'CategoryNumber') && ($rs['variantValue'] != $category)) continue;
+            if (($rs['variantType'] == 'NumberOfPlayers') && ($rs['variantValue'] != $nbplayers)) continue;
             if (($rs['variantType'] == 'QuestionValue') && ($rs['variantValue'] != $questionvalue)) continue;
 
             $r = array(
@@ -598,7 +599,8 @@ function resources() {
 
         $res = $DB->query("SELECT *
                            FROM ".$DBsta.".ressnd
-                           WHERE grp = 'Gibberish'");
+                           WHERE grp = 'Gibberish'
+                           OR (grp = 'Question' AND name IN ('TimerTimeOut'))");
         while ($rs = $res->fetch()) {
             if (($rs['variantType'] == 'FirstGibberish') && ($rs['variantValue'] != 1)) continue;
             if (($rs['variantType'] == 'PlayerSolo') && ($rs['variantValue'] != $playersolo)) continue;
@@ -627,12 +629,12 @@ function resources() {
         $reslist['Gibberish/QuestionIntro1'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/2'));
         $reslist['Gibberish/QuestionIntro2'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/3'));
         $reslist['Gibberish/QuestionIntro3'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/4'));
-        $reslist['Gibberish/QuestionHint1.1'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/5'));
-        $reslist['Gibberish/QuestionHint1.2'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/6'));
-        $reslist['Gibberish/QuestionHint2.1'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/7'));
-        $reslist['Gibberish/QuestionHint2.2'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/8'));
-        $reslist['Gibberish/QuestionHint3.1'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/9'));
-        $reslist['Gibberish/QuestionHint3.2'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/10'));
+        $reslist['Gibberish/QuestionHint11'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/5'));
+        $reslist['Gibberish/QuestionHint12'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/6'));
+        $reslist['Gibberish/QuestionHint21'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/7'));
+        $reslist['Gibberish/QuestionHint22'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/8'));
+        $reslist['Gibberish/QuestionHint31'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/9'));
+        $reslist['Gibberish/QuestionHint32'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/10'));
         $reslist['Gibberish/QuestionAnswer'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/13'));
         $reslist['Gibberish/AboutToRevealAnswer'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/14'));
         $reslist['Gibberish/RevealAnswer'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/16'));

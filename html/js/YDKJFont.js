@@ -6,7 +6,7 @@ function YDKJFont() {
     this.textdata = {
         // Miscellaneous
         9:   {font:'JackInput',size:23,color:'#000',halign:'l'}, // Player's name input TODO
-        11:  {font:'JackInput',size:23,color:['#FF3','#0F0','#F00']}, // Player's free answer input (Question, Gibberish) TODO
+        11:  {font:'JackInput',size:23,color:['#FF0','#0F0','#F00']}, // Player's free answer input (Question, Gibberish) TODO
         1315:{font:'JackInput',size:23,color:'#000'},                 // Correct free answer revealed TODO
         // Player's names and scores
         110: {font:'JackRoman',size:23,color:['#FFF','#0F0','#F00']}, // Player 1's name
@@ -40,7 +40,7 @@ function YDKJFont() {
         1214:{font:'JackCondensed',size:22,color:['#FC0','#F00'],halign:'l'}, // Answer 4
         1215:{font:'JackRoman',size:[61,38,29,23],color:'#FC0'}, // Revealed answer (probably more than one size here, TODO check sizes like 38, 29, 23)
         // Gibberish
-        1305:{font:'JackExtraCond',size:83,color:'#33F'}, // Current price
+        1305:{font:'JackExtraCond',size:83,color:'#33F',halign:'l'}, // Current price
         1310:{font:'JackExtraCond',size:[64,42],color:'#FFF'}, // Question
         1311:{font:'JackCondensed',size:20,color:'#66F',halign:'r'}, // Clue 1 TODO
         1312:{font:'JackCondensed',size:20,color:'#66F',halign:'r'}, // Clue 2 TODO
