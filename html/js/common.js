@@ -75,20 +75,126 @@ function waitForAudio(selector,callback) {
 /********** Saisie au clavier **********/
 
 function bindKeyListener(callback,timeout){
-    if (typeof(timeout) === 'undefined') timeout = 0;
+    if (typeof(timeout) === 'undefined') timeout = 0; // TODO ?
     var listener = function(event){callback(event.which)};
+    var listenerbackspace = function(event){if (event.keyCode==8) callback(event.which);};
     jQuery(window).on('keypress',listener);
-    return listener;
+    jQuery(window).on('keydown',listenerbackspace);
+    return [listener,listenerbackspace];
 }
 
 function unbindKeyListener(listener) {
-    jQuery(window).off('keypress',listener);
+    jQuery(window).off('keypress',listener[0]).off('listenerbackspace',listener[1]);
 }
 
 function getSTRfromID(STR,type,id) {
     for(var i = 0; i < STR.length; i++) if ((STR[i].type == type) && (STR[i].id == id)) return STR[i].data;
     return '';
 }
+
+/********** Saisie d'une réponse au clavier **********/
+
+/* Valeurs à intégrer à l'objet :
+  - game
+  Animations :
+  - TextFrameShow
+  - TextFrameEnter
+  - ShowAnswerTyping
+  - ShowAnswerTextFrame
+  Sons :
+  - SFXShowTextFrame
+  - SFXTypeHeartBeat
+  - SFXTypeAnswer
+  - SFXTypeBack
+  - SFXAnswerEntered
+  - SFXEraseAnswer
+  Méthodes :
+  - onEnter(text)
+  - onTimeOut
+ */
+function InputTextFrame() {}
+
+InputTextFrame.prototype.start = function() {
+    var thisFrame = this;
+
+    var cursorblinkInterval = 0;
+    var cursor;
+    this.inputframe = 0;
+    this.text = '';
+
+    this.resetblink = function() {
+        cursor.css('visibility','');
+        if (cursorblinkInterval) clearInterval(cursorblinkInterval);
+        cursorblinkInterval = setInterval(function() {
+            if (cursor.css('visibility') == 'hidden') cursor.css('visibility',''); else cursor.css('visibility','hidden');
+        },700);
+    };
+
+    this.enter = function() {
+        cursor.css('visibility','');
+        if (cursorblinkInterval) clearInterval(cursorblinkInterval);
+        thisFrame.SFXAnswerEntered.reset();
+        thisFrame.SFXAnswerEntered.play();
+        thisFrame.SFXTypeHeartBeat.reset();
+        if (thisFrame.onEnter) thisFrame.onEnter(thisFrame.text);
+    };
+
+    this.SFXShowTextFrame.ended(function() {
+        cursor = thisFrame.game.html.screen.find('.cursor');
+        thisFrame.inputframe = thisFrame.game.html.screen.find('.inputframe');
+        thisFrame.SFXTypeHeartBeat.play();
+        thisFrame.resetblink();
+    });
+
+    this.game.font.strings[11] = '<span¤class="inputframe"></span><img¤src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAsAAAAZAQMAAADdfEb1AAAABlBMVEUAAAD//wCI23BQAAAAAXRSTlMAQObYZgAAABZJREFUCNdj+P2AgY+BgYUyxMcANAcAnC8EJ8go5jgAAAAASUVORK5CYII="¤style="vertical-align:-8px;padding-bottom:3px;visibility:hidden;margin-left:-4px"¤class="cursor">';
+    this.TextFrameShow.play();
+    this.SFXShowTextFrame.play();
+};
+
+/* Méthode à appeler pour presser une touche */
+InputTextFrame.prototype.sendKeypress = function(key) {
+    if (!this.inputframe) return false;
+    if (key == 13) { // Entrée
+        this.game.font.strings[11] = this.inputframe.html().replace(' ','¤');
+        this.inputframe = 0;
+        this.enter();
+        return true;
+    }
+    if (key == 8) { // Effacement
+        if (this.text == '') return false;
+        this.SFXTypeBack.reset();
+        this.SFXTypeBack.play();
+        this.text = this.text.substr(0,this.text.length-1);
+    } else {
+        key = String.fromCharCode(key);
+        if (key == "'") key = '’';
+        this.text = this.text+key;
+        this.SFXTypeAnswer.reset();
+        this.SFXTypeAnswer.play();
+    }
+    this.resetblink();
+    this.inputframe.html(this.text.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace(' ','&nbsp;'));
+    return true;
+};
+
+/* Méthode qui efface la mauvaise réponse du joueur */
+InputTextFrame.prototype.wrong = function(callback) {
+    var thisFrame = this;
+    this.SFXEraseAnswer.play();
+    var inputframe = this.game.html.screen.find('.inputframe');
+
+    var eraseInterval = setInterval(function() {
+        if (thisFrame.text == '') {
+            thisFrame.game.font.strings[11] = inputframe.html().replace(' ','¤');
+            clearInterval(eraseInterval);
+            thisFrame.SFXEraseAnswer.reset();
+            if (callback) callback();
+            return false;
+        }
+        thisFrame.text = thisFrame.text.substr(0,thisFrame.text.length-1);
+        inputframe.html(thisFrame.text.replace('&','&amp;').replace('<','&lt;').replace('>','&gt;').replace(' ','&nbsp;'));
+    },66);
+};
 
 /********** Timer **********/
 

@@ -145,18 +145,6 @@ function YDKJAnimation(resource) {
     this.addText = function(textid, x, y, w, h, transform, val, debug) {
         //if (!thisAnim.html.debug) return true;
         if (debug === undefined) debug = 0;
-        /*
-        var ourdiv = jQuery('<div />');
-        ourdiv.css({
-            'background-color':'#999',
-            'opacity':'0.5',
-            'width':(w)+'px',
-            'height':(h)+'px',
-            'position':'absolute',
-            'left':x+'px',
-            'top':y+'px'
-        }).html(textid);
-        */
         var ourdiv = this.font.makeText(textid, w, h, transform, val, debug);
         if (!ourdiv) return true;
         ourdiv.css({

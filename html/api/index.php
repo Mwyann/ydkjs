@@ -631,13 +631,17 @@ function resources() {
         $reslist['Gibberish/QuestionIntro3'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/4'));
         $reslist['Gibberish/QuestionHint11'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/5'));
         $reslist['Gibberish/QuestionHint12'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/6'));
+        if (!file_exists('../res-full/'.$qhdr['folder'].'/snd/6.ogg')) unset($reslist['Gibberish/QuestionHint12']);
         $reslist['Gibberish/QuestionHint21'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/7'));
         $reslist['Gibberish/QuestionHint22'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/8'));
+        if (!file_exists('../res-full/'.$qhdr['folder'].'/snd/8.ogg')) unset($reslist['Gibberish/QuestionHint22']);
         $reslist['Gibberish/QuestionHint31'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/9'));
         $reslist['Gibberish/QuestionHint32'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/10'));
+        if (!file_exists('../res-full/'.$qhdr['folder'].'/snd/10.ogg')) unset($reslist['Gibberish/QuestionHint32']);
         $reslist['Gibberish/QuestionAnswer'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/13'));
         $reslist['Gibberish/AboutToRevealAnswer'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/14'));
         $reslist['Gibberish/RevealAnswer'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/16'));
+        if (!file_exists('../res-full/'.$qhdr['folder'].'/snd/16.ogg')) unset($reslist['Gibberish/RevealAnswer']);
 
         $reslist['STR'] = $qhdr['strings'];
     }

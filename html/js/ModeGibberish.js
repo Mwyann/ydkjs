@@ -46,12 +46,30 @@ ModeGibberish.prototype.preload = function(resources) {
     this.QuestionHint32 = new YDKJAnimation(resources['Gibberish/QuestionHint32']);
 
     this.TimerTimeOut = new YDKJAnimation(resources['Question/TimerTimeOut']);
-
     this.AboutToRevealAnswer = new YDKJAnimation(resources['Gibberish/AboutToRevealAnswer']);
-    this.ShowAnswerTyping = new YDKJAnimation(resources['Gibberish/ShowAnswerTyping']);
-    this.ShowAnswerTextFrame = new YDKJAnimation(resources['Gibberish/ShowAnswerTextFrame']);
     this.RevealAnswer = new YDKJAnimation(resources['Gibberish/RevealAnswer']);
     this.SFXShowAnswerAudience = new YDKJAnimation(resources['Gibberish/SFXShowAnswerAudience']);
+
+    /* Eléments pour la fenêtre de saisie texte */
+    var typeframe = new InputTextFrame();
+    typeframe.game = this.game;
+    this.TextFrameShow = typeframe.TextFrameShow = new YDKJAnimation(resources['Gibberish/TextFrameShow']);
+    this.TextFrameEnter = typeframe.TextFrameEnter = new YDKJAnimation(resources['Gibberish/TextFrameEnter']);
+    this.ShowAnswerTyping = typeframe.ShowAnswerTyping = new YDKJAnimation(resources['Gibberish/ShowAnswerTyping']);
+    this.ShowAnswerTextFrame = typeframe.ShowAnswerTextFrame = new YDKJAnimation(resources['Gibberish/ShowAnswerTextFrame']);
+    this.SFXShowTextFrame = typeframe.SFXShowTextFrame = new YDKJAnimation(resources['Gibberish/SFXShowTextFrame']);
+    this.SFXTypeHeartBeat = typeframe.SFXTypeHeartBeat = new YDKJAnimation(resources['Gibberish/SFXTypeHeartBeat']);
+    this.SFXTypeAnswer = typeframe.SFXTypeAnswer = new YDKJAnimation(resources['Gibberish/SFXTypeAnswer']);
+    this.SFXTypeBack = typeframe.SFXTypeBack = new YDKJAnimation(resources['Gibberish/SFXTypeBack']);
+    this.SFXAnswerEntered = typeframe.SFXAnswerEntered = new YDKJAnimation(resources['Gibberish/SFXAnswerEntered']);
+    this.SFXEraseAnswer = typeframe.SFXEraseAnswer = new YDKJAnimation(resources['Gibberish/SFXEraseAnswer']);
+    this.typeframe = typeframe;
+
+    this.TextFrameCorrect = new YDKJAnimation(resources['Gibberish/TextFrameCorrect']);
+    this.TextFrameWrong = new YDKJAnimation(resources['Gibberish/TextFrameWrong']);
+
+    this.ShowAnswerTyping = new YDKJAnimation(resources['Gibberish/ShowAnswerTyping']);
+    this.ShowAnswerTextFrame = new YDKJAnimation(resources['Gibberish/ShowAnswerTextFrame']);
 
     this.Player1ShowKey = new YDKJAnimation(resources['Question/Player1ShowKey']);
     this.Player1Answer = new YDKJAnimation(resources['Question/Player1Answer']);
@@ -318,9 +336,26 @@ ModeGibberish.prototype.start = function() {
         thisMode.MusicIntro1.play();
     });
 
-    this.Intro.delay(500,function(){
+    /*this.Intro.delay(500,function(){
         this.play();
+    });*/
+
+    thisMode.game.html.screen.html('');
+    var typelistener = bindKeyListener(function(key) {
+        thisMode.typeframe.sendKeypress(key);
     });
+    this.typeframe.onEnter = function(text) {
+        if (text == 'good') {
+            thisMode.TextFrameShow.reset();
+            thisMode.TextFrameCorrect.play();
+        } else {
+            thisMode.typeframe.wrong(function () {
+                thisMode.TextFrameShow.reset();
+                thisMode.TextFrameWrong.play();
+            });
+        }
+    };
+    this.typeframe.start();
 
     //nextcategoryready = this.game.api.gamemode(thisMode); // Préchargement de la prochaine catégorie
 };

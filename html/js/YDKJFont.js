@@ -6,8 +6,7 @@ function YDKJFont() {
     this.textdata = {
         // Miscellaneous
         9:   {font:'JackInput',size:23,color:'#000',halign:'l'}, // Player's name input TODO
-        11:  {font:'JackInput',size:23,color:['#FF0','#0F0','#F00']}, // Player's free answer input (Question, Gibberish) TODO
-        1315:{font:'JackInput',size:23,color:'#000'},                 // Correct free answer revealed TODO
+        11:  {font:'JackInput',size:23,color:'#FF0',top:0}, // Player's free answer input (Question, Gibberish) TODO
         // Player's names and scores
         110: {font:'JackRoman',size:23,color:['#FFF','#0F0','#F00']}, // Player 1's name
         115: {font:'JackRoman',size:23,color:['#FFF','#0F0','#F00']}, // Player 1's score
@@ -42,9 +41,10 @@ function YDKJFont() {
         // Gibberish
         1305:{font:'JackExtraCond',size:83,color:'#33F',halign:'l'}, // Current price
         1310:{font:'JackExtraCond',size:[64,42],color:'#FFF'}, // Question
-        1311:{font:'JackCondensed',size:20,color:'#66F',halign:'r'}, // Clue 1 TODO
-        1312:{font:'JackCondensed',size:20,color:'#66F',halign:'r'}, // Clue 2 TODO
-        1313:{font:'JackCondensed',size:20,color:'#66F',halign:'r'}, // Clue 3 TODO
+        1311:{font:'JackCondensed',size:20,color:'#66F',halign:'r'}, // Clue 1
+        1312:{font:'JackCondensed',size:20,color:'#66F',halign:'r'}, // Clue 2
+        1313:{font:'JackCondensed',size:20,color:'#66F',halign:'r'}, // Clue 3
+        1315:{font:'JackRoman',size:23,color:'#000'},                // Correct free answer revealed
         // DisOrDat
         1400:{font:'JackRoman',size:20,color:'#33F',halign:'l'}, // Category title, header
         1410:{font:'JackRoman',size:29,color:'#FF0'}, // Subject
@@ -314,6 +314,7 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val, d
             var left = 0;
             //var top = -2-Math.floor(textdata.size[sizeid]*this.fontdata[font].topratio).toFixed(0);
             var top = -3;
+            if (typeof textdata.top != "undefined") top = textdata.top;
 
             div.css({
                 'left': left + 'px',
