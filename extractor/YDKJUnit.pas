@@ -729,7 +729,10 @@ begin
   blockread(SRFhandler,data,ssf.filesize);
   s:='';
   for i:=0 to ssf.filesize-1 do begin
-    if (data[i] <> #00) then s:=s+MactoUTF8(data[i]);
+    if (data[i] <> #00) then begin
+      if (data[i] = '''') then s:=s+'\';
+      s:=s+MactoUTF8(data[i]);
+    end;
   end;
   result:=s;
 end;
@@ -758,6 +761,7 @@ begin
   s:='';
   for i:=0 to ssf.filesize-1 do begin
     if (data[i] <> #00) then begin
+      if (data[i] = '''') then s:=s+'\';
       s:=s+MactoUTF8(data[i]);
     end else begin
       if (s <> '') then begin
@@ -783,12 +787,14 @@ begin
   seek(SRFhandler,ssf.fileoffset);
   blockread(SRFhandler,data,ssf.filesize);
   s:='';
-  i:=2;
+  i:=1;
   while (i < ssf.filesize) do begin
-    nbw:=ord(data[1]);
+    nbw:=ord(data[i]);
+    inc(i);
     js:='';
     while (i < ssf.filesize) and (nbw > 0) do begin
       if (data[i] <> #00) then begin
+        if (data[i] = '''') then s:=s+'\';
         s:=s+MactoUTF8(data[i]);
       end else begin
         if (s <> '') then begin
@@ -823,6 +829,7 @@ begin
   while nbstr > 0 do begin
     strlength:=ord(data[i]);inc(i);
     for j:=1 to strlength do begin
+      if (data[i] = '''') then s:=s+'\';
       s:=s+MactoUTF8(data[i]);inc(i);
     end;
     js:=js+''''+s+'''';

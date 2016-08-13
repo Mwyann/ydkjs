@@ -152,6 +152,12 @@ begin
   FileSearch(SRFbasedir);
   //FileSearch('.');
   SRFList.ItemIndex:=0;
+
+  if (paramcount = 2) then begin
+    Edit1.Text := paramstr(1);
+    Edit2.Text := paramstr(2);
+    Button1.Click;
+  end;
 end;
 
 function SafeFileName(filename:string):string;
