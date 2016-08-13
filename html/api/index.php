@@ -600,7 +600,7 @@ function resources() {
         $res = $DB->query("SELECT *
                            FROM ".$DBsta.".ressnd
                            WHERE grp = 'Gibberish'
-                           OR (grp = 'Question' AND name IN ('TimerTimeOut'))");
+                           OR (grp = 'Question' AND name IN ('SFXPlayerBuzz','SFXPlayerCorrect','SFXPlayerLose','TimerTimeOut'))");
         while ($rs = $res->fetch()) {
             if (($rs['variantType'] == 'FirstGibberish') && ($rs['variantValue'] != 1)) continue;
             if (($rs['variantType'] == 'PlayerSolo') && ($rs['variantValue'] != $playersolo)) continue;
