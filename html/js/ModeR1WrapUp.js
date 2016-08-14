@@ -4,6 +4,7 @@ function ModeR1WrapUp() {}
 
 ModeR1WrapUp.prototype.preload = function(resources) {
     this.MusicRound2 = new YDKJAnimation(resources['R1WrapUp/MusicRound2']);
+    this.MusicRound2.volume(70);
     this.MusicChooseCategoryStart = this.MusicRound2; // Sera utilisée par la question 10, elle pensera jouer un son de catégorie.
 
     this.VoiceRound1Over = new YDKJAnimation(resources['R1WrapUp/VoiceRound1Over']);
@@ -19,7 +20,7 @@ ModeR1WrapUp.prototype.preload = function(resources) {
     }
 };
 
-ModeR1WrapUp.prototype.start = function(resources) {
+ModeR1WrapUp.prototype.start = function() {
     var thisMode = this;
 
     var nextcategoryready;
