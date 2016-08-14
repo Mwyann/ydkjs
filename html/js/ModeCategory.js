@@ -124,12 +124,18 @@ ModeCategory.prototype.start = function() {
             if (data.value > 0) {
                 switch (data.value) {
                     case 1:
+                        thisMode.question2.free();
+                        thisMode.question3.free();
                         nextquestion = thisMode.question1;
                         break;
                     case 2:
+                        thisMode.question1.free();
+                        thisMode.question3.free();
                         nextquestion = thisMode.question2;
                         break;
                     case 3:
+                        thisMode.question1.free();
+                        thisMode.question2.free();
                         nextquestion = thisMode.question3;
                         break;
                 }
