@@ -124,7 +124,7 @@ function gamemode() {
     $newmode = array();
     switch ($currentmode) {
         case 'None': $newmode = array('mode' => 'Intro'); break;
-        //case 'None': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 4, 'chooseplayer' => rand(1,$nbplayers)); break; // Ligne DEBUG
+        //case 'None': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 10, 'chooseplayer' => rand(1,$nbplayers)); break; // Ligne DEBUG
         case 'Intro': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 1, 'chooseplayer' => rand(1,$nbplayers)); break;
         case 'Category':
             if (!isset($_POST['category'])) die('Gamemode 2');

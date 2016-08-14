@@ -206,6 +206,11 @@ InputTextFrame.prototype.wrong = function(callback) {
 InputTextFrame.prototype.showAnswer = function(answer,callback) {
     var thisFrame = this;
     this.SFXShowTextFrame.reset(true);
+    // On boucle à la sauvage
+    this.SFXShowTextFrame.ended(function() {
+        this.reset();
+        this.play();
+    });
     this.SFXShowTextFrame.play();
     this.game.font.strings[11] = '<span¤class="inputframe"></span>';
     this.ShowAnswerTyping.play();
