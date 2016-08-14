@@ -124,7 +124,7 @@ function gamemode() {
     $newmode = array();
     switch ($currentmode) {
         case 'None': $newmode = array('mode' => 'Intro'); break;
-        //case 'None': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 10, 'chooseplayer' => rand(1,$nbplayers)); break; // Ligne DEBUG
+        //case 'None': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 4, 'chooseplayer' => rand(1,$nbplayers)); break; // Ligne DEBUG
         case 'Intro': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 1, 'chooseplayer' => rand(1,$nbplayers)); break;
         case 'Category':
             if (!isset($_POST['category'])) die('Gamemode 2');
@@ -256,7 +256,7 @@ function resources() {
                 $specialGibberish = 1-(floor($session_id / 2) % 2);
             }
         }
-        //$specialquestion = 15;$specialGibberish = 1; // Ligne DEBUG
+        //$specialquestion = 4;$specialGibberish = 1; // Ligne DEBUG
         $playersolo = 0;
         if ($nbplayers == 1) $playersolo = 1;
 
@@ -765,6 +765,7 @@ function resources() {
         $reslist['Gibberish/QuestionIntro1'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/2'));
         $reslist['Gibberish/QuestionIntro2'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/3'));
         $reslist['Gibberish/QuestionIntro3'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/4'));
+        if (!file_exists('../res-full/'.$qhdr['folder'].'/snd/4.ogg')) unset($reslist['Gibberish/QuestionIntro3']);
         $reslist['Gibberish/QuestionHint11'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/5'));
         $reslist['Gibberish/QuestionHint12'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/6'));
         if (!file_exists('../res-full/'.$qhdr['folder'].'/snd/6.ogg')) unset($reslist['Gibberish/QuestionHint12']);

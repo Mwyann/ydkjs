@@ -541,7 +541,7 @@ ModeGibberish.prototype.start = function() {
 
     this.QuestionIntro2.ended(100,function() {
         this.free();
-        thisMode.QuestionIntro3.play();
+        if (thisMode.QuestionIntro3.urlAudio != '') thisMode.QuestionIntro3.play();
     });
 
     this.MusicPart3.ended(function(){
