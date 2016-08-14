@@ -32,6 +32,9 @@ if (isset($_SESSION['player2'])) $player2 = htmlspecialchars(substr(trim($_SESSI
 $player3 = '';
 if (isset($_SESSION['player3'])) $player3 = htmlspecialchars(substr(trim($_SESSION['player3']),0,20));
 
+$total_questions = 7;
+if (isset($_SESSION['total_questions'])) $total_questions = intval($_SESSION['total_questions']);
+
 srand($session_id*130);
 
 if (!isset($_POST['call'])) die('API ready 1');
@@ -56,7 +59,7 @@ function shuffle_rand(&$array) {
 }
 
 function gameinfo() {
-    global $VERSION, $nbplayers, $localMode, $player1, $player2, $player3;
+    global $VERSION, $nbplayers, $localMode, $player_id, $players_ids, $player1, $player2, $player3, $total_questions;
     $players = array();
     $locale = '';
     $engineVersion = 2;
@@ -84,24 +87,31 @@ function gameinfo() {
     if ($player3 != '') $noms[2] = $player3;
     if ($nbplayers == 1)
         $players = array(
-            array('name' => $noms[0],'score' => 0,'keycode' => 98), // Si on fournit un keycode, cela veut dire que le joueur est contrôlable en local (sinon, renvoyer "0" ou rien du tout)
+            array('name' => $noms[0],'score' => 0,'screw' => 0,'keycode' => 98), // Si on fournit un keycode, cela veut dire que le joueur est contrôlable en local (sinon, on renvoie "0")
         );
     elseif ($nbplayers == 2)
         $players = array(
-            array('name' => $noms[0],'score' => 0,'keycode' => 113), // Ou alors on met un nouveau paramètre 'localplayer', plus explicite, au choix.
-            array('name' => $noms[1],'score' => 0,'keycode' => 112)
+            array('name' => $noms[0],'score' => 0,'screw' => 0,'keycode' => 113),
+            array('name' => $noms[1],'score' => 0,'screw' => 0,'keycode' => 112)
         );
     elseif ($nbplayers == 3)
         $players = array(
-            array('name' => $noms[0],'score' => 0,'keycode' => 113),
-            array('name' => $noms[1],'score' => 0,'keycode' => 98),
-            array('name' => $noms[2],'score' => 0,'keycode' => 112)
+            array('name' => $noms[0],'score' => 0,'screw' => 0,'keycode' => 113),
+            array('name' => $noms[1],'score' => 0,'screw' => 0,'keycode' => 98),
+            array('name' => $noms[2],'score' => 0,'screw' => 0,'keycode' => 112)
         );
+
+    $players_idsp = explode('#',$players_ids);
+    if (sizeof($players_idsp) > 2) {
+        $players_idsp = array_slice($players_idsp,1,-1);
+        foreach($players_idsp as $joueur => $id) if ($id != $player_id) $players[$joueur]['keycode'] = 0; // Pas un joueur local, on supprime donc son keycode
+    }
 
     echo json_encode(array(
             'players' => $players,
             'locale' => $locale,
             'engineVersion' => $engineVersion,
+            'totalQuestions' => $total_questions,
             'localMode' => $localMode
         ));
 }
@@ -114,7 +124,7 @@ function gamemode() {
     $newmode = array();
     switch ($currentmode) {
         //case 'None': $newmode = array('mode' => 'Intro'); break;
-        case 'None': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 4, 'chooseplayer' => rand(1,$nbplayers)); break; // Ligne DEBUG
+        case 'None': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 7, 'chooseplayer' => rand(1,$nbplayers)); break; // Ligne DEBUG
         case 'Intro': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 1, 'chooseplayer' => rand(1,$nbplayers)); break;
         case 'Category':
             if (!isset($_POST['category'])) die('Gamemode 2');
@@ -131,7 +141,7 @@ function gamemode() {
 
 // Fonction qui renvoie un tableau JSON avec la liste des ressources et des URLS à aller chercher
 function resources() {
-    global $DB, $DBsta, $DBdyn, $DEMOMODE, $VERSION, $nbplayers, $session_id;
+    global $DB, $DBsta, $DEMOMODE, $VERSION, $nbplayers, $session_id, $total_questions;
     $reslist = array();
     connectMysql();
 
@@ -218,7 +228,7 @@ function resources() {
         srand(($session_id+99)*$questionnumber); // Initialisation du générateur de nombre aléatoire de la même manière pour tout le monde
         $specialquestion = 4+($session_id%2); // Sera géré de façon plus générale plus tard, notamment lorsqu'on introduira les 21 questions (voir GAMETMPL.SRF)
         $specialGibberish = floor($session_id/2)%2;
-        $specialquestion = 4;$specialGibberish = 1; // Ligne DEBUG
+        $specialquestion = 4;$specialGibberish = 0; // Ligne DEBUG
         $playersolo = 0;
         if ($nbplayers == 1) $playersolo = 1;
 
@@ -267,7 +277,7 @@ function resources() {
         $reslist['questiontitles'] = array();
 
         $demo = '';
-        if ($questionnumber == 7) { // JackAttack
+        if ($questionnumber == $total_questions) { // JackAttack
             if ($DEMOMODE) {
                 switch ($VERSION) {
                     case 'fr': $demo = "AND id LIKE 'JC_'"; break;

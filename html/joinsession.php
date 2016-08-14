@@ -83,6 +83,12 @@ session_write_close();
                     p.val('');
                 });
 
+                jQuery('#player_nick').keypress(function(event) {
+                    if (event.which == 13) {
+                        jQuery('#change_nick').click();
+                    }
+                });
+
                 var start_game = function(active) {
                     if (game_starting != active) {
                         if (active) {

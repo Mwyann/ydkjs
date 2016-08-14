@@ -102,21 +102,23 @@ ModeCategory.prototype.start = function() {
     this.SFXChoiceCategory.ended(100,function(){
         thisMode.ChooseCategoryPlayer.play();
         thisMode.SFXChoiceCategory.reset(true);
-        listener = bindKeyListener(function(choice) {
-            var chosed = 0;
-            if (choice == 49) chosed = 1;
-            else if (choice == 50) chosed = 2;
-            else if (choice == 51) chosed = 3;
-            if (chosed) chooseCategory(chosed);
-        },10000); // 10 secondes de timeout
-        thisMode.LoopCategory1.click(function(){chooseCategory(1)});
-        thisMode.LoopCategory2.click(function(){chooseCategory(2)});
-        thisMode.LoopCategory3.click(function(){chooseCategory(3)});
-        thisMode.CategoryTitles.click(function(i){
-            if (i == 1010) chooseCategory(1);
-            if (i == 1020) chooseCategory(2);
-            if (i == 1030) chooseCategory(3);
-        });
+        if (thisMode.game.players[thisMode.chooseplayer-1].keycode) { // Joueur local
+            listener = bindKeyListener(function (choice) {
+                var chosed = 0;
+                if (choice == 49) chosed = 1;
+                else if (choice == 50) chosed = 2;
+                else if (choice == 51) chosed = 3;
+                if (chosed) chooseCategory(chosed);
+            }); // TODO 10 secondes de timeout
+            thisMode.LoopCategory1.click(function(){chooseCategory(1)});
+            thisMode.LoopCategory2.click(function(){chooseCategory(2)});
+            thisMode.LoopCategory3.click(function(){chooseCategory(3)});
+            thisMode.CategoryTitles.click(function(i){
+                if (i == 1010) chooseCategory(1);
+                if (i == 1020) chooseCategory(2);
+                if (i == 1030) chooseCategory(3);
+            });
+        }
         thisMode.game.api.registeraction('selectCategory', function(data){
             data.value = parseInt(data.value);
             if (data.value > 0) {
@@ -145,9 +147,9 @@ ModeCategory.prototype.start = function() {
         });
     });
 
-    this.game.font.strings[100] = this.game.players[thisMode.chooseplayer-1].name;
-    this.game.font.strings[102] = this.game.players[thisMode.chooseplayer-1].name;
-    this.game.font.strings[103] = this.game.players[thisMode.chooseplayer-1].name;
+    this.game.font.strings[100] = this.game.players[this.chooseplayer-1].name;
+    this.game.font.strings[102] = this.game.players[this.chooseplayer-1].name;
+    this.game.font.strings[103] = this.game.players[this.chooseplayer-1].name;
 
     this.ShowCategories.ended(300,function(){
         thisMode.SFXChoiceCategory.play();

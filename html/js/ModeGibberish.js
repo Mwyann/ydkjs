@@ -142,39 +142,65 @@ ModeGibberish.prototype.start = function() {
 
     var currentpos = 0;
     var decreasing = Math.round(thisMode.options.value/40);
+    var ShowHint = 0; // Indice programmé pour apparaitre
     var runTimer = function() {
         currentpos++;
         if (currentpos % 2 == 0) thisMode.game.font.strings[1305] = thisMode.game.displayCurrency(thisMode.options.value-currentpos*decreasing);
         thisMode.ShowPrice.reset();
         thisMode.ShowPrice.play();
-        if (currentpos == 9) { // Premier indice
-            thisMode.ShowHint1.play();
-            thisMode.QuestionHint11.play();
-        }
-        if (currentpos == 18) { // Deuxième indice
-            thisMode.ShowHint2.play();
-            thisMode.QuestionHint21.play();
-        }
-        if (currentpos == 27) { // Troisième indice
-            thisMode.ShowHint3.play();
-            thisMode.QuestionHint31.play();
-        }
-        if (currentpos == 40) { // Fin du temps !
-            clearInterval(thisMode.timerInterval);
-            thisMode.MusicPart1.free();
-            thisMode.MusicPart2.free();
-            thisMode.MusicPart3.free();
-            thisMode.TimerDance.free();
-            thisMode.TimerTimeOut.play();
-            thisMode.TimerStop.play();
+        if (!ShowHint) {
+            if ((currentpos >= 9) && (!thisMode.ShowHint1.played)) { // Premier indice
+                ShowHint = function () {
+                    thisMode.ShowHint1.play();
+                    thisMode.QuestionHint11.play();
+                    ShowHint = 0;
+                }
+            }
+            if ((currentpos >= 18) && (!thisMode.ShowHint2.played)) { // Deuxième indice
+                ShowHint = function () {
+                    thisMode.ShowHint2.play();
+                    thisMode.QuestionHint21.play();
+                    ShowHint = 0;
+                }
+            }
+            if ((currentpos >= 27) && (!thisMode.ShowHint3.played)) { // Troisième indice
+                ShowHint = function () {
+                    thisMode.ShowHint3.play();
+                    thisMode.QuestionHint31.play();
+                    ShowHint = 0;
+                }
+            }
+            if (currentpos == 40) { // Fin du temps !
+                clearInterval(thisMode.timerInterval);
+                thisMode.MusicPart1.free();
+                thisMode.MusicPart2.free();
+                thisMode.MusicPart3.free();
+                thisMode.TimerDance.free();
+                thisMode.TimerTimeOut.play();
+                thisMode.TimerStop.play();
+            }
+
+            if (ShowHint) {
+                if (thisMode.LastPlayer1.isplaying) thisMode.LastPlayer1.ended(100, ShowHint);
+                else if (thisMode.LastPlayer2.isplaying) thisMode.LastPlayer2.ended(100, ShowHint);
+                else if (thisMode.LastPlayer3.isplaying) thisMode.LastPlayer3.ended(100, ShowHint);
+                else if (thisMode.LastPlayers.isplaying) thisMode.LastPlayers.ended(100, ShowHint);
+                else if (thisMode.QuestionHint11.isplaying) {
+                    if (thisMode.QuestionHint12.urlAudio != '') thisMode.QuestionHint12.ended(100, ShowHint); else thisMode.QuestionHint11.ended(100, ShowHint);
+                }
+                else if (thisMode.QuestionHint21.isplaying) {
+                    if (thisMode.QuestionHint22.urlAudio != '') thisMode.QuestionHint22.ended(100, ShowHint); else thisMode.QuestionHint21.ended(100, ShowHint);
+                }
+                else ShowHint();
+            }
         }
     };
 
-    var registerPressKey = 0; // Déclaré plus tard
+    var registerPlayerBuzz = 0; // Déclaré plus tard
 
-    var registerPressKeyIgnore = function() { // Fonction qui ne fait rien, pour ignorer les appuis suivants TODO rendre ce genre de trucs plus propre
-        thisMode.game.api.registeraction('pressKey', function(data){
-            registerPressKeyIgnore();
+    var registerPlayerBuzzIgnore = function() { // Fonction qui ne fait rien, pour ignorer les appuis suivants TODO rendre ce genre de trucs plus propre
+        thisMode.game.api.registeraction('playerBuzz', function(data){
+            registerPlayerBuzzIgnore();
         });
     };
 
@@ -296,7 +322,6 @@ ModeGibberish.prototype.start = function() {
         }
 
         unbindKeyListener(typelistener);
-        registerPressKeyIgnore();
         typelistener = 0;
         var resultat = checkTextWrds(text,getSTRfromID(thisMode.STR,'Wrds',128));
         if (resultat == 2) { // Bonne réponse !
@@ -307,7 +332,6 @@ ModeGibberish.prototype.start = function() {
             thisMode.TextFrameCorrect.play();
             thisMode.SFXPlayerCorrect.play();
             unbindKeyListener(thisMode.listener);
-            registerPressKeyIgnore();
             pressKey = function(choice){};
 
             switch (thisMode.buzzPlayer) {
@@ -359,6 +383,18 @@ ModeGibberish.prototype.start = function() {
         }
     };
 
+    var registerTypeAnswer = function() {
+        thisMode.game.api.registeraction('typeAnswer', function(data){
+            if (!data.selfpost) thisMode.typeframe.sendKeypress(parseInt(data.value));
+            registerTypeAnswer();
+        });
+    };
+    var registerTypeAnswerIgnore = function() {
+        thisMode.game.api.registeraction('typeAnswer', function(data){
+            registerTypeAnswerIgnore();
+        });
+    };
+
     this.SFXPlayerBuzz.ended(function() {
         switch (thisMode.buzzPlayer) {
             case 1:thisMode.FreeAnswerPlayer1.play();break;
@@ -367,25 +403,19 @@ ModeGibberish.prototype.start = function() {
         }
 
         unbindKeyListener(thisMode.listener);
-        typelistener = bindKeyListener(function(key) {
-            thisMode.typeframe.sendKeypress(key);
-        });
+        registerTypeAnswer(); // Réaction à l'api
+        if (thisMode.game.players[thisMode.buzzPlayer-1].keycode) { // Ce joueur peut répondre
+            typelistener = bindKeyListener(function(key) {
+                thisMode.game.api.postaction({action: 'typeAnswer', value: key});
+                thisMode.typeframe.sendKeypress(key);
+            });
+        }
         thisMode.typeframe.start();
     });
 
-    var doPressKey = function(choice, post) {
-        if (thisMode.buzzPlayer != 0) return false; // On a déjà un joueur en attente
-        if (choice == thisMode.game.players[0].keycode) thisMode.buzzPlayer = 1; // Joueur 1
-        if (thisMode.game.players.length >= 2) {
-            if (choice == thisMode.game.players[1].keycode) thisMode.buzzPlayer = 2; // Joueur 2
-        }
-        if (thisMode.game.players.length == 3) {
-            if (choice == thisMode.game.players[2].keycode) thisMode.buzzPlayer = 3; // Joueur 3
-        }
-        if (!thisMode.availPlayers[thisMode.buzzPlayer]) thisMode.buzzPlayer = 0;
-
+    var playerBuzz = function() {
         if (thisMode.buzzPlayer) {
-            if (post) thisMode.game.api.postaction({action: 'pressKey', value: choice});
+            registerPlayerBuzzIgnore();
             clearInterval(thisMode.timerInterval);
 
             thisMode.MusicPart1.reset();
@@ -421,15 +451,31 @@ ModeGibberish.prototype.start = function() {
         }
     };
 
-    registerPressKey = function() {
-        thisMode.game.api.registeraction('pressKey', function(data){
-            if (!data.selfpost) doPressKey(parseInt(data.value)); else registerPressKey();
+    registerPlayerBuzz = function() {
+        thisMode.game.api.registeraction('playerBuzz', function(data){
+            if (!data.selfpost) {
+                thisMode.buzzPlayer = parseInt(data.value);
+                playerBuzz();
+            }
         });
     };
 
     var pressKey = function(choice) {
-        //thisMode.game.api.postaction({action: 'pressKey', value: choice});
-        doPressKey(choice, true);
+        if (!choice) return false; // Si on se voit envoyer 0 à cause d'un clic sur un joueur à keycode 0
+        if (thisMode.buzzPlayer != 0) return false; // On a déjà un joueur en attente
+        if (choice == thisMode.game.players[0].keycode) thisMode.buzzPlayer = 1; // Joueur 1
+        if (thisMode.game.players.length >= 2) {
+            if (choice == thisMode.game.players[1].keycode) thisMode.buzzPlayer = 2; // Joueur 2
+        }
+        if (thisMode.game.players.length == 3) {
+            if (choice == thisMode.game.players[2].keycode) thisMode.buzzPlayer = 3; // Joueur 3
+        }
+        if (!thisMode.availPlayers[thisMode.buzzPlayer]) thisMode.buzzPlayer = 0;
+
+        if (thisMode.buzzPlayer) {
+            thisMode.game.api.postaction({action: 'playerBuzz', value: thisMode.buzzPlayer});
+            playerBuzz(); // Laisser l'API faire un auto-appel ? (règle le souci du buzz en même temps, mais ajoute un petit délai)
+        }
     };
 
     this.SFXShowAnswerAudience.ended(150,function() {
@@ -451,26 +497,30 @@ ModeGibberish.prototype.start = function() {
     });
 
     this.TextFrameWrong.ended(100,function() {
-        thisMode.buzzPlayer = 0;
-        var nbPlayersLeft = 0;
-        for(var i = 1; i <= thisMode.game.players.length; i++) {
-            if (thisMode.availPlayers[i]) nbPlayersLeft++;
-        }
-        if (nbPlayersLeft > 0) {
-            if (nbPlayersLeft == 1) {
-                if (thisMode.availPlayers[1]) thisMode.LastPlayer1.play();
-                if (thisMode.availPlayers[2]) thisMode.LastPlayer2.play();
-                if (thisMode.availPlayers[3]) thisMode.LastPlayer3.play();
-            } else thisMode.LastPlayers.play();
+        thisMode.game.api.synchronize(function() {
+            thisMode.buzzPlayer = 0;
+            var nbPlayersLeft = 0;
+            for (var i = 1; i <= thisMode.game.players.length; i++) {
+                if (thisMode.availPlayers[i]) nbPlayersLeft++;
+            }
+            if (nbPlayersLeft > 0) {
+                if (nbPlayersLeft == 1) {
+                    if (thisMode.availPlayers[1]) thisMode.LastPlayer1.play();
+                    if (thisMode.availPlayers[2]) thisMode.LastPlayer2.play();
+                    if (thisMode.availPlayers[3]) thisMode.LastPlayer3.play();
+                } else thisMode.LastPlayers.play();
 
-            thisMode.listener = bindKeyListener(function(choice) {
-                pressKey(choice);
-            });
-            thisMode.MusicPart1.play();
-            thisMode.timerInterval = setInterval(runTimer,750);
-        } else {
-            thisMode.AboutToRevealAnswer.play();
-        }
+                ShowHint = 0;
+                registerPlayerBuzz();
+                thisMode.listener = bindKeyListener(function (choice) {
+                    pressKey(choice);
+                });
+                thisMode.MusicPart1.play();
+                thisMode.timerInterval = setInterval(runTimer, 750);
+            } else {
+                thisMode.AboutToRevealAnswer.play();
+            }
+        });
     });
 
     this.QuestionHint31.ended(300,function() {
@@ -531,6 +581,7 @@ ModeGibberish.prototype.start = function() {
             thisMode.Player3ShowKey.click(function(){pressKey(thisMode.game.players[2].keycode)});
         }
 
+        registerPlayerBuzz();
         thisMode.listener = bindKeyListener(function(choice) {
             pressKey(choice);
         });
@@ -540,7 +591,9 @@ ModeGibberish.prototype.start = function() {
 
     this.QuestionIntro1.ended(100,function() {
         this.free();
-        thisMode.ShowQuestion.play();
+        thisMode.game.api.synchronize(function() {
+            thisMode.ShowQuestion.play();
+        });
     });
 
     this.ExplainRules.ended(function() {

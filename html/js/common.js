@@ -84,7 +84,7 @@ function bindKeyListener(callback,timeout){
 }
 
 function unbindKeyListener(listener) {
-    jQuery(window).off('keypress',listener[0]).off('keydown',listener[1]);
+    if (listener) jQuery(window).off('keypress',listener[0]).off('keydown',listener[1]);
 }
 
 function getSTRfromID(STR,type,id) {

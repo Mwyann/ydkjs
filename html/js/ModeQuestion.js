@@ -117,9 +117,118 @@ ModeQuestion.prototype.start = function() {
         });
     }
 
-    var registerPressKey = 0; // Déclaré plus tard
+    var playerBuzz = function() {
+        if (thisMode.buzzPlayer) {
+            clearTimeout(thisMode.timerTimeout);
+            thisMode.Question.free();
+            thisMode.Answers.free();
+            thisMode.JingleReadQuestion.free();
+            if (thisMode.LastPlayers) thisMode.LastPlayers.free();
+            thisMode.JingleTimer.stop();
+            thisMode.SFXPlayerBuzz.reset();
+            thisMode.SFXPlayerBuzz.play();
+            misskeyallowed = 1;
+            switch (thisMode.buzzPlayer) {
+                case 1:
+                    thisMode.Player1ShowKey.free();
+                    thisMode.Player1Answer.play();
+                    break;
+                case 2:
+                    thisMode.Player2ShowKey.free();
+                    thisMode.Player2Answer.play();
+                    break;
+                case 3:
+                    thisMode.Player3ShowKey.free();
+                    thisMode.Player3Answer.play();
+                    break;
+            }
+        }
+    };
 
-    var doPressKey = function(choice, post) {
+    var autoAnswerPlayer1 = function() {
+        thisMode.currentPlayer = 1;
+        clearTimeout(thisMode.timerTimeout);
+        thisMode.Question.free();
+        thisMode.Answers.free();
+        thisMode.JingleReadQuestion.free();
+        thisMode.JingleTimer.stop();
+
+        thisMode.Player1ShowKey.free();
+        thisMode.Player1AnswerLoop.play();
+    };
+
+    var playerAnswer = function() {
+        if ((!thisMode.currentPlayer) && (thisMode.game.players.length == 1)) autoAnswerPlayer1();
+        if (thisMode.currentAns) {
+            clearTimeout(thisMode.timerTimeout);
+            switch (thisMode.currentPlayer) {
+                case 1:
+                    thisMode.Player1Buzzed.free();
+                    break;
+                case 2:
+                    thisMode.Player2Buzzed.free();
+                    break;
+                case 3:
+                    thisMode.Player3Buzzed.free();
+                    break;
+            }
+            switch(thisMode.currentAns){
+                case 1:
+                    thisMode.ShowAnswer1.free();
+                    thisMode.LoopAnswer1.play();
+                    break;
+                case 2:
+                    thisMode.ShowAnswer2.free();
+                    thisMode.LoopAnswer2.play();
+                    break;
+                case 3:
+                    thisMode.ShowAnswer3.free();
+                    thisMode.LoopAnswer3.play();
+                    break;
+                case 4:
+                    thisMode.ShowAnswer4.free();
+                    thisMode.LoopAnswer4.play();
+                    break;
+            }
+            thisMode.JingleTimer.stop();
+            thisMode.SFXPlayerKey.play();
+        }
+    };
+
+    var registerPlayerBuzz = function() {
+        thisMode.game.api.registeraction('playerBuzz', function(data){
+            if (!data.selfpost) {
+                thisMode.buzzPlayer = parseInt(data.value);
+                playerBuzz();
+            }
+            registerPlayerBuzz();
+        });
+    };
+
+    var registerPlayerAnswer = function() {
+        thisMode.game.api.registeraction('playerAnswer', function(data){
+            if (!data.selfpost) {
+                thisMode.currentAns = parseInt(data.value);
+                playerAnswer();
+            }
+            registerPlayerAnswer();
+        });
+    };
+
+    var registerPlayerBuzzIgnore = function() { // Fonction qui ne fait rien, pour ignorer les appuis suivants TODO rendre ce genre de trucs plus propre
+        thisMode.game.api.registeraction('playerBuzz', function(data){
+            registerPlayerBuzzIgnore();
+        });
+    };
+
+    var registerPlayerAnswerIgnore = function() { // Fonction qui ne fait rien, pour ignorer les appuis suivants TODO rendre ce genre de trucs plus propre
+        thisMode.game.api.registeraction('playerAnswer', function(data){
+            registerPlayerAnswerIgnore();
+        });
+    };
+
+    var pressKey = function(choice) {
+        if (!choice) return false; // Si on se voit envoyer 0 à cause d'un clic sur un joueur à keycode 0
         if (thisMode.currentPlayer == 0) {
             if (thisMode.buzzPlayer != 0) return false; // On a déjà un joueur en attente
             if (choice == thisMode.game.players[0].keycode) thisMode.buzzPlayer = 1; // Joueur 1
@@ -132,44 +241,13 @@ ModeQuestion.prototype.start = function() {
             if (!thisMode.availPlayers[thisMode.buzzPlayer]) thisMode.buzzPlayer = 0;
 
             if (thisMode.buzzPlayer) {
-                if (post) thisMode.game.api.postaction({action: 'pressKey', value: choice});
-                clearTimeout(thisMode.timerTimeout);
-                thisMode.Question.free();
-                thisMode.Answers.free();
-                thisMode.JingleReadQuestion.free();
-                if (thisMode.LastPlayers) thisMode.LastPlayers.free();
-                thisMode.JingleTimer.stop();
-                thisMode.SFXPlayerBuzz.reset();
-                thisMode.SFXPlayerBuzz.play();
-                misskeyallowed = 1;
-                switch (thisMode.buzzPlayer) {
-                    case 1:
-                        thisMode.Player1ShowKey.free();
-                        thisMode.Player1Answer.play();
-                        break;
-                    case 2:
-                        thisMode.Player2ShowKey.free();
-                        thisMode.Player2Answer.play();
-                        break;
-                    case 3:
-                        thisMode.Player3ShowKey.free();
-                        thisMode.Player3Answer.play();
-                        break;
-                }
+                thisMode.game.api.postaction({action: 'playerBuzz', value: thisMode.buzzPlayer});
+                playerBuzz();
             } else {
                 if ((choice >= 49) && (choice <= 52)) { // Si réponses 1 à 4 : 1 seul joueur = réponse directe, 2 ou 3 joueurs : "On appuie d'abord sur la lettre !"
                     if (thisMode.game.players.length == 1) {
-                        if (post) thisMode.game.api.postaction({action: 'pressKey', value: choice});
-                        thisMode.currentPlayer = 1;
-                        clearTimeout(thisMode.timerTimeout);
-                        thisMode.Question.free();
-                        thisMode.Answers.free();
-                        thisMode.JingleReadQuestion.free();
-                        thisMode.JingleTimer.stop();
-
-                        thisMode.Player1ShowKey.free();
-                        thisMode.Player1AnswerLoop.play();
-                        doPressKey(choice);
+                        autoAnswerPlayer1();
+                        pressKey(choice);
                     } else if (misskeyallowed) {
                         // Il faudrait arrêter les LastPlayer ici ?
                         if (!thisMode.PlayerMissKey1.played) thisMode.PlayerMissKey1.play(); else if (!thisMode.PlayerMissKey2.played) thisMode.PlayerMissKey2.play();
@@ -178,65 +256,16 @@ ModeQuestion.prototype.start = function() {
                 }
             }
         } else if (thisMode.currentAns == 0) { // Réponse d'un joueur
+            if (!thisMode.game.players[thisMode.currentPlayer-1].keycode) return false; // Ce joueur ne peut pas répondre
             if (choice == 49) thisMode.currentAns = 1;
             if (choice == 50) thisMode.currentAns = 2;
             if (choice == 51) thisMode.currentAns = 3;
             if (choice == 52) thisMode.currentAns = 4;
             if (!thisMode.availAnswers[thisMode.currentAns]) thisMode.currentAns = 0;
 
-            if (thisMode.currentAns) {
-                if (post) thisMode.game.api.postaction({action: 'pressKey', value: choice});
-                clearTimeout(thisMode.timerTimeout);
-                switch (thisMode.currentPlayer) {
-                    case 1:
-                        thisMode.Player1Buzzed.free();
-                        break;
-                    case 2:
-                        thisMode.Player2Buzzed.free();
-                        break;
-                    case 3:
-                        thisMode.Player3Buzzed.free();
-                        break;
-                }
-                switch(thisMode.currentAns){
-                    case 1:
-                        thisMode.ShowAnswer1.free();
-                        thisMode.LoopAnswer1.play();
-                        break;
-                    case 2:
-                        thisMode.ShowAnswer2.free();
-                        thisMode.LoopAnswer2.play();
-                        break;
-                    case 3:
-                        thisMode.ShowAnswer3.free();
-                        thisMode.LoopAnswer3.play();
-                        break;
-                    case 4:
-                        thisMode.ShowAnswer4.free();
-                        thisMode.LoopAnswer4.play();
-                        break;
-                }
-                thisMode.JingleTimer.stop();
-                thisMode.SFXPlayerKey.play();
-            }
+            if (thisMode.currentAns) thisMode.game.api.postaction({action: 'playerAnswer', value: thisMode.currentAns});
+            playerAnswer();
         }
-    };
-
-    registerPressKey = function() {
-        thisMode.game.api.registeraction('pressKey', function(data){
-            if (!data.selfpost) doPressKey(parseInt(data.value)); else registerPressKey();
-        });
-    };
-
-    var registerPressKeyIgnore = function() { // Fonction qui ne fait rien, pour ignorer les appuis suivants TODO rendre ce genre de trucs plus propre
-        thisMode.game.api.registeraction('pressKey', function(data){
-            registerPressKeyIgnore();
-        });
-    };
-
-    var pressKey = function(choice) {
-        //thisMode.game.api.postaction({action: 'pressKey', value: choice});
-        doPressKey(choice, true);
     };
 
     this.EndQuestion.ended(function(){
@@ -313,7 +342,7 @@ ModeQuestion.prototype.start = function() {
     };
 
     this.SFXPlayerLose.ended(200,function(){
-        registerPressKeyIgnore();
+        registerPlayerBuzzIgnore();
         thisMode.game.api.synchronize(function() {
             thisMode.currentPlayer = 0;
             thisMode.currentAns = 0;
@@ -325,7 +354,7 @@ ModeQuestion.prototype.start = function() {
                 thisMode.JingleTimer.play();
                 thisMode.timerTimeout = setTimeout(timerRunning, 500);
                 thisMode.LastPlayers.play();
-                registerPressKey();
+                registerPlayerBuzz();
             } else gameover();
         });
     });
@@ -439,7 +468,7 @@ ModeQuestion.prototype.start = function() {
 
             thisMode.SFXPlayerCorrect.play();
             unbindKeyListener(thisMode.listener);
-            registerPressKeyIgnore();
+            registerPlayerBuzzIgnore();
             pressKey = function(choice){};
 
             switch(thisMode.currentAns){
@@ -509,7 +538,7 @@ ModeQuestion.prototype.start = function() {
         thisMode.timerTimeout = setTimeout(timerRunning,800);
         thisMode.currentPlayer = thisMode.buzzPlayer; // Le joueur peut enfin répondre
         thisMode.buzzPlayer = 0;
-        registerPressKey(); // Déplacé ici car si deux appuis trop rapides venant de l'API, le 2eme appui risque d'être ignoré à cause du return juste au dessus.
+        registerPlayerBuzzIgnore(); // Déplacé ici car si deux appuis trop rapides venant de l'API, le 2eme appui risque d'être ignoré à cause du return juste au dessus.
 
         // Vas-y joueur X
         if (thisMode.currentPlayer == 1) {
@@ -582,7 +611,8 @@ ModeQuestion.prototype.start = function() {
         thisMode.listener = bindKeyListener(function(choice) {
             pressKey(choice);
         });
-        registerPressKey();
+        registerPlayerBuzz();
+        registerPlayerAnswer();
     });
 
     this.ShowQuestion.ended(500,function(){

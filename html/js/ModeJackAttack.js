@@ -107,7 +107,7 @@ ModeJackAttack.prototype.start = function() {
     var endgameready;
 
     var endGame = function() {
-        thisMode.game.api.registeraction('pressKey', function(data){});
+        thisMode.game.api.registeraction('playerAnswer', function(data){});
         endgameready(function(endgame) {
             endgame.start();
         });
@@ -246,16 +246,8 @@ ModeJackAttack.prototype.start = function() {
         thisMode.AudienceWrong.play();
     });
 
-    var registerPressKey = 0; // Déclaré plus tard
-
-    var doPressKey = function(choice) {
-        registerPressKey();
-        if (currentAnswer > 50) return false; // Dès qu'on a trouvé la bonne réponse on ignore les appuis sur les touches
-        var buzzPlayer = 0;
-        if (choice == thisMode.game.players[0].keycode) buzzPlayer = 1; // Joueur 1
-        if (thisMode.game.players.length >= 2) if (choice == thisMode.game.players[1].keycode) buzzPlayer = 2; // Joueur 2
-        if (thisMode.game.players.length == 3) if (choice == thisMode.game.players[2].keycode) buzzPlayer = 3; // Joueur 3
-
+    var playerAnswer = function(buzzPlayer, answer) {
+        if (currentAnswer > 50) return false;
         if (buzzPlayer) {
             var Wrong;
             var Scream;
@@ -277,7 +269,7 @@ ModeJackAttack.prototype.start = function() {
                 Correct = thisMode.Player3Correct;
             }
 
-            if (thisMode.game.font.strings[1510] == thisMode.game.font.strings[1520]) { // Bonne réponse !
+            if (ansList[answers[answer-1]] == matchList[currentQuestion-1]) { // Bonne réponse !
                 if (currentAnswer > 50) return false; // On revérifie, on ne sait jamais...
                 currentAnswer = 99;
                 thisMode.game.players[buzzPlayer-1].score = parseInt(thisMode.game.players[buzzPlayer-1].score) + 2000;
@@ -317,20 +309,29 @@ ModeJackAttack.prototype.start = function() {
         }
     };
 
-    registerPressKey = function() {
-        thisMode.game.api.registeraction('pressKey', function(data){
-            if (!data.selfpost) doPressKey(parseInt(data.value)); else registerPressKey();
+    var registerPlayerAnswer = function() {
+        thisMode.game.api.registeraction('playerAnswer', function(data){
+            if (!data.selfpost) playerAnswer(parseInt(data.player), parseInt(data.answer));
+            registerPlayerAnswer();
         });
     };
 
     var pressKey = function(choice) {
-        thisMode.game.api.postaction({action: 'pressKey', value: choice});
-        doPressKey(choice);
+        if (currentAnswer > 50) return false; // Dès qu'on a trouvé la bonne réponse on ignore les appuis sur les touches
+        var buzzPlayer = 0;
+        if (choice == thisMode.game.players[0].keycode) buzzPlayer = 1; // Joueur 1
+        if (thisMode.game.players.length >= 2) if (choice == thisMode.game.players[1].keycode) buzzPlayer = 2; // Joueur 2
+        if (thisMode.game.players.length == 3) if (choice == thisMode.game.players[2].keycode) buzzPlayer = 3; // Joueur 3
+
+        if (buzzPlayer) {
+            thisMode.game.api.postaction({action: 'playerAnswer', player: buzzPlayer, answer: currentAnswer});
+            playerAnswer(buzzPlayer, currentAnswer);
+        }
     };
 
     var startGame = function() {
         thisMode.listener = bindKeyListener(pressKey);
-        registerPressKey();
+        registerPlayerAnswer();
         thisMode.BGMusic1.play();
         playQuestion();
     };

@@ -731,26 +731,29 @@ ModeDisOrDat.prototype.start = function() {
         thisMode.PrepareTimer.free();
 
         var i;
-        for(i = 0; i < buttonsAnswer.length; i++) if (buttonsAnswer[i]) {
-            (function(){
-                var j = i;
-                buttonsAnswer[j].Ready.click(function(){
-                    pressButton(j);
-                });
-                buttonsAnswer[j].Push.click(function(){
-                    pressButton(j);
-                });
-            })();
-        }
 
-        buttonslistener = bindKeyListener(function(choice) {
-            var chosed = 0;
-            if (choice == 49) chosed = 1;
-            else if (choice == 50) chosed = 2;
-            else if ((choice == 51) && (thisMode.nbchoices == 3)) chosed = 3;
-            else if (choice == 52) chosed = 4;
-            if (chosed > 0) pressButton(chosed);
-        });
+        if (thisMode.game.players[thisMode.chooseplayer-1].keycode) { // Joueur local
+            for(i = 0; i < buttonsAnswer.length; i++) if (buttonsAnswer[i]) {
+                (function(){
+                    var j = i;
+                    buttonsAnswer[j].Ready.click(function(){
+                        pressButton(j);
+                    });
+                    buttonsAnswer[j].Push.click(function(){
+                        pressButton(j);
+                    });
+                })();
+            }
+
+            buttonslistener = bindKeyListener(function (choice) {
+                var chosed = 0;
+                if (choice == 49) chosed = 1;
+                else if (choice == 50) chosed = 2;
+                else if ((choice == 51) && (thisMode.nbchoices == 3)) chosed = 3;
+                else if (choice == 52) chosed = 4;
+                if (chosed > 0) pressButton(chosed);
+            });
+        }
         registerPressButton();
 
         timerRunning();
@@ -1045,9 +1048,11 @@ ModeDisOrDat.prototype.start = function() {
                 doskipexplanations();
             };
 
-            skiplistener = bindKeyListener(function(choice) {
-                if (choice == 32) skipexplanations(); // Barre espace = on passe les explications
-            });
+            if (thisMode.game.players[thisMode.chooseplayer-1].keycode) { // Joueur local
+                skiplistener = bindKeyListener(function (choice) {
+                    if (choice == 32) skipexplanations(); // Barre espace = on passe les explications
+                });
+            }
             thisMode.game.api.registeraction('skipexplanations', function(data){
                 if (!data.selfpost) doskipexplanations();
             });
