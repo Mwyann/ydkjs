@@ -124,7 +124,7 @@ function gamemode() {
     $newmode = array();
     switch ($currentmode) {
         //case 'None': $newmode = array('mode' => 'Intro'); break;
-        case 'None': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 7, 'chooseplayer' => rand(1,$nbplayers)); break; // Ligne DEBUG
+        case 'None': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 4, 'chooseplayer' => rand(1,$nbplayers)); break; // Ligne DEBUG
         case 'Intro': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 1, 'chooseplayer' => rand(1,$nbplayers)); break;
         case 'Category':
             if (!isset($_POST['category'])) die('Gamemode 2');
@@ -228,7 +228,7 @@ function resources() {
         srand(($session_id+99)*$questionnumber); // Initialisation du générateur de nombre aléatoire de la même manière pour tout le monde
         $specialquestion = 4+($session_id%2); // Sera géré de façon plus générale plus tard, notamment lorsqu'on introduira les 21 questions (voir GAMETMPL.SRF)
         $specialGibberish = floor($session_id/2)%2;
-        $specialquestion = 4;$specialGibberish = 0; // Ligne DEBUG
+        $specialquestion = 4;$specialGibberish = 1; // Ligne DEBUG
         $playersolo = 0;
         if ($nbplayers == 1) $playersolo = 1;
 

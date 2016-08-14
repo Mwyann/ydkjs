@@ -316,7 +316,7 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val, d
             var top = -3;
             if (typeof textdata.top != "undefined") top = textdata.top;
 
-            if (font != 'JackInput') string = string.replace(/ /g, '&#8197;').replace(/\u00A0/g, '&#8197;');
+            if (font != 'JackInput') string = string.replace(/ /g, '&#8197;').replace(/\u00A0/g, '&#8288;'); // &#8288; == WORD-JOINER : pas d'espace, mais insécable
             div.css({
                 'left': left + 'px',
                 'top': top + 'px',

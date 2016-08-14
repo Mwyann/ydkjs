@@ -80,8 +80,7 @@ ModeJackAttack.prototype.start = function() {
     var randomness = new MersenneTwister(); // Grâce à cette classe, tous les joueurs auront les mêmes probabilités d'affichage
 
     var availableQuestions = [1,2,3,4,5,6,7];
-    var randseed = this.options.randseed;
-    randomness.init_genrand(randseed);
+    randomness.init_genrand(parseInt(this.options.randseed));
     var answerseeds = [];
     for(var j = 0; j < 14; j++) {
         var r = -1;

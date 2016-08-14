@@ -143,6 +143,13 @@ ModeGibberish.prototype.start = function() {
     var currentpos = 0;
     var decreasing = Math.round(thisMode.options.value/40);
     var ShowHint = 0; // Indice programmé pour apparaitre
+    this.LastPlayer1.ended(100, function() {ShowHint()});
+    this.LastPlayer2.ended(100, function() {ShowHint()});
+    this.LastPlayer3.ended(100, function() {ShowHint()});
+    this.LastPlayers.ended(100, function() {ShowHint()});
+    if (this.QuestionHint12.urlAudio != '') this.QuestionHint12.ended(100, function() {ShowHint()}); else this.QuestionHint11.ended(100, function() {ShowHint()});
+    if (this.QuestionHint22.urlAudio != '') this.QuestionHint22.ended(100, function() {ShowHint()}); else this.QuestionHint21.ended(100, function() {ShowHint()});
+
     var runTimer = function() {
         currentpos++;
         if (currentpos % 2 == 0) thisMode.game.font.strings[1305] = thisMode.game.displayCurrency(thisMode.options.value-currentpos*decreasing);
@@ -181,17 +188,9 @@ ModeGibberish.prototype.start = function() {
             }
 
             if (ShowHint) {
-                if (thisMode.LastPlayer1.isplaying) thisMode.LastPlayer1.ended(100, ShowHint);
-                else if (thisMode.LastPlayer2.isplaying) thisMode.LastPlayer2.ended(100, ShowHint);
-                else if (thisMode.LastPlayer3.isplaying) thisMode.LastPlayer3.ended(100, ShowHint);
-                else if (thisMode.LastPlayers.isplaying) thisMode.LastPlayers.ended(100, ShowHint);
-                else if (thisMode.QuestionHint11.isplaying) {
-                    if (thisMode.QuestionHint12.urlAudio != '') thisMode.QuestionHint12.ended(100, ShowHint); else thisMode.QuestionHint11.ended(100, ShowHint);
-                }
-                else if (thisMode.QuestionHint21.isplaying) {
-                    if (thisMode.QuestionHint22.urlAudio != '') thisMode.QuestionHint22.ended(100, ShowHint); else thisMode.QuestionHint21.ended(100, ShowHint);
-                }
-                else ShowHint();
+                if ((!thisMode.LastPlayer1.isplaying) && (!thisMode.LastPlayer2.isplaying) && (!thisMode.LastPlayer3.isplaying) && (!thisMode.LastPlayers.isplaying)
+                 && (!thisMode.QuestionHint11.isplaying) && (!thisMode.QuestionHint12.isplaying) && (!thisMode.QuestionHint21.isplaying) && (!thisMode.QuestionHint22.isplaying))
+                    ShowHint();
             }
         }
     };
@@ -227,6 +226,35 @@ ModeGibberish.prototype.start = function() {
                     thisMode.EndQuestion.play();
                 });
             });
+        });
+    });
+
+    this.TextFrameWrong.ended(100,function() {
+        thisMode.game.api.synchronize(function() {
+            thisMode.buzzPlayer = 0;
+            var nbPlayersLeft = 0;
+            for (var i = 1; i <= thisMode.game.players.length; i++) {
+                if (thisMode.availPlayers[i]) nbPlayersLeft++;
+            }
+            if (nbPlayersLeft > 0) {
+                if (nbPlayersLeft == 1) {
+                    if (thisMode.availPlayers[1]) thisMode.LastPlayer1.play();
+                    if (thisMode.availPlayers[2]) thisMode.LastPlayer2.play();
+                    if (thisMode.availPlayers[3]) thisMode.LastPlayer3.play();
+                } else thisMode.LastPlayers.play();
+
+                ShowHint = 0;
+                registerPlayerBuzz();
+                thisMode.listener = bindKeyListener(function (choice) {
+                    pressKey(choice);
+                });
+                thisMode.MusicPart1.play();
+                thisMode.TimerStop.reset();
+                thisMode.TimerDance.play();
+                thisMode.timerInterval = setInterval(runTimer, 750);
+            } else {
+                thisMode.AboutToRevealAnswer.play();
+            }
         });
     });
 
@@ -494,33 +522,6 @@ ModeGibberish.prototype.start = function() {
 
     this.TimerTimeOut.ended(100,function() {
         thisMode.AboutToRevealAnswer.play();
-    });
-
-    this.TextFrameWrong.ended(100,function() {
-        thisMode.game.api.synchronize(function() {
-            thisMode.buzzPlayer = 0;
-            var nbPlayersLeft = 0;
-            for (var i = 1; i <= thisMode.game.players.length; i++) {
-                if (thisMode.availPlayers[i]) nbPlayersLeft++;
-            }
-            if (nbPlayersLeft > 0) {
-                if (nbPlayersLeft == 1) {
-                    if (thisMode.availPlayers[1]) thisMode.LastPlayer1.play();
-                    if (thisMode.availPlayers[2]) thisMode.LastPlayer2.play();
-                    if (thisMode.availPlayers[3]) thisMode.LastPlayer3.play();
-                } else thisMode.LastPlayers.play();
-
-                ShowHint = 0;
-                registerPlayerBuzz();
-                thisMode.listener = bindKeyListener(function (choice) {
-                    pressKey(choice);
-                });
-                thisMode.MusicPart1.play();
-                thisMode.timerInterval = setInterval(runTimer, 750);
-            } else {
-                thisMode.AboutToRevealAnswer.play();
-            }
-        });
     });
 
     this.QuestionHint31.ended(300,function() {
