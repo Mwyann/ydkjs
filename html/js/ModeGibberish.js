@@ -143,12 +143,12 @@ ModeGibberish.prototype.start = function() {
     var currentpos = 0;
     var decreasing = Math.round(thisMode.options.value/40);
     var ShowHint = 0; // Indice programmé pour apparaitre
-    this.LastPlayer1.ended(100, function() {ShowHint()});
-    this.LastPlayer2.ended(100, function() {ShowHint()});
-    this.LastPlayer3.ended(100, function() {ShowHint()});
-    this.LastPlayers.ended(100, function() {ShowHint()});
-    if (this.QuestionHint12.urlAudio != '') this.QuestionHint12.ended(100, function() {ShowHint()}); else this.QuestionHint11.ended(100, function() {ShowHint()});
-    if (this.QuestionHint22.urlAudio != '') this.QuestionHint22.ended(100, function() {ShowHint()}); else this.QuestionHint21.ended(100, function() {ShowHint()});
+    this.LastPlayer1.ended(100, function() {if (ShowHint) ShowHint()});
+    this.LastPlayer2.ended(100, function() {if (ShowHint) ShowHint()});
+    this.LastPlayer3.ended(100, function() {if (ShowHint) ShowHint()});
+    this.LastPlayers.ended(100, function() {if (ShowHint) ShowHint()});
+    if (this.QuestionHint12.urlAudio != '') this.QuestionHint12.ended(100, function() {if (ShowHint) ShowHint()}); else this.QuestionHint11.ended(100, function() {if (ShowHint) ShowHint()});
+    if (this.QuestionHint22.urlAudio != '') this.QuestionHint22.ended(100, function() {if (ShowHint) ShowHint()}); else this.QuestionHint21.ended(100, function() {if (ShowHint) ShowHint()});
 
     var runTimer = function() {
         currentpos++;
