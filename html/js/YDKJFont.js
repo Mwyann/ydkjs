@@ -316,20 +316,28 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val, d
             var top = -3;
             if (typeof textdata.top != "undefined") top = textdata.top;
 
+            if (font != 'JackInput') string = string.replace(/ /g, '&#8197;').replace(/\u00A0/g, '&#8197;');
             div.css({
                 'left': left + 'px',
                 'top': top + 'px',
                 'font': (fontsize) + 'px/' + (fontsize) + 'px "' + font + '"'
-            }).html(string.replace(/(\n)+/g, '<br/>').replace(/ /g, '&#8197;').replace(/¤/g,' ')); // Line breaks and thin spaces and forced spaces
+            }).html(string.replace(/(\n)+/g, '<br/>').replace(/¤/g,' ')); // Line breaks and thin spaces and forced spaces
 
             if ((textdata.sizeid === undefined) && (textdata.size.length > 1)) { // Try to find the best fitting font size, once and for all
                 var tmpdiv = div.clone();
                 tmpdiv.css({
+                    'width': 'auto',
                     'position': 'absolute',
                     'left': '-10000px'
                 });
                 $('body').append(tmpdiv);
-                if (tmpdiv.height() <= height+2) lookupsize = 0; // Found! (with 2 margin pixels, don't be so picky)
+                var naturalwidth = tmpdiv.width();
+                var naturalheight = tmpdiv.height();
+                tmpdiv.css({
+                    'width':(width) + 'px'
+                });
+                // If the text is wider than the div but hasn't changed height, then we have one big word not wrapping, and that's bad, try a smaller font.
+                if ((!((naturalwidth > width+2) && (tmpdiv.height() == naturalheight))) && (tmpdiv.height() <= height+2)) lookupsize = 0; // Found! (with 2 margin pixels, don't be so picky)
                 else if (sizeid+1 < textdata.size.length) sizeid++; // Try next size, if there's one
                 else lookupsize = 0; // No lower size, darn it, stop there.
                 if (lookupsize == 0) this.textdata[textid]['sizeid'] = sizeid; // If we stopped with some size, save it for future use.

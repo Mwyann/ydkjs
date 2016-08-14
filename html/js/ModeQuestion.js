@@ -434,6 +434,14 @@ ModeQuestion.prototype.start = function() {
                     break;
             }
         } else { // Bonne réponse
+            thisMode.game.players[thisMode.currentPlayer-1].score = parseInt(thisMode.game.players[thisMode.currentPlayer-1].score) + parseInt(thisMode.options.value);
+            thisMode.game.font.strings[10*thisMode.currentPlayer+105] = thisMode.game.displayCurrency(thisMode.game.players[thisMode.currentPlayer-1].score);
+
+            thisMode.SFXPlayerCorrect.play();
+            unbindKeyListener(thisMode.listener);
+            registerPressKeyIgnore();
+            pressKey = function(choice){};
+
             switch(thisMode.currentAns){
                 case 1:
                     thisMode.LoopAnswer1.free();
@@ -466,14 +474,6 @@ ModeQuestion.prototype.start = function() {
                     thisMode.Player3Correct.play();
                     break;
             }
-
-            thisMode.game.players[thisMode.currentPlayer-1].score = parseInt(thisMode.game.players[thisMode.currentPlayer-1].score) + parseInt(thisMode.options.value);
-            thisMode.game.font.strings[10*thisMode.currentPlayer+105] = thisMode.game.displayCurrency(thisMode.game.players[thisMode.currentPlayer-1].score);
-
-            thisMode.SFXPlayerCorrect.play();
-            unbindKeyListener(thisMode.listener);
-            registerPressKeyIgnore();
-            pressKey = function(choice){};
         }
         return true;
     };

@@ -216,6 +216,9 @@ function resources() {
         if (!isset($_POST['questionnumber'])) die('Resources 2');
         $questionnumber = $_POST['questionnumber'];
         srand(($session_id+99)*$questionnumber); // Initialisation du générateur de nombre aléatoire de la même manière pour tout le monde
+        $specialquestion = 4+($session_id%2); // Sera géré de façon plus générale plus tard, notamment lorsqu'on introduira les 21 questions (voir GAMETMPL.SRF)
+        $specialGibberish = floor($session_id/2)%2;
+        $specialquestion = 4;$specialGibberish = 1; // Ligne DEBUG
         $playersolo = 0;
         if ($nbplayers == 1) $playersolo = 1;
 
@@ -279,12 +282,11 @@ function resources() {
                                ".$demo."
                                ORDER BY MD5(CONCAT(id,".rand(1,999999)."))
                                LIMIT 0,3");
-        } elseif ($questionnumber == 4) { // Couci-Couça ou Rimatologie
-            if (1) {
+        } elseif ($questionnumber == $specialquestion) { // Couci-Couça ou Rimatologie
+            if ($specialGibberish) {
                 $res = $DB->query("SELECT *
                                    FROM ".$DBsta.".qhdr
                                    WHERE qtype = 'Gibberish'
-                                   ".$demo."
                                    ORDER BY MD5(CONCAT(id,".rand(1,999999)."))
                                    LIMIT 0,3");
             } else {
@@ -417,6 +419,7 @@ function resources() {
         //unset($reslist['Question/DefaultRevealFreeAnswer']);
         unset($reslist['Question/DefaultRevealAnswer']);
 
+        // TODO faire en sorte que ça ne donne pas deux fois la même chose (sauf s'il n'y a pas assez de possibilités évidemment)
         function PickAnySnd($grp,$type) {
             global $DB, $DBsta;
             $res = $DB->query("SELECT *
@@ -625,6 +628,43 @@ function resources() {
             }
         }
 
+        // TODO faire en sorte que ça ne donne pas deux fois la même chose (sauf s'il n'y a pas assez de possibilités évidemment)
+        function PickAnySnd($grp,$type) {
+            global $DB, $DBsta;
+            $res = $DB->query("SELECT *
+                               FROM ".$DBsta.".ressnd
+                               WHERE grp = '".addslashes($grp)."'
+                               AND name = '".addslashes($type)."'");
+            while ($rs = $res->fetch()) {
+                $possiblevalues = explode(',',$rs['val']);
+                if (sizeof($possiblevalues) > 1) shuffle_rand($possiblevalues);
+
+                $result['urlAudio'] = uriToUid('res-full/'.$rs['resfolder'].'/'.$possiblevalues[0]);
+                if ($rs['loopsnd']) $result['loop'] = $rs['loopsnd'];
+                return $result;
+            }
+            return array();
+        }
+
+        for($i = 1; $i <= $nbplayers; $i++) {
+            $reslist['Gibberish/FreeAnswerHurry1Player'.$i] = PickAnySnd('Gibberish', 'FreeAnswerHurry1');
+            $reslist['Gibberish/FreeAnswerHurry2Player'.$i] = PickAnySnd('Gibberish', 'FreeAnswerHurry2');
+            $reslist['Gibberish/FreeAnswerTimeOutPlayer'.$i] = PickAnySnd('Gibberish', 'FreeAnswerTimeOut');
+            $reslist['Gibberish/Wrong0CluePlayer'.$i] = PickAnySnd('Gibberish', 'Wrong0Clue');
+            $reslist['Gibberish/Wrong1CluePlayer'.$i] = PickAnySnd('Gibberish', 'Wrong1Clue');
+            $reslist['Gibberish/Wrong2CluePlayer'.$i] = PickAnySnd('Gibberish', 'Wrong2Clue');
+            $reslist['Gibberish/Wrong3CluePlayer'.$i] = PickAnySnd('Gibberish', 'Wrong3Clue');
+            $reslist['Gibberish/WrongSoClosePlayer'.$i] = PickAnySnd('Gibberish', 'WrongSoClose');
+        }
+        unset($reslist['Gibberish/FreeAnswerHurry1']);
+        unset($reslist['Gibberish/FreeAnswerHurry2']);
+        unset($reslist['Gibberish/FreeAnswerTimeOut']);
+        unset($reslist['Gibberish/Wrong0Clue']);
+        unset($reslist['Gibberish/Wrong1Clue']);
+        unset($reslist['Gibberish/Wrong2Clue']);
+        unset($reslist['Gibberish/Wrong3Clue']);
+        unset($reslist['Gibberish/WrongSoClose']);
+
         $reslist['Gibberish/QuestionTitle'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/1'));
         $reslist['Gibberish/QuestionIntro1'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/2'));
         $reslist['Gibberish/QuestionIntro2'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/3'));
@@ -638,7 +678,8 @@ function resources() {
         $reslist['Gibberish/QuestionHint31'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/9'));
         $reslist['Gibberish/QuestionHint32'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/10'));
         if (!file_exists('../res-full/'.$qhdr['folder'].'/snd/10.ogg')) unset($reslist['Gibberish/QuestionHint32']);
-        $reslist['Gibberish/QuestionAnswer'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/13'));
+        // TODO Il existerait un son 11 aussi ? (voir Google Doc)
+        $reslist['Gibberish/EndQuestion'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/13'));
         $reslist['Gibberish/AboutToRevealAnswer'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/14'));
         $reslist['Gibberish/RevealAnswer'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/16'));
         if (!file_exists('../res-full/'.$qhdr['folder'].'/snd/16.ogg')) unset($reslist['Gibberish/RevealAnswer']);

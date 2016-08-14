@@ -45,10 +45,16 @@ ModeGibberish.prototype.preload = function(resources) {
     this.QuestionHint31 = new YDKJAnimation(resources['Gibberish/QuestionHint31']);
     this.QuestionHint32 = new YDKJAnimation(resources['Gibberish/QuestionHint32']);
 
+    this.LastPlayer1 = new YDKJAnimation(resources['Gibberish/LastPlayer1']);
+    this.LastPlayer2 = new YDKJAnimation(resources['Gibberish/LastPlayer2']);
+    this.LastPlayer3 = new YDKJAnimation(resources['Gibberish/LastPlayer3']);
+    this.LastPlayers = new YDKJAnimation(resources['Gibberish/LastPlayers']);
+
     this.TimerTimeOut = new YDKJAnimation(resources['Question/TimerTimeOut']);
     this.AboutToRevealAnswer = new YDKJAnimation(resources['Gibberish/AboutToRevealAnswer']);
     this.RevealAnswer = new YDKJAnimation(resources['Gibberish/RevealAnswer']);
     this.SFXShowAnswerAudience = new YDKJAnimation(resources['Gibberish/SFXShowAnswerAudience']);
+    this.EndQuestion = new YDKJAnimation(resources['Gibberish/EndQuestion']);
 
     /* Eléments pour la fenêtre de saisie texte */
     var typeframe = new InputTextFrame();
@@ -68,9 +74,6 @@ ModeGibberish.prototype.preload = function(resources) {
     this.TextFrameCorrect = new YDKJAnimation(resources['Gibberish/TextFrameCorrect']);
     this.TextFrameWrong = new YDKJAnimation(resources['Gibberish/TextFrameWrong']);
 
-    this.ShowAnswerTyping = new YDKJAnimation(resources['Gibberish/ShowAnswerTyping']);
-    this.ShowAnswerTextFrame = new YDKJAnimation(resources['Gibberish/ShowAnswerTextFrame']);
-
     this.Player1ShowKey = new YDKJAnimation(resources['Question/Player1ShowKey']);
     this.Player1Answer = new YDKJAnimation(resources['Question/Player1Answer']);
     this.Player1AnswerLoop = new YDKJAnimation(resources['Question/Player1AnswerLoop']);
@@ -78,6 +81,14 @@ ModeGibberish.prototype.preload = function(resources) {
     this.Player1Wrong = new YDKJAnimation(resources['Question/Player1Wrong']);
     this.Player1LostScrew = new YDKJAnimation(resources['Question/Player1LostScrew']);
     this.FreeAnswerPlayer1 = new YDKJAnimation(resources['Gibberish/FreeAnswerPlayer1']);
+    this.FreeAnswerHurryUp1Player1 = new YDKJAnimation(resources['Gibberish/FreeAnswerHurryUp1Player1']);
+    this.FreeAnswerHurryUp2Player1 = new YDKJAnimation(resources['Gibberish/FreeAnswerHurryUp1Player1']);
+    this.FreeAnswerTimeOutPlayer1 = new YDKJAnimation(resources['Gibberish/FreeAnswerTimeOutPlayer1']);
+    this.Wrong0CluePlayer1 = new YDKJAnimation(resources['Gibberish/Wrong0CluePlayer1']);
+    this.Wrong1CluePlayer1 = new YDKJAnimation(resources['Gibberish/Wrong1CluePlayer1']);
+    this.Wrong2CluePlayer1 = new YDKJAnimation(resources['Gibberish/Wrong2CluePlayer1']);
+    this.Wrong3CluePlayer1 = new YDKJAnimation(resources['Gibberish/Wrong3CluePlayer1']);
+    this.WrongSoClosePlayer1 = new YDKJAnimation(resources['Gibberish/WrongSoClosePlayer1']);
 
     if (this.game.players.length >= 2) {
         this.Player2ShowKey = new YDKJAnimation(resources['Question/Player2ShowKey']);
@@ -87,6 +98,14 @@ ModeGibberish.prototype.preload = function(resources) {
         this.Player2Wrong = new YDKJAnimation(resources['Question/Player2Wrong']);
         this.Player2LostScrew = new YDKJAnimation(resources['Question/Player2LostScrew']);
         this.FreeAnswerPlayer2 = new YDKJAnimation(resources['Gibberish/FreeAnswerPlayer2']);
+        this.FreeAnswerHurryUp1Player2 = new YDKJAnimation(resources['Gibberish/FreeAnswerHurryUp1Player2']);
+        this.FreeAnswerHurryUp2Player2 = new YDKJAnimation(resources['Gibberish/FreeAnswerHurryUp1Player2']);
+        this.FreeAnswerTimeOutPlayer2 = new YDKJAnimation(resources['Gibberish/FreeAnswerTimeOutPlayer2']);
+        this.Wrong0CluePlayer2 = new YDKJAnimation(resources['Gibberish/Wrong0CluePlayer2']);
+        this.Wrong1CluePlayer2 = new YDKJAnimation(resources['Gibberish/Wrong1CluePlayer2']);
+        this.Wrong2CluePlayer2 = new YDKJAnimation(resources['Gibberish/Wrong2CluePlayer2']);
+        this.Wrong3CluePlayer2 = new YDKJAnimation(resources['Gibberish/Wrong3CluePlayer2']);
+        this.WrongSoClosePlayer2 = new YDKJAnimation(resources['Gibberish/WrongSoClosePlayer2']);
     }
 
     if (this.game.players.length == 3) {
@@ -97,6 +116,14 @@ ModeGibberish.prototype.preload = function(resources) {
         this.Player3Wrong = new YDKJAnimation(resources['Question/Player3Wrong']);
         this.Player3LostScrew = new YDKJAnimation(resources['Question/Player3LostScrew']);
         this.FreeAnswerPlayer3 = new YDKJAnimation(resources['Gibberish/FreeAnswerPlayer3']);
+        this.FreeAnswerHurryUp1Player3 = new YDKJAnimation(resources['Gibberish/FreeAnswerHurryUp1Player3']);
+        this.FreeAnswerHurryUp2Player3 = new YDKJAnimation(resources['Gibberish/FreeAnswerHurryUp1Player3']);
+        this.FreeAnswerTimeOutPlayer3 = new YDKJAnimation(resources['Gibberish/FreeAnswerTimeOutPlayer3']);
+        this.Wrong0CluePlayer3 = new YDKJAnimation(resources['Gibberish/Wrong0CluePlayer3']);
+        this.Wrong1CluePlayer3 = new YDKJAnimation(resources['Gibberish/Wrong1CluePlayer3']);
+        this.Wrong2CluePlayer3 = new YDKJAnimation(resources['Gibberish/Wrong2CluePlayer3']);
+        this.Wrong3CluePlayer3 = new YDKJAnimation(resources['Gibberish/Wrong3CluePlayer3']);
+        this.WrongSoClosePlayer3 = new YDKJAnimation(resources['Gibberish/WrongSoClosePlayer3']);
     }
 
     this.SFXPlayerBuzz = new YDKJAnimation(resources['Question/SFXPlayerBuzz']);
@@ -111,17 +138,7 @@ ModeGibberish.prototype.start = function() {
     this.buzzPlayer = 0;
     this.listener = 0;
 
-    /*var nextcategoryready;
-
-    var jumpToNextCategory = function() {
-        nextcategoryready(function(nextcategory){
-            nextcategory.modeObj.chooseplayer = thisMode.chooseplayer;
-            nextcategory.modeObj.MusicChooseCategoryLoop.free();
-            nextcategory.modeObj.MusicChooseCategoryLoop = thisMode.MusicLoopRules1;
-            thisMode.MusicLoopRules1 = false; // Pour ne pas être détruite au passage à la catégorie suivante
-            nextcategory.start();
-        });
-    };*/
+    var nextcategoryready;
 
     var currentpos = 0;
     var decreasing = Math.round(thisMode.options.value/40);
@@ -155,74 +172,198 @@ ModeGibberish.prototype.start = function() {
 
     var registerPressKey = 0; // Déclaré plus tard
 
+    var registerPressKeyIgnore = function() { // Fonction qui ne fait rien, pour ignorer les appuis suivants TODO rendre ce genre de trucs plus propre
+        thisMode.game.api.registeraction('pressKey', function(data){
+            registerPressKeyIgnore();
+        });
+    };
+
     var typelistener = 0;
 
-    this.SFXPlayerLose.ended(100,function() {
+    var jumpToNextCategory = function(len){
+        nextcategoryready(function(nextcategory) {
+            nextcategory.modeObj.MusicChooseCategoryStart.delay(Math.max(500,2500-len),function () {
+                nextcategory.start();
+            });
+        });
+    };
+
+    this.EndQuestion.ended(function(){jumpToNextCategory(thisMode.EndQuestion.length())});
+    this.RevealAnswer.ended(function(){jumpToNextCategory(thisMode.RevealAnswer.length())});
+
+    this.SFXPlayerCorrect.ended(function(){
+        var thisSFX = this;
+        this.delay(300,function(){
+            nextcategoryready(function(nextcategory) {
+                nextcategory.modeObj.chooseplayer = thisMode.buzzPlayer; // On donne le choix au joueur qui a bien répondu
+                nextcategory.modeObj.MusicChooseCategoryStart.play();
+                thisSFX.delay(300,function () {
+                    thisMode.EndQuestion.play();
+                });
+            });
+        });
+    });
+
+    this.SFXPlayerLose.ended(function() {
         thisMode.TextFrameShow.reset();
+        thisMode.TextFrameWrong.reset();
         thisMode.TextFrameWrong.play();
     });
+
+    var playerWrong = function() {
+        thisMode.typeframe.wrong(function () {
+            setTimeout(function() {
+                thisMode.SFXPlayerLose.reset();
+                thisMode.SFXPlayerLose.play();
+                thisMode.availPlayers[thisMode.buzzPlayer] = 0;
+
+                thisMode.game.players[thisMode.buzzPlayer-1].score = parseInt(thisMode.game.players[thisMode.buzzPlayer-1].score) - parseInt(thisMode.options.value);
+                thisMode.game.font.strings[10*thisMode.buzzPlayer+105] = thisMode.game.displayCurrency(thisMode.game.players[thisMode.buzzPlayer-1].score);
+
+                switch (thisMode.buzzPlayer) {
+                    case 1:
+                        thisMode.Player1AnswerLoop.free();
+                        thisMode.Player1Wrong.play();
+                        break;
+                    case 2:
+                        thisMode.Player2AnswerLoop.free();
+                        thisMode.Player2Wrong.play();
+                        break;
+                    case 3:
+                        thisMode.Player3AnswerLoop.free();
+                        thisMode.Player3Wrong.play();
+                        break;
+                }
+            },150);
+        });
+    };
 
     this.Player1Answer.ended(function(){
         this.free();
         thisMode.Player1AnswerLoop.play();
     });
+    this.FreeAnswerTimeOutPlayer1.ended(playerWrong);
+    this.Wrong0CluePlayer1.ended(playerWrong);
+    this.Wrong1CluePlayer1.ended(playerWrong);
+    this.Wrong2CluePlayer1.ended(playerWrong);
+    this.Wrong3CluePlayer1.ended(playerWrong);
+    this.WrongSoClosePlayer1.ended(playerWrong);
     if (this.game.players.length >= 2) {
         this.Player2Answer.ended(function () {
             this.free();
             thisMode.Player2AnswerLoop.play();
         });
+        this.FreeAnswerTimeOutPlayer2.ended(playerWrong);
+        this.Wrong0CluePlayer2.ended(playerWrong);
+        this.Wrong1CluePlayer2.ended(playerWrong);
+        this.Wrong2CluePlayer2.ended(playerWrong);
+        this.Wrong3CluePlayer2.ended(playerWrong);
+        this.WrongSoClosePlayer2.ended(playerWrong);
     }
     if (this.game.players.length == 3) {
         this.Player3Answer.ended(function () {
             this.free();
             thisMode.Player3AnswerLoop.play();
         });
+        this.FreeAnswerTimeOutPlayer3.ended(playerWrong);
+        this.Wrong0CluePlayer3.ended(playerWrong);
+        this.Wrong1CluePlayer3.ended(playerWrong);
+        this.Wrong2CluePlayer3.ended(playerWrong);
+        this.Wrong3CluePlayer3.ended(playerWrong);
+        this.WrongSoClosePlayer3.ended(playerWrong);
     }
 
-    thisMode.typeframe.onEnter = function(text) {
+    this.typeframe.onEnter = function(text) {
+        switch (thisMode.buzzPlayer) {
+            case 1:
+                thisMode.FreeAnswerPlayer1.free();
+                thisMode.FreeAnswerHurryUp1Player1.free();
+                thisMode.FreeAnswerHurryUp2Player1.free();
+                thisMode.FreeAnswerTimeOutPlayer1.free();
+                break;
+            case 2:
+                thisMode.FreeAnswerPlayer2.free();
+                thisMode.FreeAnswerHurryUp1Player2.free();
+                thisMode.FreeAnswerHurryUp2Player2.free();
+                thisMode.FreeAnswerTimeOutPlayer2.free();
+                break;
+            case 3:
+                thisMode.FreeAnswerPlayer3.free();
+                thisMode.FreeAnswerHurryUp1Player3.free();
+                thisMode.FreeAnswerHurryUp2Player3.free();
+                thisMode.FreeAnswerTimeOutPlayer3.free();
+                break;
+        }
+
         unbindKeyListener(typelistener);
+        registerPressKeyIgnore();
         typelistener = 0;
-        if (text == 'good') {
+        var resultat = checkTextWrds(text,getSTRfromID(thisMode.STR,'Wrds',128));
+        if (resultat == 2) { // Bonne réponse !
+            thisMode.game.players[thisMode.buzzPlayer-1].score = parseInt(thisMode.game.players[thisMode.buzzPlayer-1].score) + parseInt(thisMode.options.value);
+            thisMode.game.font.strings[10*thisMode.buzzPlayer+105] = thisMode.game.displayCurrency(thisMode.game.players[thisMode.buzzPlayer-1].score);
+
             thisMode.TextFrameShow.reset();
             thisMode.TextFrameCorrect.play();
-        } else {
-            setTimeout(function() {
-                thisMode.typeframe.wrong(function () {
-                    setTimeout(function() {
-                        thisMode.SFXPlayerLose.reset();
-                        thisMode.SFXPlayerLose.play();
-                        thisMode.availPlayers[thisMode.buzzPlayer] = 0;
-                        switch (thisMode.buzzPlayer) {
-                            case 1:
-                                thisMode.Player1AnswerLoop.free();
-                                thisMode.Player1Wrong.play();
-                                break;
-                            case 2:
-                                thisMode.Player2AnswerLoop.free();
-                                thisMode.Player2Wrong.play();
-                                break;
-                            case 3:
-                                thisMode.Player3AnswerLoop.free();
-                                thisMode.Player3Wrong.play();
-                                break;
-                        }
-                    },150);
-                });
-            },150);
+            thisMode.SFXPlayerCorrect.play();
+            unbindKeyListener(thisMode.listener);
+            registerPressKeyIgnore();
+            pressKey = function(choice){};
+
+            switch (thisMode.buzzPlayer) {
+                case 1:
+                    thisMode.Player1AnswerLoop.free();
+                    thisMode.Player1Correct.play();
+                    break;
+                case 2:
+                    thisMode.Player2AnswerLoop.free();
+                    thisMode.Player2Correct.play();
+                    break;
+                case 3:
+                    thisMode.Player3AnswerLoop.free();
+                    thisMode.Player3Correct.play();
+                    break;
+            }
+        } else if (resultat == 1) { // Presque !
+            switch (thisMode.buzzPlayer) {
+                case 1:thisMode.WrongSoClosePlayer1.play();break;
+                case 2:thisMode.WrongSoClosePlayer2.play();break;
+                case 3:thisMode.WrongSoClosePlayer3.play();break;
+            }
+        } else { // Mauvaise réponse
+            if (currentpos < 9) { // Aucun indice n'a été donné
+                switch (thisMode.buzzPlayer) {
+                    case 1:thisMode.Wrong0CluePlayer1.play();break;
+                    case 2:thisMode.Wrong0CluePlayer2.play();break;
+                    case 3:thisMode.Wrong0CluePlayer3.play();break;
+                }
+            } else if (currentpos < 18) { // 1 indice a été donné
+                switch (thisMode.buzzPlayer) {
+                    case 1:thisMode.Wrong1CluePlayer1.play();break;
+                    case 2:thisMode.Wrong1CluePlayer2.play();break;
+                    case 3:thisMode.Wrong1CluePlayer3.play();break;
+                }
+            } else if (currentpos < 27) { // 2 indices ont été donnés
+                switch (thisMode.buzzPlayer) {
+                    case 1:thisMode.Wrong2CluePlayer1.play();break;
+                    case 2:thisMode.Wrong2CluePlayer2.play();break;
+                    case 3:thisMode.Wrong2CluePlayer3.play();break;
+                }
+            } else { // 3 indices ont été donnés
+                switch (thisMode.buzzPlayer) {
+                    case 1:thisMode.Wrong3CluePlayer1.play();break;
+                    case 2:thisMode.Wrong3CluePlayer2.play();break;
+                    case 3:thisMode.Wrong3CluePlayer3.play();break;
+                }
+            }
         }
     };
 
     this.SFXPlayerBuzz.ended(function() {
         switch (thisMode.buzzPlayer) {
-            case 1:
-                thisMode.FreeAnswerPlayer1.play();
-                break;
-            case 2:
-                thisMode.FreeAnswerPlayer2.play();
-                break;
-            case 3:
-                thisMode.FreeAnswerPlayer3.play();
-                break;
+            case 1:thisMode.FreeAnswerPlayer1.play();break;
+            case 2:thisMode.FreeAnswerPlayer2.play();break;
+            case 3:thisMode.FreeAnswerPlayer3.play();break;
         }
 
         unbindKeyListener(thisMode.listener);
@@ -250,6 +391,8 @@ ModeGibberish.prototype.start = function() {
             thisMode.MusicPart1.reset();
             thisMode.MusicPart2.reset();
             thisMode.MusicPart3.reset();
+            thisMode.QuestionIntro2.reset();
+            thisMode.QuestionIntro3.reset();
             thisMode.QuestionHint11.reset();
             thisMode.QuestionHint12.reset();
             thisMode.QuestionHint21.reset();
@@ -289,28 +432,60 @@ ModeGibberish.prototype.start = function() {
         doPressKey(choice, true);
     };
 
+    this.SFXShowAnswerAudience.ended(150,function() {
+        nextcategoryready(function(nextcategory) {
+            nextcategory.modeObj.chooseplayer = thisMode.chooseplayer; // On donne le choix au joueur précédent
+            nextcategory.modeObj.MusicChooseCategoryStart.play();
+        });
+        if (thisMode.RevealAnswer.urlAudio != '') thisMode.RevealAnswer.play(); else thisMode.EndQuestion.play();
+    });
+
+    this.AboutToRevealAnswer.ended(100,function(){
+        thisMode.typeframe.showAnswer(getSTRfromID(thisMode.STR,'Ansr',128),function() {
+            thisMode.SFXShowAnswerAudience.play();
+        });
+    });
+
+    this.TimerTimeOut.ended(100,function() {
+        thisMode.AboutToRevealAnswer.play();
+    });
+
     this.TextFrameWrong.ended(100,function() {
         thisMode.buzzPlayer = 0;
-        thisMode.listener = bindKeyListener(function(choice) {
-            pressKey(choice);
-        });
-        thisMode.MusicPart1.play();
-        thisMode.timerInterval = setInterval(runTimer,750);
+        var nbPlayersLeft = 0;
+        for(var i = 1; i <= thisMode.game.players.length; i++) {
+            if (thisMode.availPlayers[i]) nbPlayersLeft++;
+        }
+        if (nbPlayersLeft > 0) {
+            if (nbPlayersLeft == 1) {
+                if (thisMode.availPlayers[1]) thisMode.LastPlayer1.play();
+                if (thisMode.availPlayers[2]) thisMode.LastPlayer2.play();
+                if (thisMode.availPlayers[3]) thisMode.LastPlayer3.play();
+            } else thisMode.LastPlayers.play();
+
+            thisMode.listener = bindKeyListener(function(choice) {
+                pressKey(choice);
+            });
+            thisMode.MusicPart1.play();
+            thisMode.timerInterval = setInterval(runTimer,750);
+        } else {
+            thisMode.AboutToRevealAnswer.play();
+        }
     });
 
-    thisMode.QuestionHint31.ended(300,function() {
+    this.QuestionHint31.ended(300,function() {
         this.free();
-        thisMode.QuestionHint32.play();
+        if (thisMode.QuestionHint32.urlAudio != '') thisMode.QuestionHint32.play();
     });
 
-    thisMode.QuestionHint21.ended(300,function() {
+    this.QuestionHint21.ended(300,function() {
         this.free();
-        thisMode.QuestionHint22.play();
+        if (thisMode.QuestionHint22.urlAudio != '') thisMode.QuestionHint22.play();
     });
 
-    thisMode.QuestionHint11.ended(300,function() {
+    this.QuestionHint11.ended(300,function() {
         this.free();
-        thisMode.QuestionHint12.play();
+        if (thisMode.QuestionHint12.urlAudio != '') thisMode.QuestionHint12.play();
     });
 
     this.QuestionIntro2.ended(100,function() {
@@ -349,11 +524,11 @@ ModeGibberish.prototype.start = function() {
         thisMode.Player1ShowKey.click(function(){pressKey(thisMode.game.players[0].keycode)});
         if (thisMode.game.players.length >= 2) {
             thisMode.availPlayers[2] = 1;
-            thisMode.Player1ShowKey.click(function(){pressKey(thisMode.game.players[1].keycode)});
+            thisMode.Player2ShowKey.click(function(){pressKey(thisMode.game.players[1].keycode)});
         }
         if (thisMode.game.players.length == 3) {
             thisMode.availPlayers[3] = 1;
-            thisMode.Player1ShowKey.click(function(){pressKey(thisMode.game.players[2].keycode)});
+            thisMode.Player3ShowKey.click(function(){pressKey(thisMode.game.players[2].keycode)});
         }
 
         thisMode.listener = bindKeyListener(function(choice) {
@@ -508,5 +683,5 @@ ModeGibberish.prototype.start = function() {
         this.play();
     });
 
-    //nextcategoryready = this.game.api.gamemode(thisMode); // Préchargement de la prochaine catégorie
+    nextcategoryready = this.game.api.gamemode(thisMode); // Préchargement de la prochaine catégorie
 };
