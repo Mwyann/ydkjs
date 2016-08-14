@@ -7,6 +7,7 @@ if (isset($_GET['nbplayers'])) {
     if (($nbplayers < 1) || ($nbplayers > 3)) $nbplayers = 3;
 }
 $_SESSION['nbplayers'] = $nbplayers;
+$_SESSION['nbquestions'] = 7;
 session_write_close();
 
 header('Location: alpha.php');

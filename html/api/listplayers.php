@@ -25,6 +25,7 @@ $res = $DB->query("SELECT * FROM sessions WHERE id = " . $session_id);
 if ($rs = $res->fetch()) {
     $player_host = $rs['player_host'];
     $status = $rs['status'];
+    $nbquestions = $rs['nbquestions'];
     $public = $rs['public'];
 } else {
     unset($_SESSION['session_id']);
@@ -59,7 +60,9 @@ if (($is_host) && (!$readonly)) {
     if (($status < 2) && ($game_starting < 2)) {
         $status = $game_starting;
         $public = intval($_POST['public']);
-        $DB->query("UPDATE sessions SET status = ".$status.", public = ".$public." WHERE id = " . $session_id);
+        $nbquestions = intval($_POST['nbquestions']);
+        if (!$nbquestions) $nbquestions = 7;
+        $DB->query("UPDATE sessions SET status = ".$status.", public = ".$public.", nbquestions = ".$nbquestions." WHERE id = " . $session_id);
     }
 
     $participants = array();
@@ -114,5 +117,6 @@ if (($game_starting == 2) && ($status != 2)) {
 echo json_encode(array(
         'players' => $players,
         'status' => $status,
+        'nbquestions' => $nbquestions,
         'public' => $public
     ));

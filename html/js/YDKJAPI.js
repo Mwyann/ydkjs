@@ -697,7 +697,24 @@ YDKJAPI.prototype.initgame = function() {
         if (currentmode === undefined) data['currentmode'] = 'None';
         //if (currentmode === undefined) data['currentmode'] = 'Intro'; // Ligne DEBUG
         if (currentmode instanceof ModeIntro) data['currentmode'] = 'Intro';
-        if ((currentmode instanceof ModeQuestion) || (currentmode instanceof ModeDisOrDat) || (currentmode instanceof ModeGibberish)) {data['currentmode'] = 'Category'; data['category'] = 1; data['questionnumber'] = parseInt(currentmode.options.questionnumber)+1;}
+        if (currentmode instanceof ModeR1WrapUp) {
+            data['currentmode'] = 'Category';
+            data['category'] = currentmode.options.category;
+            data['questionnumber'] = currentmode.options.questionnumber;
+        }
+        if ((currentmode instanceof ModeQuestion) || (currentmode instanceof ModeDisOrDat) || (currentmode instanceof ModeGibberish)) {
+            if (parseInt(currentmode.options.questionnumber) == 10) {
+                data['currentmode'] = 'R1WrapUp';
+                data['category'] = parseInt(currentmode.options.category)+1; // Round 2
+            } else if (parseInt(currentmode.options.questionnumber) == 20) {
+                data['currentmode'] = 'Category';
+                data['category'] = parseInt(currentmode.options.category)+1; // Round 3 (JackAttack)
+            } else {
+                data['currentmode'] = 'Category';
+                data['category'] = currentmode.options.category;
+            }
+            data['questionnumber'] = parseInt(currentmode.options.questionnumber) + 1;
+        }
         if (currentmode instanceof ModeJackAttack) data['currentmode'] = 'JackAttack';
 
         var newmode;
@@ -714,6 +731,8 @@ YDKJAPI.prototype.initgame = function() {
 
                 if (newmodedata['mode'] == 'Intro') newmode = new YDKJMode(thisAPI.game, 'Intro', {});
                 if (newmodedata['mode'] == 'Category') newmode = new YDKJMode(thisAPI.game, 'Category', {category: newmodedata['category'], questionnumber: newmodedata['questionnumber'], chooseplayer: newmodedata['chooseplayer']});
+                if (newmodedata['mode'] == 'R1WrapUp') newmode = new YDKJMode(thisAPI.game, 'R1WrapUp', {category: newmodedata['category'], questionnumber: newmodedata['questionnumber'], chooseplayer: newmodedata['chooseplayer']});
+                // Les types de questions suivantes (Question, Couci-Couça, Rimatologie, Jackattack...) sont chargées dans les ressources.
                 if (newmodedata['mode'] == 'End') newmode = new YDKJMode(thisAPI.game, 'End', {});
 
                 ready = 1;
@@ -739,6 +758,12 @@ YDKJAPI.prototype.initgame = function() {
         }
         else if (mode instanceof ModeCategory) {
             data['mode'] = 'Category';
+            data['category'] = mode.options.category;
+            data['questionnumber'] = mode.options.questionnumber;
+        }
+        else if (mode instanceof ModeR1WrapUp) {
+            data['mode'] = 'R1WrapUp';
+            // On pourrait le deviner ça, mais bon...
             data['category'] = mode.options.category;
             data['questionnumber'] = mode.options.questionnumber;
         }
@@ -789,6 +814,10 @@ YDKJAPI.prototype.initgame = function() {
                     for (i = 1; i <= 3; i++) {
                         reslist['question'+i] = new YDKJMode(thisAPI.game, reslist['questiontype'+i], {category: mode.options.category, questionnumber: mode.options.questionnumber, id: reslist['question'+i]}); // Preload des questions suivantes
                     }
+                }
+
+                if (mode instanceof ModeR1WrapUp) {
+                    // Rien de spécial à faire ?
                 }
 
                 if (mode instanceof ModeQuestion) {

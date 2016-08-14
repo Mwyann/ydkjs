@@ -9,6 +9,7 @@ if (isset($_SESSION['session_id'])) {
     $res = $DB->query("SELECT * FROM sessions WHERE status = 2 AND nbplayers > 0 AND id = " . $session_id);
     if ($session = $res->fetch()) {
       $_SESSION['session_id'] = $session_id;
+      $_SESSION['nbquestions'] = $session['nbquestions'];
       $_SESSION['nbplayers'] = $session['nbplayers'];
       $_SESSION['player1'] = $session['nick1'];
       $_SESSION['player2'] = $session['nick2'];

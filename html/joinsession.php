@@ -168,7 +168,9 @@ session_write_close();
                     if (readonly) players_participants = 0;
                     var publicgame = 0;
                     if (jQuery('#public').is(':checked')) publicgame = 1;
-                    var data = {player_nick: player_nick, readonly: (readonly?1:0), players_participants: players_participants, game_starting: game_starting, 'public': publicgame};
+                    var nbquestions = 7;
+                    if (jQuery('#nbquestions21').is(':checked')) nbquestions = 21;
+                    var data = {player_nick: player_nick, readonly: (readonly?1:0), players_participants: players_participants, game_starting: game_starting, nbquestions: nbquestions, 'public': publicgame};
                     jQuery.ajax({
                         url: 'api/listplayers.php',
                         type: 'post',
@@ -252,11 +254,17 @@ session_write_close();
                                 if (data.status == '1') start_game(true);
                             }
                             if (data.status == '2') window.location.href = 'alpha.php';
-                            if ((readonly) || (!is_host)) if (data.public == '1') jQuery('#public').prop('checked', true); else jQuery('#public').prop('checked', false);
+                            if ((readonly) || (!is_host)) {
+                                if (data.public == '1') jQuery('#public').prop('checked', true); else jQuery('#public').prop('checked', false);
+                                if (data.nbquestions == '21') jQuery('#nbquestions21').prop('checked', true); else jQuery('#nbquestions21').prop('checked', false);
+                            }
 
                             window.setTimeout(updatePlayers,1000);
                             if (readonly) {
-                                if (is_host) jQuery('#public').removeAttr('disabled');
+                                if (is_host) {
+                                    jQuery('#nbquestions21').removeAttr('disabled');
+                                    jQuery('#public').removeAttr('disabled');
+                                }
                                 start_game(false);
                             }
                         }
@@ -287,7 +295,7 @@ session_write_close();
     (Cochez les joueurs qui vont participer, les autres seront spectateurs)
 </div>
 <div style="margin:10px 0;font-size:80%">
-    <input type="checkbox" id="public" disabled="disabled" /> <label for="public">Partie publique</label> <input type="checkbox" id="sound"/> <label for="sound">Son à la connexion d'un nouveau joueur</label>
+    <input type="checkbox" id="nbquestions21" disabled="disabled" /> <label for="nbquestions21">21 questions (7 si décoché)</label> <input type="checkbox" id="public" disabled="disabled" /> <label for="public">Partie publique</label> <input type="checkbox" id="sound"/> <label for="sound">Son à la connexion d'un nouveau joueur</label>
 </div>
 <div style="margin:20px auto 10px auto; text-align:center"><input type="button" id="start_game" value="Chargement..." disabled/></div>
 </div>

@@ -48,6 +48,7 @@ function YDKJ(screen, debug) {
     if (typeof AudioSpecs == "undefined") loadScript('js/common.js');
     if (typeof ModeIntro == "undefined") loadScript('js/ModeIntro.js');
     if (typeof ModeCategory == "undefined") loadScript('js/ModeCategory.js');
+    if (typeof ModeR1WrapUp == "undefined") loadScript('js/ModeR1WrapUp.js');
     if (typeof ModeQuestion == "undefined") loadScript('js/ModeQuestion.js');
     if (typeof ModeDisOrDat == "undefined") loadScript('js/ModeDisOrDat.js');
     if (typeof ModeGibberish == "undefined") loadScript('js/ModeGibberish.js');

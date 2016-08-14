@@ -33,17 +33,17 @@ function YDKJFont() {
         1200:{font:'JackRoman',size:20,color:'#33F',halign:'l'}, // Category title, header
         1205:{font:'JackRoman',size:20,color:'#33F',halign:'r'}, // Category value, header
         1210:{font:'JackExtraCond',size:[42,32],color:'#FFF'}, // Question
-        1211:{font:'JackCondensed',size:22,color:['#FC0','#F00'],halign:'l'}, // Answer 1
-        1212:{font:'JackCondensed',size:22,color:['#FC0','#F00'],halign:'l'}, // Answer 2
-        1213:{font:'JackCondensed',size:22,color:['#FC0','#F00'],halign:'l'}, // Answer 3
-        1214:{font:'JackCondensed',size:22,color:['#FC0','#F00'],halign:'l'}, // Answer 4
+        1211:{font:'JackCondensed',size:22,color:['#FC0','#F00'],halign:'l',top:-1}, // Answer 1
+        1212:{font:'JackCondensed',size:22,color:['#FC0','#F00'],halign:'l',top:-1}, // Answer 2
+        1213:{font:'JackCondensed',size:22,color:['#FC0','#F00'],halign:'l',top:-1}, // Answer 3
+        1214:{font:'JackCondensed',size:22,color:['#FC0','#F00'],halign:'l',top:-1}, // Answer 4
         1215:{font:'JackRoman',size:[61,38,29,23],color:'#FC0'}, // Revealed answer (probably more than one size here, TODO check sizes like 38, 29, 23)
         // Gibberish
         1305:{font:'JackExtraCond',size:83,color:'#33F',halign:'l'}, // Current price
         1310:{font:'JackExtraCond',size:[64,42],color:'#FFF'}, // Question
-        1311:{font:'JackCondensed',size:20,color:'#66F',halign:'r'}, // Clue 1
-        1312:{font:'JackCondensed',size:20,color:'#66F',halign:'r'}, // Clue 2
-        1313:{font:'JackCondensed',size:20,color:'#66F',halign:'r'}, // Clue 3
+        1311:{font:'JackCondensed',size:[20,18],color:'#66F',halign:'r'}, // Clue 1
+        1312:{font:'JackCondensed',size:[20,18],color:'#66F',halign:'r'}, // Clue 2
+        1313:{font:'JackCondensed',size:[20,18],color:'#66F',halign:'r'}, // Clue 3
         1315:{font:'JackRoman',size:23,color:'#000'},                // Correct free answer revealed
         // DisOrDat
         1400:{font:'JackRoman',size:20,color:'#33F',halign:'l'}, // Category title, header

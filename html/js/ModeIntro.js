@@ -31,6 +31,9 @@ ModeIntro.prototype.preload = function(resources) {
         this.Player1 = new YDKJAnimation(resources['Intro/Player1']);
         if (this.game.players.length >= 2) this.Player2 = new YDKJAnimation(resources['Intro/Player2']);
         if (this.game.players.length == 3) this.Player3 = new YDKJAnimation(resources['Intro/Player3']);
+
+        this.ShowRound1 = new YDKJAnimation(resources['Intro/ShowRound1']);
+        this.TiltRound1 = new YDKJAnimation(resources['Intro/TiltRound1']);
     }
 };
 
@@ -103,6 +106,10 @@ ModeIntro.prototype.start = function() {
 
         this.Welcome.ended(300, function () {
             thisMode.WelcomePlayers.play();
+        });
+
+        this.Welcome.ended(-100, function () {
+            thisMode.ShowRound1.play();
         });
 
         if (this.game.players.length >= 2) {

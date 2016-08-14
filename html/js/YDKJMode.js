@@ -8,6 +8,7 @@ function YDKJMode(game, modename, options) {
     // preload
     if (modename == 'Intro') this.modeObj = new ModeIntro();
     if (modename == 'Category') this.modeObj = new ModeCategory();
+    if (modename == 'R1WrapUp') this.modeObj = new ModeR1WrapUp();
     if (modename == 'Question') this.modeObj = new ModeQuestion();
     if (modename == 'DisOrDat') this.modeObj = new ModeDisOrDat();
     if (modename == 'Gibberish') this.modeObj = new ModeGibberish();
