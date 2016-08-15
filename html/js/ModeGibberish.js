@@ -180,9 +180,10 @@ ModeGibberish.prototype.start = function() {
             }
             if (currentpos == 40) { // Fin du temps !
                 clearInterval(thisMode.timerInterval);
-                thisMode.MusicPart1.free();
-                thisMode.MusicPart2.free();
-                thisMode.MusicPart3.free();
+                unbindKeyListener(thisMode.listener);
+                thisMode.MusicPart1.reset();
+                thisMode.MusicPart2.reset();
+                thisMode.MusicPart3.reset();
                 thisMode.TimerDance.free();
                 thisMode.TimerTimeOut.play();
                 thisMode.TimerStop.play();
@@ -465,6 +466,7 @@ ModeGibberish.prototype.start = function() {
             thisMode.QuestionHint32.reset();
             thisMode.TimerDance.reset();
             thisMode.TimerStop.play();
+            thisMode.AboutToRevealAnswer.reset();
 
             thisMode.SFXPlayerBuzz.reset();
             thisMode.SFXPlayerBuzz.play();
@@ -521,6 +523,7 @@ ModeGibberish.prototype.start = function() {
     });
 
     this.AboutToRevealAnswer.ended(100,function(){
+        registerPlayerBuzzIgnore();
         thisMode.typeframe.showAnswer(getSTRfromID(thisMode.STR,'Ansr',128),function() {
             thisMode.SFXShowAnswerAudience.play();
         });
