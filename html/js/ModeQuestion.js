@@ -225,6 +225,14 @@ ModeQuestion.prototype.start = function() {
         });
     };
 
+    var unregisterPlayerBuzz = function() {
+        thisMode.game.api.unregisteraction('playerBuzz');
+    };
+
+    var unregisterPlayerAnswer = function() {
+        thisMode.game.api.unregisteraction('playerAnswer');
+    };
+
     var pressKey = function(choice) {
         if (!choice) return false; // Si on se voit envoyer 0 à cause d'un clic sur un joueur à keycode 0
         if (thisMode.currentPlayer == 0) {
@@ -312,9 +320,11 @@ ModeQuestion.prototype.start = function() {
 
     var gameover = function() {
         // Plus aucun joueur ne peut jouer (timer ou tous les joueurs ont participé)
-        unbindKeyListener(thisMode.listener);
-        thisMode.game.api.registeraction('pressKey', function(data){}); // Fonction qui ne fait rien.
         pressKey = function(choice){};
+        unbindKeyListener(thisMode.listener);
+        registerPlayerBuzzIgnore();
+        registerPlayerAnswerIgnore();
+
 
         var revealAnswer;
         var nbAns = 0;
@@ -352,6 +362,7 @@ ModeQuestion.prototype.start = function() {
                 thisMode.JingleTimer.play();
                 thisMode.timerTimeout = setTimeout(timerRunning, 500);
                 thisMode.LastPlayers.play();
+                unregisterPlayerAnswer();
                 registerPlayerBuzz();
             } else gameover();
         });
@@ -437,6 +448,8 @@ ModeQuestion.prototype.start = function() {
 
     var checkAnswer = function(){
         if (thisMode.currentPlayer == 0) return true;
+        unregisterPlayerBuzz();
+        registerPlayerAnswerIgnore();
         if (thisMode.currentAns != thisMode.correctanswer) { // Mauvaise réponse
             switch(thisMode.currentAns){
                 case 1:
@@ -610,6 +623,7 @@ ModeQuestion.prototype.start = function() {
             pressKey(choice);
         });
         registerPlayerBuzz();
+        if (thisMode.game.players.length == 1) registerPlayerAnswer();
     });
 
     this.ShowQuestion.ended(500,function(){

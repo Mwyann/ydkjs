@@ -37,7 +37,10 @@ YDKJMode.prototype.start = function() {
         var numobj = 1;
         var readyfunction = function () {
             numobj--;
-            if (numobj == 0) thisMode.modeObj.start();
+            if (numobj == 0) {
+                thisMode.modeObj.game.api.unregisteraction(true); // On nettoie tous les handlers de l'API avant de démarrer
+                thisMode.modeObj.start();
+            }
         };
 
         for (var i in thisMode.modeObj) if (thisMode.modeObj.hasOwnProperty(i)) {
