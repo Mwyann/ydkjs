@@ -26,11 +26,11 @@ if (isset($_SESSION['nbplayers'])) $nbplayers = intval($_SESSION['nbplayers']);
 if (($nbplayers < 1) || ($nbplayers > 3)) $nbplayers = 3;
 
 $player1 = '';
-if (isset($_SESSION['player1'])) $player1 = htmlspecialchars(substr(trim($_SESSION['player1']),0,20));
+if (isset($_SESSION['player1'])) $player1 = htmlspecialchars(substr(trim($_SESSION['player1']['nick']),0,20));
 $player2 = '';
-if (isset($_SESSION['player2'])) $player2 = htmlspecialchars(substr(trim($_SESSION['player2']),0,20));
+if (isset($_SESSION['player2'])) $player2 = htmlspecialchars(substr(trim($_SESSION['player2']['nick']),0,20));
 $player3 = '';
-if (isset($_SESSION['player3'])) $player3 = htmlspecialchars(substr(trim($_SESSION['player3']),0,20));
+if (isset($_SESSION['player3'])) $player3 = htmlspecialchars(substr(trim($_SESSION['player3']['nick']),0,20));
 
 $nbquestions = 7;
 if (isset($_SESSION['nbquestions'])) $nbquestions = intval($_SESSION['nbquestions']);
@@ -59,7 +59,7 @@ function shuffle_rand(&$array) {
 }
 
 function gameinfo() {
-    global $VERSION, $nbplayers, $localMode, $player_id, $players_ids, $player1, $player2, $player3, $nbquestions;
+    global $VERSION, $nbplayers, $localMode, $player_id, $player1, $player2, $player3, $nbquestions;
     $players = array();
     $locale = '';
     $engineVersion = 2;
@@ -101,10 +101,8 @@ function gameinfo() {
             array('name' => $noms[2],'score' => 0,'screw' => 0,'keycode' => 112)
         );
 
-    $players_idsp = explode('#',$players_ids);
-    if (sizeof($players_idsp) > 2) {
-        $players_idsp = array_slice($players_idsp,1,-1);
-        foreach($players_idsp as $joueur => $id) if ($id != $player_id) $players[$joueur]['keycode'] = 0; // Pas un joueur local, on supprime donc son keycode
+    if ((!$localMode) && ($nbplayers > 1)) {
+        for($i = 0; $i < $nbplayers; $i++) if ((isset($_SESSION['player'.($i+1)])) && ($_SESSION['player'.($i+1)]['id'] != $player_id)) $players[$i]['keycode'] = 0; // Pas un joueur local, on supprime donc son keycode
     }
 
     echo json_encode(array(

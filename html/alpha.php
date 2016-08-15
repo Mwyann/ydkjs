@@ -11,9 +11,9 @@ if (isset($_SESSION['session_id'])) {
       $_SESSION['session_id'] = $session_id;
       $_SESSION['nbquestions'] = $session['nbquestions'];
       $_SESSION['nbplayers'] = $session['nbplayers'];
-      $_SESSION['player1'] = $session['nick1'];
-      $_SESSION['player2'] = $session['nick2'];
-      $_SESSION['player3'] = $session['nick3'];
+      $_SESSION['player1'] = array('nick' => $session['nick1'], 'id' => $session['player1']);
+      $_SESSION['player2'] = array('nick' => $session['nick2'], 'id' => $session['player2']);
+      $_SESSION['player3'] = array('nick' => $session['nick3'], 'id' => $session['player3']);
       $players_id = array();
       if ($session['player1'] > 0) $players_id[$session['player1']] = 1;
       if ($session['player2'] > 0) $players_id[$session['player2']] = 1;

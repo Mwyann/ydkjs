@@ -201,7 +201,6 @@ ModeQuestion.prototype.start = function() {
                 thisMode.buzzPlayer = parseInt(data.value);
                 playerBuzz();
             }
-            registerPlayerBuzz();
         });
     };
 
@@ -211,7 +210,6 @@ ModeQuestion.prototype.start = function() {
                 thisMode.currentAns = parseInt(data.value);
                 playerAnswer();
             }
-            registerPlayerAnswer();
         });
     };
 
@@ -468,7 +466,6 @@ ModeQuestion.prototype.start = function() {
 
             thisMode.SFXPlayerCorrect.play();
             unbindKeyListener(thisMode.listener);
-            registerPlayerBuzzIgnore();
             pressKey = function(choice){};
 
             switch(thisMode.currentAns){
@@ -539,6 +536,7 @@ ModeQuestion.prototype.start = function() {
         thisMode.currentPlayer = thisMode.buzzPlayer; // Le joueur peut enfin répondre
         thisMode.buzzPlayer = 0;
         registerPlayerBuzzIgnore(); // Déplacé ici car si deux appuis trop rapides venant de l'API, le 2eme appui risque d'être ignoré à cause du return juste au dessus.
+        registerPlayerAnswer();
 
         // Vas-y joueur X
         if (thisMode.currentPlayer == 1) {
@@ -612,7 +610,6 @@ ModeQuestion.prototype.start = function() {
             pressKey(choice);
         });
         registerPlayerBuzz();
-        registerPlayerAnswer();
     });
 
     this.ShowQuestion.ended(500,function(){
