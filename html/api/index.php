@@ -316,14 +316,14 @@ function resources() {
                                FROM ".$DBsta.".qhdr
                                WHERE qtype = 'JackAttack'
                                ".$demo."
-                               ORDER BY MD5(CONCAT(id,".rand(1,999999)."))
+                               ORDER BY MD5(CONCAT(id,".$session_id."))
                                LIMIT 0,3");
         } elseif ($questionnumber == $specialquestion) { // Couci-Couça ou Rimatologie
             if ($specialGibberish) {
                 $res = $DB->query("SELECT *
                                    FROM ".$DBsta.".qhdr
                                    WHERE qtype = 'Gibberish'
-                                   ORDER BY MD5(CONCAT(id,".rand(1,999999)."))
+                                   ORDER BY MD5(CONCAT(id,".$session_id."))
                                    LIMIT 0,3");
             } else {
                 if ($DEMOMODE) {
@@ -338,7 +338,7 @@ function resources() {
                                    FROM ".$DBsta.".qhdr
                                    WHERE qtype = 'DisOrDat'
                                    ".$demo."
-                                   ORDER BY MD5(CONCAT(id,".rand(1,999999)."))
+                                   ORDER BY MD5(CONCAT(id,".$session_id."))
                                    LIMIT 0,3");
             }
         } else { // Toute autre question
@@ -356,8 +356,8 @@ function resources() {
                                AND qsubtype = 'Normal'
                                ".$demo."
                                AND NOT EXISTS (SELECT * FROM ".$DBsta.".qhdr a WHERE qhdr.id = a.forcenext)
-                               ORDER BY MD5(CONCAT(id,".rand(1,999999)."))
-                               LIMIT 0,3");
+                               ORDER BY MD5(CONCAT(id,".$session_id."))
+                               LIMIT ".($questionnumber*3).",3");
         }
         $c = 0;
         while ($rs = $res->fetch()) {
