@@ -601,9 +601,15 @@ ModeGibberish.prototype.start = function() {
         this.free();
         thisMode.ShowRules.free();
         thisMode.HideRules.play();
-        thisMode.QuestionIntro1.delay(100,function() {
-            this.play();
-        });
+        if (thisMode.QuestionIntro1.urlAudio != '') {
+            thisMode.QuestionIntro1.delay(100, function () {
+                this.play();
+            });
+        } else {
+            thisMode.game.api.synchronize(function() {
+                thisMode.ShowQuestion.play();
+            });
+        }
     });
 
     this.ShowHeader.ended(500,function() {
