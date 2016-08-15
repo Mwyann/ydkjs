@@ -51,6 +51,7 @@ ModeGibberish.prototype.preload = function(resources) {
     this.LastPlayers = new YDKJAnimation(resources['Gibberish/LastPlayers']);
 
     this.TimerTimeOut = new YDKJAnimation(resources['Question/TimerTimeOut']);
+    this.CorrectAnswer = new YDKJAnimation(resources['Gibberish/CorrectAnswer']);
     this.AboutToRevealAnswer = new YDKJAnimation(resources['Gibberish/AboutToRevealAnswer']);
     this.RevealAnswer = new YDKJAnimation(resources['Gibberish/RevealAnswer']);
     this.SFXShowAnswerAudience = new YDKJAnimation(resources['Gibberish/SFXShowAnswerAudience']);
@@ -353,29 +354,34 @@ ModeGibberish.prototype.start = function() {
         typelistener = 0;
         var resultat = checkTextWrds(text,getSTRfromID(thisMode.STR,'Wrds',128));
         if (resultat == 2) { // Bonne réponse !
-            thisMode.game.players[thisMode.buzzPlayer-1].score = parseInt(thisMode.game.players[thisMode.buzzPlayer-1].score) + parseInt(thisMode.options.value);
-            thisMode.game.font.strings[10*thisMode.buzzPlayer+105] = thisMode.game.displayCurrency(thisMode.game.players[thisMode.buzzPlayer-1].score);
+            var correctAnswer = function() {
+                thisMode.game.players[thisMode.buzzPlayer-1].score = parseInt(thisMode.game.players[thisMode.buzzPlayer-1].score) + parseInt(thisMode.options.value);
+                thisMode.game.font.strings[10*thisMode.buzzPlayer+105] = thisMode.game.displayCurrency(thisMode.game.players[thisMode.buzzPlayer-1].score);
 
-            thisMode.TextFrameShow.reset();
-            thisMode.TextFrameCorrect.play();
-            thisMode.SFXPlayerCorrect.play();
-            unbindKeyListener(thisMode.listener);
-            pressKey = function(choice){};
+                thisMode.TextFrameShow.reset();
+                thisMode.TextFrameCorrect.play();
+                thisMode.SFXPlayerCorrect.play();
+                pressKey = function(choice){};
 
-            switch (thisMode.buzzPlayer) {
-                case 1:
-                    thisMode.Player1AnswerLoop.free();
-                    thisMode.Player1Correct.play();
-                    break;
-                case 2:
-                    thisMode.Player2AnswerLoop.free();
-                    thisMode.Player2Correct.play();
-                    break;
-                case 3:
-                    thisMode.Player3AnswerLoop.free();
-                    thisMode.Player3Correct.play();
-                    break;
-            }
+                switch (thisMode.buzzPlayer) {
+                    case 1:
+                        thisMode.Player1AnswerLoop.free();
+                        thisMode.Player1Correct.play();
+                        break;
+                    case 2:
+                        thisMode.Player2AnswerLoop.free();
+                        thisMode.Player2Correct.play();
+                        break;
+                    case 3:
+                        thisMode.Player3AnswerLoop.free();
+                        thisMode.Player3Correct.play();
+                        break;
+                }
+            };
+            if (thisMode.CorrectAnswer.urlAudio != '') {
+                thisMode.CorrectAnswer.ended(100,correctAnswer);
+                thisMode.CorrectAnswer.play();
+            } else correctAnswer();
         } else if (resultat == 1) { // Presque !
             switch (thisMode.buzzPlayer) {
                 case 1:thisMode.WrongSoClosePlayer1.play();break;
@@ -607,7 +613,9 @@ ModeGibberish.prototype.start = function() {
             });
         } else {
             thisMode.game.api.synchronize(function() {
-                thisMode.ShowQuestion.play();
+                thisMode.ShowQuestion.delay(200,function(){
+                    this.play();
+                });
             });
         }
     });

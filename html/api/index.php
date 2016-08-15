@@ -776,7 +776,8 @@ function resources() {
         $reslist['Gibberish/QuestionHint31'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/9'));
         $reslist['Gibberish/QuestionHint32'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/10'));
         if (!file_exists('../res-full/'.$qhdr['folder'].'/snd/10.ogg')) unset($reslist['Gibberish/QuestionHint32']);
-        // TODO Il existerait un son 11 aussi ? Apparemment le son lors d'une réponse correcte.
+        $reslist['Gibberish/CorrectAnswer'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/11'));
+        if (!file_exists('../res-full/'.$qhdr['folder'].'/snd/11.ogg')) unset($reslist['Gibberish/CorrectAnswer']);
         $reslist['Gibberish/EndQuestion'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/13'));
         $reslist['Gibberish/AboutToRevealAnswer'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/14'));
         $reslist['Gibberish/RevealAnswer'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/16'));

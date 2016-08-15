@@ -351,19 +351,22 @@ function checkTextWrds(text,wrds) {
     for(var i = 0; i < wrds.length; i++) {
         var currentwords = wrds[i];
         var bestpos = 999;
-        var bestword = -1;
+        var bestword = '';
         // On cherche le mot le plus long, qui entre le mieux dans la case (le plus à gauche)
         for(var j = 0; j < currentwords.length; j++) {
-            var p = text.indexOf(' '+cleanText(currentwords[j])+' ');
-            if ((p >= 0) && ((bestpos > p) || ((bestpos == p) && (currentwords[j].length > currentwords[bestword].length)))) {
-                bestpos = p;
-                bestword = j;
+            var word = cleanText(currentwords[j]);
+            if (word != '') {
+                var p = text.indexOf(' ' + word + ' ');
+                if ((p >= 0) && ((bestpos > p) || ((bestpos == p) && (currentwords[j].length > word.length)))) {
+                    bestpos = p;
+                    bestword = word;
+                }
             }
         }
         if (bestpos == 0) numcorrectwords++; // Mot correct !
-        if (bestword != -1) { // Mot trouvé !
+        if (bestword != '') { // Mot trouvé !
             numfoundwords++;
-            text = text.substr(bestpos+currentwords[bestword].length+1) + text.substr(1,bestpos+currentwords[bestword].length+1); // On met le meilleur mot à la fin, si on l'a trouvé. Cela permet de trouver tous les mots, même s'ils sont dans le mauvais ordre.
+            text = text.substr(bestpos+bestword.length+1) + text.substr(1,bestpos+bestword.length+1); // On met le meilleur mot à la fin, si on l'a trouvé. Cela permet de trouver tous les mots, même s'ils sont dans le mauvais ordre.
         }
     }
     if (numcorrectwords == wrds.length) return 2;
