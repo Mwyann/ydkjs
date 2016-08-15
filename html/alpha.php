@@ -3,7 +3,7 @@ session_start();
 
 if (isset($_SESSION['session_id'])) {
   $session_id = intval($_SESSION['session_id']);
-  if ($session_id > 0) {
+  if (($session_id > 0) && ($session_id < 1000000)) {
     require 'api/mysql.inc.php';
     connectMysql('dyn');
     $res = $DB->query("SELECT * FROM sessions WHERE status = 2 AND nbplayers > 0 AND id = " . $session_id);
@@ -20,9 +20,10 @@ if (isset($_SESSION['session_id'])) {
       if ($session['player3'] > 0) $players_id[$session['player3']] = 1;
       $_SESSION['players_ids'] = '#'.implode('#',array_keys($players_id)).'#';
     } else die('Session ID unknown');
-  } else die('Session ID incorrect');
-} else {
-  unset($_SESSION['session_id']);
+  } else unset($_SESSION['session_id']);
+}
+if (!isset($_SESSION['session_id'])) {
+  $_SESSION['session_id'] = rand(1000000,999999999);
   //unset($_SESSION['nbplayers']);
   unset($_SESSION['player1']);
   unset($_SESSION['player2']);

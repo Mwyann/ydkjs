@@ -6,7 +6,7 @@ function YDKJFont() {
     this.textdata = {
         // Miscellaneous
         9:   {font:'JackInput',size:23,color:'#000',halign:'l'}, // Player's name input TODO
-        11:  {font:'JackInput',size:23,color:'#FF0',top:0}, // Player's free answer input (Question, Gibberish) TODO
+        11:  {font:'JackInput',size:23,color:'#FF0',top:0}, // Player's free answer input (Question, Gibberish)
         // Player's names and scores
         110: {font:'JackRoman',size:23,color:['#FFF','#0F0','#F00']}, // Player 1's name
         115: {font:'JackRoman',size:23,color:['#FFF','#0F0','#F00']}, // Player 1's score
@@ -49,9 +49,9 @@ function YDKJFont() {
         1400:{font:'JackRoman',size:20,color:'#33F',halign:'l'}, // Category title, header
         1410:{font:'JackRoman',size:29,color:'#FF0'}, // Subject
         1420:{font:'JackExtraCond',size:[64,42],color:'#FFF'}, // Question
-        1430:{font:'JackCondensed',size:22,color:['#FF0','#F00']}, // First answer
+        1430:{font:'JackCondensed',size:22,color:['#FF0','#F00'],top:-1}, // First answer
         1435:{font:'JackCondensed',size:32,color:'#F00'}, // First answer, big (pushed)
-        1440:{font:'JackCondensed',size:22,color:['#FF0','#F00']}, // Second answer
+        1440:{font:'JackCondensed',size:22,color:['#FF0','#F00'],top:-1}, // Second answer
         1445:{font:'JackCondensed',size:32,color:'#F00'}, // Second answer, big (pushed)
         1470:{font:'JackExtraCond',size:83,color:['#090','#33F','#063']}, // Temporary score (bottom left)
         1475:{font:'JackExtraCond',size:83,color:['#0F0','#900','#F00']}, // Temporary score (bottom left), second color scheme
@@ -94,7 +94,6 @@ function YDKJFont() {
         1627:{font:'JackRoman',size:[38,29,23],color:'#AAA'},
         1630:{font:'JackRoman',size:[29,23],color:'#666'},
         1635:{font:'JackRoman',size:[29,23],color:'#666'},
-
     };
 }
 

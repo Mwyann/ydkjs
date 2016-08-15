@@ -13,8 +13,8 @@ $localMode = 0;
 if (isset($_SESSION['session_id'])) $session_id = intval($_SESSION['session_id']);
 if ($session_id <= 0) { // Si pas de numéro de session renseigné, on en génère un aléatoirement et on reste en mode local
     $session_id = rand(1000000,999999999);
-    $localMode = 1;
 }
+if ($session_id >= 1000000) $localMode = 1;
 $player_id = 0;
 if (isset($_SESSION['player_id'])) $player_id = intval($_SESSION['player_id']);
 // Liste des IDs des autres joueurs (entourés de #, exemple : #123#456#789#)
