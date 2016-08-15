@@ -252,6 +252,7 @@ ModeQuestion.prototype.start = function() {
             } else {
                 if ((choice >= 49) && (choice <= 52)) { // Si réponses 1 à 4 : 1 seul joueur = réponse directe, 2 ou 3 joueurs : "On appuie d'abord sur la lettre !"
                     if (thisMode.game.players.length == 1) {
+                        if (!thisMode.game.players[0].keycode) return false; // Ce joueur ne peut pas répondre
                         autoAnswerPlayer1();
                         pressKey(choice);
                     } else if (misskeyallowed) {

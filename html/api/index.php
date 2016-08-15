@@ -101,7 +101,7 @@ function gameinfo() {
             array('name' => $noms[2],'score' => 0,'screw' => 0,'keycode' => 112)
         );
 
-    if ((!$localMode) && ($nbplayers > 1)) {
+    if (!$localMode) {
         for($i = 0; $i < $nbplayers; $i++) if ((isset($_SESSION['player'.($i+1)])) && ($_SESSION['player'.($i+1)]['id'] != $player_id)) $players[$i]['keycode'] = 0; // Pas un joueur local, on supprime donc son keycode
     }
 
