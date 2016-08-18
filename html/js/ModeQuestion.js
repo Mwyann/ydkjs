@@ -554,8 +554,8 @@ ModeQuestion.prototype.start = function() {
         thisMode.timerTimeout = setTimeout(timerRunning,800);
         thisMode.currentPlayer = thisMode.buzzPlayer; // Le joueur peut enfin répondre
         thisMode.buzzPlayer = 0;
-        registerPlayerAnswer(); // On détecte d'abord une réponse, car si on inverse, on va accepter les deux évènements immédiatement
         registerPlayerBuzzIgnore(); // Déplacé ici car si deux appuis trop rapides venant de l'API, le 2eme appui risque d'être ignoré à cause du return juste au dessus.
+        registerPlayerAnswer();
 
         // Vas-y joueur X
         if (thisMode.currentPlayer == 1) {
@@ -628,8 +628,8 @@ ModeQuestion.prototype.start = function() {
         thisMode.listener = bindKeyListener(function(choice) {
             pressKey(choice);
         });
+        if (thisMode.game.players.length == 1) registerPlayerAnswer();  // On détecte d'abord une réponse, car si on inverse, on va accepter les deux évènements immédiatement
         registerPlayerBuzz();
-        if (thisMode.game.players.length == 1) registerPlayerAnswer();
     });
 
     this.ShowQuestion.ended(500,function(){
