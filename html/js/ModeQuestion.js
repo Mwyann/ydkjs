@@ -117,9 +117,18 @@ ModeQuestion.prototype.start = function() {
         });
     }
 
+    var unregisterPlayerBuzz = function() {
+        thisMode.game.api.unregisteraction('playerBuzz');
+    };
+
+    var unregisterPlayerAnswer = function() {
+        thisMode.game.api.unregisteraction('playerAnswer');
+    };
+
     var playerBuzz = function() {
         if (thisMode.buzzPlayer) {
             clearTimeout(thisMode.timerTimeout);
+            unregisterPlayerAnswer();
             thisMode.Question.free();
             thisMode.Answers.free();
             thisMode.JingleReadQuestion.free();
@@ -225,14 +234,6 @@ ModeQuestion.prototype.start = function() {
         });
     };
 
-    var unregisterPlayerBuzz = function() {
-        thisMode.game.api.unregisteraction('playerBuzz');
-    };
-
-    var unregisterPlayerAnswer = function() {
-        thisMode.game.api.unregisteraction('playerAnswer');
-    };
-
     var pressKey = function(choice) {
         if (!choice) return false; // Si on se voit envoyer 0 à cause d'un clic sur un joueur à keycode 0
         if (thisMode.currentPlayer == 0) {
@@ -247,7 +248,6 @@ ModeQuestion.prototype.start = function() {
             if (!thisMode.availPlayers[thisMode.buzzPlayer]) thisMode.buzzPlayer = 0;
 
             if (thisMode.buzzPlayer) {
-                unregisterPlayerAnswer();
                 thisMode.game.api.postaction({action: 'playerBuzz', value: thisMode.buzzPlayer});
                 playerBuzz();
             } else {
@@ -277,6 +277,7 @@ ModeQuestion.prototype.start = function() {
     };
 
     this.EndQuestion.ended(function(){
+        clearTimeout(thisMode.timerTimeout);
         nextcategoryready(function(nextcategory) {
             nextcategory.modeObj.MusicChooseCategoryStart.delay(Math.max(500,2500-thisMode.EndQuestion.length()),function () {
                 nextcategory.start();
@@ -326,7 +327,6 @@ ModeQuestion.prototype.start = function() {
         unbindKeyListener(thisMode.listener);
         registerPlayerBuzzIgnore();
         registerPlayerAnswerIgnore();
-
 
         var revealAnswer;
         var nbAns = 0;
