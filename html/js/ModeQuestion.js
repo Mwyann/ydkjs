@@ -128,6 +128,7 @@ ModeQuestion.prototype.start = function() {
     var playerBuzz = function() {
         if (thisMode.buzzPlayer) {
             clearTimeout(thisMode.timerTimeout);
+            thisMode.timerTimeout = 0;
             unregisterPlayerAnswer();
             thisMode.Question.free();
             thisMode.Answers.free();
@@ -157,6 +158,7 @@ ModeQuestion.prototype.start = function() {
     var autoAnswerPlayer1 = function() {
         thisMode.currentPlayer = 1;
         clearTimeout(thisMode.timerTimeout);
+        thisMode.timerTimeout = 0;
         thisMode.Question.free();
         thisMode.Answers.free();
         thisMode.JingleReadQuestion.free();
@@ -170,6 +172,7 @@ ModeQuestion.prototype.start = function() {
         if ((!thisMode.currentPlayer) && (thisMode.game.players.length == 1)) autoAnswerPlayer1();
         if (thisMode.currentAns) {
             clearTimeout(thisMode.timerTimeout);
+            thisMode.timerTimeout = 0;
             switch (thisMode.currentPlayer) {
                 case 1:
                     thisMode.Player1Buzzed.free();
@@ -277,7 +280,7 @@ ModeQuestion.prototype.start = function() {
     };
 
     this.EndQuestion.ended(function(){
-        clearTimeout(thisMode.timerTimeout);
+        if (thisMode.timerTimeout) clearTimeout(thisMode.timerTimeout);
         nextcategoryready(function(nextcategory) {
             nextcategory.modeObj.MusicChooseCategoryStart.delay(Math.max(500,2500-thisMode.EndQuestion.length()),function () {
                 nextcategory.start();
@@ -440,6 +443,7 @@ ModeQuestion.prototype.start = function() {
 
     this.JingleTimer.ended(function(){
         clearTimeout(thisMode.timerTimeout);
+        thisMode.timerTimeout = 0;
         this.delay(200,function(){
             thisMode.currentAns = -1;
             this.reset();
@@ -550,8 +554,8 @@ ModeQuestion.prototype.start = function() {
         thisMode.timerTimeout = setTimeout(timerRunning,800);
         thisMode.currentPlayer = thisMode.buzzPlayer; // Le joueur peut enfin répondre
         thisMode.buzzPlayer = 0;
+        registerPlayerAnswer(); // On détecte d'abord une réponse, car si on inverse, on va accepter les deux évènements immédiatement
         registerPlayerBuzzIgnore(); // Déplacé ici car si deux appuis trop rapides venant de l'API, le 2eme appui risque d'être ignoré à cause du return juste au dessus.
-        registerPlayerAnswer();
 
         // Vas-y joueur X
         if (thisMode.currentPlayer == 1) {
