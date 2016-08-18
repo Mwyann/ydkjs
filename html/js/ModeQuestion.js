@@ -247,6 +247,7 @@ ModeQuestion.prototype.start = function() {
             if (!thisMode.availPlayers[thisMode.buzzPlayer]) thisMode.buzzPlayer = 0;
 
             if (thisMode.buzzPlayer) {
+                unregisterPlayerAnswer();
                 thisMode.game.api.postaction({action: 'playerBuzz', value: thisMode.buzzPlayer});
                 playerBuzz();
             } else {

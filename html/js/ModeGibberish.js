@@ -218,6 +218,13 @@ ModeGibberish.prototype.start = function() {
     this.EndQuestion.ended(function(){jumpToNextCategory(thisMode.EndQuestion.length())});
     this.RevealAnswer.ended(function(){jumpToNextCategory(thisMode.RevealAnswer.length())});
 
+    var revealAnswer = function() {
+        registerPlayerBuzzIgnore();
+        thisMode.typeframe.showAnswer(getSTRfromID(thisMode.STR,'Ansr',128),function() {
+            thisMode.SFXShowAnswerAudience.play();
+        });
+    };
+
     this.SFXPlayerCorrect.ended(function(){
         var thisSFX = this;
         this.delay(300,function(){
@@ -255,7 +262,7 @@ ModeGibberish.prototype.start = function() {
                 thisMode.TimerDance.play();
                 thisMode.timerInterval = setInterval(runTimer, 750);
             } else {
-                thisMode.AboutToRevealAnswer.play();
+                if (thisMode.AboutToRevealAnswer.urlAudio != '') thisMode.AboutToRevealAnswer.play(); else revealAnswer();
             }
         });
     });
@@ -522,15 +529,10 @@ ModeGibberish.prototype.start = function() {
         if (thisMode.RevealAnswer.urlAudio != '') thisMode.RevealAnswer.play(); else thisMode.EndQuestion.play();
     });
 
-    this.AboutToRevealAnswer.ended(100,function(){
-        registerPlayerBuzzIgnore();
-        thisMode.typeframe.showAnswer(getSTRfromID(thisMode.STR,'Ansr',128),function() {
-            thisMode.SFXShowAnswerAudience.play();
-        });
-    });
+    this.AboutToRevealAnswer.ended(100,revealAnswer);
 
     this.TimerTimeOut.ended(100,function() {
-        thisMode.AboutToRevealAnswer.play();
+        if (thisMode.AboutToRevealAnswer.urlAudio != '') thisMode.AboutToRevealAnswer.play(); else revealAnswer();
     });
 
     this.QuestionHint31.ended(300,function() {

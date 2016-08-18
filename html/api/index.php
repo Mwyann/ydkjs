@@ -778,6 +778,7 @@ function resources() {
         if (!file_exists('../res-full/'.$qhdr['folder'].'/snd/11.ogg')) unset($reslist['Gibberish/CorrectAnswer']);
         $reslist['Gibberish/EndQuestion'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/13'));
         $reslist['Gibberish/AboutToRevealAnswer'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/14'));
+        if (!file_exists('../res-full/'.$qhdr['folder'].'/snd/14.ogg')) unset($reslist['Gibberish/AboutToRevealAnswer']);
         $reslist['Gibberish/RevealAnswer'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/16'));
         if (!file_exists('../res-full/'.$qhdr['folder'].'/snd/16.ogg')) unset($reslist['Gibberish/RevealAnswer']);
 
