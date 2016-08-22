@@ -19,11 +19,11 @@ function AudioSpecs() {
             this.playDelay = -25;
             this.stopDelay = 25;
             this.maxVolume = 0.5;
-        } else { // Chrome Mobile
-            this.playDelay = -300;
-            this.stopDelay = -200;
+        } else { // Chrome Mobile (en fait mêmes caractéristiques que la version Desktop désormais)
+            this.playDelay = -25;
+            this.stopDelay = 25;
             this.maxVolume = 0.5;
-            this.lengthOffset = -600;
+            //this.lengthOffset = -600;
         }
     }
     if(this.is.ff) this.playDelay = -25;
@@ -149,7 +149,7 @@ InputTextFrame.prototype.start = function() {
         thisFrame.resetblink();
     });
 
-    this.game.font.strings[11] = '<span¤class="inputframe"></span><img¤src="'+ITFcursordata+'"¤style="vertical-align:-8px;padding-bottom:3px;visibility:hidden;margin-left:-4px"¤class="cursor">';
+    this.game.font.strings[11] = '<span class="inputframe"></span><img src="'+ITFcursordata+'" style="vertical-align:-8px;padding-bottom:3px;visibility:hidden;margin-left:-4px" class="cursor">';
     this.SFXTypeHeartBeat.reset();
     this.TextFrameShow.reset();
     this.TextFrameShow.play();
@@ -160,7 +160,7 @@ InputTextFrame.prototype.start = function() {
 InputTextFrame.prototype.sendKeypress = function(key) {
     if (!this.inputframe) return false;
     if (key == 13) { // Entrée
-        this.game.font.strings[11] = this.inputframe.html().replace(' ','¤');
+        this.game.font.strings[11] = this.inputframe.html();
         this.inputframe = 0;
         this.enter();
         return true;
@@ -191,7 +191,7 @@ InputTextFrame.prototype.wrong = function(callback) {
 
     var eraseInterval = setInterval(function() {
         if (thisFrame.text == '') {
-            thisFrame.game.font.strings[11] = '<img¤src="'+ITFcursordata+'"¤style="vertical-align:-8px;padding-bottom:3px;margin-left:-4px"¤class="cursor">';
+            thisFrame.game.font.strings[11] = '<img src="'+ITFcursordata+'" style="vertical-align:-8px;padding-bottom:3px;margin-left:-4px" class="cursor">';
             clearInterval(eraseInterval);
             thisFrame.SFXEraseAnswer.reset();
             if (callback) callback();
@@ -212,14 +212,14 @@ InputTextFrame.prototype.showAnswer = function(answer,callback) {
         this.play();
     });
     this.SFXShowTextFrame.play();
-    this.game.font.strings[11] = '<span¤class="inputframe"></span>';
+    this.game.font.strings[11] = '<span class="inputframe"></span>';
     this.ShowAnswerTyping.play();
     var inputframe = this.game.html.screen.find('.inputframe');
     this.text = '';
 
     var showAnswer = setInterval(function() {
         if (answer == '') {
-            thisFrame.game.font.strings[11] = inputframe.html().replace(' ','¤');
+            thisFrame.game.font.strings[11] = inputframe.html();
             clearInterval(showAnswer);
             thisFrame.SFXShowTextFrame.free();
             thisFrame.ShowAnswerTyping.free();
@@ -600,3 +600,14 @@ MersenneTwister.prototype.integer = function (min,max) {
     // See: http://vq.io/132sa2j
     return Math.floor(this.random() * (max - min + 1) + min);
 };
+
+/*
+ jquery.fullscreen 1.1.4
+ https://github.com/kayahr/jquery-fullscreen-plugin
+ Copyright (C) 2012 Klaus Reimer <k@ailis.de>
+ Licensed under the MIT license
+ (See http://www.opensource.org/licenses/mit-license)
+ */
+function d(b){var c,a;if(!this.length)return this;c=this[0];c.ownerDocument?a=c.ownerDocument:(a=c,c=a.documentElement);if(null==b){if(!a.cancelFullScreen&&!a.webkitCancelFullScreen&&!a.mozCancelFullScreen)return null;b=!!a.fullScreen||!!a.webkitIsFullScreen||!!a.mozFullScreen;return!b?b:a.fullScreenElement||a.webkitCurrentFullScreenElement||a.mozFullScreenElement||b}b?(b=c.requestFullScreen||c.webkitRequestFullScreen||c.mozRequestFullScreen)&&b.call(c,Element.ALLOW_KEYBOARD_INPUT):(b=a.cancelFullScreen||
+    a.webkitCancelFullScreen||a.mozCancelFullScreen)&&b.call(a);return this}jQuery.fn.fullScreen=d;jQuery.fn.toggleFullScreen=function(){return d.call(this,!d.call(this))};var e,f,g;e=document;e.webkitCancelFullScreen?(f="webkitfullscreenchange",g="webkitfullscreenerror"):e.mozCancelFullScreen?(f="mozfullscreenchange",g="mozfullscreenerror"):(f="fullscreenchange",g="fullscreenerror");jQuery(document).bind(f,function(){jQuery(document).trigger(new jQuery.Event("fullscreenchange"))});
+jQuery(document).bind(g,function(){jQuery(document).trigger(new jQuery.Event("fullscreenerror"))});

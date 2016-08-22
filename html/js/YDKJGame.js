@@ -27,17 +27,24 @@ function YDKJGame(html, demomode) {
         onresize();
     });
 
+    this.fullscreenoff = function() {
+        body.fullScreen(false);
+        onresize = function() {};
+        body.attr('style',oldcssbody);
+        thisGame.html.screen.attr('style',oldcssscreen);
+        onfullscreenoff();
+        onfullscreenoff = function() {};
+        oldcssbody = undefined;
+        oldcssscreen = undefined;
+    };
+
     thewindow.keyup(function(event) {
-        if ((event.keyCode == 27) && (oldcssbody !== undefined) && (oldcssscreen !== undefined)) {
-            onresize = function() {};
-            body.attr('style',oldcssbody);
-            thisGame.html.screen.attr('style',oldcssscreen);
-            onfullscreenoff();
-            onfullscreenoff = function() {};
-        }
+        if ((event.keyCode == 27) && (oldcssbody !== undefined) && (oldcssscreen !== undefined)) thisGame.fullscreenoff();
     });
 
     this.fullscreen = function(f) {
+        if ((oldcssbody !== undefined) && (oldcssscreen !== undefined)) return false;
+        body.fullScreen(true);
         var autozoom = function() {
             var zoom = Math.min(jQuery(window).width()/640,jQuery(window).height()/480);
             var centerup = Math.max(0,Math.round((jQuery(window).height()-(zoom*480))/2));
@@ -63,7 +70,11 @@ function YDKJGame(html, demomode) {
 
         onresize = autozoom;
         autozoom();
-    }
+    };
+
+    body.bind("fullscreenchange", function(e) {
+        if (body.fullScreen()) thisGame.fullscreen(function() {}); else thisGame.fullscreenoff();
+    });
 }
 
 YDKJGame.prototype.start = function() {
@@ -125,7 +136,7 @@ YDKJGame.prototype.displayCurrency = function(value) {
         return minus+'$'+value.toString();
     }
     if (this.locale == 'de_DE') {
-        return minus+'<span¤style="font-size:70%">DM</span>'+value.toString(); // The ¤ symbol will be replaced by a space later.
+        return minus+'<span style="font-size:70%">DM</span>'+value.toString();
     }
     return value.toString();
 };

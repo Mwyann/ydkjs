@@ -298,6 +298,7 @@ session_write_close();
     <input type="checkbox" id="nbquestions21" disabled="disabled" /> <label for="nbquestions21">21 questions (7 si décoché)</label> <input type="checkbox" id="public" disabled="disabled" /> <label for="public">Partie publique</label> <input type="checkbox" id="sound"/> <label for="sound">Son à la connexion d'un nouveau joueur</label>
 </div>
 <div style="margin:20px auto 10px auto; text-align:center"><input type="button" id="start_game" value="Chargement..." disabled/></div>
+<div style="margin:20px auto 10px auto; text-align:center; color:#FF0">Note : Il y a eu récemment une importante mise à jour du jeu, et il est possible que vous rencontriez quelques bugs (arrêt du jeu, bug graphique gênant...). Si tel est le cas, envoyez moi un <a href="mailto:alpha@ydkj.fr" style="color:#FFF">e-mail</a> avec une description du problème, et je jetterai un oeil. Merci !</div>
 </div>
 <div style="margin:20px auto 10px auto; text-align:center"><a href="findsession.php" style="color:#666">Trouver une autre partie publique</a> - <a href="./" style="color:#666">Retour à l'accueil</a></div>
 <?php require 'analytics.php'; ?>

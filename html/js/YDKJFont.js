@@ -308,19 +308,20 @@ YDKJFont.prototype.makeText = function(textid, width, height, transforms, val, d
         if (textdata.size[sizeid] === undefined) sizeid = 0;
 
         var lookupsize = 1;
-        while (lookupsize && (sizeid < textdata.size.length)) { // If font size is too big for the container, we'd liek to try some more
+        while (lookupsize && (sizeid < textdata.size.length)) { // If font size is too big for the container, we'd like to try some more
             var fontsize = Math.floor(textdata.size[sizeid] * this.fontdata[font].heightratio).toFixed(0);
             var left = 0;
             //var top = -2-Math.floor(textdata.size[sizeid]*this.fontdata[font].topratio).toFixed(0);
             var top = -3;
             if (typeof textdata.top != "undefined") top = textdata.top;
 
-            if (font != 'JackInput') string = string.replace(/ /g, '&#8197;').replace(/\u00A0/g, '&#8288;'); // &#8288; == WORD-JOINER : pas d'espace, mais insécable
+            if (font != 'JackInput') string = string.replace(/\u00A0/g, '&nbsp;');
             div.css({
                 'left': left + 'px',
                 'top': top + 'px',
-                'font': (fontsize) + 'px/' + (fontsize) + 'px "' + font + '"'
-            }).html(string.replace(/(\n)+/g, '<br/>').replace(/¤/g,' ')); // Line breaks and thin spaces and forced spaces
+                'font': (fontsize) + 'px/' + (fontsize) + 'px "' + font + '"',
+                'word-spacing': '-0.07em'
+            }).html(string.replace(/(\n)+/g, '<br/>')); // Line breaks
 
             if ((textdata.sizeid === undefined) && (textdata.size.length > 1)) { // Try to find the best fitting font size, once and for all
                 var tmpdiv = div.clone();
