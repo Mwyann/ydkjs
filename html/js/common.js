@@ -17,19 +17,23 @@ function AudioSpecs() {
     if(this.is.chrome) {
         if(!this.mobile) { // Chrome Desktop
             this.playDelay = -25;
-            this.stopDelay = 25;
+            this.stopDelay = 300;
             this.maxVolume = 0.5;
-        } else { // Chrome Mobile (en fait mêmes caractéristiques que la version Desktop désormais)
+        } else { // Chrome Mobile
             this.playDelay = -25;
             this.stopDelay = 25;
             this.maxVolume = 0.5;
             //this.lengthOffset = -600;
         }
     }
-    if(this.is.ff) this.playDelay = -25;
-    if(this.is.ff) this.stopDelay = 85;
-    if(this.is.opera) this.playDelay = 5;
-    if(this.is.opera) this.stopDelay = 0;
+    if(this.is.ff) {
+        this.playDelay = -25;
+        this.stopDelay = 85;
+    }
+    if(this.is.opera) {
+        this.playDelay = 5;
+        this.stopDelay = 0;
+    }
 }
 
 var audiospecs = new AudioSpecs();
@@ -147,6 +151,25 @@ InputTextFrame.prototype.start = function() {
         thisFrame.inputframe = thisFrame.game.html.screen.find('.inputframe');
         thisFrame.SFXTypeHeartBeat.play();
         thisFrame.resetblink();
+    });
+
+    this.TextFrameShow.ended(function() {
+        var textframediv = this.getDiv();
+        var input = $('<input type="text" style="width:100%;height:100%;position:absolute;top:0;left:0;opacity:0" />');
+        $(textframediv).find('div').find('div:first').append(input);
+        input.focus();
+        /*input.on('keypress',function(original_e) {
+            var e = jQuery.Event("keypress");
+            e.which = original_e.which; // # Some key code value
+            jQuery(window).trigger(e);
+            return true;
+        });
+        input.on('keydown',function(original_e) {
+            var e = jQuery.Event("keydown");
+            e.which = original_e.which; // # Some key code value
+            jQuery(window).trigger(e);
+            return true;
+        });*/
     });
 
     this.game.font.strings[11] = '<span class="inputframe"></span><img src="'+ITFcursordata+'" style="vertical-align:-8px;padding-bottom:3px;visibility:hidden;margin-left:-4px" class="cursor">';
@@ -355,6 +378,7 @@ function checkTextWrds(text,wrds) {
         // On cherche le mot le plus long, qui entre le mieux dans la case (le plus à gauche)
         for(var j = 0; j < currentwords.length; j++) {
             var word = cleanText(currentwords[j]);
+            console.log(word);
             if (word != '') {
                 var p = text.indexOf(' ' + word + ' ');
                 if ((p >= 0) && ((bestpos > p) || ((bestpos == p) && (currentwords[j].length > word.length)))) {
@@ -368,6 +392,7 @@ function checkTextWrds(text,wrds) {
             numfoundwords++;
             text = text.substr(bestpos+bestword.length+1) + text.substr(1,bestpos+bestword.length+1); // On met le meilleur mot à la fin, si on l'a trouvé. Cela permet de trouver tous les mots, même s'ils sont dans le mauvais ordre.
         }
+        console.log(text);
     }
     if (numcorrectwords == wrds.length) return 2;
     if (numfoundwords >= wrds.length/2) return 1;
