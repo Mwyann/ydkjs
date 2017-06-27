@@ -2,7 +2,7 @@
 <html>
 <head>
     <title></title>
-    <script src="../js/jquery-3.0.0.min.js" type="text/javascript"></script>
+    <script src="../js/jquery-3.2.1.min.js" type="text/javascript"></script>
     <script src="../js/AudioManager.js" type="text/javascript"></script>
     <script src="../js/common.js" type="text/javascript"></script>
     <script src="../js/SeamlessLoop.js" type="text/javascript"></script>

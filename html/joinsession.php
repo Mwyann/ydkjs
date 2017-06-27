@@ -63,7 +63,7 @@ session_write_close();
     <title>You Don't Know Jack® ALPHA FR</title>
     <link href="css/ydkj.css" rel="stylesheet"/>
     <script src="js/HackTimer.min.js" type="text/javascript"></script>
-    <script src="js/jquery-3.0.0.min.js" type="text/javascript"></script>
+    <script src="js/jquery-3.2.1.min.js" type="text/javascript"></script>
 
     <script type="text/javascript">
         (function(){
