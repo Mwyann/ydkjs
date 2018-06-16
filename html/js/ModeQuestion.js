@@ -681,9 +681,12 @@ ModeQuestion.prototype.start = function() {
         thisMode.ShowHeader.play();
     });
 
-    this.HideValue.ended(300,function() {
+    this.HideValue.ended(function() {
         this.free();
-        thisMode.TimerComesIn.play();
+        thisMode.game.html.screen.find('.markedAsRemoved').remove(); // Evite un glitch visuel où le texte ne disparait pas complètement
+        setTimeout(function() {
+            thisMode.TimerComesIn.play();
+        },300);
     });
 
     this.VoiceAnnounceValue.ended(function(){
