@@ -732,7 +732,7 @@ ModeDisOrDat.prototype.start = function() {
 
         var i;
 
-        if (thisMode.game.players[thisMode.chooseplayer-1].keycode) { // Joueur local
+        if (hasKeycode(thisMode.game.players[thisMode.chooseplayer-1].keycode)) { // Joueur local
             for(i = 0; i < buttonsAnswer.length; i++) if (buttonsAnswer[i]) {
                 (function(){
                     var j = i;
@@ -1048,7 +1048,7 @@ ModeDisOrDat.prototype.start = function() {
                 doskipexplanations();
             };
 
-            if (thisMode.game.players[thisMode.chooseplayer-1].keycode) { // Joueur local
+            if (hasKeycode(thisMode.game.players[thisMode.chooseplayer-1].keycode)) { // Joueur local
                 skiplistener = bindKeyListener(function (choice) {
                     if (choice == 32) skipexplanations(); // Barre espace = on passe les explications
                 });

@@ -102,7 +102,7 @@ ModeCategory.prototype.start = function() {
     this.SFXChoiceCategory.ended(100,function(){
         thisMode.ChooseCategoryPlayer.play();
         thisMode.SFXChoiceCategory.reset(true);
-        if (thisMode.game.players[thisMode.chooseplayer-1].keycode) { // Joueur local
+        if (hasKeycode(thisMode.game.players[thisMode.chooseplayer-1].keycode)) { // Joueur local
             listener = bindKeyListener(function (choice) {
                 var chosed = 0;
                 if (choice == 49) chosed = 1;

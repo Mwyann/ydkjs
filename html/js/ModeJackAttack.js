@@ -320,9 +320,9 @@ ModeJackAttack.prototype.start = function() {
         if (currentAnswer > 50) return false; // Dès qu'on a trouvé la bonne réponse on ignore les appuis sur les touches
         if (currentAnswer == 0) return false;
         var buzzPlayer = 0;
-        if (choice == thisMode.game.players[0].keycode) buzzPlayer = 1; // Joueur 1
-        if (thisMode.game.players.length >= 2) if (choice == thisMode.game.players[1].keycode) buzzPlayer = 2; // Joueur 2
-        if (thisMode.game.players.length == 3) if (choice == thisMode.game.players[2].keycode) buzzPlayer = 3; // Joueur 3
+        if (findKeycode(choice, thisMode.game.players[0].keycode)) buzzPlayer = 1; // Joueur 1
+        if (thisMode.game.players.length >= 2) if (findKeycode(choice, thisMode.game.players[1].keycode)) buzzPlayer = 2; // Joueur 2
+        if (thisMode.game.players.length == 3) if (findKeycode(choice, thisMode.game.players[2].keycode)) buzzPlayer = 3; // Joueur 3
 
         if (buzzPlayer) {
             thisMode.game.api.postaction({action: 'playerAnswer', player: buzzPlayer, answer: currentAnswer});

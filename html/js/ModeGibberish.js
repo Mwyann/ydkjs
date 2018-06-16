@@ -446,7 +446,7 @@ ModeGibberish.prototype.start = function() {
 
         unbindKeyListener(thisMode.listener);
         registerTypeAnswer(); // Réaction à l'api
-        if (thisMode.game.players[thisMode.buzzPlayer-1].keycode) { // Ce joueur peut répondre
+        if (hasKeycode(thisMode.game.players[thisMode.buzzPlayer-1].keycode)) { // Ce joueur peut répondre
             typelistener = bindKeyListener(function(key) {
                 thisMode.game.api.postaction({action: 'typeAnswer', value: key});
                 thisMode.typeframe.sendKeypress(key);
@@ -506,12 +506,12 @@ ModeGibberish.prototype.start = function() {
     var pressKey = function(choice) {
         if (!choice) return false; // Si on se voit envoyer 0 à cause d'un clic sur un joueur à keycode 0
         if (thisMode.buzzPlayer != 0) return false; // On a déjà un joueur en attente
-        if (choice == thisMode.game.players[0].keycode) thisMode.buzzPlayer = 1; // Joueur 1
+        if (findKeycode(choice, thisMode.game.players[0].keycode)) thisMode.buzzPlayer = 1; // Joueur 1
         if (thisMode.game.players.length >= 2) {
-            if (choice == thisMode.game.players[1].keycode) thisMode.buzzPlayer = 2; // Joueur 2
+            if (findKeycode(choice, thisMode.game.players[1].keycode)) thisMode.buzzPlayer = 2; // Joueur 2
         }
         if (thisMode.game.players.length == 3) {
-            if (choice == thisMode.game.players[2].keycode) thisMode.buzzPlayer = 3; // Joueur 3
+            if (findKeycode(choice, thisMode.game.players[2].keycode)) thisMode.buzzPlayer = 3; // Joueur 3
         }
         if (!thisMode.availPlayers[thisMode.buzzPlayer]) thisMode.buzzPlayer = 0;
 
@@ -583,14 +583,14 @@ ModeGibberish.prototype.start = function() {
 
         thisMode.availPlayers = [];
         thisMode.availPlayers[1] = 1;
-        thisMode.Player1ShowKey.click(function(){pressKey(thisMode.game.players[0].keycode)});
+        thisMode.Player1ShowKey.click(function(){pressKey(firstKeycode(thisMode.game.players[0].keycode))});
         if (thisMode.game.players.length >= 2) {
             thisMode.availPlayers[2] = 1;
-            thisMode.Player2ShowKey.click(function(){pressKey(thisMode.game.players[1].keycode)});
+            thisMode.Player2ShowKey.click(function(){pressKey(firstKeycode(thisMode.game.players[1].keycode))});
         }
         if (thisMode.game.players.length == 3) {
             thisMode.availPlayers[3] = 1;
-            thisMode.Player3ShowKey.click(function(){pressKey(thisMode.game.players[2].keycode)});
+            thisMode.Player3ShowKey.click(function(){pressKey(firstKeycode(thisMode.game.players[2].keycode))});
         }
 
         registerPlayerBuzz();

@@ -241,12 +241,12 @@ ModeQuestion.prototype.start = function() {
         if (!choice) return false; // Si on se voit envoyer 0 à cause d'un clic sur un joueur à keycode 0
         if (thisMode.currentPlayer == 0) {
             if (thisMode.buzzPlayer != 0) return false; // On a déjà un joueur en attente
-            if (choice == thisMode.game.players[0].keycode) thisMode.buzzPlayer = 1; // Joueur 1
+            if (findKeycode(choice, thisMode.game.players[0].keycode)) thisMode.buzzPlayer = 1; // Joueur 1
             if (thisMode.game.players.length >= 2) {
-                if (choice == thisMode.game.players[1].keycode) thisMode.buzzPlayer = 2; // Joueur 2
+                if (findKeycode(choice, thisMode.game.players[1].keycode)) thisMode.buzzPlayer = 2; // Joueur 2
             }
             if (thisMode.game.players.length == 3) {
-                if (choice == thisMode.game.players[2].keycode) thisMode.buzzPlayer = 3; // Joueur 3
+                if (findKeycode(choice, thisMode.game.players[2].keycode)) thisMode.buzzPlayer = 3; // Joueur 3
             }
             if (!thisMode.availPlayers[thisMode.buzzPlayer]) thisMode.buzzPlayer = 0;
 
@@ -256,7 +256,7 @@ ModeQuestion.prototype.start = function() {
             } else {
                 if ((choice >= 49) && (choice <= 52)) { // Si réponses 1 à 4 : 1 seul joueur = réponse directe, 2 ou 3 joueurs : "On appuie d'abord sur la lettre !"
                     if (thisMode.game.players.length == 1) {
-                        if (!thisMode.game.players[0].keycode) return false; // Ce joueur ne peut pas répondre
+                        if (!hasKeycode(thisMode.game.players[0].keycode)) return false; // Ce joueur ne peut pas répondre
                         autoAnswerPlayer1();
                         pressKey(choice);
                     } else if (misskeyallowed) {
@@ -267,7 +267,7 @@ ModeQuestion.prototype.start = function() {
                 }
             }
         } else if (thisMode.currentAns == 0) { // Réponse d'un joueur
-            if (!thisMode.game.players[thisMode.currentPlayer-1].keycode) return false; // Ce joueur ne peut pas répondre
+            if (!hasKeycode(thisMode.game.players[thisMode.currentPlayer-1].keycode)) return false; // Ce joueur ne peut pas répondre
             if (choice == 49) thisMode.currentAns = 1;
             if (choice == 50) thisMode.currentAns = 2;
             if (choice == 51) thisMode.currentAns = 3;
@@ -665,13 +665,13 @@ ModeQuestion.prototype.start = function() {
         }
         thisMode.Player1ShowKey.delay(200,function(){
             this.play();
-            this.click(function(){pressKey(thisMode.game.players[0].keycode)});
+            this.click(function(){pressKey(firstKeycode(thisMode.game.players[0].keycode))});
             if (thisMode.game.players.length >= 2) thisMode.Player2ShowKey.delay(90,function(){
                 this.play();
-                this.click(function(){pressKey(thisMode.game.players[1].keycode)});
+                this.click(function(){pressKey(firstKeycode(thisMode.game.players[1].keycode))});
                 if (thisMode.game.players.length == 3) thisMode.Player3ShowKey.delay(90,function(){
                     this.play();
-                    this.click(function(){pressKey(thisMode.game.players[2].keycode)});
+                    this.click(function(){pressKey(firstKeycode(thisMode.game.players[2].keycode))});
                 });
             });
         });

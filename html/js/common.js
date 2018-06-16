@@ -86,6 +86,21 @@ function getSTRfromID(STR,type,id) {
     return '';
 }
 
+// Teste si la valeur keycode est bien un tableau et s'il contient au moins une valeur
+function hasKeycode(keycodes) {
+    return ((Array.isArray(keycodes)) && (keycodes.length > 0));
+}
+
+// Teste si la valeur du keycode existe, si on a bien une liste de keycode
+function findKeycode(needle,keycodes) {
+    return ((hasKeycode(keycodes)) && (keycodes.indexOf(needle) !== -1));
+}
+
+// Retourne le premier keycode trouvé, ou zéro si on en a aucun
+function firstKeycode(keycodes) {
+    return (hasKeycode(keycodes))?keycodes[0]:0;
+}
+
 /********** Saisie d'une réponse au clavier **********/
 
 /* Valeurs à intégrer à l'objet :

@@ -633,9 +633,9 @@ YDKJAPI.prototype.initdemo = function() {
     YDKJAPI.prototype.gameinfo = function() {
         var playernames = shuffle(['David','Marité','Marjorie','Frédéric','Olivier','Mathieu','Alicia','Fabrice','Jackqueline','Bruno','Natacha','Jeff','Henri','Barbara','Christophe','Luc','Danièle','Serge','Anita','Alain','Denise','Marcel','Lucette','Gilles','Julien','Adrienne','Camille','Anna','Laurel','Diane','Michelle']);
         var players = [
-            {name:playernames[0],score:0,keycode:113},
-            {name:playernames[1],score:0,keycode:98},
-            {name:playernames[2],score:0,keycode:112}
+            {name:playernames[0],score:0,keycode:[113,81]},
+            {name:playernames[1],score:0,keycode:[98,66]},
+            {name:playernames[2],score:0,keycode:[112,80]}
         ];
 
         return function(f) {f({players: players, locale:'fr_FR', engineVersion: 2, localMode: 1})}
