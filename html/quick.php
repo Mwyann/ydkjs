@@ -10,5 +10,8 @@ $_SESSION['nbplayers'] = $nbplayers;
 $_SESSION['nbquestions'] = 7;
 session_write_close();
 
-header('Location: alpha.php');
+$hash = '';
+if (isset($_GET['fullscreen'])) $hash = '#fullscreen';
+
+header('Location: alpha.php'.$hash);
 die();

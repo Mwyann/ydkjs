@@ -41,6 +41,11 @@ session_write_close();
 <script src="js/jquery-3.3.1.min.js" type="text/javascript"></script>
 <script src="js/YDKJ.js?ver=8" type="text/javascript"></script>
 
+<meta name="viewport" content="width=800,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.json">
+
 <script type="text/javascript">
 
 (function(){
@@ -54,6 +59,9 @@ session_write_close();
       return false;
     });
     game.start();
+    if (window.location.hash.toString().indexOf('fullscreen') >= 0) {
+      jQuery('#fullscreen').click();
+    }
   });
 })();
 

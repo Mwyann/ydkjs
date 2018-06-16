@@ -1,0 +1,16 @@
+{
+  "short_name": "You Don't Know Javascript",
+  "name": "You Don't Know Javascript",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "128x128",
+      "type": "image/gif"
+    }
+  ],
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "start_url": "/quick.php?nbplayers=1&fullscreen=1",
+  "display": "fullscreen",
+  "orientation": "landscape"
+}
