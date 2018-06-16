@@ -39,6 +39,7 @@ function YDKJ(screen, debug) {
 
     loadScript('js/HackTimer.min.js'); // https://github.com/turuslan/HackTimer
     if (typeof Howler == "undefined") loadScript('js/howler.core.min.js'); // https://howlerjs.com/
+    if (typeof NoSleep == "undefined") loadScript('js/NoSleep.min.js'); // https://davidwalsh.name/wake-lock-shim
     if (typeof YDKJGame == "undefined") loadScript('js/YDKJGame.js');
     if (typeof YDKJFont == "undefined") loadScript('js/YDKJFont.js');
     if (typeof YDKJMode == "undefined") loadScript('js/YDKJMode.js');

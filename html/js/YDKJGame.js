@@ -99,10 +99,12 @@ YDKJGame.prototype.start = function() {
                         'left': '0'
                     });
                     useraction.appendTo('body');
+                    var noSleep = new NoSleep();
                     var userok = function() {
                         if (!useraction) return;
                         useraction.remove();
                         useraction = 0;
+                        noSleep.enable();
                         gamemode.start();
                     };
                     jQuery(window).one('touchend',userok).one('mouseup',userok);
