@@ -99,10 +99,13 @@ YDKJGame.prototype.start = function() {
                         'left': '0'
                     });
                     useraction.appendTo('body');
-                    jQuery(window).one('touchend',function() {
+                    var userok = function() {
+                        if (!useraction) return;
                         useraction.remove();
+                        useraction = 0;
                         gamemode.start();
-                    });
+                    };
+                    jQuery(window).one('touchend',userok).one('mouseup',userok);
                 } else gamemode.start();
             });
         });

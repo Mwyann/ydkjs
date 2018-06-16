@@ -3,9 +3,9 @@
   "name": "You Don't Know Javascript",
   "icons": [
     {
-      "src": "/jack.gif",
-      "sizes": "128x128",
-      "type": "image/gif"
+      "src": "/jack.png",
+      "sizes": "32x32",
+      "type": "image/png"
     }
   ],
   "background_color": "#000000",
