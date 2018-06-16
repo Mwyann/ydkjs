@@ -6,6 +6,11 @@
       "src": "/jack.png",
       "sizes": "32x32",
       "type": "image/png"
+    },
+    {
+      "src": "/jack128.png",
+      "sizes": "128x128",
+      "type": "image/png"
     }
   ],
   "background_color": "#000000",
