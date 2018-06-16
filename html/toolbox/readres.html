@@ -5,11 +5,21 @@
 <title>Test YDKJ</title>
 
 <script src="../js/jquery-3.2.1.min.js" type="text/javascript"></script>
-<script src="../js/SeamlessLoop.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="css/ui-lightness/jquery-ui-1.12.0.custom.min.css">
 <link rel="stylesheet" href="../css/ydkj.css"/>
 <script src="js/jquery-ui-1.12.0.custom.min.js"></script>
+
+<style>
+    #anims .timings {
+        font-family: "Courier New", monospace;
+        float:left;
+        width:100px;
+    }
+    #anims a {
+        color:#FFFF00;
+    }
+</style>
 
 <script type="text/javascript">
 var animationSpeed = 66;
@@ -107,37 +117,71 @@ jQuery(document).ready(function() {
             screen.html('');
             debug.html('');
             if (slider) $("#slider").slider({disabled: true});
+            if (animationFile == '') return;
             anim = new YDKJAnimation({urlGif: '../'+animationFile+'.gif', urlJS: '../'+animationFile+'.js'});
             anim.html = {screen: screen, debug: debug};
             anim.font = Font;
             anim.ready(function() {
-            var thisAnim = this;
+                var thisAnim = this;
 
-            $("#slider").slider({
-                value: 0,
-                min: 0,
-                max: thisAnim.frames.length-1,
-                step: 1,
-                disabled: false,
-                slide: function( event, ui ) {
-                    if (anim) anim.free();
-                    anim = new YDKJAnimation({urlGif: '../'+animationFile+'.gif', urlJS: '../'+animationFile+'.js', framestart: ui.value, framestop: ui.value});
-                    anim.html = {screen: screen, debug: debug};
-                    anim.font = Font;
-                    anim.ready(function() {
-                        this.play();
+                $("#slider").slider({
+                    value: 0,
+                    min: 0,
+                    max: thisAnim.frames.length-1,
+                    step: 1,
+                    disabled: false,
+                    slide: function( event, ui ) {
+                        if (anim) anim.free();
+                        anim = new YDKJAnimation({urlGif: '../'+animationFile+'.gif', urlJS: '../'+animationFile+'.js', framestart: ui.value, framestop: ui.value});
+                        anim.html = {screen: screen, debug: debug};
+                        anim.font = Font;
+                        anim.ready(function() {
+                            this.play();
+                        });
+                    }
+                });
+
+                slider= 1;
+            });
+            anim = 0;
+
+            // Chargement des animations présentes en base
+            var anims = $('#anims');
+            jQuery.ajax({
+                url: 'readres.ajax.php',
+                type: 'post',
+                data: {type:'animationList', animationFile:animationFile},
+                dataType: 'json',
+                success: function(data, status, xhr) {
+                    anims.html('');
+                    $(data).each(function(i, t) {
+                        var newanim = $('<div></div>');
+                        var link = $('<a></a>').html(t['name']).attr('href','#').click(function(){
+                            $('#animstop').click();
+                            $('#framefrom').val(t['framestart']);
+                            $('#frameto').val(t['framestop']);
+                            $('#animloop').prop('checked',t['loopani'] == '1');
+                            $('#animplay').click();
+                            return false;
+                        });
+                        newanim.append($('<div></div>').addClass('timings').html(t['framestart']+((t['loopani'] == "1")?'~':'-')+((t['framestop'] === null)?'':t['framestop'])));
+                        newanim.append(link);
+                        if (t['variantType'] != '') newanim.append(' ('+t['variantType']+' = '+t['variantValue']+')');
+                        anims.append(newanim);
                     });
+                },
+                error: function (xhr, ajaxOptions, thrownError){
+
                 }
             });
-            slider= 1;
-          });
-          anim = 0;
         };
 
         var filename = $('#filename');
+        if (window.location.hash != '#') filename.val(window.location.hash.substr(1));
         animationFile = filename.val();
         loadAnim();
         filename.on('change',function() {
+            window.location.hash = '#'+$(this).val();
             animationFile = $(this).val();
             loadAnim();
         });
@@ -181,6 +225,16 @@ jQuery(document).ready(function() {
                 anim = 0;
             }
         });
+
+        $('#clickfrom').on('click',function() {
+            $('#framefrom').val($("#slider").slider("value"));
+            return false;
+        });
+
+        $('#clickto').on('click',function() {
+            $('#frameto').val($("#slider").slider("value"));
+            return false;
+        });
     });
 });
 
@@ -202,9 +256,10 @@ function play(t) {
   <div id="screen" style="background-color:#000;position:relative;width:640px;height:480px;overflow:hidden;margin-left:auto;margin-right:auto;margin-top:30px"></div> <!-- Couleur #EEE pour l'intro -->
   <div id="slider" style="width:90%;margin: 10px auto"></div>
   <div id="debuglive" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;"><br/></div>
-  <div id="debug" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;height:150px;overflow-y:scroll">
+  <div id="debug" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;height:150px;overflow-y:scroll;width:48%;float:left;margin-right:10px">
      Select a file:
      <select id="filename">
+         <option value="">Drop down...</option>
          <option disabled> - SEGUES -</option>
          <option value="res-full/QNUMBERS/off4/-1010">-1010 - Question 1 (1)</option>
          <option value="res-full/QNUMBERS/off4/-2010">-2010 - Question 1 (2)</option>
@@ -360,9 +415,11 @@ function play(t) {
          <option value="res/5QDemo/off4/20000">20000 - Who is this</option>
          <option value="res/5QDemo/off4/21000">21000 - Open Your Eyes</option>
          <option value="res/5QDemo/off4/23000">23000 - Hiscores</option>
-     </select><br/><br/>
-     Play from <input type="text" id="framefrom" style="width:50px"/> to <input type="text" id="frameto" style="width:50px"/> loop <input type="checkbox" id="animloop" /> slow <input type="checkbox" id="animslow" /> blue bg <input type="checkbox" id="bluebg" /> <input type="button" id="animplay" value="Play" /> <input type="button" id="animstop" value="Stop" /><br/><br/>
-
+     </select> slow <input type="checkbox" id="animslow" /> blue bg <input type="checkbox" id="bluebg" /><br/><br/>
+      Play <a href="#" style="color:#FFFFFF" id="clickfrom">from</a> <input type="text" id="framefrom" style="width:50px"/> <a href="#" style="color:#FFFFFF" id="clickto">to</a> <input type="text" id="frameto" style="width:50px"/> loop <input type="checkbox" id="animloop" /> <input type="button" id="animplay" value="Play" /> <input type="button" id="animstop" value="Stop" /><br/><br/>
+      Save as: <input type="text" id="name"/> Group: <input type="text" id="group"/> <input type="button" id="save" value="Save" /><br/><br/>
+  </div>
+  <div id="anims" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;height:150px;overflow-y:scroll;width:48%">
   </div>
   <div id="tmpscreen" style="display:none"></div>
   <div id="preload" style="display:none"></div>

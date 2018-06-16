@@ -106,6 +106,7 @@ YDKJFont.prototype.preload = function(callback){
             (function(font) {
                 var height = thisFont.measureTextHeight('giItT1WQy@!-/#', testheight.toString() + 'px "' + font + '"', 10, 10, parseInt(Math.round(testheight*1.5)), 1500);
                 thisFont.fontdata[font] = {heightratio: testheight / height['height'], topratio: height['top']/testheight};
+                //console.log(font+' heightratio = '+(thisFont.fontdata[font].heightratio)+' topratio = '+(thisFont.fontdata[font].topratio));
             })(fonts[i]);
         }
         callback();
