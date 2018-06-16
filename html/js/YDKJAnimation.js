@@ -19,7 +19,6 @@ function YDKJAnimation(resource) {
         this.loop = 0;
         this.framestop = -1;
     }
-    this.seamlessLoop = 0;
 
     var thisAnim = this;
 
@@ -46,7 +45,6 @@ function YDKJAnimation(resource) {
     this.tiles = 0;
     this.frames = 0;
     this.intervalTimer = 0;
-    this.audiostopTimer = 0;
     this.html = {};
     this.font = 0;
     this.speed = 66;
@@ -68,7 +66,7 @@ function YDKJAnimation(resource) {
 
     // Vérifier le statut du preload, dans l'ordre inverse, soit : gif -> js -> audio -> seamlessloop
 
-    var seamlessloopready = function() {
+    var audioready2 = function() {
         thisAnim.preloaded = 1;
         for(var i = 0; i < thisAnim.readyFunctions.length; i++) {
             thisAnim.readyFunctions[i].call(thisAnim);
@@ -79,20 +77,13 @@ function YDKJAnimation(resource) {
         if ((thisAnim.audio) && (thisAnim.loop)) {
             var audiofile = thisAnim.audio.res;
             if (audiofile) {
-                var audioelem = audiofile.get(0);
-                thisAnim.seamlessLoop = new SeamlessLoop();
-                var length = audiospecs.lengthOffset+(audioelem.duration*1000);
-                if (length < 0) length = 0;
-                thisAnim.seamlessLoop.addUri(thisAnim.urlAudio,length,1);
-                var doLoopOriginal = thisAnim.seamlessLoop.doLoop;
-                thisAnim.seamlessLoop.doLoop = function(looped) { // Petit hack pour maintenir les fonctions ended en boucle synchro
-                    if (!looped) doLoopOriginal.call(thisAnim.seamlessLoop,looped);
-                    else if (!thisAnim.triggerEnd(0)) doLoopOriginal.call(thisAnim.seamlessLoop,looped);
-                    else thisAnim.stop();
-                };
-                seamlessloopready();
+                audiofile.loop(true);
+                audiofile.on('end', function() { // Petit hack pour maintenir les fonctions ended en boucle synchro
+                    if (thisAnim.triggerEnd(0)) thisAnim.stop();
+                });
+                audioready2();
             }
-        } else seamlessloopready();
+        } else audioready2();
     };
 
     var jsready = function() {
@@ -307,7 +298,7 @@ YDKJAnimation.prototype.play = function() {
     var thisAnim = this;
 
     var setupEnd = function() { // this.triggerEnd lorsque l'animation est terminée, basée sur this.length()
-        if ((thisAnim.loop) && (thisAnim.seamlessLoop)) return false; // Les boucles seamlessLoop ont leur propre trigger de fin
+        if (thisAnim.loop) return false; // Les boucles ont leur propre trigger de fin
         var lth = thisAnim.length();
         for(var i = 0; i < thisAnim.endedFunctions.length; i++) {
             (function(i){
@@ -355,30 +346,9 @@ YDKJAnimation.prototype.play = function() {
     }
 
     if (this.audio) {
-        if ((this.loop) && (this.seamlessLoop)) {
-            this.seamlessLoop.start(1);
-            this.seamlessLoop.volume(this._volume);
-        } else {
-            var audiofile = this.audio.res;
-            if (audiofile) {
-                var audioelem = audiofile.get(0);
-                var ended = function() {
-                    thisAnim.audiostopTimer = 0;
-                    if (!thisAnim.loop) {
-                        setTimeout(function() {
-                            if (audioelem.readyState) {
-                                audioelem.pause();
-                                audioelem.currentTime = 0;
-                            }
-                        }, audiospecs.stopDelay);
-                    }
-                };
-                thisAnim.audiostopTimer = setTimeout(ended, audioelem.duration*1000+audiospecs.playDelay);
-                if ((audioelem.readyState) && (audioelem.currentTime)) audioelem.currentTime = 0;
-                audioelem.play();
-                audioelem.volume=this._volume;
-            }
-        }
+        this.audio.res.seek(0);
+        this.audio.res.volume(this._volume);
+        this.audio.res.play();
     }
 
     setupEnd();
@@ -402,20 +372,7 @@ YDKJAnimation.prototype.stop = function() {
     }
 
     if (this.audio) {
-        if ((this.loop) && (this.seamlessLoop)) {
-            this.seamlessLoop.stop();
-        } else {
-            if (this.audiostopTimer) clearTimeout(this.audiostopTimer);
-            this.audiostopTimer = 0;
-            var audiofile = this.audio.res;
-            if (audiofile) {
-                var audioelem = audiofile.get(0);
-                if (audioelem.readyState) {
-                    audioelem.pause();
-                    audioelem.currentTime = 0;
-                }
-            }
-        }
+        this.audio.res.stop();
     }
 };
 
@@ -438,11 +395,9 @@ YDKJAnimation.prototype.free = function() {
     var audio = this.audio; this.audio = false;
     var div = this.div; this.div = false;
     var tmpdiv = this.tmpdiv; this.tmpdiv = false;
-    var seamlessLoop = this.seamlessLoop; this.seamlessLoop = false;
     if (gif) gif.free();
     if (js) js.free();
     if (audio) audio.free();
-    if (seamlessLoop) seamlessLoop.free();
     if (div) div.addClass('markedAsRemoved'); // Sera retiré réellement à la prochaine animation (pour éviter les écrans noirs entre animations)
     if (tmpdiv) tmpdiv.remove();
 };
@@ -456,15 +411,7 @@ YDKJAnimation.prototype.volume = function(vol) {
 
     this.ready(function(){
         if (thisAnim.audio) {
-            if ((thisAnim.loop) && (thisAnim.seamlessLoop)) {
-                thisAnim.seamlessLoop.volume(thisAnim._volume);
-            } else {
-                var audiofile = thisAnim.audio.res;
-                if (audiofile) {
-                    var audioelem = audiofile.get(0);
-                    audioelem.volume = thisAnim._volume;
-                }
-            }
+            thisAnim.audio.res.volume(thisAnim._volume);
         }
     });
 };
@@ -487,8 +434,7 @@ YDKJAnimation.prototype.length = function() {
     if (this.audio) {
         var audiofile = this.audio.res;
         if (audiofile) {
-            var audioelem = audiofile.get(0);
-            length = (audiospecs.lengthOffset+(audioelem.duration*1000)).toFixed(0);
+            length = (audiofile.duration()*1000).toFixed(0);
             if (length < 0) length = 0;
             if (length > maxlength) maxlength = length;
         }

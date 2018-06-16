@@ -65,15 +65,15 @@ YDKJFile.prototype.preload = function(f) {
     }
 
     if (this.filetype == 'audio') {
-        this.res = YDKJaudiomanager.lease();
-        var a = this.res.get(0); // Hope that we got a lease here...
-        if (a.canPlayType('audio/ogg')) this.res.append('<source />').children().last().attr('type','audio/ogg').attr('src',this.url+'.ogg');
-        else if (a.canPlayType('audio/mpeg')) this.res.append('<source />').children().last().attr('type','audio/mpeg').attr('src',this.url+'.mp3');
-        else {
-            this.res.append('<source />').children().last().attr('type','audio/ogg').attr('src',this.url+'.ogg');
-            this.res.append('<source />').children().last().attr('type','audio/mpeg').attr('src',this.url+'.mp3');
-        }
-        waitForAudio(this.res,isready);
+        this.res = new Howl({
+            src: [this.url+'.ogg', this.url+'.mp3'],
+            format: ['ogg', 'mp3'],
+            preload: true,
+            autoplay: false,
+            loop: false,
+            volume: audiospecs.maxVolume,
+            onload: isready
+        });
     }
 };
 
@@ -86,7 +86,7 @@ YDKJFile.prototype.free = function() {
     if (preloadpool[this.url].used <= 0) {
         if (this.res) {
             if (this.filetype == 'gif') this.res.remove();
-            if (this.filetype == 'audio') YDKJaudiomanager.release(this.res);
+            if (this.filetype == 'audio') this.res.unload();
         }
         this.res = 0;
         preloadpool[this.url] = 0;

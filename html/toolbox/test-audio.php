@@ -3,26 +3,24 @@
 <head>
     <title></title>
     <script src="../js/jquery-3.2.1.min.js" type="text/javascript"></script>
-    <script src="../js/AudioManager.js" type="text/javascript"></script>
-    <script src="../js/common.js" type="text/javascript"></script>
-    <script src="../js/SeamlessLoop.js" type="text/javascript"></script>
+    <script src="../js/howler.core.min.js" type="text/javascript"></script>
     <script type="application/javascript">
-        var YDKJaudiomanager = new AudioManager();
         $().ready(function() {
             var ago = [0,0];
             var urls = ['../res/5QDemo/Mb93/1', '../res/5QDemo/Mb95/1'];
 
             $('#worksok').click(function(){
                 var url = urls[0];
-                var res = jQuery('<audio />');
-                res.appendTo('body');
-                var a = res.get(0);
-                if (a.canPlayType('audio/ogg')) res.append('<source />').children().last().attr('type','audio/ogg').attr('src',url+'.ogg');
-                else if (a.canPlayType('audio/mpeg')) res.append('<source />').children().last().attr('type','audio/mpeg').attr('src',url+'.mp3');
-                else {
-                    res.append('<source />').children().last().attr('type','audio/ogg').attr('src',url+'.ogg');
-                    res.append('<source />').children().last().attr('type','audio/mpeg').attr('src',url+'.mp3');
-                }
+
+                var a = new Howl({
+                    src: [url+'.ogg', url+'.mp3'],
+                    autoplay: false,
+                    loop: false,
+                    volume: 1,
+                    onend: function() {
+                        console.log('Finished!');
+                    }
+                });
 
                 window.setTimeout(function() { // One setTimeout is okay...
                     a.play();
@@ -80,28 +78,35 @@
                 ago[1] = 1;
             });
 
-            var seamlessLoop = 0;
+            var loop = 0;
 
             $('#startloop').click(function() {
-                seamlessLoop = new SeamlessLoop();
-                seamlessLoop.addUri('../res-full/JACKSND1/Mc70/4',2420,1);
-                seamlessLoop.start(1);
-                seamlessLoop.volume(0.5);
+
+                var url = '../res-full/JACKSND1/Mc70/5';
+                loop = new Howl({
+                    src: [url+'.ogg', url+'.mp3'],
+                    autoplay: false,
+                    loop: true,
+                    volume: 1,
+                    onend: function() {
+                        console.log('Finished!');
+                    }
+                });
+
+                loop.play();
+                loop.volume(0.5);
             });
 
             $('#stoploop').click(function() {
-                if (seamlessLoop) {
-                    seamlessLoop.stop(1);
-                    seamlessLoop.free();
-                    seamlessLoop = 0;
+                if (loop) {
+                    loop.stop();
+                    loop.unload();
+                    loop = 0;
                 }
             });
-
-            YDKJaudiomanager = new AudioManager();
-            if (YDKJaudiomanager.init(32,function() {
-                $('#enableaudio').css('display','none');
-                $('#audioenabled').css('display','');
-            })) $('#tryme').attr('value','Audio initialized immediately, should work right away (setInterval)');
+            $('#enableaudio').css('display','none');
+            $('#audioenabled').css('display','');
+            $('#tryme').attr('value','Audio initialized immediately, should work right away (setInterval)');
         });
     </script>
 </head>

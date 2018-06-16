@@ -1,7 +1,5 @@
 /********** YDKJGame **********/
 
-var YDKJaudiomanager = 0;
-
 function YDKJGame(html, demomode) {
     var thisGame = this;
     if (!demomode) demomode = false;
@@ -12,7 +10,6 @@ function YDKJGame(html, demomode) {
     jQuery.fx.interval = 66;
     this.gameinfoready = this.api.gameinfo();
     this.currentmode = 0;
-    if (!YDKJaudiomanager) YDKJaudiomanager = new AudioManager();
 
     // Gestion du fullscreen
     var onresize = function() {};
@@ -80,19 +77,23 @@ function YDKJGame(html, demomode) {
 YDKJGame.prototype.start = function() {
     var thisGame = this;
     this.font.preload(function () {
+        thisGame.gameinfoready(function (gameinfo) {
+            thisGame.players = gameinfo.players;
+            thisGame.locale = gameinfo.locale;
+            thisGame.engineVersion = gameinfo.engineVersion;
+            thisGame.api.localMode = gameinfo.localMode;
+            thisGame.api.subscribe();
+            (thisGame.api.gamemode())(function (gamemode) {
+                gamemode.start();
+            });
+        });
+
+        // TODO Voir comment ça se comporte sur navigateur mobile
+        /*
         var useraction = 0;
         if (!YDKJaudiomanager.init(512,function() {
             if (useraction) useraction.remove();
-            thisGame.gameinfoready(function (gameinfo) {
-                thisGame.players = gameinfo.players;
-                thisGame.locale = gameinfo.locale;
-                thisGame.engineVersion = gameinfo.engineVersion;
-                thisGame.api.localMode = gameinfo.localMode;
-                thisGame.api.subscribe();
-                (thisGame.api.gamemode())(function (gamemode) {
-                    gamemode.start();
-                });
-            });
+
         })) {
             useraction = jQuery('<div />');
             useraction.html('Mobile user: please touch the screen to start the game').css({
@@ -106,7 +107,7 @@ YDKJGame.prototype.start = function() {
                 'left': '0'
             });
             useraction.appendTo('body');
-        }
+        }*/
     });
 };
 

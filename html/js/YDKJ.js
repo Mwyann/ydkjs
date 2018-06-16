@@ -38,14 +38,14 @@ function YDKJ(screen, debug) {
     }
 
     loadScript('js/HackTimer.min.js'); // https://github.com/turuslan/HackTimer
-    if (typeof AudioManager == "undefined") loadScript('js/AudioManager.js');
+    if (typeof Howler == "undefined") loadScript('js/howler.core.min.js'); // https://howlerjs.com/
     if (typeof YDKJGame == "undefined") loadScript('js/YDKJGame.js');
     if (typeof YDKJFont == "undefined") loadScript('js/YDKJFont.js');
     if (typeof YDKJMode == "undefined") loadScript('js/YDKJMode.js');
     if (typeof YDKJAPI == "undefined") loadScript('js/YDKJAPI.js');
     if (typeof YDKJAnimation == "undefined") loadScript('js/YDKJAnimation.js');
     if (typeof YDKJFile == "undefined") loadScript('js/YDKJFile.js');
-    if (typeof AudioSpecs == "undefined") loadScript('js/common.js');
+    if (typeof YDKJTimer == "undefined") loadScript('js/common.js');
     if (typeof ModeIntro == "undefined") loadScript('js/ModeIntro.js');
     if (typeof ModeCategory == "undefined") loadScript('js/ModeCategory.js');
     if (typeof ModeR1WrapUp == "undefined") loadScript('js/ModeR1WrapUp.js');
@@ -55,7 +55,6 @@ function YDKJ(screen, debug) {
     if (typeof ModeJackAttack == "undefined") loadScript('js/ModeJackAttack.js');
     if (typeof ModeEnd == "undefined") loadScript('js/ModeEnd.js');
     if (typeof YDKJDemoSnd == "undefined") loadScript('js/demo-res.js');
-    if (typeof SeamlessLoop == "undefined") loadScript('js/SeamlessLoop.js');
 
     scriptsready();
 }
@@ -66,6 +65,7 @@ YDKJ.prototype.ready = function(f) {
 
 YDKJ.prototype.start = function() {
     this.ready(function() {
+        Howler.autoSuspend = false;
         this.game = new YDKJGame({screen: this.screen, debug: this.debug});
         this.game.start();
     });

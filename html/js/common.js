@@ -66,16 +66,6 @@ jQuery.fn.imagesLoaded = function(callback, fireOne) {
         });
 };
 
-function waitForAudio(selector,callback) {
-    var waitloop = function() {
-        var elems = jQuery(selector);
-        var totalAudio = elems.length;
-        elems.each(function(){if (this.duration) totalAudio--;});
-        if (totalAudio) window.setTimeout(function(){waitloop()},50); else callback.call();
-    };
-    waitloop();
-}
-
 /********** Saisie au clavier **********/
 
 function bindKeyListener(callback,timeout){
