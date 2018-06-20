@@ -48,7 +48,7 @@
   font-style: normal;
 }
 
-span, div {
+:not(body.allowSelect) span, :not(body.allowSelect) div {
   cursor:default;
   -webkit-touch-callout: none;
   -webkit-user-select: none;

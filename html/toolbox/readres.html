@@ -112,6 +112,38 @@ jQuery(document).ready(function() {
         var screen = jQuery('#screen');
         var debug = jQuery('#debuglive');
         var slider = 0;
+
+        var loadAnimList = function() {
+            // Chargement des animations présentes en base
+            var anims = $('#anims');
+            jQuery.ajax({
+                url: 'readres.ajax.php',
+                type: 'post',
+                data: {type:'animationList', animationFile:animationFile},
+                dataType: 'json',
+                success: function(data, status, xhr) {
+                    anims.html('');
+                    $(data).each(function(i, t) {
+                        var newanim = $('<div></div>');
+                        var link = $('<a></a>').html(t['name']).attr('href','#').click(function(){
+                            $('#animstop').click();
+                            $('#framefrom').val(t['framestart']);
+                            $('#frameto').val(t['framestop']);
+                            $('#animloop').prop('checked',t['loopani'] == '1');
+                            $('#animplay').click();
+                            return false;
+                        });
+                        newanim.append($('<div></div>').addClass('timings').html(t['framestart']+((t['loopani'] == "1")?'~':'-')+((t['framestop'] === null)?'':t['framestop'])));
+                        newanim.append(link);
+                        if (t['variantType'] != '') newanim.append(' ('+t['variantType']+' = '+t['variantValue']+')');
+                        anims.append(newanim);
+                    });
+                },
+                error: function (xhr, ajaxOptions, thrownError){
+                }
+            });
+        };
+
         var loadAnim = function() {
             if (anim) anim.free();
             screen.html('');
@@ -145,35 +177,7 @@ jQuery(document).ready(function() {
             });
             anim = 0;
 
-            // Chargement des animations présentes en base
-            var anims = $('#anims');
-            jQuery.ajax({
-                url: 'readres.ajax.php',
-                type: 'post',
-                data: {type:'animationList', animationFile:animationFile},
-                dataType: 'json',
-                success: function(data, status, xhr) {
-                    anims.html('');
-                    $(data).each(function(i, t) {
-                        var newanim = $('<div></div>');
-                        var link = $('<a></a>').html(t['name']).attr('href','#').click(function(){
-                            $('#animstop').click();
-                            $('#framefrom').val(t['framestart']);
-                            $('#frameto').val(t['framestop']);
-                            $('#animloop').prop('checked',t['loopani'] == '1');
-                            $('#animplay').click();
-                            return false;
-                        });
-                        newanim.append($('<div></div>').addClass('timings').html(t['framestart']+((t['loopani'] == "1")?'~':'-')+((t['framestop'] === null)?'':t['framestop'])));
-                        newanim.append(link);
-                        if (t['variantType'] != '') newanim.append(' ('+t['variantType']+' = '+t['variantValue']+')');
-                        anims.append(newanim);
-                    });
-                },
-                error: function (xhr, ajaxOptions, thrownError){
-
-                }
-            });
+            loadAnimList();
         };
 
         var filename = $('#filename');
@@ -235,6 +239,36 @@ jQuery(document).ready(function() {
             $('#frameto').val($("#slider").slider("value"));
             return false;
         });
+
+        $('#save').on('click', function() {
+            var anims = $('#anims');
+
+            var scroll = anims.scrollTop();
+
+            jQuery.ajax({
+                url: 'readres.ajax.php',
+                type: 'post',
+                data: {type:'saveAnimation',
+                    'grp':$('#group').val(),
+                    'name':$('#name').val(),
+                    'variantType':$('#variantType').val(),
+                    'variantValue':$('#variantValue').val(),
+                    animationFile:animationFile,
+                    'framestart':$('#framefrom').val(),
+                    'framestop':$('#frameto').val(),
+                    'loopani':($('#animloop').is(':checked'))?1:0
+                },
+                dataType: 'json',
+                success: function(data, status, xhr) {
+                    loadAnimList();
+                    anims.scrollTop(scroll);
+                },
+                error: function (xhr, ajaxOptions, thrownError){
+                }
+            });
+
+            return false;
+        });
     });
 });
 
@@ -252,7 +286,7 @@ function play(t) {
 </script>
 </head>
 
-<body style="background-color:#333">
+<body style="background-color:#333" class="allowSelect">
   <div id="screen" style="background-color:#000;position:relative;width:640px;height:480px;overflow:hidden;margin-left:auto;margin-right:auto;margin-top:30px"></div> <!-- Couleur #EEE pour l'intro -->
   <div id="slider" style="width:90%;margin: 10px auto"></div>
   <div id="debuglive" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;"><br/></div>
@@ -418,6 +452,7 @@ function play(t) {
      </select> slow <input type="checkbox" id="animslow" /> blue bg <input type="checkbox" id="bluebg" /><br/><br/>
       Play <a href="#" style="color:#FFFFFF" id="clickfrom">from</a> <input type="text" id="framefrom" style="width:50px"/> <a href="#" style="color:#FFFFFF" id="clickto">to</a> <input type="text" id="frameto" style="width:50px"/> loop <input type="checkbox" id="animloop" /> <input type="button" id="animplay" value="Play" /> <input type="button" id="animstop" value="Stop" /><br/><br/>
       Save as: <input type="text" id="name"/> Group: <input type="text" id="group"/> <input type="button" id="save" value="Save" /><br/><br/>
+      Variant type: <input type="text" id="variantType"/> Value: <input type="text" id="variantValue"/>
   </div>
   <div id="anims" style="background-color:#000;color:#FFF;padding:5px;margin-top:10px;height:150px;overflow-y:scroll;width:48%">
   </div>
