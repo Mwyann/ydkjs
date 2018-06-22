@@ -448,3 +448,121 @@ YDKJAnimation.prototype.getDiv = function() {
     this.createDiv();
     return this.div;
 };
+
+YDKJAnimation.prototype.init = function(html, font) {
+    if (html) this.html = html;
+    if (font) this.font = font;
+};
+
+// Liste d'animations et fonctions helper
+
+var YDKJAnimList = function(resources) {
+    this.animations = {};
+    this.resources = resources;
+    this.html = {};
+    this.font = 0;
+};
+
+YDKJAnimList.prototype.load = function(resourcename, name) {
+    if (name === undefined) { // Nom automatique, exemple : Question/JingleQuestion => JingleQuestion
+        var sp = resourcename.toString().split('/');
+        name = sp[sp.length-1];
+    }
+    this.animations[name] = new YDKJAnimation(this.resources[resourcename]);
+    this.animations[name].html = this.html;
+    this.animations[name].font = this.font;
+    return this;
+};
+
+YDKJAnimList.prototype.ready = function(f) {
+    var nbanim = 1;
+
+    var animlistready = function() {
+        nbanim--;
+        if (nbanim <= 0) {
+            f.call(this);
+        }
+    };
+
+    for(var anim in this.animations) if (this.animations.hasOwnProperty(anim)) {
+        nbanim++;
+        this.animations[anim].ready(animlistready);
+    }
+
+    animlistready();
+    return this;
+};
+
+YDKJAnimList.prototype.get = function(name) {
+    return this.animations[name];
+};
+
+YDKJAnimList.prototype.ended = function(name, a, b) {
+    this.animations[name].ended(a, b);
+    return this;
+};
+
+YDKJAnimList.prototype.delay = function(name, delay, f) {
+    this.animations[name].delay(delay, f);
+    return this;
+};
+
+YDKJAnimList.prototype.play = function(name) {
+    this.animations[name].play();
+    return this;
+};
+
+YDKJAnimList.prototype.stop = function(name) {
+    this.animations[name].stop();
+    return this;
+};
+
+YDKJAnimList.prototype.reset = function(name, fullreset) {
+    this.animations[name].reset(fullreset);
+    return this;
+};
+
+YDKJAnimList.prototype.free = function(name) {
+    if (name === undefined) { // Clean complet
+        for(var anim in this.animations) if (this.animations.hasOwnProperty(anim) && this.animations[anim]) {
+            this.animations[anim].free();
+        }
+        this.animations = {};
+    } else if (this.animations[name]) {
+        this.animations[name].free();
+        this.animations[name] = undefined;
+        delete this.animations[name];
+    }
+    return this;
+};
+
+YDKJAnimList.prototype.click = function(name, f) {
+    this.animations[name].click(f);
+    return this;
+};
+
+YDKJAnimList.prototype.frame = function(name, f) {
+    this.animations[name].frame(f);
+    return this;
+};
+
+YDKJAnimList.prototype.volume = function(name, vol) {
+    if (vol === undefined) return this.animations[name].volume();
+    this.animations[name].volume(vol);
+    return this;
+};
+
+YDKJAnimList.prototype.length = function(name) {
+    return this.animations[name].length();
+};
+
+YDKJAnimList.prototype.init = function(html, font) {
+    if (html) this.html = html;
+    if (font) this.font = font;
+
+    for(var anim in this.animations) if (this.animations.hasOwnProperty(anim)) {
+        this.animations[anim].init(this.html, this.font);
+    }
+
+    return this;
+};

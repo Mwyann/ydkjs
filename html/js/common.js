@@ -453,7 +453,7 @@ YDKJTimer.prototype.playTimer = function(next) {
     if ((next < 0) || (next > this.timerType)) return false;
     var thisTimer = this;
     this.animation.ready(function() {
-        thisTimer.animation.html = thisTimer.html;
+        thisTimer.animation.init(thisTimer.html);
         if (next == thisTimer.current) {
             thisTimer.animation.framestart = thisTimer.frames.Still[thisTimer.current].framestart;
             thisTimer.animation.framestop = thisTimer.frames.Still[thisTimer.current].framestart;
@@ -470,6 +470,11 @@ YDKJTimer.prototype.playTimer = function(next) {
         }
     });
     return next;
+};
+
+YDKJTimer.prototype.init = function(html, font) {
+    if (html) this.html = html;
+    if (font) this.font = font;
 };
 
 /********** MersenneTwister **********/

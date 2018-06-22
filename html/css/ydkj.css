@@ -48,7 +48,7 @@
   font-style: normal;
 }
 
-:not(body.allowSelect) span, :not(body.allowSelect) div {
+span, div {
   cursor:default;
   -webkit-touch-callout: none;
   -webkit-user-select: none;
@@ -56,4 +56,14 @@
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+}
+
+body.allowSelect span, body.allowSelect div {
+    cursor:auto;
+    -webkit-touch-callout: default;
+    -webkit-user-select: auto;
+    -khtml-user-select: auto;
+    -moz-user-select: auto;
+    -ms-user-select: auto;
+    user-select: auto;
 }
