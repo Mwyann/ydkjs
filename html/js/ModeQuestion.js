@@ -4,122 +4,8 @@ function ModeQuestion() {}
 
 ModeQuestion.prototype.preload = function(resources) {
     this.animations = new YDKJAnimList(resources);
-    var anim = this.animations;
-
-    // Animations générales
-    anim.load('Question/JingleQuestion')
-        .load('Question/BGQuestion')
-
-        .load('Question/AnnounceCategory')
-        .load('Question/ShowCategory')
-        .load('Question/AnnounceValue')
-        .load('Question/VoiceAnnounceValue')
-        .load('Question/HideValue')
-        .load('Question/TimerComesIn')
-        .load('Question/PrepareTimer')
-        .load('Question/JingleReadQuestion')
-        .load('Question/JingleTimer')
-        .load('Question/TimeOut1')
-        .load('Question/TimeOut2')
-        .load('Question/TimeOut3')
-        .load('Question/TimerTimeOut')
-        .load('Question/ShowHeader')
-        .load('Question/ShowQuestion')
-        .load('Question/HideQuestion')
-
-        .load('Question/SFXPlayerBuzz')
-        .load('Question/SFXPlayerKey')
-        .load('Question/SFXPlayerLose')
-        .load('Question/SFXPlayerCorrect')
-        .load('Question/DefaultRevealLastAnswer');
-
-    // Animations joueur
-    // TODO : Créer une fonction pour savoir quelle animation jouer, avec ou sans vicieuse
-    for(var i = 1; i <= this.game.players.length; i++) {
-        anim.load('Question/Player'+i+'ShowKey')
-            .load('Question/Player'+i+'Answer')
-            .load('Question/Player'+i+'AnswerLoop')
-            .load('Question/Player'+i+'Buzzed')
-            .load('Question/Player'+i+'Correct')
-            .load('Question/Player'+i+'Wrong');
-
-        /*
-        if (this.game.players.length >= 2) { // Animations avec vicieuse
-            anim.load('Question/Player'+i+'ShowKey.Screw')
-                .load('Question/Player'+i+'Loop.Screw')
-                .load('Question/Player'+i+'Answer.Screw')
-                .load('Question/Player'+i+'AnswerLoop.Screw')
-                .load('Question/Player'+i+'AnswerEnd.Screw')
-                .load('Question/Player'+i+'Correct.Screw')
-                .load('Question/Player'+i+'Wrong.Screw')
-                .load('Question/Player'+i+'AnswerLoopScrewed')
-                .load('Question/Player'+i+'CorrectScrewed')
-                .load('Question/Player'+i+'WrongScrewed')
-                .load('Question/Player'+i+'Screw')
-                .load('Question/Player'+i+'Screwed.Screw')
-                .load('Question/Player'+i+'Screwed')
-                .load('Question/Player'+i+'LostScrew');
-        }
-        */
-    }
-
-    // Animations réponses
-    for(i = 1; i <= 4; i++) {
-        anim.load('Question/ShowAnswer'+i)
-            .load('Question/LoopAnswer'+i)
-            .load('Question/CorrectAnswer'+i)
-            .load('Question/WrongAnswer'+i)
-    }
-
-    // Animations diverses
-    if (this.game.players.length >= 2) {
-        anim.load('Question/LastPlayer1')
-            .load('Question/LastPlayer2')
-            .load('Question/PlayerMissKey1')
-            .load('Question/PlayerMissKey2');
-            // Vicieuse
-            /*
-            .load('Question/ScrewActivate')
-            .load('Question/ScrewSounds')
-            .load('Question/Screwed')
-            .load('Question/Player1Screwed')
-            .load('Question/Player1ScrewLost')
-            .load('Question/Player2Screwed')
-            .load('Question/Player2ScrewLost');
-            */
-    }
-    if (this.game.players.length == 3) {
-        anim.load('Question/LastPlayer3')
-            .load('Question/LastPlayers12')
-            .load('Question/LastPlayers13')
-            .load('Question/LastPlayers23');
-            // Vicieuse
-            /*
-            .load('Question/ScrewLoop')
-            .load('Question/Player1ScrewWho')
-            .load('Question/Player2ScrewWho')
-            .load('Question/Player3ScrewWho')
-            .load('Question/Player3Screwed')
-            .load('Question/Player3ScrewLost')
-            .load('Question/PlayerScrewedSelf')
-            .load('Question/PlayerScrewTimeout');
-            */
-    }
 
     this.correctanswer = this.options.correctanswer;
-
-    // Animations spécifiques à la question
-    anim.load('Question/QuestionTitle')
-        .load('Question/PreQuestion')
-        .load('Question/Question')
-        .load('Question/Answers')
-        .load('Question/EndQuestion')
-        .load('Question/Answer1')
-        .load('Question/Answer2')
-        .load('Question/Answer3')
-        .load('Question/Answer4')
-        .load('Question/AboutToRevealAnswer')
-        .load('Question/RevealAnswer');
 
     this.Timer = this.options.timer;
     this.timerTimeout = 0;
@@ -265,30 +151,27 @@ ModeQuestion.prototype.start = function() {
     anim.ended('EndQuestion', function() {
         if (thisMode.timerTimeout) clearTimeout(thisMode.timerTimeout);
         nextcategoryready(function(nextcategory) {
-            nextcategory.modeObj.MusicChooseCategoryStart.delay(Math.max(500,2500-anim.length('EndQuestion')),function () {
+            nextcategory.modeObj.animations.delay('MusicChooseCategoryStart', Math.max(500,2500-anim.length('EndQuestion')), function() {
                 nextcategory.start();
             });
         });
     });
 
     anim.ended('SFXPlayerCorrect', function() {
-        var thisSFX = this;
-        this.delay(300,function() {
+        this.delay(300, function() {
             nextcategoryready(function(nextcategory) {
                 nextcategory.modeObj.chooseplayer = thisMode.currentPlayer; // On donne le choix au joueur qui a bien répondu
-                nextcategory.modeObj.MusicChooseCategoryStart.play();
-                thisSFX.delay(300,function () {
-                    anim.play('EndQuestion');
-                });
+                nextcategory.modeObj.play('MusicChooseCategoryStart')
+                                    .delay('SFXPlayerCorrect', 300, function() {
+                                        anim.play('EndQuestion');
+                                    });
             });
         });
     });
 
     anim.ended('RevealAnswer', 300, function() {
         if (thisMode.options.correctanswerisdefault) {
-            thisMode.delay('EndQuestion', 200,function() {
-                this.play();
-            });
+            thisMode.play('EndQuestion', 200);
         } else {
             anim.ended('Answer'+thisMode.correctanswer, 200,function () {
                 anim.play('EndQuestion');
@@ -298,7 +181,7 @@ ModeQuestion.prototype.start = function() {
             });
         }
         nextcategoryready(function(nextcategory) {
-            nextcategory.modeObj.MusicChooseCategoryStart.play();
+            nextcategory.modeObj.animations.play('MusicChooseCategoryStart');
         });
     });
 
@@ -488,7 +371,7 @@ ModeQuestion.prototype.start = function() {
         });
     });
 
-    anim.ended('SFXPlayerKey', 150,function() {
+    anim.ended('SFXPlayerKey', 150, function() {
         this.reset();
         anim.play('Answer'+thisMode.currentAns);
     });
@@ -567,9 +450,7 @@ ModeQuestion.prototype.start = function() {
     anim.ended('HideValue', function() {
         this.free();
         thisMode.game.html.screen.find('.markedAsRemoved').remove(); // Evite un glitch visuel où le texte ne disparait pas complètement
-        anim.delay('TimerComesIn', 300, function() {
-            this.play();
-        });
+        anim.play('TimerComesIn', 300);
     });
 
     anim.ended('VoiceAnnounceValue', function() {
@@ -584,9 +465,7 @@ ModeQuestion.prototype.start = function() {
 
     anim.ended('QuestionTitle', function() {
         this.free();
-        anim.delay('VoiceAnnounceValue', 100, function() {
-            this.play();
-        });
+        anim.play('VoiceAnnounceValue', 100);
     });
 
     this.game.font.strings[110] = this.game.players[0].name;
@@ -620,9 +499,7 @@ ModeQuestion.prototype.start = function() {
     anim.ended('AnnounceCategory', function() {
         this.free();
         anim.play('ShowCategory')
-            .delay('QuestionTitle', 100,function() {
-                this.play();
-            });
+            .play('QuestionTitle', 100);
     });
 
     anim.ended('JingleQuestion', function() {

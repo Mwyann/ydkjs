@@ -3,94 +3,57 @@
 function ModeCategory() {}
 
 ModeCategory.prototype.preload = function(resources) {
-    var thisMode = this;
+    this.questiontitles = resources['questiontitles']; delete resources['questiontitles'];
+    this.question1 = resources['question1']; delete resources['question1'];
+    this.question2 = resources['question2']; delete resources['question2'];
+    this.question3 = resources['question3']; delete resources['question3'];
 
-    this.SFXShowCategoryScreen = new YDKJAnimation(resources['Category/SFXShowCategoryScreen']);
+    this.animations = new YDKJAnimList(resources);
+    var anim = this.animations;
 
-    this.MusicChooseCategoryStart = new YDKJAnimation(resources['Category/MusicChooseCategoryStart']);
-    this.MusicChooseCategoryLoop = new YDKJAnimation(resources['Category/MusicChooseCategoryLoop']);
-    this.MusicChooseCategoryStart.volume(70);
-    this.MusicChooseCategoryLoop.volume(70);
-    this.ShowCategories = new YDKJAnimation(resources['Category/ShowCategories']);
-    this.CategoryTitles = new YDKJAnimation(resources['Category/CategoryTitles']);
-
-    this.MusicChooseCategoryStart.ended(function(){
-        thisMode.MusicChooseCategoryLoop.play();
-    });
-
-    this.ChooseCategory = new YDKJAnimation(resources['Category/ChooseCategory']);
-    this.ChooseCategoryText = new YDKJAnimation(resources['Category/ChooseCategoryText']);
-
-    this.ChooseCategoryPlayer1 = new YDKJAnimation(resources['Category/ChooseCategoryPlayer1']);
-    this.ChooseCategoryPlayer2 = new YDKJAnimation(resources['Category/ChooseCategoryPlayer2']);
-    this.ChooseCategoryPlayer3 = new YDKJAnimation(resources['Category/ChooseCategoryPlayer3']);
-
-    this.SFXChoiceCategory = new YDKJAnimation(resources['Category/SFXChoiceCategory']);
-
-    this.LoopCategory1 = new YDKJAnimation(resources['Category/LoopCategory1']);
-    this.LoopCategory2 = new YDKJAnimation(resources['Category/LoopCategory2']);
-    this.LoopCategory3 = new YDKJAnimation(resources['Category/LoopCategory3']);
-    this.ChoiceCategory1 = new YDKJAnimation(resources['Category/ChoiceCategory1']);
-    this.ChoiceCategory2 = new YDKJAnimation(resources['Category/ChoiceCategory2']);
-    this.ChoiceCategory3 = new YDKJAnimation(resources['Category/ChoiceCategory3']);
-
-    this.questiontitles = resources['questiontitles'];
-    this.question1 = resources['question1'];
-    this.question2 = resources['question2'];
-    this.question3 = resources['question3'];
+    anim.volume('MusicChooseCategoryStart', 70) // Volume changé dès le preload car la musique est susceptible d'être déclenchée par le mode précédent
+        .volume('MusicChooseCategoryLoop', 70)
+        .ended('MusicChooseCategoryStart', function() {
+            anim.play('MusicChooseCategoryLoop');
+        });
 
     if (this.options.chooseplayer) this.chooseplayer = this.options.chooseplayer;
 };
 
 ModeCategory.prototype.start = function() {
     var thisMode = this;
+    var anim = this.animations;
 
     if (!this.chooseplayer) this.chooseplayer = 1; // Déterminer un joueur qui pourra choisir la catégorie
     this.question1.modeObj.chooseplayer = this.chooseplayer;
     this.question2.modeObj.chooseplayer = this.chooseplayer;
     this.question3.modeObj.chooseplayer = this.chooseplayer;
 
-    if (this.chooseplayer == 1) this.ChooseCategoryPlayer = this.ChooseCategoryPlayer1;
-    if (this.chooseplayer == 2) this.ChooseCategoryPlayer = this.ChooseCategoryPlayer2;
-    if (this.chooseplayer == 3) this.ChooseCategoryPlayer = this.ChooseCategoryPlayer3;
-
     var listener;
     var nextquestion = 0;
 
     var doChooseCategory = function(chosen) {
-        var choice;
         if (chosen == -1) { // Timeout
             // TODO A gérer
         }
         if (chosen) {
             doChooseCategory = false;
             unbindKeyListener(listener);
-            switch (chosen) {
-                case 1:
-                    choice = thisMode.ChoiceCategory1;
-                    break;
-                case 2:
-                    choice = thisMode.ChoiceCategory2;
-                    break;
-                case 3:
-                    choice = thisMode.ChoiceCategory3;
-                    break;
-            }
-            thisMode.ChooseCategoryPlayer.free();
-            thisMode.MusicChooseCategoryLoop.free();
-            thisMode.CategoryTitles.free();
-            thisMode.LoopCategory1.free();
-            thisMode.LoopCategory2.free();
-            thisMode.LoopCategory3.free();
-
-            thisMode.SFXChoiceCategory.ended(function () {
-                thisMode.ChooseCategory.free();
-                thisMode.ChooseCategoryText.free();
-                choice.free();
-            });
-
-            thisMode.SFXChoiceCategory.play();
-            choice.play();
+            anim.free('ChooseCategoryPlayer')
+                .free('MusicChooseCategoryLoop')
+                .free('CategoryTitles')
+                .free('LoopCategory1')
+                .free('LoopCategory2')
+                .free('LoopCategory3')
+                .ended('SFXChoiceCategory', function() {
+                    anim.free('ChooseCategory');
+                    anim.free('ChooseCategoryText');
+                    anim.free('ChoiceCategory1');
+                    anim.free('ChoiceCategory2');
+                    anim.free('ChoiceCategory3');
+                })
+                .play('SFXChoiceCategory')
+                .play('ChoiceCategory'+chosen);
         }
     };
 
@@ -99,9 +62,10 @@ ModeCategory.prototype.start = function() {
         if (doChooseCategory) doChooseCategory(chosen);
     };
 
-    this.SFXChoiceCategory.ended(100,function(){
-        thisMode.ChooseCategoryPlayer.play();
-        thisMode.SFXChoiceCategory.reset(true);
+    anim.ended('SFXChoiceCategory', 100, function() {
+        anim.play('ChooseCategoryPlayer'+thisMode.chooseplayer)
+            .reset('SFXChoiceCategory', true);
+
         if (hasKeycode(thisMode.game.players[thisMode.chooseplayer-1].keycode)) { // Joueur local
             listener = bindKeyListener(function (choice) {
                 var chosed = 0;
@@ -110,14 +74,14 @@ ModeCategory.prototype.start = function() {
                 else if (choice == 51) chosed = 3;
                 if (chosed) chooseCategory(chosed);
             }); // TODO 10 secondes de timeout
-            thisMode.LoopCategory1.click(function(){chooseCategory(1)});
-            thisMode.LoopCategory2.click(function(){chooseCategory(2)});
-            thisMode.LoopCategory3.click(function(){chooseCategory(3)});
-            thisMode.CategoryTitles.click(function(i){
-                if (i == 1010) chooseCategory(1);
-                if (i == 1020) chooseCategory(2);
-                if (i == 1030) chooseCategory(3);
-            });
+            anim.click('LoopCategory1', function(){chooseCategory(1)})
+                .click('LoopCategory2', function(){chooseCategory(2)})
+                .click('LoopCategory3', function(){chooseCategory(3)})
+                .click('CategoryTitles', function(i){
+                    if (i == 1010) chooseCategory(1);
+                    if (i == 1020) chooseCategory(2);
+                    if (i == 1030) chooseCategory(3);
+                });
         }
         thisMode.game.api.registeraction('selectCategory', function(data){
             data.value = parseInt(data.value);
@@ -146,7 +110,7 @@ ModeCategory.prototype.start = function() {
                     registerSelectCategory();
                 });
             };
-            thisMode.SFXChoiceCategory.ended(function() {
+            anim.ended('SFXChoiceCategory', function() {
                 this.free();
                 nextquestion.start();
             });
@@ -157,28 +121,28 @@ ModeCategory.prototype.start = function() {
     this.game.font.strings[102] = this.game.players[this.chooseplayer-1].name;
     this.game.font.strings[103] = this.game.players[this.chooseplayer-1].name;
 
-    this.ShowCategories.ended(300,function(){
-        thisMode.SFXChoiceCategory.play();
-        thisMode.ChooseCategoryText.play();
-        thisMode.LoopCategory1.play();
-        thisMode.LoopCategory2.play();
-        thisMode.LoopCategory3.play();
+    anim.ended('ShowCategories', 300, function() {
         this.free();
-        thisMode.CategoryTitles.play();
+        anim.play('SFXChoiceCategory')
+            .play('ChooseCategoryText')
+            .play('LoopCategory1')
+            .play('LoopCategory2')
+            .play('LoopCategory3')
+            .play('CategoryTitles');
     });
 
     this.game.font.strings[1010] = this.questiontitles[0];
     this.game.font.strings[1020] = this.questiontitles[1];
     this.game.font.strings[1030] = this.questiontitles[2];
 
-    this.ChooseCategory.ended(300,function(){
+    anim.ended('ChooseCategory', 300, function() {
         thisMode.game.api.synchronize(function() {
-            thisMode.ShowCategories.play();
+            anim.play('ShowCategories');
         });
     });
 
-    this.SFXShowCategoryScreen.ended(function(){
-        if ((!thisMode.MusicChooseCategoryStart.isplaying) && (!thisMode.MusicChooseCategoryLoop.isplaying)) thisMode.MusicChooseCategoryStart.play();
+    anim.ended('SFXShowCategoryScreen', function() {
+        if ((!anim.get('MusicChooseCategoryStart').isplaying) && (!anim.get('MusicChooseCategoryLoop').isplaying)) anim.play('MusicChooseCategoryStart');
     });
 
     // Jouer l'animation du zoom bleu
@@ -211,15 +175,14 @@ ModeCategory.prototype.start = function() {
                 clearInterval(interval);
                 var bluehtml = jQuery('<div />').append(blueDiv.css('z-index','')).html();
                 thisMode.game.html.screen.html(bluehtml); // On ne garde que le grand cadre bleu.
-                thisMode.ChooseCategory.play();
+                anim.play('ChooseCategory');
             }
         };
         interval = setInterval(nextStep,40);
     };
 
-
-    this.SFXShowCategoryScreen.play();
+    anim.play('SFXShowCategoryScreen')
+        .volume('MusicChooseCategoryStart',100)
+        .volume('MusicChooseCategoryLoop',100);
     blueZoom();
-    this.MusicChooseCategoryStart.volume(100);
-    this.MusicChooseCategoryLoop.volume(100);
 };

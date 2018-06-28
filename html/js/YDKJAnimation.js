@@ -286,7 +286,13 @@ YDKJAnimation.prototype.delay = function(delay,f) {
     if (delay > 0) setTimeout(function(){f.call(thisAnim)},delay); else f.call(this);
 };
 
-YDKJAnimation.prototype.play = function() {
+YDKJAnimation.prototype.play = function(delay) {
+    if (typeof delay === "number") {
+        var t = this;
+        this.delay(delay, function() {t.play();});
+        return true;
+    }
+
     if (this.isplaying || this.stopped) return false; // Forcer un appel à reset() pour être capable de relancer une animation.
 
     if (!this.preloaded) {
@@ -461,6 +467,9 @@ var YDKJAnimList = function(resources) {
     this.resources = resources;
     this.html = {};
     this.font = 0;
+
+    // Chargement auto des ressources
+    for(var resourcename in this.resources) if (this.resources.hasOwnProperty(resourcename)) this.load(resourcename);
 };
 
 YDKJAnimList.prototype.load = function(resourcename, name) {
@@ -507,8 +516,8 @@ YDKJAnimList.prototype.delay = function(name, delay, f) {
     return this;
 };
 
-YDKJAnimList.prototype.play = function(name) {
-    this.animations[name].play();
+YDKJAnimList.prototype.play = function(name, delay) {
+    this.animations[name].play(delay);
     return this;
 };
 

@@ -3,59 +3,50 @@
 function ModeR1WrapUp() {}
 
 ModeR1WrapUp.prototype.preload = function(resources) {
-    this.MusicRound2 = new YDKJAnimation(resources['R1WrapUp/MusicRound2']);
-    this.MusicRound2.volume(70);
-    this.MusicChooseCategoryStart = this.MusicRound2; // Sera utilisée par la question 10, elle pensera jouer un son de catégorie.
+    this.animations = new YDKJAnimList(resources);
+    var anim = this.animations;
 
-    this.VoiceRound1Over = new YDKJAnimation(resources['R1WrapUp/VoiceRound1Over']);
-    this.VoiceRound2Start = new YDKJAnimation(resources['R1WrapUp/VoiceRound2Start']);
-    this.ShowRound2 = new YDKJAnimation(resources['R1WrapUp/ShowRound2']);
-
-    this.ShowPlayer1 = new YDKJAnimation(resources['R1WrapUp/ShowPlayer1']);
-    if (this.game.players.length >= 2) {
-        this.ShowPlayer2 = new YDKJAnimation(resources['R1WrapUp/ShowPlayer2']);
-    }
-    if (this.game.players.length == 3) {
-        this.ShowPlayer3 = new YDKJAnimation(resources['R1WrapUp/ShowPlayer3']);
-    }
+    anim.volume('MusicRound2', 70);
+    anim.animations['MusicChooseCategoryStart'] = anim.animations['MusicRound2']; // Sera utilisée par la question 10, elle pensera jouer un son de catégorie.
 };
 
 ModeR1WrapUp.prototype.start = function() {
     var thisMode = this;
+    var anim = this.animations;
 
     var nextcategoryready;
 
-    this.VoiceRound2Start.ended(function() {
+    anim.ended('VoiceRound2Start', function() {
         nextcategoryready(function(nextcategory) {
             nextcategory.modeObj.chooseplayer = thisMode.chooseplayer; // On donne le choix au joueur précédent
-            thisMode.MusicRound2.free();
+            anim.free('MusicRound2');
             nextcategory.start();
         });
     });
 
-    this.VoiceRound1Over.ended(200,function() {
-        thisMode.VoiceRound2Start.play();
+    anim.ended('VoiceRound1Over', 200, function() {
+        anim.play('VoiceRound2Start');
     });
 
     if (thisMode.game.players.length == 3) {
-        this.ShowPlayer3.ended(function () {
-            thisMode.ShowRound2.delay(300, function () {this.play()});
+        anim.ended('ShowPlayer3', function() {
+            anim.play('ShowRound2', 300);
         });
     }
 
     if (thisMode.game.players.length >= 2) {
-        this.ShowPlayer2.ended(function() {
-            if (thisMode.game.players.length == 3) thisMode.ShowPlayer3.play(); else thisMode.ShowRound2.delay(300,function() {this.play()});
+        anim.ended('ShowPlayer2', function() {
+            if (thisMode.game.players.length == 3) anim.play('ShowPlayer3'); else anim.play('ShowRound2', 300);
         });
     }
 
-    this.ShowPlayer1.ended(function() {
-        if (thisMode.game.players.length >= 2) thisMode.ShowPlayer2.play(); else thisMode.ShowRound2.delay(300,function() {this.play()});
+    anim.ended('ShowPlayer1', function() {
+        if (thisMode.game.players.length >= 2) anim.play('ShowPlayer2'); else anim.play('ShowRound2', 300);
     });
 
-    this.ShowPlayer1.delay(500,function() {
+    anim.delay('ShowPlayer1', 500, function() {
         this.play();
-        thisMode.VoiceRound1Over.play();
+        anim.play('VoiceRound1Over');
     });
 
     this.game.font.strings[310] = this.game.players[0].name;
