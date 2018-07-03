@@ -161,10 +161,8 @@ ModeQuestion.prototype.start = function() {
         this.delay(300, function() {
             nextcategoryready(function(nextcategory) {
                 nextcategory.modeObj.chooseplayer = thisMode.currentPlayer; // On donne le choix au joueur qui a bien répondu
-                nextcategory.modeObj.play('MusicChooseCategoryStart')
-                                    .delay('SFXPlayerCorrect', 300, function() {
-                                        anim.play('EndQuestion');
-                                    });
+                nextcategory.modeObj.animations.play('MusicChooseCategoryStart');
+                anim.play('EndQuestion', 300);
             });
         });
     });
