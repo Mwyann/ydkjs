@@ -228,8 +228,8 @@ ModeDisOrDat.prototype.start = function() {
     var jumpToNextCategory = function() {
         nextcategoryready(function(nextcategory){
             nextcategory.modeObj.chooseplayer = thisMode.chooseplayer;
-            nextcategory.modeObj.MusicChooseCategoryLoop.free();
-            nextcategory.modeObj.MusicChooseCategoryLoop = thisMode.MusicLoopRules1;
+            nextcategory.modeObj.animations.free('MusicChooseCategoryLoop');
+            nextcategory.modeObj.animations.animations['MusicChooseCategoryLoop'] = thisMode.MusicLoopRules1;
             thisMode.MusicLoopRules1 = false; // Pour ne pas être détruite au passage à la catégorie suivante
             nextcategory.start();
         });
