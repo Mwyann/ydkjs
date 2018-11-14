@@ -85,8 +85,15 @@ YDKJGame.prototype.start = function() {
             thisGame.api.subscribe();
             (thisGame.api.gamemode())(function (gamemode) {
                 // device detection
-                var audiocontext = new AudioContext();
-                if (audiocontext.state !== 'running') {
+                var AudioContext = window.AudioContext // Default
+                    || window.webkitAudioContext // Safari and old versions of Chrome
+                    || false;
+                var state = '';
+                if (AudioContext) {
+                    var audiocontext = new AudioContext();
+                    state = audiocontext.state;
+                }
+                if (state !== 'running') {
                     var useraction = jQuery('<div />');
                     useraction.html('Mobile user: please touch the screen to start the game').css({
                         'text-align': 'center',
