@@ -160,21 +160,40 @@ InputTextFrame.prototype.start = function() {
 
     this.TextFrameShow.ended(function() {
         var textframediv = this.getDiv();
-        var input = $('<input type="text" style="width:100%;height:100%;position:absolute;top:0;left:0;opacity:0" />');
+        var input = $('<input type="text" style="width:100%;height:100%;position:absolute;top:0;left:0;opacity:0;text-align:center" />');
         $(textframediv).find('div').find('div:first').append(input);
         input.focus();
-        /*input.on('keypress',function(original_e) {
-            var e = jQuery.Event("keypress");
-            e.which = original_e.which; // # Some key code value
-            jQuery(window).trigger(e);
-            return true;
+
+        //for android chrome keycode fix
+        if (navigator.userAgent.match(/Android/i)) {
+            input.on('keyup',function(e){
+                var inputValue = this.value;
+
+                var charKeyCode = e.keyCode || e.which;
+
+                if (charKeyCode == 0 || charKeyCode == 229) {
+                    charKeyCode = inputValue.charCodeAt(inputValue.length-1);
+                }
+
+                if (charKeyCode > 0) thisFrame.sendKeypress(charKeyCode);
+                return false;
+            });
+        } else {
+            input.on('keydown',function(e){
+                var charKeyCode = e.key;
+                if (charKeyCode.length === 1) charKeyCode = charKeyCode.charCodeAt(0);
+                else if (charKeyCode === 'Backspace') charKeyCode = 8;
+                else if (charKeyCode === 'Enter') charKeyCode = 13;
+                else charKeyCode = 0;
+
+                if (charKeyCode > 0) thisFrame.sendKeypress(charKeyCode);
+                return false;
+            });
+        }
+
+        input.on('blur',function(){
+            input.focus();
         });
-        input.on('keydown',function(original_e) {
-            var e = jQuery.Event("keydown");
-            e.which = original_e.which; // # Some key code value
-            jQuery(window).trigger(e);
-            return true;
-        });*/
     });
 
     this.game.font.strings[11] = '<span class="inputframe"></span><img src="'+ITFcursordata+'" style="vertical-align:-8px;padding-bottom:3px;visibility:hidden;margin-left:-4px" class="cursor">';
@@ -187,6 +206,7 @@ InputTextFrame.prototype.start = function() {
 /* Méthode à appeler pour presser une touche */
 InputTextFrame.prototype.sendKeypress = function(key) {
     if (!this.inputframe) return false;
+    if (key <= 0) return false;
     if (key == 13) { // Entrée
         this.game.font.strings[11] = this.inputframe.html();
         this.inputframe = 0;
@@ -207,7 +227,7 @@ InputTextFrame.prototype.sendKeypress = function(key) {
         this.SFXTypeAnswer.play();
     }
     this.resetblink();
-    this.inputframe.html(this.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'));
+    this.inputframe.html(this.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/ /g,'&nbsp;'));
     return true;
 };
 
