@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.0.10deb1
--- http://www.phpmyadmin.net
+-- version 4.6.6deb5
+-- https://www.phpmyadmin.net/
 --
--- Client: localhost
--- Généré le: Mar 12 Janvier 2016 à 11:31
--- Version du serveur: 5.5.46-0ubuntu0.14.04.2
--- Version de PHP: 5.5.9-1ubuntu4.14
+-- Client :  localhost:3306
+-- Généré le :  Lun 21 Janvier 2019 à 18:40
+-- Version du serveur :  5.7.24-0ubuntu0.18.04.1
+-- Version de PHP :  7.2.10-0ubuntu0.18.04.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -14,11 +14,29 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données: `ydkjfr_sta`
+-- Base de données :  `ydkjfr_sta`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `qhdr`
+--
+
+DROP TABLE IF EXISTS `qhdr`;
+CREATE TABLE `qhdr` (
+  `id` varchar(3) NOT NULL,
+  `title` varchar(64) NOT NULL,
+  `folder` varchar(64) NOT NULL,
+  `qtype` set('Question','Gibberish','DisOrDat','JackAttack','Fiber') NOT NULL,
+  `qsubtype` set('Normal','Blank','Who','Eyes') DEFAULT NULL,
+  `value` tinyint(1) DEFAULT NULL,
+  `answer` tinyint(1) DEFAULT NULL,
+  `forcenext` varchar(3) DEFAULT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -27,7 +45,7 @@ SET time_zone = "+00:00";
 --
 
 DROP TABLE IF EXISTS `resani`;
-CREATE TABLE IF NOT EXISTS `resani` (
+CREATE TABLE `resani` (
   `grp` varchar(16) NOT NULL,
   `name` varchar(64) NOT NULL,
   `variantType` varchar(32) NOT NULL DEFAULT '',
@@ -35,8 +53,7 @@ CREATE TABLE IF NOT EXISTS `resani` (
   `resid` int(7) NOT NULL,
   `framestart` int(7) NOT NULL DEFAULT '0',
   `framestop` int(7) DEFAULT NULL,
-  `loopani` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`grp`,`name`,`variantType`,`variantValue`)
+  `loopani` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -100,9 +117,9 @@ INSERT INTO `resani` (`grp`, `name`, `variantType`, `variantValue`, `resid`, `fr
 ('Question', 'BGQuestion3', 'QuestionNumber', 1, -3010, 57, NULL, 0),
 ('Question', 'BGQuestion3', 'QuestionNumber', 2, -3020, 67, NULL, 0),
 ('Question', 'BGQuestion3', 'QuestionNumber', 3, -3030, 66, NULL, 0),
-('Question', 'AnnounceValue', 'QuestionValue', 1000, 11000, 16, NULL, 0),
+('Question', 'AnnounceValue', 'QuestionValue', 1000, 11000, 14, NULL, 0),
 ('Question', 'HideValue', 'QuestionValue', 1000, 11000, 35, NULL, 0),
-('Question', 'AnnounceValue', 'QuestionValue', 3000, 11030, 16, NULL, 0),
+('Question', 'AnnounceValue', 'QuestionValue', 3000, 11030, 14, NULL, 0),
 ('Question', 'HideValue', 'QuestionValue', 3000, 11030, 35, NULL, 0),
 ('Question', 'JingleQuestion1', 'QuestionNumber', 4, -1040, 0, NULL, 0),
 ('Question', 'BGQuestion1', 'QuestionNumber', 4, -1040, 60, NULL, 0),
@@ -143,8 +160,8 @@ INSERT INTO `resani` (`grp`, `name`, `variantType`, `variantValue`, `resid`, `fr
 ('DisOrDat', 'ShowCategory', '', 0, 14000, 21, NULL, 0),
 ('DisOrDat', 'ShowHeader', '', 0, 14000, 8, 15, 0),
 ('DisOrDat', 'TimerTimeOut', '', 0, 8021, 666, NULL, 0),
-('DisOrDat', 'PrepareTimer', '', 0, 8021, 12, NULL, 0),
-('DisOrDat', 'TimerComesIn', '', 0, 8041, 2, NULL, 0),
+('DisOrDat', 'PrepareTimer', 'CategoryNumber', 1, 8021, 12, NULL, 0),
+('DisOrDat', 'TimerComesIn', 'CategoryNumber', 1, 8041, 5, NULL, 0),
 ('DisOrDat', 'IntroStill', '', 0, 14690, 74, NULL, 0),
 ('DisOrDat', 'Intro', '', 0, 14690, 2, NULL, 0),
 ('Question', 'RevealAnswer', '', 0, 12000, 178, NULL, 0),
@@ -182,7 +199,7 @@ INSERT INTO `resani` (`grp`, `name`, `variantType`, `variantValue`, `resid`, `fr
 ('Question', 'Player1AnswerLoop', 'NumberOfPlayers', 3, 3000, 321, 326, 1),
 ('Question', 'Player1Answer', 'NumberOfPlayers', 3, 3000, 307, 319, 0),
 ('Question', 'ShowQuestion', '', 0, 12000, 22, NULL, 0),
-('Question', 'PrepareTimer', '', 0, 8018, 8, NULL, 0),
+('Question', 'PrepareTimer', 'CategoryNumber', 1, 8018, 8, NULL, 0),
 ('Question', 'HideValue', 'QuestionValue', 2000, 11020, 35, NULL, 0),
 ('Question', 'Round1', '', 0, 8014, 0, NULL, 0),
 ('Question', 'BGQuestion1', 'QuestionDemo', 2, -2020, 56, NULL, 0),
@@ -243,9 +260,9 @@ INSERT INTO `resani` (`grp`, `name`, `variantType`, `variantValue`, `resid`, `fr
 ('Question', 'HideQuestion', '', 0, 12000, 31, 35, 0),
 ('Question', 'ShowHeader', '', 0, 12000, 9, 20, 0),
 ('Question', 'TimerTimeOut', '', 0, 8018, 254, NULL, 0),
-('Question', 'AnnounceValue', 'QuestionValue', 2000, 11020, 16, NULL, 0),
-('Question', 'ShowCategory', '', 0, 11020, 0, NULL, 0),
-('Question', 'TimerComesIn', '', 0, 8017, 2, NULL, 0),
+('Question', 'AnnounceValue', 'QuestionValue', 2000, 11020, 14, NULL, 0),
+('Question', 'ShowCategory', 'QuestionValue', 2000, 11020, 0, NULL, 0),
+('Question', 'TimerComesIn', 'CategoryNumber', 1, 8017, 2, NULL, 0),
 ('Question', 'BGQuestion1', 'QuestionDemo', 3, -2030, 55, NULL, 0),
 ('Question', 'JingleQuestion1', 'QuestionDemo', 3, -2030, 0, NULL, 0),
 ('Question', 'JingleQuestion1', 'QuestionDemo', 2, -2020, 0, NULL, 0),
@@ -474,7 +491,112 @@ INSERT INTO `resani` (`grp`, `name`, `variantType`, `variantValue`, `resid`, `fr
 ('Question', 'Player2Answer', 'NumberOfPlayers', 2, 3200, 701, 713, 0),
 ('Question', 'Player2AnswerLoop', 'NumberOfPlayers', 2, 3200, 715, 720, 1),
 ('Question', 'Player2Correct', 'NumberOfPlayers', 2, 3200, 722, NULL, 0),
-('Question', 'Player2Wrong', 'NumberOfPlayers', 2, 3200, 748, NULL, 0);
+('Question', 'Player2Wrong', 'NumberOfPlayers', 2, 3200, 748, NULL, 0),
+('Gibberish', 'Intro1', 'Intro', 1, 12910, 0, NULL, 0),
+('Gibberish', 'Intro1', 'Intro', 2, 12920, 0, NULL, 0),
+('Gibberish', 'Intro1', 'Intro', 4, 12930, 0, NULL, 0),
+('Gibberish', 'Intro1', 'Intro', 3, 12940, 0, NULL, 0),
+('Gibberish', 'BGIntro', 'Intro', 1, 12910, 50, NULL, 0),
+('Gibberish', 'BGIntro', 'Intro', 2, 12920, 50, NULL, 0),
+('Gibberish', 'BGIntro', 'Intro', 3, 12930, 50, NULL, 0),
+('Gibberish', 'BGIntro', 'Intro', 4, 12940, 50, NULL, 0),
+('Gibberish', 'TimerComesIn', 'CategoryNumber', 1, 12905, 4, NULL, 0),
+('Gibberish', 'TimerComesIn', 'CategoryNumber', 2, 12906, 4, NULL, 0),
+('Gibberish', 'TimerDance', 'CategoryNumber', 1, 12905, 24, 319, 1),
+('Gibberish', 'TimerDance', 'CategoryNumber', 2, 12906, 24, 319, 1),
+('Gibberish', 'Intro2', 'Intro', 1, 12910, 25, NULL, 0),
+('Gibberish', 'Intro2', 'Intro', 2, 12920, 25, NULL, 0),
+('Gibberish', 'Intro2', 'Intro', 4, 12930, 25, NULL, 0),
+('Gibberish', 'Intro2', 'Intro', 3, 12940, 25, NULL, 0),
+('Gibberish', 'AnnounceValue', 'QuestionValue', 5000, 11050, 14, NULL, 0),
+('Gibberish', 'AnnounceValue', 'QuestionValue', 10000, 11100, 14, NULL, 0),
+('Gibberish', 'HideValue', 'QuestionValue', 5000, 11050, 35, NULL, 0),
+('Gibberish', 'HideValue', 'QuestionValue', 10000, 11100, 35, NULL, 0),
+('Question', 'ShowCategory', 'QuestionValue', 1000, 11000, 0, NULL, 0),
+('Question', 'ShowCategory', 'QuestionValue', 3000, 11030, 0, NULL, 0),
+('Gibberish', 'ShowCategory', 'QuestionValue', 5000, 11050, 0, NULL, 0),
+('Gibberish', 'ShowCategory', 'QuestionValue', 10000, 11100, 0, NULL, 0),
+('Gibberish', 'ShowHeader', '', 0, 13000, 21, 30, 0),
+('Gibberish', 'ShowPrice', '', 0, 13000, 49, NULL, 0),
+('Gibberish', 'ShowRules', '', 0, 13000, 63, NULL, 0),
+('Gibberish', 'HideRules', '', 0, 13000, 71, 77, 0),
+('Gibberish', 'ShowQuestion', '', 0, 13000, 84, NULL, 0),
+('Gibberish', 'ShowHint1', '', 0, 13000, 92, NULL, 0),
+('Gibberish', 'ShowHint2', '', 0, 13000, 97, NULL, 0),
+('Gibberish', 'ShowHint3', '', 0, 13000, 102, NULL, 0),
+('Gibberish', 'TextFrameShow', '', 0, 13000, 107, NULL, 0),
+('Gibberish', 'TextFrameEnter', '', 0, 13000, 127, NULL, 0),
+('Gibberish', 'TextFrameWrong', '', 0, 13000, 134, 142, 0),
+('Gibberish', 'TextFrameCorrect', '', 0, 13000, 143, NULL, 0),
+('Gibberish', 'TimerStop', 'CategoryNumber', 1, 12905, 17, NULL, 0),
+('Gibberish', 'TimerStop', 'CategoryNumber', 2, 12906, 17, NULL, 0),
+('Gibberish', 'ShowAnswerTyping', '', 0, 13000, 150, NULL, 0),
+('Gibberish', 'ShowAnswerTextFrame', '', 0, 13000, 156, NULL, 0),
+('Question', 'BGQuestion1', 'QuestionNumber', 11, -1110, 63, NULL, 0),
+('Question', 'BGQuestion1', 'QuestionNumber', 12, -1120, 59, NULL, 0),
+('Question', 'BGQuestion1', 'QuestionNumber', 13, -1130, 64, NULL, 0),
+('Question', 'BGQuestion1', 'QuestionNumber', 14, -1140, 64, NULL, 0),
+('Question', 'BGQuestion1', 'QuestionNumber', 15, -1150, 61, NULL, 0),
+('Question', 'BGQuestion1', 'QuestionNumber', 16, -1160, 56, NULL, 0),
+('Question', 'BGQuestion1', 'QuestionNumber', 17, -1170, 63, NULL, 0),
+('Question', 'BGQuestion1', 'QuestionNumber', 18, -1180, 68, NULL, 0),
+('Question', 'BGQuestion1', 'QuestionNumber', 19, -1190, 59, NULL, 0),
+('Question', 'BGQuestion1', 'QuestionNumber', 20, -1200, 62, NULL, 0),
+('Question', 'BGQuestion2', 'QuestionNumber', 11, -2110, 54, NULL, 0),
+('Question', 'JingleQuestion1', 'QuestionNumber', 13, -1130, 0, NULL, 0),
+('Question', 'BGQuestion2', 'QuestionNumber', 12, -2120, 58, NULL, 0),
+('Question', 'JingleQuestion1', 'QuestionNumber', 12, -1120, 0, NULL, 0),
+('Question', 'JingleQuestion1', 'QuestionNumber', 11, -1110, 0, NULL, 0),
+('Question', 'BGQuestion2', 'QuestionNumber', 13, -2130, 65, NULL, 0),
+('Question', 'BGQuestion2', 'QuestionNumber', 14, -2140, 55, NULL, 0),
+('Question', 'BGQuestion2', 'QuestionNumber', 15, -2150, 59, NULL, 0),
+('Question', 'BGQuestion2', 'QuestionNumber', 16, -2160, 53, NULL, 0),
+('Question', 'BGQuestion2', 'QuestionNumber', 17, -2170, 55, NULL, 0),
+('Question', 'BGQuestion2', 'QuestionNumber', 18, -2180, 55, NULL, 0),
+('Question', 'BGQuestion2', 'QuestionNumber', 19, -2190, 55, NULL, 0),
+('Question', 'BGQuestion2', 'QuestionNumber', 20, -2200, 63, NULL, 0),
+('Question', 'JingleQuestion1', 'QuestionNumber', 14, -1140, 0, NULL, 0),
+('Question', 'JingleQuestion1', 'QuestionNumber', 15, -1150, 0, NULL, 0),
+('Question', 'JingleQuestion1', 'QuestionNumber', 16, -1160, 0, NULL, 0),
+('Question', 'JingleQuestion1', 'QuestionNumber', 17, -1170, 0, NULL, 0),
+('Question', 'JingleQuestion1', 'QuestionNumber', 18, -1180, 0, NULL, 0),
+('Question', 'JingleQuestion1', 'QuestionNumber', 19, -1190, 0, NULL, 0),
+('Question', 'JingleQuestion1', 'QuestionNumber', 20, -1200, 0, NULL, 0),
+('Question', 'JingleQuestion2', 'QuestionNumber', 11, -2110, 0, NULL, 0),
+('Question', 'JingleQuestion2', 'QuestionNumber', 12, -2120, 0, NULL, 0),
+('Question', 'JingleQuestion2', 'QuestionNumber', 13, -2130, 0, NULL, 0),
+('Question', 'JingleQuestion2', 'QuestionNumber', 14, -2140, 0, NULL, 0),
+('Question', 'JingleQuestion2', 'QuestionNumber', 15, -2150, 0, NULL, 0),
+('Question', 'JingleQuestion2', 'QuestionNumber', 16, -2160, 0, NULL, 0),
+('Question', 'JingleQuestion2', 'QuestionNumber', 17, -2170, 0, NULL, 0),
+('Question', 'JingleQuestion2', 'QuestionNumber', 18, -2180, 0, NULL, 0),
+('Question', 'JingleQuestion2', 'QuestionNumber', 19, -2190, 0, NULL, 0),
+('Question', 'JingleQuestion2', 'QuestionNumber', 20, -2200, 0, NULL, 0),
+('Intro', 'ShowRound1.1', '', 0, 8100, 0, NULL, 0),
+('Intro', 'ShowRound1.2', '', 0, 8101, 0, NULL, 0),
+('Intro', 'ShowRound1.3', '', 0, 8102, 0, NULL, 0),
+('Intro', 'TiltRound1.1', '', 0, 8100, 12, NULL, 0),
+('Intro', 'TiltRound1.2', '', 0, 8101, 18, NULL, 0),
+('Intro', 'TiltRound1.3', '', 0, 8102, 27, NULL, 0),
+('R1WrapUp', 'ShowRound2.1', '', 0, 8200, 0, NULL, 0),
+('R1WrapUp', 'ShowRound2.2', '', 0, 8201, 0, NULL, 0),
+('R1WrapUp', 'ShowRound2.3', '', 0, 8202, 0, NULL, 0),
+('R1WrapUp', 'ShowPlayer1', 'NumberOfPlayers', 1, 3100, 0, NULL, 0),
+('R1WrapUp', 'ShowPlayer1', 'NumberOfPlayers', 2, 3100, 15, NULL, 0),
+('R1WrapUp', 'ShowPlayer2', 'NumberOfPlayers', 2, 3100, 70, NULL, 0),
+('R1WrapUp', 'ShowPlayer1', 'NumberOfPlayers', 3, 3100, 130, NULL, 0),
+('R1WrapUp', 'ShowPlayer2', 'NumberOfPlayers', 3, 3100, 182, NULL, 0),
+('R1WrapUp', 'ShowPlayer3', 'NumberOfPlayers', 3, 3100, 234, NULL, 0),
+('Question', 'TimerComesIn', 'CategoryNumber', 2, 8019, 2, NULL, 0),
+('Question', 'PrepareTimer', 'CategoryNumber', 2, 8018, 36, NULL, 0),
+('Question', 'HideValue', 'QuestionValue', 4000, 11040, 35, NULL, 0),
+('Question', 'AnnounceValue', 'QuestionValue', 4000, 11040, 14, NULL, 0),
+('Question', 'ShowCategory', 'QuestionValue', 4000, 11040, 0, NULL, 0),
+('Question', 'ShowCategory', 'QuestionValue', 6000, 11060, 0, NULL, 0),
+('Question', 'AnnounceValue', 'QuestionValue', 6000, 11060, 14, NULL, 0),
+('Question', 'HideValue', 'QuestionValue', 6000, 11060, 35, NULL, 0),
+('DisOrDat', 'TimerComesIn', 'CategoryNumber', 2, 8042, 5, NULL, 0),
+('DisOrDat', 'PrepareTimer', 'CategoryNumber', 2, 8021, 50, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -483,10 +605,9 @@ INSERT INTO `resani` (`grp`, `name`, `variantType`, `variantValue`, `resid`, `fr
 --
 
 DROP TABLE IF EXISTS `resfiles`;
-CREATE TABLE IF NOT EXISTS `resfiles` (
+CREATE TABLE `resfiles` (
   `resid` int(7) NOT NULL,
-  `filename` varchar(40) NOT NULL,
-  PRIMARY KEY (`resid`)
+  `filename` varchar(40) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -623,15 +744,14 @@ INSERT INTO `resfiles` (`resid`, `filename`) VALUES
 --
 
 DROP TABLE IF EXISTS `ressnd`;
-CREATE TABLE IF NOT EXISTS `ressnd` (
+CREATE TABLE `ressnd` (
   `grp` varchar(16) NOT NULL,
   `name` varchar(64) NOT NULL,
   `variantType` varchar(32) NOT NULL,
   `variantValue` int(7) NOT NULL,
   `resfolder` varchar(64) NOT NULL,
   `val` varchar(256) NOT NULL DEFAULT '1',
-  `loopsnd` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`grp`,`name`,`variantType`,`variantValue`)
+  `loopsnd` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -670,12 +790,12 @@ INSERT INTO `ressnd` (`grp`, `name`, `variantType`, `variantValue`, `resfolder`,
 ('Question', 'DefaultRevealLastAnswer', '', 0, 'JACKSND1/Mc57', '1,2,3,4,5,6,7,8,9,11,12', 0),
 ('Question', 'DefaultRevealFreeAnswer', '', 0, 'JACKSND1/Mc00', '1,2,3', 0),
 ('Question', 'DefaultWrongAnswer', '', 0, 'JACKSND1/Mc20', '1,2,3,4,5,6,7,8,9,11,12,13,14,15,16,17,18,19,20,21,22,23,24', 0),
-(' Gibberish', 'FreeAnswerHurryUp', '', 0, 'GIBBER/Md15', '1,2,3,4,5,6,7', 0),
-(' Gibberish', 'FreeAnswerPlayer1', '', 0, 'GIBBER/Md11', '1,2,3,4', 0),
-(' Gibberish', 'FreeAnswerPlayer2', '', 0, 'GIBBER/Md12', '1,2,3', 0),
-(' Gibberish', 'FreeAnswerPlayer3', '', 0, 'GIBBER/Md13', '1,2,3', 0),
-(' Gibberish', 'FreeAnswerPressEnter', '', 0, 'GIBBER/Md14', '1,2,3,4', 0),
-(' Gibberish', 'FreeAnswerTimeOut', '', 0, 'GIBBER/Md16', '1,2,3,4,5,6,7,8,9,10,11,12', 0),
+('Gibberish', 'FreeAnswerHurry2', '', 0, 'GIBBER/Md15', '1,2,3,4,5,6,7', 0),
+('Gibberish', 'FreeAnswerPlayer1', 'PlayerSolo', 0, 'GIBBER/Md11', '1,2,3,4', 0),
+('Gibberish', 'FreeAnswerPlayer2', 'PlayerSolo', 0, 'GIBBER/Md12', '1,2,3', 0),
+('Gibberish', 'FreeAnswerPlayer3', 'PlayerSolo', 0, 'GIBBER/Md13', '1,2,3', 0),
+('Gibberish', 'FreeAnswerHurry1', '', 0, 'GIBBER/Md14', '1,2,3,4', 0),
+('Gibberish', 'FreeAnswerTimeOut', '', 0, 'GIBBER/Md16', '1,2,3,4,5,6,7,8,9,10,11,12', 0),
 ('Question', 'JingleReadQuestion', '', 0, 'JACKSND1/Mc70', '1,2,3,4,5,6', 1),
 ('Question', 'JingleTimer', '', 0, 'JACKSND1/Mc71', '1,2,3,4,5,6', 0),
 ('Question', 'LastPlayer1', 'PlayerSolo', 0, 'JACKSND1/Mc21', '1,2,3', 0),
@@ -883,8 +1003,8 @@ INSERT INTO `ressnd` (`grp`, `name`, `variantType`, `variantValue`, `resfolder`,
 ('Intro', 'WelcomePlayers', 'NumberOfPlayers', 1, 'TITLE/Mh12', '1,2,3,4,5,6', 0),
 ('DisOrDat', 'SFXScoreWin', '', 0, 'DDSND/Mb84', '2', 0),
 ('JackAttack', 'ExplainRules', '', 0, 'JATTACK2/Me01', '1,2,3,4', 0),
-('JackAttack', 'NoExplain1Player', 'PlayerSolo', 1, 'JATTACK2/Me03', '1,2', 0),
-('JackAttack', 'NoExplain23Players', 'PlayerSolo', 0, 'JATTACK2/Me04', '1,2,3,4', 0),
+('JackAttack', 'NoExplain', 'PlayerSolo', 1, 'JATTACK2/Me03', '1,2', 0),
+('JackAttack', 'NoExplain', 'PlayerSolo', 0, 'JATTACK2/Me04', '1,2,3,4', 0),
 ('JackAttack', 'SkipRules', '', 0, 'JATTACK2/Me05', '1,2,3', 0),
 ('JackAttack', 'CategorySelected', '', 0, 'JATTACK2/Me10', '1', 0),
 ('JackAttack', 'SFXRip', '', 0, 'JATTACK2/Me11', '1', 0),
@@ -918,7 +1038,100 @@ INSERT INTO `ressnd` (`grp`, `name`, `variantType`, `variantValue`, `resfolder`,
 ('End', 'EndMusic', '', 0, 'JATTACK1/Me21', '8', 0),
 ('End', 'AudienceJack', '', 0, 'ENDGAME/Mk53', '1', 0),
 ('End', 'StartMusicJack', '', 0, 'ENDGAME/Mg40', '1', 1),
-('End', 'MusicJack', '', 0, 'ENDGAME/Mg40', '2', 1);
+('End', 'MusicJack', '', 0, 'ENDGAME/Mg40', '2', 1),
+('Credits', 'NewPlayers', '', 0, 'CREDITS/Ml07', '1,2,3', 0),
+('Gibberish', 'SFXIntro1', 'FirstGibberish', 1, 'GIBBER/Md01', '1', 0),
+('Gibberish', 'SFXIntro1', 'FirstGibberish', 0, 'GIBBER/Md02', '1', 0),
+('Gibberish', 'SFXIntro2', '', 0, 'GIBBER/Md03', '1,2,3,4', 0),
+('Gibberish', 'AnnounceCategory', '', 0, 'GIBBER/Md04', '1,2,3,4,5', 0),
+('Gibberish', 'VoiceAnnounceValue', 'QuestionValue', 5000, 'GIBBER/Md05', '1,2,3,4,5', 0),
+('Gibberish', 'VoiceAnnounceValue', 'QuestionValue', 10000, 'GIBBER/Md06', '1,2,3,4,5', 0),
+('Gibberish', 'ExplainRules', '', 0, 'GIBBER/Md07', '1,2,3,4', 0),
+('Gibberish', 'NoScrew', '', 0, 'GIBBER/Md08', '1,2,3,4', 0),
+('Gibberish', 'FreeAnswerPlayer1', 'PlayerSolo', 1, 'GIBBER/Md10', '1,2,3,4,5,6,7,8,9,10', 0),
+('Gibberish', 'LastPlayers', 'PlayerSolo', 0, 'GIBBER/Md17', '1,2,3,4', 0),
+('Gibberish', 'LastPlayer1', 'PlayerSolo', 0, 'GIBBER/Md18', '1,2', 0),
+('Gibberish', 'LastPlayer2', 'PlayerSolo', 0, 'GIBBER/Md19', '1,2', 0),
+('Gibberish', 'LastPlayer3', 'PlayerSolo', 0, 'GIBBER/Md20', '1,2,3', 0),
+('Gibberish', 'Wrong0Clue', '', 0, 'GIBBER/Md21', '1,2,3,4', 0),
+('Gibberish', 'Wrong1Clue', '', 0, 'GIBBER/Md22', '1,2,3,4', 0),
+('Gibberish', 'Wrong2Clue', '', 0, 'GIBBER/Md23', '1,2,3', 0),
+('Gibberish', 'Wrong3Clue', '', 0, 'GIBBER/Md24', '1,2,3,4', 0),
+('Gibberish', 'WrongSoClose', '', 0, 'GIBBER/Md25', '1,2,3,4', 0),
+('Gibberish', 'MusicIntro1', '', 0, 'GIBBER/Md40', '1', 0),
+('Gibberish', 'MusicIntro2', '', 0, 'GIBBER/Md41', '1', 0),
+('Gibberish', 'MusicPart1', '', 0, 'GIBBER/Md42', '1', 0),
+('Gibberish', 'MusicPart2', '', 0, 'GIBBER/Md42', '2', 0),
+('Gibberish', 'MusicPart3', '', 0, 'GIBBER/Md42', '3', 0),
+('Gibberish', 'SFXTypeHeartBeat', '', 0, 'GIBBER/Md43', '1', 1),
+('Gibberish', 'SFXShowQuestion', '', 0, 'GIBBER/Md50', '1', 0),
+('Gibberish', 'SFXAnswerEntered', '', 0, 'GIBBER/Md51', '1', 0),
+('Gibberish', 'SFXShowTextFrame', '', 0, 'GIBBER/Md52', '1', 0),
+('Gibberish', 'SFXEraseAnswer', '', 0, 'GIBBER/Md53', '1', 1),
+('Gibberish', 'SFXTypeAnswer', '', 0, 'GIBBER/Md55', '1', 0),
+('Gibberish', 'SFXTypeBack', '', 0, 'GIBBER/Md58', '1', 0),
+('Gibberish', 'SFXTextFrameWrong', '', 0, 'GIBBER/Md59', '1', 0),
+('Gibberish', 'SFXShowAnswerAudience', '', 0, 'GIBBER/Md60', '1', 0),
+('Gibberish', 'BadWord1', '', 0, 'GIBBER/Md70', '1', 0),
+('Gibberish', 'BadWord2', '', 0, 'GIBBER/Md71', '1', 0),
+('Gibberish', 'BadWord3', '', 0, 'GIBBER/Md72', '1', 0),
+('Gibberish', 'Intro', '', 0, 'GIBBER/Md80', '1,2,3,4', 0),
+('Gibberish', 'SFXEnterWoo', '', 0, 'GIBBER/Md81', '1', 0),
+('Gibberish', 'SFXTimerComesIn', '', 0, 'GIBBER/Md82', '1', 0),
+('Intro', 'SFXShowRound1', '', 0, 'TITLE/Mh41', '1,2,3', 0),
+('R1WrapUp', 'VoiceRound1Over', '', 0, 'R1WRAPUP/Mf01', '1,2,3,4', 0),
+('R1WrapUp', 'VoiceGiveScrews', '', 0, 'R1WRAPUP/Mf02', '1,2,3,4,5,6,7,8,9,10,11', 0),
+('R1WrapUp', 'VoiceRound2Start', '', 0, 'R1WRAPUP/Mf03', '1,2,3', 0),
+('R1WrapUp', 'VoiceExplainScrews', '', 0, 'R1WRAPUP/Mf04', '1,2,3,4', 0),
+('R1WrapUp', 'MusicRound2', '', 0, 'R1WRAPUP/Mf10', '1,2', 1),
+('R1WrapUp', 'SFXShowRound2', '', 0, 'R1WRAPUP/Mf20', '1,2,3', 0),
+('R1WrapUp', 'SFXGiveScrews', '', 0, 'R1WRAPUP/Mf21', '1,2', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `strings`
+--
+
+DROP TABLE IF EXISTS `strings`;
+CREATE TABLE `strings` (
+  `folder` varchar(64) NOT NULL,
+  `strings` text NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+--
+-- Index pour les tables exportées
+--
+
+--
+-- Index pour la table `qhdr`
+--
+ALTER TABLE `qhdr`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Index pour la table `resani`
+--
+ALTER TABLE `resani`
+  ADD PRIMARY KEY (`grp`,`name`,`variantType`,`variantValue`);
+
+--
+-- Index pour la table `resfiles`
+--
+ALTER TABLE `resfiles`
+  ADD PRIMARY KEY (`resid`);
+
+--
+-- Index pour la table `ressnd`
+--
+ALTER TABLE `ressnd`
+  ADD PRIMARY KEY (`grp`,`name`,`variantType`,`variantValue`);
+
+--
+-- Index pour la table `strings`
+--
+ALTER TABLE `strings`
+  ADD PRIMARY KEY (`folder`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

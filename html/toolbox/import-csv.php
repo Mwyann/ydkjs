@@ -3,7 +3,7 @@
 require_once 'mysql.inc.php';
 pdo_select_db($DBsta);
 
-echo 'Importing QHDR...';
+echo "Importing QHDR... ";
 if (($handle = fopen("qhdr.csv", "r")) !== FALSE) {
     $DB->query("DELETE FROM qhdr");
     while (($data = fgetcsv($handle, 2000, chr(0xBD), chr(0xBE))) !== FALSE) { // 0xBD et 0xBE sont les deux seuls caractères que j'ai trouvé utilisables, non présents dans le charset UTF8...
@@ -42,10 +42,10 @@ if (($handle = fopen("qhdr.csv", "r")) !== FALSE) {
     $DB->query("UPDATE qhdr SET qsubtype = NULL WHERE qsubtype = ''");
     $DB->query("UPDATE qhdr SET answer = NULL WHERE answer = 0");
     fclose($handle);
-    echo 'OK<br/>';
-} else echo 'Missing<br/>';
+    echo "OK\n";
+} else echo "Missing\n";
 
-echo 'Importing strings...';
+echo "Importing strings... ";
 if (($handle = fopen("strings.csv", "r")) !== FALSE) {
     $DB->query("DELETE FROM strings");
     while (($data = fgetcsv($handle, 2000, chr(0xBD), chr(0xBE))) !== FALSE) {
@@ -55,5 +55,5 @@ if (($handle = fopen("strings.csv", "r")) !== FALSE) {
                     '".addslashes(str_replace(chr(13),'\\n',str_replace(chr(10),'',$data[1])))."')");
     }
     fclose($handle);
-    echo 'OK<br/>';
-} else echo 'Missing<br/>';
+    echo "OK\n";
+} else echo "Missing\n";
