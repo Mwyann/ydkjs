@@ -280,7 +280,7 @@ ModeGibberish.prototype.start = function() {
                 thisMode.SFXPlayerLose.play();
                 thisMode.availPlayers[thisMode.buzzPlayer] = 0;
 
-                thisMode.game.players[thisMode.buzzPlayer-1].score = parseInt(thisMode.game.players[thisMode.buzzPlayer-1].score) - parseInt(thisMode.options.value);
+                thisMode.game.players[thisMode.buzzPlayer-1].score = parseInt(thisMode.game.players[thisMode.buzzPlayer-1].score) - (parseInt(thisMode.options.value)-currentpos*decreasing);
                 thisMode.game.font.strings[10*thisMode.buzzPlayer+105] = thisMode.game.displayCurrency(thisMode.game.players[thisMode.buzzPlayer-1].score);
 
                 switch (thisMode.buzzPlayer) {
@@ -363,7 +363,7 @@ ModeGibberish.prototype.start = function() {
         var resultat = checkTextWrds(text,getSTRfromID(thisMode.STR,'Wrds',128));
         if (resultat == 2) { // Bonne réponse !
             var correctAnswer = function() {
-                thisMode.game.players[thisMode.buzzPlayer-1].score = parseInt(thisMode.game.players[thisMode.buzzPlayer-1].score) + parseInt(thisMode.options.value);
+                thisMode.game.players[thisMode.buzzPlayer-1].score = parseInt(thisMode.game.players[thisMode.buzzPlayer-1].score) + (parseInt(thisMode.options.value)-currentpos*decreasing);
                 thisMode.game.font.strings[10*thisMode.buzzPlayer+105] = thisMode.game.displayCurrency(thisMode.game.players[thisMode.buzzPlayer-1].score);
 
                 thisMode.TextFrameShow.reset();
