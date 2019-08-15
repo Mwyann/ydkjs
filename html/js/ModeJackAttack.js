@@ -67,6 +67,16 @@ ModeJackAttack.prototype.preload = function(resources) {
     this.QuestionCorrect = new YDKJAnimation(resources['JackAttack/QuestionCorrect']);
     this.AnswerCorrect = new YDKJAnimation(resources['JackAttack/AnswerCorrect']);
 
+    // Animations spéciales pour afficher les touches en version mobile
+    if (isMobile()) {
+        this.Player1Button = new YDKJAnimation(resources['Intro/Player1']);
+        if (this.game.players.length >= 2) {
+            this.Player2Button = new YDKJAnimation(resources['Intro/Player2']);
+        }
+        if (this.game.players.length == 3) {
+            this.Player3Button = new YDKJAnimation(resources['Intro/Player3']);
+        }
+    }
     for(var i = 1; i < 50; i++) {
         this['ShowAnswer'+ i.toString() + '.1'] = new YDKJAnimation(resources['JackAttack/ShowAnswer'+ i.toString() + '.1']);
         this['ShowAnswer'+ i.toString() + '.2'] = new YDKJAnimation(resources['JackAttack/ShowAnswer'+ i.toString() + '.2']);
@@ -104,9 +114,21 @@ ModeJackAttack.prototype.start = function() {
 
     var currentAnswerAnim;
     var endgameready;
+    var pressKey;
 
     var endGame = function() {
         thisMode.game.api.registeraction('playerAnswer', function(data){});
+        unbindKeyListener(pressKey);
+        // Effacer les touches à l'écran pour les appareils mobiles
+        if (isMobile()) {
+            thisMode.Player1Button.free();
+            if (thisMode.game.players.length >= 2) {
+                thisMode.Player2Button.free();
+            }
+            if (thisMode.game.players.length == 3) {
+                thisMode.Player3Button.free();
+            }
+        }
         endgameready(function(endgame) {
             endgame.start();
         });
@@ -301,6 +323,7 @@ ModeJackAttack.prototype.start = function() {
                 Wrong.reset();
                 Scream.reset();
                 Wrong.play();
+                Wrong.getDiv().css('pointer-events','none');
                 Scream.play();
                 divWrong.stop(true).css({
                     'opacity': 0.8
@@ -316,7 +339,7 @@ ModeJackAttack.prototype.start = function() {
         });
     };
 
-    var pressKey = function(choice) {
+    pressKey = function(choice) {
         if (currentAnswer > 50) return false; // Dès qu'on a trouvé la bonne réponse on ignore les appuis sur les touches
         if (currentAnswer == 0) return false;
         var buzzPlayer = 0;
@@ -331,6 +354,33 @@ ModeJackAttack.prototype.start = function() {
     };
 
     var startGame = function() {
+        // device detection
+        if(isMobile()) {
+            // Animations spéciales pour afficher les touches en version mobile
+            var div;
+            thisMode.game.font.strings[310] = thisMode.game.players[0].name;
+            thisMode.game.font.strings[315] = '';
+            thisMode.Player1Button.play();
+            thisMode.Player1Button.click(function(){pressKey(thisMode.game.players[0].keycode[0])});
+            div = thisMode.Player1Button.getDiv();
+            div.css('opacity','0.5');
+            if (thisMode.game.players.length >= 2) {
+                thisMode.game.font.strings[320] = thisMode.game.players[1].name;
+                thisMode.game.font.strings[325] = '';
+                thisMode.Player2Button.play();
+                thisMode.Player2Button.click(function(){pressKey(thisMode.game.players[1].keycode[0])});
+                div = thisMode.Player2Button.getDiv();
+                div.css('opacity','0.5');
+            }
+            if (thisMode.game.players.length == 3) {
+                thisMode.game.font.strings[330] = thisMode.game.players[2].name;
+                thisMode.game.font.strings[335] = '';
+                thisMode.Player3Button.play();
+                thisMode.Player3Button.click(function(){pressKey(thisMode.game.players[2].keycode[0])});
+                div = thisMode.Player3Button.getDiv();
+                div.css('opacity','0.5');
+            }
+        }
         thisMode.listener = bindKeyListener(pressKey);
         registerPlayerAnswer();
         thisMode.BGMusic1.play();

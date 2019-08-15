@@ -805,17 +805,19 @@ function resources() {
         $res = $DB->query("SELECT *
                            FROM ".$DBsta.".resani a, ".$DBsta.".resfiles f
                            WHERE a.resid = f.resid
-                           AND grp = 'JackAttack'");
+                           AND (grp = 'JackAttack' OR grp = 'Intro')");
         while ($rs = $res->fetch()) {
             if (($rs['variantType'] == 'CategoryNumber') && ($rs['variantValue'] != $category)) continue;
+            if (($rs['variantType'] == 'NumberOfPlayers') && ($rs['variantValue'] != $nbplayers)) continue; // Ignorer ce qui ne correspond pas au bon nombre de joueurs
 
-            // Cas particulier pour les joueurs : en mode solo, on prend le joueur du milieu (Player2), en deux joueurs on prend les extrémités (Player1 et Player3), et en 3 joueurs bah on prend les 3 bien sûr.
-            if ((substr($rs['name'],0,7) == 'Player1') && ($nbplayers == 1)) continue; // On ignore le Player1 en mode un joueur (dingue non ?)
-            if ((substr($rs['name'],0,7) == 'Player2') && ($nbplayers == 2)) continue; // On ignore le Player2 en mode deux joueurs (ce mec est fou)
-            if ((substr($rs['name'],0,7) == 'Player2') && ($nbplayers == 1)) $rs['name'] = str_replace('Player2','Player1',$rs['name']); // Mais en mode solo, le Player2 devient le Player1.
-            if ((substr($rs['name'],0,7) == 'Player3') && ($nbplayers == 1)) continue; // On ignore le Player3 en solo (ha enfin quelque chose de sensé)
-            if ((substr($rs['name'],0,7) == 'Player3') && ($nbplayers == 2)) $rs['name'] = str_replace('Player3','Player2',$rs['name']); // Et enfin, à deux, le Player3 devient le Player2.
-
+            if ($rs['grp'] != 'Intro') {
+                // Cas particulier pour les joueurs : en mode solo, on prend le joueur du milieu (Player2), en deux joueurs on prend les extrémités (Player1 et Player3), et en 3 joueurs bah on prend les 3 bien sûr.
+                if ((substr($rs['name'],0,7) == 'Player1') && ($nbplayers == 1)) continue; // On ignore le Player1 en mode un joueur (dingue non ?)
+                if ((substr($rs['name'],0,7) == 'Player2') && ($nbplayers == 2)) continue; // On ignore le Player2 en mode deux joueurs (ce mec est fou)
+                if ((substr($rs['name'],0,7) == 'Player2') && ($nbplayers == 1)) $rs['name'] = str_replace('Player2','Player1',$rs['name']); // Mais en mode solo, le Player2 devient le Player1.
+                if ((substr($rs['name'],0,7) == 'Player3') && ($nbplayers == 1)) continue; // On ignore le Player3 en solo (ha enfin quelque chose de sensé)
+                if ((substr($rs['name'],0,7) == 'Player3') && ($nbplayers == 2)) $rs['name'] = str_replace('Player3','Player2',$rs['name']); // Et enfin, à deux, le Player3 devient le Player2.
+            }
             if ((substr($rs['name'],0,12) == 'ShowSkipText') || (substr($rs['name'],0,12) == 'HideSkipText')) {
                 if ($rs['name'] == 'ShowSkipText'.$skiprules) $rs['name'] = 'ShowSkipText';
                 elseif ($rs['name'] == 'HideSkipText'.$skiprules) $rs['name'] = 'HideSkipText';
