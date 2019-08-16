@@ -304,7 +304,6 @@ YDKJAnimation.prototype.play = function(delay) {
     var thisAnim = this;
 
     var setupEnd = function() { // this.triggerEnd lorsque l'animation est terminée, basée sur this.length()
-        if (thisAnim.loop) return false; // Les boucles ont leur propre trigger de fin
         var lth = thisAnim.length();
         for(var i = 0; i < thisAnim.endedFunctions.length; i++) {
             (function(i){

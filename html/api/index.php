@@ -91,14 +91,14 @@ function gameinfo() {
         );
     elseif ($nbplayers == 2)
         $players = array(
-            array('name' => $noms[0],'score' => 0,'screw' => 0,'keycode' => array(113,81)),
-            array('name' => $noms[1],'score' => 0,'screw' => 0,'keycode' => array(112,80))
+            array('name' => $noms[0],'score' => 0,'screw' => 1,'keycode' => array(113,81)),
+            array('name' => $noms[1],'score' => 0,'screw' => 1,'keycode' => array(112,80))
         );
     elseif ($nbplayers == 3)
         $players = array(
-            array('name' => $noms[0],'score' => 0,'screw' => 0,'keycode' => array(113,81)),
-            array('name' => $noms[1],'score' => 0,'screw' => 0,'keycode' => array(98,66)),
-            array('name' => $noms[2],'score' => 0,'screw' => 0,'keycode' => array(112,80))
+            array('name' => $noms[0],'score' => 0,'screw' => 1,'keycode' => array(113,81)),
+            array('name' => $noms[1],'score' => 0,'screw' => 1,'keycode' => array(98,66)),
+            array('name' => $noms[2],'score' => 0,'screw' => 1,'keycode' => array(112,80))
         );
 
     if (!$localMode) {

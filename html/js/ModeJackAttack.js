@@ -319,7 +319,7 @@ ModeJackAttack.prototype.start = function() {
                 thisMode.AudienceCorrect.play();
             } else {
                 thisMode.game.players[buzzPlayer-1].score = parseInt(thisMode.game.players[buzzPlayer-1].score) - 2000;
-                var divWrong = thisMode[currentAnswerAnim+'.2'].getDiv();
+                var divWrong = thisMode[currentAnswerAnim+'.2'].getDiv(); // TODO Bug ici parfois (TypeError: Cannot read property 'getDiv' of undefined)
                 Wrong.reset();
                 Scream.reset();
                 Wrong.play();
@@ -361,14 +361,14 @@ ModeJackAttack.prototype.start = function() {
             thisMode.game.font.strings[310] = thisMode.game.players[0].name;
             thisMode.game.font.strings[315] = '';
             thisMode.Player1Button.play();
-            thisMode.Player1Button.click(function(){pressKey(thisMode.game.players[0].keycode[0])});
+            thisMode.Player1Button.click(function(){pressKey(firstKeycode(thisMode.game.players[0].keycode))});
             div = thisMode.Player1Button.getDiv();
             div.css('opacity','0.5');
             if (thisMode.game.players.length >= 2) {
                 thisMode.game.font.strings[320] = thisMode.game.players[1].name;
                 thisMode.game.font.strings[325] = '';
                 thisMode.Player2Button.play();
-                thisMode.Player2Button.click(function(){pressKey(thisMode.game.players[1].keycode[0])});
+                thisMode.Player2Button.click(function(){pressKey(firstKeycode(thisMode.game.players[1].keycode))});
                 div = thisMode.Player2Button.getDiv();
                 div.css('opacity','0.5');
             }
@@ -376,7 +376,7 @@ ModeJackAttack.prototype.start = function() {
                 thisMode.game.font.strings[330] = thisMode.game.players[2].name;
                 thisMode.game.font.strings[335] = '';
                 thisMode.Player3Button.play();
-                thisMode.Player3Button.click(function(){pressKey(thisMode.game.players[2].keycode[0])});
+                thisMode.Player3Button.click(function(){pressKey(firstKeycode(thisMode.game.players[2].keycode))});
                 div = thisMode.Player3Button.getDiv();
                 div.css('opacity','0.5');
             }

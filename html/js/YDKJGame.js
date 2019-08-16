@@ -80,6 +80,14 @@ YDKJGame.prototype.start = function() {
         thisGame.gameinfoready(function (gameinfo) {
             thisGame.players = gameinfo.players;
             thisGame.locale = gameinfo.locale;
+            thisGame.screwKeycodes = [];
+            switch(thisGame.locale) {
+                case 'fr_FR': thisGame.screwKeycodes = [118, 86]; break; // v ou V (vicieuse)
+                case 'en_GB':
+                case 'en_US': thisGame.screwKeycodes = [115, 83]; break; // s ou S (screw)
+                case 'de_DE': thisGame.screwKeycodes = [110, 78]; break; // n ou N (nageln)
+                default: thisGame.screwKeycodes = [];
+            }
             thisGame.engineVersion = gameinfo.engineVersion;
             thisGame.api.localMode = gameinfo.localMode;
             thisGame.api.subscribe();
@@ -137,17 +145,11 @@ YDKJGame.prototype.displayCurrency = function(value) {
     if (value < 0) minus = '-';
     value = Math.abs(value).toString();
 
-    if (this.locale == 'fr_FR') {
-        return minus+value+' F';
+    switch(this.locale) {
+        case 'fr_FR': return minus+value+' F';
+        case 'en_GB': return minus+'£'+thousandSeparator(value,',');
+        case 'en_US': return minus+'$'+value.toString();
+        case 'de_DE': return minus+'<span style="font-size:70%">DM</span>'+value.toString();
+        default: return value.toString();
     }
-    if (this.locale == 'en_GB') {
-        return minus+'£'+thousandSeparator(value,',');
-    }
-    if (this.locale == 'en_US') {
-        return minus+'$'+value.toString();
-    }
-    if (this.locale == 'de_DE') {
-        return minus+'<span style="font-size:70%">DM</span>'+value.toString();
-    }
-    return value.toString();
 };

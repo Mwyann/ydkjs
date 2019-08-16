@@ -9,6 +9,8 @@ ModeQuestion.prototype.preload = function(resources) {
 
     this.Timer = this.options.timer;
     this.timerTimeout = 0;
+
+    // TODO: AnnounceFreeAnswer (Mc55) n'est pas présent dans la version allemande !
 };
 
 ModeQuestion.prototype.start = function() {
@@ -16,7 +18,16 @@ ModeQuestion.prototype.start = function() {
     var anim = this.animations;
 
     var nextcategoryready = 0;
-    var misskeyallowed = 0;
+    var misskeyallowed = -1; // -1 = Les réponses n'ont pas encore étés lues. 0 = Pas de son autorisé. 1 = Son autorisé
+    var screwallowed = true; // Vicieuse autorisée ? (sera utile lors de l'implémentation des autres modes de question qui n'autorisent pas la vicieuse)
+    var screwer = 0; // Joueur ayant lancé sa vicieuse
+    var screwee = 0; // Joueur ayant été vicié
+    var gameOver = 0; // Fin de la question
+
+    // fonction qui sélectionne l'animation avec vicieuse ou non
+    var IsScrew = function(player) {
+        if (screwallowed && (thisMode.game.players.length > 1) && (thisMode.game.players[player-1].screw) && (player != screwee)) return '.Screw'; else return '';
+    };
 
     if (this.game.players.length >= 2) {
         anim.ended('PlayerMissKey1', 1000, function() {
@@ -32,11 +43,16 @@ ModeQuestion.prototype.start = function() {
         thisMode.game.api.unregisteraction('playerAnswer');
     };
 
+    var unregisterPlayerScrew = function() {
+        thisMode.game.api.unregisteraction('playerScrew');
+    };
+
     var playerBuzz = function() {
         if (thisMode.buzzPlayer) {
             clearTimeout(thisMode.timerTimeout);
             thisMode.timerTimeout = 0;
             unregisterPlayerAnswer();
+            unregisterPlayerScrew();
             if (thisMode.LastPlayers) anim.free(thisMode.LastPlayers);
             misskeyallowed = 1;
             anim.free('Question')
@@ -45,8 +61,9 @@ ModeQuestion.prototype.start = function() {
                 .stop('JingleTimer')
                 .reset('SFXPlayerBuzz')
                 .play('SFXPlayerBuzz')
-                .free('Player'+thisMode.buzzPlayer+'ShowKey')
-                .play('Player'+thisMode.buzzPlayer+'Answer');
+                .free('Player'+thisMode.buzzPlayer+'ShowKey'+IsScrew(thisMode.buzzPlayer))
+                .reset('Player'+thisMode.buzzPlayer+'Loop'+IsScrew(thisMode.buzzPlayer))
+                .play('Player'+thisMode.buzzPlayer+'Answer'+IsScrew(thisMode.buzzPlayer));
         }
     };
 
@@ -68,12 +85,129 @@ ModeQuestion.prototype.start = function() {
         if (thisMode.currentAns) {
             clearTimeout(thisMode.timerTimeout);
             thisMode.timerTimeout = 0;
-            anim.free('Player'+thisMode.currentPlayer+'Buzzed')
+            if (screwee) {
+                anim.free('Player'+screwee+'AnswerScrewed');
+                if (thisMode.game.players.length == 3) anim.reset('PlayerScrewedSelf');
+            }
+            anim.reset('Player'+thisMode.currentPlayer+'Buzzed')
                 .free('ShowAnswer'+thisMode.currentAns)
                 .play('LoopAnswer'+thisMode.currentAns)
                 .stop('JingleTimer')
                 .play('SFXPlayerKey');
+            if (thisMode.game.players[thisMode.currentPlayer-1].screw) {
+                anim.ended('Player'+thisMode.currentPlayer+'AnswerLoop.Screw', function() {
+                    this.free();
+                    anim.play('Player'+thisMode.currentPlayer+'AnswerEnd.Screw');
+                });
+            }
         }
+    };
+
+    var screwablePlayer = function() { // Joueur qui peut être vissié autre que le joueur courant. Renvoie le numéro du joueur, 0 si aucun joueur ne peut être vissié, -1 s'il y en a deux.
+        var player = 0;
+        if ((thisMode.currentPlayer != 1) && (thisMode.availPlayers[1])) player = 1;
+        if ((thisMode.currentPlayer != 2) && (thisMode.availPlayers[2]))
+            if (player == 0) player = 2; else player = -1;
+        if ((thisMode.currentPlayer != 3) && (thisMode.availPlayers[3]))
+            if (player == 0) player = 3; else player = -1;
+        return player;
+    };
+
+    var doPlayerScrew = function(tmpscrewee) {
+        var screwable = screwablePlayer();
+        if (tmpscrewee) screwable = tmpscrewee;
+        if (screwable == -1) {
+            anim.play('Player'+screwer+'ScrewLoop')
+                .click('Player'+screwer+'ScrewLoop',function(){pressKey(firstKeycode(thisMode.game.players[screwer-1].keycode));});
+            screwee = -1;
+        } else {
+            anim.free('Player'+thisMode.currentPlayer+'ScrewWho')
+                .free('Player'+screwable+'Loop'+IsScrew(screwable))
+                .play('Player'+screwable+'Screwed'+IsScrew(screwable));
+            if (thisMode.game.players.length == 3) anim.play('PlayerScrewed');
+            if (screwer != screwable) {
+                anim.play('Player'+screwer+'Loop');
+                (function(screwer2){
+                    // Rétablir le clic = buzz pour le joueur qui vient de jouer sa vicieuse (mais sur l'animation sans vicieuse pour le coup)
+                    anim.click('Player'+screwer2+'Loop',function(){pressKey(firstKeycode(thisMode.game.players[screwer2-1].keycode));});
+                })(screwer);
+            }
+        }
+    };
+
+    var PlayerScrewed = function() {
+        thisMode.currentPlayer = screwee;
+        PlayerBuzz();
+
+        // Joueur X tu t'es fait vissier
+        anim.play('Player'+thisMode.currentPlayer+'AnswerLoopScrewed');
+        if (screwer != screwee) anim.play('Player'+thisMode.currentPlayer+'AnswerScrewed');
+        else anim.play('PlayerScrewedSelf');
+    };
+
+    if (thisMode.game.players.length > 1) {
+        if (thisMode.game.players.length == 3) {
+            anim.ended('ScrewSounds', 300, function() {
+                anim.play('Player'+thisMode.currentPlayer+'ScrewWho');
+            });
+        }
+
+        anim.ended('ScrewActivate', 100, function() {
+            var screwable = screwablePlayer();
+            if (screwable == -1) {
+                anim.play('ScrewLoop')
+                    .reset('ScrewSounds')
+                    .play('ScrewSounds');
+            } else {
+                if (thisMode.game.players.length == 2) anim.play('PlayerScrewed', 500);
+            }
+        });
+
+        anim.ended('Player1Screw', function() {
+            this.free();
+            if (thisMode.game.players.length == 3) doPlayerScrew();
+        });
+
+        var PlayerScrewedEnd = function(playernum) {
+            return function() {
+                this.free();
+                screwee = playernum;
+                PlayerScrewed();
+            }
+        };
+
+        anim.ended('Player1Screwed', PlayerScrewedEnd(1))
+            .ended('Player1Screwed.Screw', PlayerScrewedEnd(1));
+
+        anim.ended('Player2Screw', function() {
+            this.free();
+            if (thisMode.game.players.length == 3) doPlayerScrew();
+        });
+
+        anim.ended('Player2Screwed', PlayerScrewedEnd(2))
+            .ended('Player2Screwed.Screw', PlayerScrewedEnd(2));
+
+        if (thisMode.game.players.length == 3) {
+            anim.ended('Player3Screw', function() {
+                this.free();
+                if (thisMode.game.players.length == 3) doPlayerScrew();
+            });
+
+            anim.ended('Player3Screwed', PlayerScrewedEnd(3))
+                .ended('Player3Screwed.Screw', PlayerScrewedEnd(3));
+        }
+    }
+    var playerScrew = function() {
+        anim.reset('Player'+thisMode.currentPlayer+'Buzzed')
+            .stop('JingleTimer')
+            .reset('ScrewActivate')
+            .play('ScrewActivate')
+            .free('Player'+thisMode.currentPlayer+'AnswerLoop.Screw')
+            .play('Player'+thisMode.currentPlayer+'Screw');
+        thisMode.game.players[thisMode.currentPlayer-1].screw = 0;
+        if (thisMode.game.players.length == 2) doPlayerScrew(); // En mode 2 joueurs, on joue immédiatement l'animation de vissieuse
+        clearTimeout(thisMode.timerTimeout);
+        thisMode.timerTimeout = 0;
     };
 
     var registerPlayerBuzz = function() {
@@ -94,6 +228,26 @@ ModeQuestion.prototype.start = function() {
         });
     };
 
+    var playerScrewChoosed = function(tmspcrewee) {
+        anim.free('Player'+screwer+'AnswerLoop')
+            .free('Player'+screwer+'ScrewLoop')
+            .play('Player'+screwer+'ScrewWho')
+            .reset('ScrewLoop');
+        doPlayerScrew(tmspcrewee);
+    };
+
+    var registerPlayerScrew = function() {
+        thisMode.game.api.registeraction('playerScrew', function(data){
+            if (!data.selfpost) {
+                var val = parseInt(data.value);
+                if (val == 0) {
+                    screwer = thisMode.currentPlayer;
+                    playerScrew();
+                } else playerScrewChoosed(val); // screwee
+            }
+        });
+    };
+
     var registerPlayerBuzzIgnore = function() { // Fonction qui ne fait rien, pour ignorer les appuis suivants TODO rendre ce genre de trucs plus propre
         thisMode.game.api.registeraction('playerBuzz', function(data){
             registerPlayerBuzzIgnore();
@@ -106,9 +260,26 @@ ModeQuestion.prototype.start = function() {
         });
     };
 
+    var registerPlayerScrewIgnore = function() { // Fonction qui ne fait rien, pour ignorer les appuis suivants TODO rendre ce genre de trucs plus propre
+        thisMode.game.api.registeraction('playerScrew', function(data){
+            registerPlayerScrewIgnore();
+        });
+    };
+
     var pressKey = function(choice) {
         if (!choice) return false; // Si on se voit envoyer 0 à cause d'un clic sur un joueur à keycode 0
-        if (thisMode.currentPlayer == 0) {
+        if ((screwer != 0) && (screwee <= 0)) { // Vicieuse en cours de viciage
+            if (screwee == 0) return false; // Pas encore de choix disponible
+            var tmpscrewee = 0;
+            if ((choice == 49) || (findKeycode(choice, thisMode.game.players[0].keycode))) tmpscrewee = 1;
+            if ((choice == 50) || (findKeycode(choice, thisMode.game.players[1].keycode))) tmpscrewee = 2;
+            if ((choice == 51) || (findKeycode(choice, thisMode.game.players[2].keycode))) tmpscrewee = 3;
+            if (!thisMode.availPlayers[tmpscrewee]) tmpscrewee = 0;
+            if (tmpscrewee > 0) {
+                thisMode.game.api.postaction({action: 'playerScrew', value: tmpscrewee});
+                playerScrewChoosed(tmpscrewee);
+            }
+        } else if (thisMode.currentPlayer == 0) {
             if (thisMode.buzzPlayer != 0) return false; // On a déjà un joueur en attente
             if (findKeycode(choice, thisMode.game.players[0].keycode)) thisMode.buzzPlayer = 1; // Joueur 1
             if (thisMode.game.players.length >= 2) {
@@ -128,33 +299,76 @@ ModeQuestion.prototype.start = function() {
                         if (!hasKeycode(thisMode.game.players[0].keycode)) return false; // Ce joueur ne peut pas répondre
                         autoAnswerPlayer1();
                         pressKey(choice);
-                    } else if (misskeyallowed) {
+                    } else if (misskeyallowed != 0) {
                         // Il faudrait arrêter les LastPlayer ici ?
+                        if (misskeyallowed == -1) gameReady();
                         if (!anim.get('PlayerMissKey1').played) anim.play('PlayerMissKey1'); else if (!anim.get('PlayerMissKey2').played) anim.play('PlayerMissKey2');
                         misskeyallowed = 0;
                     }
                 }
+                if ((thisMode.game.players.length > 1) && (misskeyallowed) && (findKeycode(choice, thisMode.game.screwKeycodes))) { // vicieuse
+                    // Il faudrait arrêter les LastPlayer ici ?
+                    if (!anim.get('PlayerMissKey1').played) anim.play('PlayerMissKey1'); else if (!anim.get('PlayerMissKey2').played) anim.play('PlayerMissKey2');
+                    misskeyallowed = 0;
+                }
             }
         } else if (thisMode.currentAns == 0) { // Réponse d'un joueur
             if (!hasKeycode(thisMode.game.players[thisMode.currentPlayer-1].keycode)) return false; // Ce joueur ne peut pas répondre
+            if (screwallowed && (findKeycode(choice, thisMode.game.screwKeycodes))) { // vicieuse
+                if (thisMode.game.players[thisMode.currentPlayer-1].screw) {
+                    if (screwablePlayer() != 0) { // Si il reste au moins un autre joueur à vissier
+                        screwer = thisMode.currentPlayer;
+                        thisMode.game.api.postaction({action: 'playerScrew', value: 0});
+                        playerScrew();
+                    }
+                }
+                return true;
+            }
             if (choice == 49) thisMode.currentAns = 1;
             if (choice == 50) thisMode.currentAns = 2;
             if (choice == 51) thisMode.currentAns = 3;
             if (choice == 52) thisMode.currentAns = 4;
-            if (!thisMode.availAnswers[thisMode.currentAns]) thisMode.currentAns = 0;
-
-            if (thisMode.currentAns) thisMode.game.api.postaction({action: 'playerAnswer', value: thisMode.currentAns});
-            playerAnswer();
+            if ((thisMode.currentAns) && (!thisMode.availAnswers[thisMode.currentAns])) thisMode.currentAns = 0;
+            if (thisMode.currentAns) {
+                thisMode.game.api.postaction({action: 'playerAnswer', value: thisMode.currentAns});
+                playerAnswer();
+            }
         }
     };
 
+    var screwerLost = false; // Sera renseigné si le vissieur a perdu son "pari"
+
     anim.ended('EndQuestion', function() {
         if (thisMode.timerTimeout) clearTimeout(thisMode.timerTimeout);
-        nextcategoryready(function(nextcategory) {
-            nextcategory.modeObj.animations.delay('MusicChooseCategoryStart', Math.max(500,2500-anim.length('EndQuestion')), function() {
-                nextcategory.start();
+
+        var goNextCat = function() {
+            nextcategoryready(function(nextcategory) {
+                nextcategory.modeObj.animations.delay('MusicChooseCategoryStart', Math.max(500,2500-anim.length('EndQuestion')), function() {
+                    nextcategory.start();
+                });
             });
-        });
+        };
+
+        // Ici, si le joueur a été vissié (sauf si vissié lui-même), il faut faire "perdre" le vissieur
+        if (screwerLost) {
+            var voiceLost = 'Player'+screwerLost+'ScrewLost';
+            var animLost = 'Player'+screwerLost+'Wrong';
+
+            anim.play(voiceLost, 200)
+                .ended(voiceLost, 200, function() {
+                    thisMode.game.players[screwerLost-1].score = parseInt(thisMode.game.players[screwerLost-1].score) - parseInt(thisMode.options.value);
+                    thisMode.game.font.strings[10*screwerLost+105] = thisMode.game.displayCurrency(thisMode.game.players[screwerLost-1].score);
+
+                    anim.ended('SFXPlayerLose',false)
+                        .free('Player'+screwerLost+'Loop')
+                        .reset('SFXPlayerLose')
+                        .play('SFXPlayerLose')
+                        .ended(animLost, 500, function() {
+                            goNextCat();
+                        })
+                        .play(animLost);
+                });
+        } else goNextCat();
     });
 
     anim.ended('SFXPlayerCorrect', function() {
@@ -189,6 +403,8 @@ ModeQuestion.prototype.start = function() {
         unbindKeyListener(thisMode.listener);
         registerPlayerBuzzIgnore();
         registerPlayerAnswerIgnore();
+        registerPlayerScrewIgnore();
+        gameOver = 1;
 
         var revealAnswer;
         var nbAns = 0;
@@ -223,8 +439,12 @@ ModeQuestion.prototype.start = function() {
                 anim.reset('JingleTimer')
                     .play('JingleTimer')
                     .play(thisMode.LastPlayers);
+                if (thisMode.availPlayers[1]) anim.reset('Player1Loop'+IsScrew(1)).play('Player1Loop'+IsScrew(1));
+                if (thisMode.availPlayers[2]) anim.delay('Player2Loop'+IsScrew(2), 100, function() {this.reset(); this.play();});
+                if (thisMode.availPlayers[3]) anim.delay('Player3Loop'+IsScrew(3), 200, function() {this.reset(); this.play();});
                 thisMode.timerTimeout = setTimeout(timerRunning, 500);
                 unregisterPlayerAnswer();
+                unregisterPlayerScrew();
                 registerPlayerBuzz();
             } else gameover();
         });
@@ -232,8 +452,7 @@ ModeQuestion.prototype.start = function() {
 
     var wrong1 = function() {
         anim.delay('SFXPlayerLose', 100, function() {
-            var currentPlayer = thisMode.currentPlayer;
-            thisMode.game.players[currentPlayer-1].score = parseInt(thisMode.game.players[currentPlayer-1].score) - parseInt(thisMode.options.value);
+            thisMode.game.players[thisMode.currentPlayer-1].score = parseInt(thisMode.game.players[thisMode.currentPlayer-1].score) - parseInt(thisMode.options.value);
             thisMode.game.font.strings[10*thisMode.currentPlayer+105] = thisMode.game.displayCurrency(thisMode.game.players[thisMode.currentPlayer-1].score);
 
             thisMode.availPlayers[thisMode.currentPlayer] = 0;
@@ -252,17 +471,27 @@ ModeQuestion.prototype.start = function() {
                 thisMode.LastPlayers = 0;
             }
 
+            var animwrong;
+            if (thisMode.currentPlayer == screwee)
+                animwrong = 'Player'+thisMode.currentPlayer+'WrongScrewed';
+            else
+                animwrong = 'Player'+thisMode.currentPlayer+'Wrong'+IsScrew(thisMode.currentPlayer);
+
             if (thisMode.LastPlayers) { // S'il reste des joueurs, on relance le timer
-                anim.ended('Player'+currentPlayer+'Wrong', -400, function() {
+                anim.ended(animwrong, -400, function() {
                     anim.reset('TimerTimeOut');
                     thisMode.Timer.playTimer(10);
                 });
             }
 
-            anim.free('Player'+currentPlayer+'AnswerLoop')
-                .play('Player'+currentPlayer+'Wrong');
+            anim.free('Player'+thisMode.currentPlayer+'AnswerLoop'+IsScrew(thisMode.currentPlayer))
+                .free('Player'+thisMode.currentPlayer+'AnswerEnd.Screw')
+                .free('Player'+thisMode.currentPlayer+'AnswerLoopScrewed')
+                .play(animwrong);
             this.reset();
             this.play();
+            screwer = 0;
+            screwee = 0;
         });
     };
 
@@ -293,6 +522,7 @@ ModeQuestion.prototype.start = function() {
         if (thisMode.currentPlayer == 0) return true;
         unregisterPlayerBuzz();
         registerPlayerAnswerIgnore();
+        registerPlayerScrewIgnore();
         if (thisMode.currentAns != thisMode.correctanswer) { // Mauvaise réponse
             anim.free('LoopAnswer'+thisMode.currentAns)
                 .play('WrongAnswer'+thisMode.currentAns)
@@ -307,8 +537,14 @@ ModeQuestion.prototype.start = function() {
             anim.play('SFXPlayerCorrect')
                 .free('LoopAnswer'+thisMode.currentAns)
                 .play('CorrectAnswer'+thisMode.currentAns)
-                .free('Player'+thisMode.currentPlayer+'AnswerLoop')
-                .play('Player'+thisMode.currentPlayer+'Correct');
+                .free('Player'+thisMode.currentPlayer+'AnswerLoop'+IsScrew(thisMode.currentPlayer))
+                .free('Player'+thisMode.currentPlayer+'AnswerEnd.Screw')
+                .free('Player'+thisMode.currentPlayer+'AnswerLoopScrewed');
+            if (thisMode.currentPlayer == screwee) {
+                anim.play('Player'+thisMode.currentPlayer+'CorrectScrewed');
+                if (screwer != screwee) screwerLost = screwer;
+            } else
+                anim.play('Player'+thisMode.currentPlayer+'Correct'+IsScrew(thisMode.currentPlayer));
         }
         return true;
     };
@@ -323,9 +559,20 @@ ModeQuestion.prototype.start = function() {
         anim.play('Player1AnswerLoop');
     });
     if (this.game.players.length >= 2) {
+        anim.ended('Player1Answer.Screw', function() {
+            this.free();
+            anim.play('Player1AnswerLoop.Screw')
+                .click('Player1AnswerLoop.Screw',function(){pressKey(firstKeycode(thisMode.game.screwKeycodes));}); // Clic vicieuse
+
+        });
         anim.ended('Player2Answer', function() {
             this.free();
             anim.play('Player2AnswerLoop');
+        });
+        anim.ended('Player2Answer.Screw', function() {
+            this.free();
+            anim.play('Player2AnswerLoop.Screw')
+                .click('Player2AnswerLoop.Screw',function(){pressKey(firstKeycode(thisMode.game.screwKeycodes));}); // Clic vicieuse
         });
     }
     if (this.game.players.length == 3) {
@@ -333,33 +580,48 @@ ModeQuestion.prototype.start = function() {
             this.free();
             anim.play('Player3AnswerLoop');
         });
+        anim.ended('Player3Answer.Screw', function() {
+            this.free();
+            anim.play('Player3AnswerLoop.Screw')
+                .click('Player3AnswerLoop.Screw',function(){pressKey(firstKeycode(thisMode.game.screwKeycodes));}); // Clic vicieuse
+        });
     }
 
-    anim.ended('SFXPlayerBuzz', 150, function() {
+    var PlayerBuzz = function() {
         // Remise du compteur à 10
         thisMode.Timer.playTimer(10);
         anim.reset('JingleTimer').play('JingleTimer')
             .free('PrepareTimer');
         thisMode.timerTimeout = setTimeout(timerRunning,800);
-        thisMode.currentPlayer = thisMode.buzzPlayer; // Le joueur peut enfin répondre
-        thisMode.buzzPlayer = 0;
         registerPlayerBuzzIgnore(); // Déplacé ici car si deux appuis trop rapides venant de l'API, le 2eme appui risque d'être ignoré à cause du return juste au dessus.
         registerPlayerAnswer();
+        registerPlayerScrew();
+    };
+
+    anim.ended('SFXPlayerBuzz', 150, function() {
+        thisMode.currentPlayer = thisMode.buzzPlayer; // Le joueur peut enfin répondre
+        thisMode.buzzPlayer = 0;
+        PlayerBuzz();
 
         // Vas-y joueur X
         anim.play('Player'+thisMode.currentPlayer+'Buzzed');
     });
 
-    anim.ended('Answers', function() {
-        this.free();
-        anim.delay('JingleReadQuestion', 100, function() {
-            anim.free('JingleReadQuestion')
-                .free('PrepareTimer')
-                .play('JingleTimer');
-            thisMode.Timer.playTimer(10);
-            thisMode.timerTimeout = setTimeout(timerRunning,500);
-            misskeyallowed = 1;
+    var gameReady = function() {
+        anim.free('Question')
+            .free('Answers')
+            .delay('JingleReadQuestion', 100, function() {
+                anim.free('JingleReadQuestion')
+                    .free('PrepareTimer')
+                    .play('JingleTimer');
+                thisMode.Timer.playTimer(10);
+                thisMode.timerTimeout = setTimeout(timerRunning,500);
+                misskeyallowed = 1;
         });
+    };
+
+    anim.ended('Answers', 100, function() {
+        gameReady();
     });
 
     anim.ended('Question', function() {
@@ -372,6 +634,35 @@ ModeQuestion.prototype.start = function() {
     anim.ended('SFXPlayerKey', 150, function() {
         this.reset();
         anim.play('Answer'+thisMode.currentAns);
+    });
+
+    anim.ended('ShowAnswer1', function() {
+        anim.ended('Player1Loop'+IsScrew(1), function() {
+                if ((thisMode.buzzPlayer != 0) || (thisMode.currentPlayer != 0) || gameOver) this.stop();
+            })
+            .free('Player1ShowKey'+IsScrew(1))
+            .play('Player1Loop'+IsScrew(1))
+            .click('Player1Loop'+IsScrew(1), function(){pressKey(firstKeycode(thisMode.game.players[0].keycode));});
+        if (thisMode.game.players.length >= 2) {
+            anim.ended('Player2Loop'+IsScrew(2), function() {
+                    if ((thisMode.buzzPlayer != 0) || (thisMode.currentPlayer != 0) || gameOver) this.stop();
+                })
+                .delay('Player2ShowKey'+IsScrew(2), 100, function() {
+                    this.free();
+                    anim.play('Player2Loop'+IsScrew(2))
+                        .click('Player2Loop'+IsScrew(2), function(){pressKey(firstKeycode(thisMode.game.players[1].keycode));});
+                });
+        }
+        if (thisMode.game.players.length == 3) {
+            anim.ended('Player3Loop'+IsScrew(3), function() {
+                    if ((thisMode.buzzPlayer != 0) || (thisMode.currentPlayer != 0) || gameOver) this.stop();
+                })
+                .delay('Player3ShowKey'+IsScrew(3), 200, function() {
+                    this.free();
+                    anim.play('Player3Loop'+IsScrew(3))
+                        .click('Player3Loop'+IsScrew(3), function(){pressKey(firstKeycode(thisMode.game.players[2].keycode));});
+                });
+        }
     });
 
     anim.ended('PrepareTimer', 100, function() {
@@ -414,28 +705,25 @@ ModeQuestion.prototype.start = function() {
         });
 
         thisMode.availPlayers = [];
-        anim.ended('Player1ShowKey', function() {
+        anim.ended('Player1ShowKey'+IsScrew(1), function() {
             thisMode.availPlayers[1] = 1;
         });
         if (thisMode.game.players.length >= 2) {
-            anim.ended('Player2ShowKey', function() {
+            anim.ended('Player2ShowKey'+IsScrew(2), function() {
                 thisMode.availPlayers[2] = 1;
             });
         }
         if (thisMode.game.players.length == 3) {
-            anim.ended('Player3ShowKey', function() {
+            anim.ended('Player3ShowKey'+IsScrew(3), function() {
                 thisMode.availPlayers[3] = 1;
             });
         }
-        anim.delay('Player1ShowKey', 200, function() {
+        anim.delay('Player1ShowKey'+IsScrew(1), 200, function() {
             this.play();
-            this.click(function(){pressKey(firstKeycode(thisMode.game.players[0].keycode))});
-            if (thisMode.game.players.length >= 2) anim.delay('Player2ShowKey', 90, function() {
+            if (thisMode.game.players.length >= 2) anim.delay('Player2ShowKey'+IsScrew(2), 90, function() {
                 this.play();
-                this.click(function(){pressKey(firstKeycode(thisMode.game.players[1].keycode))});
-                if (thisMode.game.players.length == 3) anim.delay('Player3ShowKey', 90, function() {
+                if (thisMode.game.players.length == 3) anim.delay('Player3ShowKey'+IsScrew(3), 90, function() {
                     this.play();
-                    this.click(function(){pressKey(firstKeycode(thisMode.game.players[2].keycode))});
                 });
             });
         });

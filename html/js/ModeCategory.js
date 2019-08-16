@@ -39,7 +39,8 @@ ModeCategory.prototype.start = function() {
         if (chosen) {
             doChooseCategory = false;
             unbindKeyListener(listener);
-            anim.free('ChooseCategoryPlayer')
+            anim.free('ChooseCategoryPlayer'+thisMode.chooseplayer)
+                .free('MusicChooseCategoryStart')
                 .free('MusicChooseCategoryLoop')
                 .free('CategoryTitles')
                 .free('LoopCategory1')

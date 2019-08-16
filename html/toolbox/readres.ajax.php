@@ -23,7 +23,7 @@ if ($_POST['type'] == 'saveAnimation') {
                         '".addslashes(trim($_POST['grp']))."',
                         '".addslashes(trim($_POST['name']))."',
                         '".addslashes(trim($_POST['variantType']))."',
-                        '".addslashes(trim($_POST['variantValue']))."',
+                        ".intval($_POST['variantValue']).",
                         ".$animationFile.",
                         ".$framestart.",
                         ".$framestop.",

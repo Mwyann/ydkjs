@@ -65,30 +65,111 @@ ModeIntro.prototype.start = function() {
         anim.play('IntroPreTitle');
 
     } else { // Mode jeu normal
-        anim.ended('WelcomePlayers', 300, function () {
-            anim.free('MusicJack')
-                .free('IntroJack');
-            thisMode.categoryready(function (category) {
+        var skiplistener = 0;
+
+        var goNextCat = function() {
+            if (skiplistener) unbindKeyListener(skiplistener);
+            thisMode.categoryready(function(category) {
                 category.start(); // On passe au choix de la catégorie
             });
-        });
+        };
 
-        anim.ended('Welcome', 300, function () {
-            anim.play('WelcomePlayers');
+        if (this.game.players.length == 1) {
+            anim.ended('NewPlayers', 300, function () {
+                anim.free('MusicJack')
+                    .free('IntroJack');
+                goNextCat();
+            });
+        } else {
+            anim.ended('LetsGo', 100, function() {
+                goNextCat();
+            });
+
+            anim.ended('TiltRound1', 100, function() {
+                anim.play('LetsGo');
+            });
+
+            anim.ended('TiltRound1', -200, function() {
+                anim.stop('MusicJack');
+                anim.free('MusicJack')
+                    .free('IntroJack');
+            });
+
+            anim.ended('HelpScrews', function() {
+                if (skiplistener) unbindKeyListener(skiplistener);
+                anim.free('ShowRound1');
+                anim.play('TiltRound1');
+                anim.stop('Screw1Loop');
+                anim.stop('Screw2Loop');
+                if (thisMode.game.players.length == 3) anim.stop('Screw3Loop');
+                anim.free('ShowSkipRules');
+                anim.play('HideSkipRules');
+            });
+
+            anim.ended('SFXScrews', function() {
+                anim.play('HelpScrews');
+                anim.play('ShowSkipRules');
+                var skipRules = function() {
+                    thisMode.game.api.postaction({action: 'skipRules'});
+                    //goNextCat(); // On laisse l'action loopback s'exécuter car puisqu'on change direct de catégorie, l'action se fait unregister direct et le jeu bloque.
+                };
+                skiplistener = bindKeyListener(function (choice) {
+                    if (choice == 32) skipRules();
+                });
+                anim.click('ShowSkipRules',skipRules);
+                thisMode.game.api.registeraction('skipRules', function(data){
+                    /*if (!data.selfpost) */goNextCat();
+                });
+            });
+
+            anim.ended('Screw1', function() {
+                this.free();
+                anim.play('Screw1Loop');
+                thisMode.game.players[0].screw = 1;
+            });
+
+            anim.ended('Screw2', function() {
+                this.free();
+                anim.play('Screw2Loop');
+                thisMode.game.players[1].screw = 1;
+            });
+
+            if (this.game.players.length == 3) {
+                anim.ended('Screw3', function () {
+                    this.free();
+                    anim.play('Screw3Loop');
+                    thisMode.game.players[2].screw = 1;
+                });
+            }
+
+            anim.ended('GiveScrews', -200, function() {
+                anim.play('SFXScrews');
+                anim.play('Screw1', 400);
+                anim.play('Screw2', 600);
+                if (thisMode.game.players.length == 3) anim.play('Screw3', 800);
+            });
+
+            anim.ended('NewPlayers', 100, function () {
+                anim.play('GiveScrews');
+            });
+
+            if (this.game.players.length == 3) {
+                anim.ended('Player2', 1000, function() {
+                    anim.play('Player3');
+                });
+            }
+
+            anim.ended('Player1', 1000, function() {
+                anim.play('Player2');
+            });
+        }
+
+        anim.ended('Welcome', 100, function () {
+            anim.play('NewPlayers');
         });
 
         anim.ended('Welcome', -100, function () {
             anim.play('ShowRound1');
-        });
-
-        if (this.game.players.length >= 2) {
-            anim.ended('Player2', 1000, function(){
-                if (thisMode.game.players.length == 3) anim.play('Player3');
-            });
-        }
-
-        anim.ended('Player1', 1000, function(){
-            if (thisMode.game.players.length >= 2) anim.play('Player2');
         });
 
         anim.ended('IntroJackTitle', 300, function () {

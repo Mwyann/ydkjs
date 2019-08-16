@@ -103,14 +103,25 @@ YDKJFont.prototype.preload = function(callback){
     var testheight = 300;
     this.waitForWebFonts(fonts, function() {
         for(var i = 0, l = fonts.length; i < l; ++i) {
-            (function(font) {
-                var height = thisFont.measureTextHeight('giItT1WQy@!-/#', testheight.toString() + 'px "' + font + '"', 10, 10, parseInt(Math.round(testheight*1.5)), 1500);
-                thisFont.fontdata[font] = {heightratio: testheight / height['height'], topratio: height['top']/testheight};
-                //console.log(font+' heightratio = '+(thisFont.fontdata[font].heightratio)+' topratio = '+(thisFont.fontdata[font].topratio));
-            })(fonts[i]);
+            var height = thisFont.measureTextHeight('giItT1WQy@!-/#', testheight.toString() + 'px "' + fonts[i] + '"', 10, 10, parseInt(Math.round(testheight*1.5)), 1500);
+            if (height === false) height = thisFont.measureTextHeightFallback(fonts[i]);
+            thisFont.fontdata[fonts[i]] = {heightratio: testheight / height['height'], topratio: height['top']/testheight};
+            //console.log(fonts[i]+' heightratio = '+(thisFont.fontdata[fonts[i]].heightratio)+' topratio = '+(thisFont.fontdata[fonts[i]].topratio));
         }
-        callback();
+        if (typeof callback != 'undefined') callback();
     });
+};
+
+YDKJFont.prototype.measureTextHeightFallback = function(font) {
+    // Le navigateur Brave a désactivé par défaut la fonction getImageData afin d'empêcher le fingerprinting du navigateur.
+    // Dans ce genre de cas, on utilisera donc des valeurs précalculées par Chrome.
+    switch(font) {
+        case 'JackCondensed': return {height: 259, top: 28};
+        case 'JackExtraCond': return {height: 259, top: 17};
+        case 'JackInput': return {height: 261, top: 14};
+        case 'JackRoman': return {height: 278, top: 13};
+    }
+    return {height: 278, top: 13};
 };
 
 YDKJFont.prototype.waitForWebFonts = function(fonts, callback) {
@@ -172,7 +183,7 @@ YDKJFont.prototype.waitForWebFonts = function(fonts, callback) {
                             clearInterval(interval);
                         }
                         if (loadedFonts == fonts.length) {
-                            callback();
+                            if (typeof callback != 'undefined') callback();
                             return true;
                         }
                     }
@@ -225,6 +236,8 @@ YDKJFont.prototype.measureTextHeight = function(text, font, left, top, width, he
         last = false,
         r = height,
         c = 0;
+
+    if (data.length === 0) return false;
 
     // Find the last line with a non-white pixel
     while(!last && r) {
