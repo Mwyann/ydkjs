@@ -77,7 +77,8 @@ ModeQuestion.prototype.start = function() {
             .stop('JingleTimer')
 
             .free('Player1ShowKey')
-            .play('Player1AnswerLoop');
+            .free('Player1Loop')
+            .play('Player1Answer');
     };
 
     var playerAnswer = function() {
@@ -94,7 +95,7 @@ ModeQuestion.prototype.start = function() {
                 .play('LoopAnswer'+thisMode.currentAns)
                 .stop('JingleTimer')
                 .play('SFXPlayerKey');
-            if (thisMode.game.players[thisMode.currentPlayer-1].screw) {
+            if ((thisMode.game.players.length > 1) && (thisMode.game.players[thisMode.currentPlayer-1].screw)) {
                 anim.ended('Player'+thisMode.currentPlayer+'AnswerLoop.Screw', function() {
                     this.free();
                     anim.play('Player'+thisMode.currentPlayer+'AnswerEnd.Screw');
