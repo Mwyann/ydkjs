@@ -17,6 +17,7 @@ INSERT INTO ydkjuk_sta.ressnd SELECT * FROM ydkjfr_sta.ressnd;
 
 TRUNCATE ydkjde_sta.ressnd;
 INSERT INTO ydkjde_sta.ressnd SELECT * FROM ydkjfr_sta.ressnd;
+DELETE FROM ydkjde_sta.ressnd WHERE grp = 'Question' AND name = 'AnnounceFreeAnswer'; -- AnnounceFreeAnswer (Mc55) n'est pas présent dans la version allemande !
 
 -- http://192.168.0.110/de/toolbox/scan-snd.php
 
