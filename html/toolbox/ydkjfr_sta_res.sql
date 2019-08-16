@@ -1,13 +1,15 @@
 -- phpMyAdmin SQL Dump
--- version 4.6.6deb5
+-- version 4.8.4
 -- https://www.phpmyadmin.net/
 --
--- Client :  localhost:3306
--- Généré le :  Lun 21 Janvier 2019 à 18:40
--- Version du serveur :  5.7.24-0ubuntu0.18.04.1
--- Version de PHP :  7.2.10-0ubuntu0.18.04.1
+-- Hôte : localhost
+-- Généré le :  ven. 16 août 2019 à 23:27
+-- Version du serveur :  5.7.26-0ubuntu0.18.04.1
+-- Version de PHP :  7.2.19-0ubuntu0.18.04.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -57,7 +59,7 @@ CREATE TABLE `resani` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
--- Contenu de la table `resani`
+-- Déchargement des données de la table `resani`
 --
 
 INSERT INTO `resani` (`grp`, `name`, `variantType`, `variantValue`, `resid`, `framestart`, `framestop`, `loopani`) VALUES
@@ -187,17 +189,14 @@ INSERT INTO `resani` (`grp`, `name`, `variantType`, `variantValue`, `resid`, `fr
 ('Question', 'Player3AnswerLoop', 'NumberOfPlayers', 3, 3000, 1122, 1127, 1),
 ('Question', 'Player3Answer', 'NumberOfPlayers', 3, 3000, 1108, 1120, 0),
 ('Question', 'Player3ShowKey', 'NumberOfPlayers', 3, 3000, 1093, NULL, 0),
-('Question', 'Player2LostScrew', 'NumberOfPlayers', 3, 3000, 763, NULL, 0),
-('Question', 'Player2Wrong', 'NumberOfPlayers', 3, 3000, 748, NULL, 0),
-('Question', 'Player2Correct', 'NumberOfPlayers', 3, 3000, 722, NULL, 0),
-('Question', 'Player2AnswerLoop', 'NumberOfPlayers', 3, 3000, 715, 720, 1),
-('Question', 'Player2Answer', 'NumberOfPlayers', 3, 3000, 701, 713, 0),
-('Question', 'Player2ShowKey', 'NumberOfPlayers', 3, 3000, 686, NULL, 0),
-('Question', 'Player1LostScrew', 'NumberOfPlayers', 3, 3000, 368, NULL, 0),
-('Question', 'Player1Wrong', 'NumberOfPlayers', 3, 3000, 354, NULL, 0),
-('Question', 'Player1Correct', 'NumberOfPlayers', 3, 3000, 328, NULL, 0),
-('Question', 'Player1AnswerLoop', 'NumberOfPlayers', 3, 3000, 321, 326, 1),
 ('Question', 'Player1Answer', 'NumberOfPlayers', 3, 3000, 307, 319, 0),
+('Question', 'Player1Answer.Screw', 'NumberOfPlayers', 3, 3000, 41, 53, 0),
+('Question', 'Player1AnswerEnd.Screw', 'NumberOfPlayers', 3, 3000, 68, NULL, 0),
+('Question', 'Player1AnswerLoop', 'NumberOfPlayers', 3, 3000, 321, 326, 1),
+('Question', 'Player1AnswerLoop.Screw', 'NumberOfPlayers', 3, 3000, 55, 66, 1),
+('Question', 'Player1AnswerLoopScrewed', 'NumberOfPlayers', 3, 3000, 116, 121, 1),
+('Question', 'Player1Correct', 'NumberOfPlayers', 3, 3000, 328, NULL, 0),
+('Question', 'Player1Correct.Screw', 'NumberOfPlayers', 3, 3000, 73, NULL, 0),
 ('Question', 'ShowQuestion', '', 0, 12000, 22, NULL, 0),
 ('Question', 'PrepareTimer', 'CategoryNumber', 1, 8018, 8, NULL, 0),
 ('Question', 'HideValue', 'QuestionValue', 2000, 11020, 35, NULL, 0),
@@ -256,7 +255,7 @@ INSERT INTO `resani` (`grp`, `name`, `variantType`, `variantValue`, `resid`, `fr
 ('DisOrDat', 'HideSubject', '', 0, 14000, 51, 57, 0),
 ('DisOrDat', 'ShowSubject', '', 0, 14000, 40, NULL, 0),
 ('DisOrDat', 'HideCategory', '', 0, 14000, 28, 35, 0),
-('Question', 'Player1ShowKey', 'NumberOfPlayers', 3, 3000, 292, NULL, 0),
+('Question', 'Player1CorrectScrewed', 'NumberOfPlayers', 3, 3000, 123, NULL, 0),
 ('Question', 'HideQuestion', '', 0, 12000, 31, 35, 0),
 ('Question', 'ShowHeader', '', 0, 12000, 9, 20, 0),
 ('Question', 'TimerTimeOut', '', 0, 8018, 254, NULL, 0),
@@ -596,7 +595,113 @@ INSERT INTO `resani` (`grp`, `name`, `variantType`, `variantValue`, `resid`, `fr
 ('Question', 'AnnounceValue', 'QuestionValue', 6000, 11060, 14, NULL, 0),
 ('Question', 'HideValue', 'QuestionValue', 6000, 11060, 35, NULL, 0),
 ('DisOrDat', 'TimerComesIn', 'CategoryNumber', 2, 8042, 5, NULL, 0),
-('DisOrDat', 'PrepareTimer', 'CategoryNumber', 2, 8021, 50, NULL, 0);
+('DisOrDat', 'PrepareTimer', 'CategoryNumber', 2, 8021, 50, NULL, 0),
+('Question', 'Player1ShowKey.Screw', 'NumberOfPlayers', 2, 3200, 0, NULL, 0),
+('Question', 'Player1Loop.Screw', 'NumberOfPlayers', 2, 3200, 16, 39, 1),
+('Question', 'Player1Answer.Screw', 'NumberOfPlayers', 2, 3200, 41, 53, 0),
+('Question', 'Player1AnswerLoop.Screw', 'NumberOfPlayers', 2, 3200, 55, 66, 1),
+('Question', 'Player1AnswerEnd.Screw', 'NumberOfPlayers', 2, 3200, 68, NULL, 0),
+('Question', 'Player1Correct.Screw', 'NumberOfPlayers', 2, 3200, 73, NULL, 0),
+('Question', 'Player1Wrong.Screw', 'NumberOfPlayers', 2, 3200, 99, NULL, 0),
+('Question', 'Player1AnswerLoopScrewed', 'NumberOfPlayers', 2, 3200, 116, 121, 1),
+('Question', 'Player1CorrectScrewed', 'NumberOfPlayers', 2, 3200, 123, NULL, 0),
+('Question', 'Player1WrongScrewed', 'NumberOfPlayers', 2, 3200, 152, NULL, 0),
+('Question', 'Player1Screw', 'NumberOfPlayers', 2, 3200, 168, NULL, 0),
+('Question', 'Player1Screwed.Screw', 'NumberOfPlayers', 2, 3200, 194, 239, 0),
+('Question', 'Player1Screwed', 'NumberOfPlayers', 2, 3200, 244, 289, 0),
+('Question', 'Player2ShowKey.Screw', 'NumberOfPlayers', 2, 3200, 383, NULL, 0),
+('Question', 'Player2Loop.Screw', 'NumberOfPlayers', 2, 3200, 400, 423, 1),
+('Question', 'Player2Answer.Screw', 'NumberOfPlayers', 2, 3200, 425, 437, 0),
+('Question', 'Player2AnswerLoop.Screw', 'NumberOfPlayers', 2, 3200, 439, 450, 1),
+('Question', 'Player2AnswerEnd.Screw', 'NumberOfPlayers', 2, 3200, 452, NULL, 0),
+('Question', 'Player2Correct.Screw', 'NumberOfPlayers', 2, 3200, 458, NULL, 0),
+('Question', 'Player2Wrong.Screw', 'NumberOfPlayers', 2, 3200, 484, NULL, 0),
+('Question', 'Player2AnswerLoopScrewed', 'NumberOfPlayers', 2, 3200, 502, 507, 1),
+('Question', 'Player2CorrectScrewed', 'NumberOfPlayers', 2, 3200, 509, NULL, 0),
+('Question', 'Player2WrongScrewed', 'NumberOfPlayers', 2, 3200, 538, NULL, 0),
+('Question', 'Player2Screw', 'NumberOfPlayers', 2, 3200, 556, NULL, 0),
+('Question', 'Player2Screwed.Screw', 'NumberOfPlayers', 2, 3200, 579, 624, 0),
+('Question', 'Player2Screwed', 'NumberOfPlayers', 2, 3200, 627, 672, 0),
+('Question', 'Player1LostScrew', 'NumberOfPlayers', 2, 3200, 368, NULL, 0),
+('Question', 'Player2LostScrew', 'NumberOfPlayers', 2, 3200, 763, NULL, 0),
+('Question', 'Player1Loop.Screw', 'NumberOfPlayers', 3, 3000, 16, 39, 1),
+('Question', 'Player1LostScrew', 'NumberOfPlayers', 3, 3000, 368, NULL, 0),
+('Question', 'Player1Screw', 'NumberOfPlayers', 3, 3000, 168, 196, 0),
+('Question', 'Player1Screwed', 'NumberOfPlayers', 3, 3000, 263, 290, 0),
+('Question', 'Player1Screwed.Screw', 'NumberOfPlayers', 3, 3000, 230, 257, 0),
+('Question', 'Player1ShowKey', 'NumberOfPlayers', 3, 3000, 292, NULL, 0),
+('Question', 'Player1ShowKey.Screw', 'NumberOfPlayers', 3, 3000, 0, NULL, 0),
+('Question', 'Player1Wrong', 'NumberOfPlayers', 3, 3000, 354, NULL, 0),
+('Question', 'Player1Wrong.Screw', 'NumberOfPlayers', 3, 3000, 99, NULL, 0),
+('Question', 'Player1WrongScrewed', 'NumberOfPlayers', 3, 3000, 152, NULL, 0),
+('Question', 'Player2Answer', 'NumberOfPlayers', 3, 3000, 701, 713, 0),
+('Question', 'Player2Answer.Screw', 'NumberOfPlayers', 3, 3000, 425, 437, 0),
+('Question', 'Player2AnswerEnd.Screw', 'NumberOfPlayers', 3, 3000, 452, NULL, 0),
+('Question', 'Player2AnswerLoop', 'NumberOfPlayers', 3, 3000, 715, 720, 1),
+('Question', 'Player2AnswerLoop.Screw', 'NumberOfPlayers', 3, 3000, 439, 450, 1),
+('Question', 'Player2AnswerLoopScrewed', 'NumberOfPlayers', 3, 3000, 502, 507, 1),
+('Question', 'Player2Correct', 'NumberOfPlayers', 3, 3000, 722, NULL, 0),
+('Question', 'Player2Correct.Screw', 'NumberOfPlayers', 3, 3000, 458, NULL, 0),
+('Question', 'Player2CorrectScrewed', 'NumberOfPlayers', 3, 3000, 509, NULL, 0),
+('Question', 'Player2Loop.Screw', 'NumberOfPlayers', 3, 3000, 400, 423, 1),
+('Question', 'Player2LostScrew', 'NumberOfPlayers', 3, 3000, 763, NULL, 0),
+('Question', 'Player2Screw', 'NumberOfPlayers', 3, 3000, 556, 579, 0),
+('Question', 'Player2Screwed', 'NumberOfPlayers', 3, 3000, 644, 671, 0),
+('Question', 'Player2Screwed.Screw', 'NumberOfPlayers', 3, 3000, 612, 639, 0),
+('Question', 'Player2ShowKey', 'NumberOfPlayers', 3, 3000, 686, NULL, 0),
+('Question', 'Player2ShowKey.Screw', 'NumberOfPlayers', 3, 3000, 383, NULL, 0),
+('Question', 'Player2Wrong', 'NumberOfPlayers', 3, 3000, 748, NULL, 0),
+('Question', 'Player2Wrong.Screw', 'NumberOfPlayers', 3, 3000, 484, NULL, 0),
+('Question', 'Player2WrongScrewed', 'NumberOfPlayers', 3, 3000, 538, NULL, 0),
+('Question', 'Player1ScrewLoop', 'NumberOfPlayers', 3, 3000, 198, 212, 1),
+('Question', 'Player1ScrewChosen', 'NumberOfPlayers', 3, 3000, 214, 227, 0),
+('Question', 'Player2ScrewLoop', 'NumberOfPlayers', 3, 3000, 581, 595, 1),
+('Question', 'Player2ScrewChosen', 'NumberOfPlayers', 3, 3000, 597, 610, 0),
+('Question', 'Player3ShowKey.Screw', 'NumberOfPlayers', 3, 3000, 784, NULL, 0),
+('Question', 'Player3Loop.Screw', 'NumberOfPlayers', 3, 3000, 803, 826, 1),
+('Question', 'Player3Answer.Screw', 'NumberOfPlayers', 3, 3000, 828, 840, 0),
+('Question', 'Player3AnswerLoop.Screw', 'NumberOfPlayers', 3, 3000, 842, 853, 1),
+('Question', 'Player3AnswerEnd.Screw', 'NumberOfPlayers', 3, 3000, 855, NULL, 0),
+('Question', 'Player3Correct.Screw', 'NumberOfPlayers', 3, 3000, 860, NULL, 0),
+('Question', 'Player3Wrong.Screw', 'NumberOfPlayers', 3, 3000, 886, NULL, 0),
+('Question', 'Player3AnswerLoopScrewed', 'NumberOfPlayers', 3, 3000, 905, 910, 1),
+('Question', 'Player3CorrectScrewed', 'NumberOfPlayers', 3, 3000, 912, NULL, 0),
+('Question', 'Player3WrongScrewed', 'NumberOfPlayers', 3, 3000, 943, NULL, 0),
+('Question', 'Player3Screw', 'NumberOfPlayers', 3, 3000, 966, 994, 0),
+('Question', 'Player3ScrewLoop', 'NumberOfPlayers', 3, 3000, 997, 1011, 1),
+('Question', 'Player3ScrewChosen', 'NumberOfPlayers', 3, 3000, 1013, 1026, 0),
+('Question', 'Player3Screwed.Screw', 'NumberOfPlayers', 3, 3000, 1028, 1056, 0),
+('Question', 'Player3Screwed', 'NumberOfPlayers', 3, 3000, 1061, 1089, 0),
+('Intro', 'Player1ScrewShow', 'NumberOfPlayers', 2, 3500, 366, 385, 0),
+('Intro', 'Player1ScrewLoop', 'NumberOfPlayers', 2, 3500, 388, 411, 1),
+('Intro', 'Player2ScrewShow', 'NumberOfPlayers', 2, 3500, 419, 438, 0),
+('Intro', 'Player2ScrewLoop', 'NumberOfPlayers', 2, 3500, 440, 463, 1),
+('Intro', 'Player1ScrewShow', 'NumberOfPlayers', 3, 3500, 478, 497, 0),
+('Intro', 'Player1ScrewLoop', 'NumberOfPlayers', 3, 3500, 499, 522, 1),
+('Intro', 'Player2ScrewShow', 'NumberOfPlayers', 3, 3500, 530, 549, 0),
+('Intro', 'Player2ScrewLoop', 'NumberOfPlayers', 3, 3500, 551, 574, 1),
+('Intro', 'Player3ScrewShow', 'NumberOfPlayers', 3, 3500, 581, 600, 0),
+('Intro', 'Player3ScrewLoop', 'NumberOfPlayers', 3, 3500, 602, 625, 1),
+('Intro', 'ShowSkipRules', '', 0, 3500, 627, NULL, 0),
+('Intro', 'HideSkipRules', '', 0, 3500, 630, NULL, 0),
+('Question', 'Player1Loop', 'NumberOfPlayers', 3, 3000, 304, 305, 0),
+('Question', 'Player2Loop', 'NumberOfPlayers', 3, 3000, 698, 699, 0),
+('Question', 'Player3Loop', 'NumberOfPlayers', 3, 3000, 1105, 1106, 0),
+('Question', 'Player1Loop', 'NumberOfPlayers', 2, 3200, 304, 305, 0),
+('Question', 'Player2Loop', 'NumberOfPlayers', 2, 3200, 698, 699, 0),
+('Question', 'Player1Loop', 'NumberOfPlayers', 1, 3300, 304, 305, 0),
+('R1WrapUp', 'Player1ScrewShow', 'NumberOfPlayers', 2, 3100, 20, 39, 0),
+('R1WrapUp', 'Player1ScrewLoop', 'NumberOfPlayers', 2, 3100, 41, 64, 1),
+('R1WrapUp', 'Player2ScrewShow', 'NumberOfPlayers', 2, 3100, 76, 95, 0),
+('R1WrapUp', 'Player2ScrewLoop', 'NumberOfPlayers', 2, 3100, 97, 120, 1),
+('R1WrapUp', 'Player1ScrewShow', 'NumberOfPlayers', 3, 3100, 135, 154, 0),
+('R1WrapUp', 'Player2ScrewShow', 'NumberOfPlayers', 3, 3100, 187, 206, 0),
+('R1WrapUp', 'Player3ScrewShow', 'NumberOfPlayers', 3, 3100, 239, 258, 0),
+('R1WrapUp', 'Player1ScrewLoop', 'NumberOfPlayers', 3, 3100, 156, 179, 1),
+('R1WrapUp', 'Player2ScrewLoop', 'NumberOfPlayers', 3, 3100, 208, 231, 1),
+('R1WrapUp', 'Player3ScrewLoop', 'NumberOfPlayers', 3, 3100, 260, 283, 1),
+('R1WrapUp', 'ShowSkipRules', '', 0, 3100, 286, NULL, 0),
+('R1WrapUp', 'HideSkipRules', '', 0, 3100, 288, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -611,7 +716,7 @@ CREATE TABLE `resfiles` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
--- Contenu de la table `resfiles`
+-- Déchargement des données de la table `resfiles`
 --
 
 INSERT INTO `resfiles` (`resid`, `filename`) VALUES
@@ -755,7 +860,7 @@ CREATE TABLE `ressnd` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
--- Contenu de la table `ressnd`
+-- Déchargement des données de la table `ressnd`
 --
 
 INSERT INTO `ressnd` (`grp`, `name`, `variantType`, `variantValue`, `resfolder`, `val`, `loopsnd`) VALUES
@@ -816,7 +921,6 @@ INSERT INTO `ressnd` (`grp`, `name`, `variantType`, `variantValue`, `resfolder`,
 ('Question', 'PlayerBuzzedTooFastWrong', '', 0, 'JACKSND1/Mc59', '1,2,3,4', 0),
 ('Question', 'PlayerMissKey1', '', 0, 'JACKSND1/Mc58', '1,2,3,4,5,6,7,8', 0),
 ('Question', 'PlayerMissKey2', '', 0, 'JACKSND1/Mc60', '1,2,3,4,6,7', 0),
-('Question', 'PlayerScrewedKeptHisScrew', '', 0, 'JACKSND1/Mc53', '1,2', 0),
 ('Question', 'SFXPlayerAnswer', '', 0, 'JACKSND1/Mc94', '1', 0),
 ('Question', 'SFXPlayerBuzz', '', 0, 'JACKSND1/Mc82', '1', 0),
 ('Question', 'SFXPlayerBuzzedTooFast', '', 0, 'JACKSND1/Mc88', '1', 0),
@@ -995,12 +1099,12 @@ INSERT INTO `ressnd` (`grp`, `name`, `variantType`, `variantValue`, `resfolder`,
 ('Question', 'VoiceAnnounceValue', 'QuestionValue', 5000, 'JACKSND1/Mc13', '1,2,3,4,5,6,7,8,9,10,11,12,13', 0),
 ('Question', 'VoiceAnnounceValue', 'QuestionValue', 6000, 'JACKSND1/Mc14', '1,2,3,4,5,6,7,8,9,10', 0),
 ('DisOrDat', 'SFXScoreLose', '', 0, 'DDSND/Mb85', '2', 0),
-('Intro', 'Welcome', '', 0, 'TITLE/Mh01', '1,2,3,4,5,6', 0),
-('Intro', 'WelcomePlayers', 'NumberOfPlayers', 2, 'TITLE/Mh02', '1,2,3,4,5,6,7,8,9,10,11', 0),
-('Intro', 'WelcomePlayers', 'NumberOfPlayers', 3, 'TITLE/Mh03', '1,2,3,4,5,6,7,8', 0),
+('Intro', 'Welcome', 'NumberOfPlayers', 1, 'TITLE/Mh01', '1,2,3,4,5,6', 0),
+('Intro', 'Welcome', 'NumberOfPlayers', 2, 'TITLE/Mh02', '1,2,3,4,5,6,7,8,9,10,11', 0),
+('Intro', 'Welcome', 'NumberOfPlayers', 3, 'TITLE/Mh03', '1,2,3,4,5,6,7,8', 0),
 ('Intro', 'GiveScrews', '', 0, 'TITLE/Mh04', '1,2,3,4', 0),
 ('Intro', 'HelpScrews', '', 0, 'TITLE/Mh09', '1,2,3,4', 0),
-('Intro', 'WelcomePlayers', 'NumberOfPlayers', 1, 'TITLE/Mh12', '1,2,3,4,5,6', 0),
+('Intro', 'NewPlayers', 'NumberOfPlayers', 1, 'TITLE/Mh12', '1,2,3,4,5,6', 0),
 ('DisOrDat', 'SFXScoreWin', '', 0, 'DDSND/Mb84', '2', 0),
 ('JackAttack', 'ExplainRules', '', 0, 'JATTACK2/Me01', '1,2,3,4', 0),
 ('JackAttack', 'NoExplain', 'PlayerSolo', 1, 'JATTACK2/Me03', '1,2', 0),
@@ -1085,7 +1189,29 @@ INSERT INTO `ressnd` (`grp`, `name`, `variantType`, `variantValue`, `resfolder`,
 ('R1WrapUp', 'VoiceExplainScrews', '', 0, 'R1WRAPUP/Mf04', '1,2,3,4', 0),
 ('R1WrapUp', 'MusicRound2', '', 0, 'R1WRAPUP/Mf10', '1,2', 1),
 ('R1WrapUp', 'SFXShowRound2', '', 0, 'R1WRAPUP/Mf20', '1,2,3', 0),
-('R1WrapUp', 'SFXGiveScrews', '', 0, 'R1WRAPUP/Mf21', '1,2', 0);
+('R1WrapUp', 'SFXGiveScrews', 'NumberOfPlayers', 2, 'R1WRAPUP/Mf21', '1', 0),
+('Question', 'Player1ScrewWho', 'NumberOfPlayers', 3, 'JACKSND1/Mc32', '1,2', 0),
+('Question', 'Player2ScrewWho', 'NumberOfPlayers', 3, 'JACKSND1/Mc33', '1,2', 0),
+('Question', 'Player3ScrewWho', 'NumberOfPlayers', 3, 'JACKSND1/Mc34', '1,2', 0),
+('Question', 'Player1AnswerScrewed', 'PlayerSolo', 0, 'JACKSND1/Mc38', '1,2,3', 0),
+('Question', 'Player2AnswerScrewed', 'PlayerSolo', 0, 'JACKSND1/Mc39', '1,2,3', 0),
+('Question', 'Player3AnswerScrewed', 'NumberOfPlayers', 3, 'JACKSND1/Mc40', '1,2,3,4', 0),
+('Question', 'PlayerScrewedSelf', 'NumberOfPlayers', 3, 'JACKSND1/Mc41', '1,2,3', 0),
+('Question', 'Player1ScrewLost', 'PlayerSolo', 0, 'JACKSND1/Mc42', '1,2,3', 0),
+('Question', 'Player2ScrewLost', 'PlayerSolo', 0, 'JACKSND1/Mc43', '1,2,3', 0),
+('Question', 'Player3ScrewLost', 'NumberOfPlayers', 3, 'JACKSND1/Mc44', '1,2,3', 0),
+('Question', 'PlayerScrewTimeout', 'NumberOfPlayers', 3, 'JACKSND1/Mc53', '1,2', 0),
+('Question', 'ScrewActivate', 'PlayerSolo', 0, 'JACKSND1/Mc83', '1', 0),
+('Question', 'ScrewLoop', 'NumberOfPlayers', 3, 'JACKSND1/Mc84', '1', 1),
+('Question', 'ScrewSounds', 'PlayerSolo', 0, 'JACKSND1/Mc85', '3', 0),
+('Question', 'PlayerScrewed', 'PlayerSolo', 0, 'JACKSND1/Mc86', '1', 0),
+('Intro', 'SFXScrews', 'NumberOfPlayers', 2, 'TITLE/Mh42', '1', 0),
+('Intro', 'SFXScrews', 'NumberOfPlayers', 3, 'TITLE/Mh42', '2', 0),
+('Intro', 'NewPlayers', 'NumberOfPlayers', 2, 'TITLE/Mh13', '1,3,5', 0),
+('Intro', 'NewPlayers', 'NumberOfPlayers', 3, 'TITLE/Mh14', '1,3,5', 0),
+('Intro', 'SFXTiltRound1', 'PlayerSolo', 0, 'TITLE/Mh40', '2', 0),
+('Intro', 'LetsGo', 'PlayerSolo', 0, 'TITLE/Mh10', '1,2,3,4,5,6,7,8', 0),
+('R1WrapUp', 'SFXGiveScrews', 'NumberOfPlayers', 3, 'R1WRAPUP/Mf21', '2', 0);
 
 -- --------------------------------------------------------
 
@@ -1100,7 +1226,7 @@ CREATE TABLE `strings` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
--- Index pour les tables exportées
+-- Index pour les tables déchargées
 --
 
 --
@@ -1132,6 +1258,7 @@ ALTER TABLE `ressnd`
 --
 ALTER TABLE `strings`
   ADD PRIMARY KEY (`folder`);
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
