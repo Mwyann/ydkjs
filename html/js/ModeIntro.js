@@ -99,9 +99,9 @@ ModeIntro.prototype.start = function() {
                 if (skiplistener) unbindKeyListener(skiplistener);
                 anim.free('ShowRound1');
                 anim.play('TiltRound1');
-                anim.stop('Screw1Loop');
-                anim.stop('Screw2Loop');
-                if (thisMode.game.players.length == 3) anim.stop('Screw3Loop');
+                anim.stop('Player1ScrewLoop');
+                anim.stop('Player2ScrewLoop');
+                if (thisMode.game.players.length == 3) anim.stop('Player3ScrewLoop');
                 anim.free('ShowSkipRules');
                 anim.play('HideSkipRules');
             });
@@ -122,31 +122,31 @@ ModeIntro.prototype.start = function() {
                 });
             });
 
-            anim.ended('Screw1', function() {
+            anim.ended('Player1ScrewShow', function() {
                 this.free();
-                anim.play('Screw1Loop');
+                anim.play('Player1ScrewLoop');
                 thisMode.game.players[0].screw = 1;
             });
 
-            anim.ended('Screw2', function() {
+            anim.ended('Player2ScrewShow', function() {
                 this.free();
-                anim.play('Screw2Loop');
+                anim.play('Player2ScrewLoop');
                 thisMode.game.players[1].screw = 1;
             });
 
             if (this.game.players.length == 3) {
-                anim.ended('Screw3', function () {
+                anim.ended('Player3ScrewShow', function () {
                     this.free();
-                    anim.play('Screw3Loop');
+                    anim.play('Player3ScrewLoop');
                     thisMode.game.players[2].screw = 1;
                 });
             }
 
             anim.ended('GiveScrews', -200, function() {
                 anim.play('SFXScrews');
-                anim.play('Screw1', 400);
-                anim.play('Screw2', 600);
-                if (thisMode.game.players.length == 3) anim.play('Screw3', 800);
+                anim.play('Player1ScrewShow', 400);
+                anim.play('Player2ScrewShow', 600);
+                if (thisMode.game.players.length == 3) anim.play('Player3ScrewShow', 800);
             });
 
             anim.ended('NewPlayers', 100, function () {

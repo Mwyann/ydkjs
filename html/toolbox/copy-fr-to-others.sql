@@ -2,11 +2,11 @@
 
 -- ANI
 
-DELETE FROM ydkjuk_sta.resani WHERE NOT ((grp = 'Question' AND name LIKE 'BGQuestion%') OR (grp = 'Intro' AND name LIKE 'IntroPreTitle%') OR (grp = 'Intro' AND name LIKE 'Player_'));
-INSERT INTO ydkjuk_sta.resani SELECT * FROM ydkjfr_sta.resani WHERE NOT ((grp = 'Question' AND name LIKE 'BGQuestion%') OR (grp = 'Intro' AND name LIKE 'IntroPreTitle%') OR (grp = 'Intro' AND name LIKE 'Player_'));
+DELETE FROM ydkjuk_sta.resani WHERE NOT ((grp = 'Question' AND name LIKE 'BGQuestion%') OR (grp = 'Intro' AND name LIKE 'IntroPreTitle%') OR (grp = 'Intro' AND name LIKE 'Player%') OR (grp = 'Intro' AND name LIKE '%SkipRules'));
+INSERT INTO ydkjuk_sta.resani SELECT * FROM ydkjfr_sta.resani WHERE NOT ((grp = 'Question' AND name LIKE 'BGQuestion%') OR (grp = 'Intro' AND name LIKE 'IntroPreTitle%') OR (grp = 'Intro' AND name LIKE 'Player%') OR (grp = 'Intro' AND name LIKE '%SkipRules'));
 
-DELETE FROM ydkjde_sta.resani WHERE NOT ((grp = 'Question' AND name LIKE 'BGQuestion%') OR (grp = 'Intro' AND name LIKE 'IntroPreTitle%') OR (grp = 'Intro' AND name LIKE 'Player_'));
-INSERT INTO ydkjde_sta.resani SELECT * FROM ydkjfr_sta.resani WHERE NOT ((grp = 'Question' AND name LIKE 'BGQuestion%') OR (grp = 'Intro' AND name LIKE 'IntroPreTitle%') OR (grp = 'Intro' AND name LIKE 'Player_'));
+DELETE FROM ydkjde_sta.resani WHERE NOT ((grp = 'Question' AND name LIKE 'BGQuestion%') OR (grp = 'Intro' AND name LIKE 'IntroPreTitle%') OR (grp = 'Intro' AND name LIKE 'Player%') OR (grp = 'Intro' AND name LIKE '%SkipRules'));
+INSERT INTO ydkjde_sta.resani SELECT * FROM ydkjfr_sta.resani WHERE NOT ((grp = 'Question' AND name LIKE 'BGQuestion%') OR (grp = 'Intro' AND name LIKE 'IntroPreTitle%') OR (grp = 'Intro' AND name LIKE 'Player%') OR (grp = 'Intro' AND name LIKE '%SkipRules'));
 
 -- SND
 
