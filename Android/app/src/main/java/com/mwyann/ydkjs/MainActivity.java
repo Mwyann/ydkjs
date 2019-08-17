@@ -1,6 +1,10 @@
 package com.mwyann.ydkjs;
 
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -85,6 +89,26 @@ public class MainActivity extends AppCompatActivity {
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             Toast.makeText(view.getContext(), "Cannot load YDKJS, check your Internet connectivity", Toast.LENGTH_LONG).show();
             finish();
+        }
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            if (Uri.parse(url).getScheme().equals("market")) {
+                try {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(url));
+                    Activity host = (Activity) view.getContext();
+                    host.startActivity(intent);
+                    return true;
+                } catch (ActivityNotFoundException e) {
+                    // Google Play app is not installed, you may want to open the app store link
+                    Uri uri = Uri.parse(url);
+                    view.loadUrl("http://play.google.com/store/apps/" + uri.getHost() + "?" + uri.getQuery());
+                    return false;
+                }
+
+            }
+            return false;
         }
     }
 }
