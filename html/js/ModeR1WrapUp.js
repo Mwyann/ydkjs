@@ -89,6 +89,7 @@ ModeR1WrapUp.prototype.start = function() {
         this.play();
         anim.play('ShowSkipRules');
         var skipRules = function() {
+            skipRules = function() {}; // Eviter les doubles clics sur le bouton de passage d'intro
             thisMode.game.api.postaction({action: 'skipRules'});
             //goNextCat(); // On laisse l'action loopback s'exécuter car puisqu'on change direct de catégorie, l'action se fait unregister direct et le jeu bloque.
         };

@@ -1,3 +1,6 @@
 <?php
 
-header('Location: /quick.php?nbplayers=1&fullscreen=1');
+$nbplayers = 1;
+if (isset($_GET['nbplayers'])) $nbplayers = intval($_GET['nbplayers']);
+
+header('Location: /quick.php?nbplayers='.$nbplayers.'&fullscreen=1');
