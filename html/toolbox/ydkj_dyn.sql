@@ -68,7 +68,8 @@ CREATE TABLE `errors` (
   `url` varchar(200) NOT NULL,
   `line` int(7) NOT NULL,
   `col` int(7) NOT NULL,
-  `error` text NOT NULL
+  `error` text NOT NULL,
+  `stack` text NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
