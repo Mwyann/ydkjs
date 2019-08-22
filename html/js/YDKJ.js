@@ -107,9 +107,10 @@ function loadScriptOldSchool(sScriptSrc, oCallback) {
         jQuery.ajax({
             url: 'api/report-error.php',
             type: 'post',
-            data: {msg:msg, url:url, line:line, col:col, error:error},
+            data: {msg:msg, url:url, line:line, col:col, error:error, stack:error.stack},
             success: function(html, status, xhr) {
-                console.log('YDKJS: An error has been found and has been reported to the developer.');
+                if (html == 'OK') console.log('YDKJS: An error has been found and has been reported to the developer.');
+                else console.log('YDKJS: An error has been found but couldn\'t be reported.');
             },
             error: function (xhr, ajaxOptions, thrownError){
                 console.log('YDKJS: An error has been found but couldn\'t be reported.');
