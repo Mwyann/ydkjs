@@ -356,7 +356,7 @@ YDKJAnimation.prototype.play = function(delay) {
         this.audio.res.play();
     }
 
-    if (!this.audio || !this.loop) setupEnd(); // Les musiques en boucle sont leur propre système d'appel aux fonctions ended
+    if (!this.audio || !this.loop) setupEnd(); // Les musiques en boucle ont leur propre système d'appel aux fonctions ended
 
     return true;
 };

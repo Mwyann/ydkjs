@@ -34,6 +34,7 @@ if (isset($_SESSION['player3'])) $player3 = htmlspecialchars(substr(trim($_SESSI
 
 $nbquestions = 7;
 if (isset($_SESSION['nbquestions'])) $nbquestions = intval($_SESSION['nbquestions']);
+if (isset($_SESSION['debug'])) $nbquestions = intval($_SESSION['debug']['nbquestions']);
 
 srand($session_id*130);
 
@@ -121,8 +122,10 @@ function gamemode() {
     $currentmode = $_POST['currentmode'];
     $newmode = array();
     switch ($currentmode) {
-        case 'None': $newmode = array('mode' => 'Intro'); break;
-        //case 'None': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 10, 'chooseplayer' => rand(1,$nbplayers)); break; // Ligne DEBUG
+        case 'None':
+            if (isset($_SESSION['debug'])) {
+                $newmode = array('mode' => $_SESSION['debug']['mode'], 'category' => intval($_SESSION['debug']['category']), 'questionnumber' => intval($_SESSION['debug']['questionnumber']), 'chooseplayer' => rand(1,$nbplayers)); break; // Ligne DEBUG
+            } else $newmode = array('mode' => 'Intro'); break;
         case 'Intro': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 1, 'chooseplayer' => rand(1,$nbplayers)); break;
         case 'Category':
             if (!isset($_POST['category'])) die('Gamemode 2');
@@ -254,7 +257,10 @@ function resources() {
                 $specialGibberish = 1-(floor($session_id / 2) % 2);
             }
         }
-        //$specialquestion = 4;$specialGibberish = 1; // Ligne DEBUG
+
+        if (isset($_SESSION['debug'])) {
+            $specialquestion = intval($_SESSION['debug']['specialquestion']);$specialGibberish = intval($_SESSION['debug']['specialGibberish']); // Ligne DEBUG
+        }
         $playersolo = 0;
         if ($nbplayers == 1) $playersolo = 1;
 
@@ -590,6 +596,7 @@ function resources() {
         while ($rs = $res->fetch()) {
             if (($rs['variantType'] == 'NumberOfAnswers') && ($rs['variantValue'] != $nbanswers)) continue;
             if (($rs['variantType'] == 'QuestionValue') && ($rs['variantValue'] != $questionvalue)) continue;
+            if (($rs['variantType'] == 'CategoryNumber') && ($rs['variantValue'] != $category)) continue;
 
             $r = array(
                 'urlGif' => uriToUid('res-full/'.$rs['filename'].'.gif'),
