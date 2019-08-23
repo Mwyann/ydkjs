@@ -232,7 +232,6 @@ ModeQuestion.prototype.start = function() {
     var playerScrewChoosed = function(tmspcrewee) {
         anim.free('Player'+screwer+'AnswerLoop')
             .free('Player'+screwer+'ScrewLoop')
-            .play('Player'+screwer+'ScrewWho')
             .reset('ScrewLoop');
         doPlayerScrew(tmspcrewee);
     };
