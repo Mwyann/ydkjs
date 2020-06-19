@@ -550,18 +550,11 @@ YDKJAnimList.prototype.free = function(name) {
         }
         this.animations = {};
     } else if (this.animations[name]) {
-        var freedStack = Error().stack;
-        this.animations[name].play = function(delay) {
-            window.logError('play', '', 0, 0, 'animation '+name+' tried to play but was first freed on: '+freedStack, Error().stack, window.safeJson(window.YDKJCurrentGame));
-        }
-        this.animations[name].delay = function(delay, f) {
-            window.logError('delay', '', 0, 0, 'animation '+name+' tried to delay but was first freed on: '+freedStack, Error().stack, window.safeJson(window.YDKJCurrentGame));
-        }
-        /*
-        this.animations[name].free();
-        this.animations[name] = undefined;
-        delete this.animations[name];
-        */
+        // On libère l'objet mais on ne le supprime pas complètement, on se contente de désactiver tous ses prototypes, afinde ne pas générer d'erreur JS en cas d'appel en race condition.
+        var anim2 = this.animations[name];
+        anim2.free();
+        var proto = Object.getPrototypeOf(anim2);
+        for(var i in proto) if (proto.hasOwnProperty(i)) anim2[i] = function() {return true;}
     }
     return this;
 };
