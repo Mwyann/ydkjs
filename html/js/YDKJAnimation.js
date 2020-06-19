@@ -376,7 +376,7 @@ YDKJAnimation.prototype.stop = function() {
         }
     }
 
-    if (this.audio) {
+    if ((this.audio) && (this.audio.res.stop)) {
         this.audio.res.stop();
     }
 };
@@ -469,6 +469,13 @@ var YDKJAnimList = function(resources) {
 
     // Chargement auto des ressources
     for(var resourcename in this.resources) if (this.resources.hasOwnProperty(resourcename)) this.load(resourcename);
+
+    // Debug : tester l'existence d'une animation avant d'exécuter quoi que ce soit (et logguer l'erreur si nécessaire)
+    this.checkAnim = function(name) {
+        if (typeof this.animations[name] == 'undefined') {
+            window.logError('checkAnim', '', 0, 0, 'checkAnim failed for animation '+name, Error().stack, window.safeJson(window.YDKJCurrentGame));
+        }
+    }
 };
 
 YDKJAnimList.prototype.load = function(resourcename, name) {
@@ -502,30 +509,36 @@ YDKJAnimList.prototype.ready = function(f) {
 };
 
 YDKJAnimList.prototype.get = function(name) {
+    this.checkAnim(name);
     return this.animations[name];
 };
 
 YDKJAnimList.prototype.ended = function(name, a, b) {
+    this.checkAnim(name);
     this.animations[name].ended(a, b);
     return this;
 };
 
 YDKJAnimList.prototype.delay = function(name, delay, f) {
+    this.checkAnim(name);
     this.animations[name].delay(delay, f);
     return this;
 };
 
 YDKJAnimList.prototype.play = function(name, delay) {
+    this.checkAnim(name);
     this.animations[name].play(delay);
     return this;
 };
 
 YDKJAnimList.prototype.stop = function(name) {
+    this.checkAnim(name);
     this.animations[name].stop();
     return this;
 };
 
 YDKJAnimList.prototype.reset = function(name, fullreset) {
+    this.checkAnim(name);
     this.animations[name].reset(fullreset);
     return this;
 };
@@ -545,6 +558,7 @@ YDKJAnimList.prototype.free = function(name) {
 };
 
 YDKJAnimList.prototype.click = function(name, f) {
+    this.checkAnim(name);
     this.animations[name].click(f);
     return this;
 };

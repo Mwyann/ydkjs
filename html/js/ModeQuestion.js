@@ -383,7 +383,7 @@ ModeQuestion.prototype.start = function() {
 
     anim.ended('RevealAnswer', 300, function() {
         if (thisMode.options.correctanswerisdefault) {
-            thisMode.play('EndQuestion', 200);
+            anim.play('EndQuestion', 200);
         } else {
             anim.ended('Answer'+thisMode.correctanswer, 200,function () {
                 anim.play('EndQuestion');

@@ -92,6 +92,7 @@ YDKJGame.prototype.start = function() {
             thisGame.engineVersion = gameinfo.engineVersion;
             thisGame.api.localMode = gameinfo.localMode;
             thisGame.api.subscribe();
+            window.YDKJCurrentGame = thisGame; // Utile pour le debug
             (thisGame.api.gamemode())(function (gamemode) {
                 // device detection
                 var AudioContext = window.AudioContext // Default

@@ -101,21 +101,49 @@ function loadScriptOldSchool(sScriptSrc, oCallback) {
     oHead.appendChild(oScript);
 }
 
+window.logError = function(msg, url, line, col, error, stack, log) {
+    if (typeof log == 'undefined') log = '';
+    jQuery.ajax({
+        url: 'api/report-error.php',
+        type: 'post',
+        data: {msg:msg, url:url, line:line, col:col, error:error, stack:stack, log:log},
+        success: function(html, status, xhr) {
+            if (html == 'OK') console.log('YDKJS: An error has been found and has been reported to the developer.');
+            else console.log('YDKJS: An error has been found but couldn\'t be reported.');
+        },
+        error: function (xhr, ajaxOptions, thrownError){
+            console.log('YDKJS: An error has been found but couldn\'t be reported.');
+        }
+    });
+};
+
+window.safeJson = function(obj) {
+    var cache = [];
+    var json = JSON.stringify(obj, (key, value) => {
+        // Discard useless and big objects
+        if (key == 'frames') return;
+        if (key == 'tiles') return;
+        if (key == 'resource') return;
+        if (key == 'resources') return;
+
+        // Check for duplicate references
+        if (typeof value === 'object' && value !== null) {
+            // Duplicate reference found, discard key
+            if (cache.includes(value)) return;
+
+            // Store value in our collection
+            cache.push(value);
+        }
+        return value;
+    });
+    cache = null; // Enable garbage collection
+    return json;
+};
+
 (function() {
     var oldWindowError = window.onerror;
     window.onerror = function(msg, url, line, col, error) {
-        jQuery.ajax({
-            url: 'api/report-error.php',
-            type: 'post',
-            data: {msg:msg, url:url, line:line, col:col, error:error, stack:error.stack},
-            success: function(html, status, xhr) {
-                if (html == 'OK') console.log('YDKJS: An error has been found and has been reported to the developer.');
-                else console.log('YDKJS: An error has been found but couldn\'t be reported.');
-            },
-            error: function (xhr, ajaxOptions, thrownError){
-                console.log('YDKJS: An error has been found but couldn\'t be reported.');
-            }
-        });
+        window.logError(msg, url, line, col, error, error.stack, window.safeJson(window.YDKJCurrentGame));
         if (oldWindowError) oldWindowError.apply(this,arguments);
     };
 })();
