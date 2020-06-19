@@ -155,6 +155,7 @@ YDKJAPI.prototype.initdemo = function() {
                 'Question/SFXPlayerCorrect': 0,
                 'Question/DefaultRevealLastAnswer': 0,
                 'Question/Player1ShowKey': 0,
+                'Question/Player1Loop': 0,
                 'Question/Player1Answer': 0,
                 'Question/Player1AnswerLoop': 0,
                 'Question/Player1Buzzed': 0,
@@ -162,6 +163,7 @@ YDKJAPI.prototype.initdemo = function() {
                 'Question/Player1Wrong': 0,
                 'Question/Player1LostScrew': 0,
                 'Question/Player2ShowKey': 0,
+                'Question/Player2Loop': 0,
                 'Question/Player2Answer': 0,
                 'Question/Player2AnswerLoop': 0,
                 'Question/Player2Buzzed': 0,
@@ -169,6 +171,7 @@ YDKJAPI.prototype.initdemo = function() {
                 'Question/Player2Wrong': 0,
                 'Question/Player2LostScrew': 0,
                 'Question/Player3ShowKey': 0,
+                'Question/Player3Loop': 0,
                 'Question/Player3Answer': 0,
                 'Question/Player3AnswerLoop': 0,
                 'Question/Player3Buzzed': 0,
@@ -638,7 +641,7 @@ YDKJAPI.prototype.initdemo = function() {
             {name:playernames[2],score:0,keycode:[112,80]}
         ];
 
-        return function(f) {f({players: players, locale:'fr_FR', engineVersion: 2, localMode: 1})}
+        return function(f) {f({players: players, locale:'fr_FR', engineVersion: 2, localMode: 1, screwEnabled: 0})}
     };
 
     // Emulation de l'API bien sûr

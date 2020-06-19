@@ -80,6 +80,7 @@ YDKJGame.prototype.start = function() {
         thisGame.gameinfoready(function (gameinfo) {
             thisGame.players = gameinfo.players;
             thisGame.locale = gameinfo.locale;
+            thisGame.screwEnabled = gameinfo.screwEnabled;
             thisGame.screwKeycodes = [];
             switch(thisGame.locale) {
                 case 'fr_FR': thisGame.screwKeycodes = [118, 86]; break; // v ou V (vicieuse)

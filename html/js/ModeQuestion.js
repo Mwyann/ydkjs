@@ -26,7 +26,7 @@ ModeQuestion.prototype.start = function() {
 
     // fonction qui sélectionne l'animation avec vicieuse ou non
     var IsScrew = function(player) {
-        if (screwallowed && (thisMode.game.players.length > 1) && (thisMode.game.players[player-1].screw) && (player != screwee)) return '.Screw'; else return '';
+        if (screwallowed && (thisMode.game.screwEnabled) && (thisMode.game.players.length > 1) && (thisMode.game.players[player-1].screw) && (player != screwee)) return '.Screw'; else return '';
     };
 
     if (this.game.players.length >= 2) {
@@ -96,7 +96,7 @@ ModeQuestion.prototype.start = function() {
                 .stop('JingleTimer')
                 .play('SFXPlayerKey');
             if ((thisMode.game.players.length > 1) && (thisMode.game.players[thisMode.currentPlayer-1].screw)) {
-                anim.ended('Player'+thisMode.currentPlayer+'AnswerLoop.Screw', function() {
+                (thisMode.game.screwEnabled) && anim.ended('Player'+thisMode.currentPlayer+'AnswerLoop.Screw', function() {
                     this.free();
                     anim.play('Player'+thisMode.currentPlayer+'AnswerEnd.Screw');
                 });
@@ -146,7 +146,7 @@ ModeQuestion.prototype.start = function() {
         else anim.play('PlayerScrewedSelf');
     };
 
-    if (thisMode.game.players.length > 1) {
+    if ((thisMode.game.screwEnabled) && (thisMode.game.players.length > 1)) {
         if (thisMode.game.players.length == 3) {
             anim.ended('ScrewSounds', 300, function() {
                 anim.play('Player'+thisMode.currentPlayer+'ScrewWho');
@@ -314,7 +314,7 @@ ModeQuestion.prototype.start = function() {
             }
         } else if (thisMode.currentAns == 0) { // Réponse d'un joueur
             if (!hasKeycode(thisMode.game.players[thisMode.currentPlayer-1].keycode)) return false; // Ce joueur ne peut pas répondre
-            if (screwallowed && (findKeycode(choice, thisMode.game.screwKeycodes))) { // vicieuse
+            if (screwallowed && (thisMode.game.screwEnabled) && (findKeycode(choice, thisMode.game.screwKeycodes))) { // vicieuse
                 if (thisMode.game.players[thisMode.currentPlayer-1].screw) {
                     if (screwablePlayer() != 0) { // Si il reste au moins un autre joueur à vissier
                         screwer = thisMode.currentPlayer;
@@ -559,7 +559,7 @@ ModeQuestion.prototype.start = function() {
         anim.play('Player1AnswerLoop');
     });
     if (this.game.players.length >= 2) {
-        anim.ended('Player1Answer.Screw', function() {
+        (thisMode.game.screwEnabled) && anim.ended('Player1Answer.Screw', function() {
             this.free();
             anim.play('Player1AnswerLoop.Screw')
                 .click('Player1AnswerLoop.Screw',function(){pressKey(firstKeycode(thisMode.game.screwKeycodes));}); // Clic vicieuse
@@ -569,7 +569,7 @@ ModeQuestion.prototype.start = function() {
             this.free();
             anim.play('Player2AnswerLoop');
         });
-        anim.ended('Player2Answer.Screw', function() {
+        (thisMode.game.screwEnabled) && anim.ended('Player2Answer.Screw', function() {
             this.free();
             anim.play('Player2AnswerLoop.Screw')
                 .click('Player2AnswerLoop.Screw',function(){pressKey(firstKeycode(thisMode.game.screwKeycodes));}); // Clic vicieuse
@@ -580,7 +580,7 @@ ModeQuestion.prototype.start = function() {
             this.free();
             anim.play('Player3AnswerLoop');
         });
-        anim.ended('Player3Answer.Screw', function() {
+        (thisMode.game.screwEnabled) && anim.ended('Player3Answer.Screw', function() {
             this.free();
             anim.play('Player3AnswerLoop.Screw')
                 .click('Player3AnswerLoop.Screw',function(){pressKey(firstKeycode(thisMode.game.screwKeycodes));}); // Clic vicieuse

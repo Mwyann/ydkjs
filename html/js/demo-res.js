@@ -230,6 +230,7 @@ var YDKJDemoAnim = {
         'HideQuestion':{res:'5QDemo',name:'off4/12000',framestart:31,framestop:35,loop:0},
 
         'Player1ShowKey':{res:'5QDemo',name:'off4/3000',framestart:292,loop:0},
+        'Player1Loop':{res:'5QDemo',name:'off4/3000',framestart:304,framestop:305,loop:0},
         'Player1Answer':{res:'5QDemo',name:'off4/3000',framestart:307,framestop:319,loop:0},
         'Player1AnswerLoop':{res:'5QDemo',name:'off4/3000',framestart:321,framestop:326,loop:1},
         'Player1Correct':{res:'5QDemo',name:'off4/3000',framestart:328,loop:0},
@@ -237,6 +238,7 @@ var YDKJDemoAnim = {
         'Player1LostScrew':{res:'5QDemo',name:'off4/3000',framestart:368,loop:0},
 
         'Player2ShowKey':{res:'5QDemo',name:'off4/3000',framestart:686,loop:0}, // L'animation est buguée, même dans le jeu original : le nombre ne monte pas.
+        'Player2Loop':{res:'5QDemo',name:'off4/3000',framestart:698,framestop:699,loop:0},
         'Player2Answer':{res:'5QDemo',name:'off4/3000',framestart:701,framestop:713,loop:0},
         'Player2AnswerLoop':{res:'5QDemo',name:'off4/3000',framestart:715,framestop:720,loop:1},
         'Player2Correct':{res:'5QDemo',name:'off4/3000',framestart:722,loop:0},
@@ -244,6 +246,7 @@ var YDKJDemoAnim = {
         'Player2LostScrew':{res:'5QDemo',name:'off4/3000',framestart:763,loop:0},
 
         'Player3ShowKey':{res:'5QDemo',name:'off4/3000',framestart:1093,loop:0},
+        'Player3Loop':{res:'5QDemo',name:'off4/3000',framestart:1105,framestop:1106,loop:0},
         'Player3Answer':{res:'5QDemo',name:'off4/3000',framestart:1108,framestop:1120,loop:0},
         'Player3AnswerLoop':{res:'5QDemo',name:'off4/3000',framestart:1122,framestop:1127,loop:1},
         'Player3Correct':{res:'5QDemo',name:'off4/3000',framestart:1129,loop:0},

@@ -111,7 +111,8 @@ function gameinfo() {
             'locale' => $locale,
             'engineVersion' => $engineVersion,
             'nbQuestions' => $nbquestions,
-            'localMode' => $localMode
+            'localMode' => $localMode,
+            'screwEnabled' => 1
         ));
 }
 
