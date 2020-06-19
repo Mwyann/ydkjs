@@ -267,6 +267,7 @@ ModeQuestion.prototype.start = function() {
     };
 
     var pressKey = function(choice) {
+        if (thisMode.currentAns == -1) return false; // Fin de partie, appui non autorisé
         if (!choice) return false; // Si on se voit envoyer 0 à cause d'un clic sur un joueur à keycode 0
         if ((screwer != 0) && (screwee <= 0)) { // Vicieuse en cours de viciage
             if (screwee == 0) return false; // Pas encore de choix disponible
@@ -511,7 +512,7 @@ ModeQuestion.prototype.start = function() {
         clearTimeout(thisMode.timerTimeout);
         thisMode.timerTimeout = 0;
         this.delay(200,function() {
-            thisMode.currentAns = -1;
+            thisMode.currentAns = -1; // TODO Comment synchroniser la fin de la question en même temps pour tous les joueurs ?
             this.reset();
             thisMode.Timer.reset();
             anim.play('TimerTimeOut');
