@@ -557,9 +557,6 @@ YDKJAnimList.prototype.free = function(name) {
         this.animations[name].delay = function(delay, f) {
             window.logError('delay', '', 0, 0, 'animation '+name+' tried to delay but was first freed on: '+freedStack, Error().stack, window.safeJson(window.YDKJCurrentGame));
         }
-        this.animations[name].ended = function(a, b) {
-            window.logError('ended', '', 0, 0, 'animation '+name+' tried to ended but was first freed on: '+freedStack, Error().stack, window.safeJson(window.YDKJCurrentGame));
-        }
         /*
         this.animations[name].free();
         this.animations[name] = undefined;
