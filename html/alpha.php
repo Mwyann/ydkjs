@@ -38,7 +38,7 @@ session_write_close();
 <meta charset="UTF-8" />
 <title>You Don't Know Jack® ALPHA FR</title>
 <link href="css/ydkj.css" rel="stylesheet"/>
-<script src="js/jquery-3.3.1.min.js" type="text/javascript"></script>
+<script src="js/jquery-3.5.1.min.js" type="text/javascript"></script>
 <script src="js/YDKJ.js?ver=10" type="text/javascript"></script>
 
 <meta name="viewport" content="width=800,user-scalable=no">
