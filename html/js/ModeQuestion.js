@@ -120,6 +120,7 @@ ModeQuestion.prototype.start = function() {
         if (screwable == -1) {
             anim.play('Player'+screwer+'ScrewLoop')
                 .click('Player'+screwer+'ScrewLoop',function(){pressKey(firstKeycode(thisMode.game.players[screwer-1].keycode));});
+            // TODO Activer les boutons des autres joueurs afin qu'ils soient vissiables sur mobile également (en simulant les touches 1, 2 et 3)
             screwee = -1;
         } else {
             anim.free('Player'+thisMode.currentPlayer+'ScrewWho')

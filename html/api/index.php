@@ -149,7 +149,7 @@ function gamemode() {
 
 // Fonction qui renvoie un tableau JSON avec la liste des ressources et des URLS à aller chercher
 function resources() {
-    global $DB, $DBsta, $DEMOMODE, $VERSION, $nbplayers, $session_id, $nbquestions;
+    global $DB, $DBsta, $DEMOMODE, $VERSION, $players_ids, $nbplayers, $session_id, $nbquestions;
     $reslist = array();
     connectMysql();
 
@@ -258,6 +258,8 @@ function resources() {
                 $specialGibberish = 1-(floor($session_id / 2) % 2);
             }
         }
+
+        if (substr_count($players_ids, '#') > 2) $specialGibberish = 0; // DEBUG Si on joue en ligne contre un autre joueur, on désactive les rimatologies, trop bugguées pour le moment
 
         if (isset($_SESSION['debug'])) {
             $specialquestion = intval($_SESSION['debug']['specialquestion']);$specialGibberish = intval($_SESSION['debug']['specialGibberish']); // Ligne DEBUG

@@ -998,7 +998,7 @@ YDKJAPI.prototype.initgame = function() {
             thisAPI.lastid++;
             actiondata.id = thisAPI.lastid; // On génère un id fictif
             //console.log('Post action #'+actiondata.id);
-            if (actiondata.action != 'sync') thisAPI.postid = [thisAPI.lastid];
+            if (actiondata.action != 'sync') thisAPI.postid = [thisAPI.lastid]; // Ceci permettra de détecter le post en loopback, donc selfpost=1.
             thisAPI.actionlist.push(actiondata); // On push l'action en loopback
             thisAPI.runactions(); // Exécuter l'action immédiatement
             return; // Et on ne touche pas au serveur
