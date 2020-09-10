@@ -198,7 +198,8 @@ if (!isset($_SESSION['id'])) {
         <div style="text-align:center;font-size:20px;margin:12px">- <a href="joinsession.php" style="font-size:30px">Commencer une partie multi-joueurs (local ou en ligne)</a></div>
         <div style="text-align:center;font-size:20px;margin:12px"><form action="joinsession.php" method="post">- Rejoindre une partie multi-joueurs : <input type="text" name="session_id" size="4" maxlength="4" /> <input type="submit" value="Go" /> ou <a href="findsession.php">rejoindre une partie publique</a></form></div>
         <br/>
-        <div style="text-align:center;font-size:26px;margin:20px;color:#FF0">&Eacute;coutez <a href="itv/">l'interview exclusive de Walther Pépéka</a>, la voix de Jack !</div>
+        <div style="text-align:center;font-size:26px;margin:20px;color:#FF0">&Eacute;coutez <a href="itv/">l'interview exclusive de Luc Mitéran</a>, la voix de Jack !</div>
+        <div style="text-align:center;font-size:26px;margin:20px;color:#FF0">Exclusif ! Saviez-vous que Jack voulait passer à la TV ?<br/>Visionnez <a href="https://www.youtube.com/watch?v=jxsfDZwQCrY" target="_blank">le pré-pilote de Wewewe</a>, l'émission présentée par Luc Mitéran (+ making of) !</div>
         <div style="text-align:center;font-size:20px;margin:10px">Projet original : <a href="http://www.ydkjs.eu/">You Don't Know Javascript</a></div>
         <div style="text-align:center;font-size:20px">Contact : <a href="mailto:alpha@ydkj.fr">alpha@ydkj.fr</a></div>
         <div id="warning" style="border:#F00 1px solid; background-color:#300;color:#FFF;margin:50px;padding:20px;font-family:JackCondensed;font-size:18px">
