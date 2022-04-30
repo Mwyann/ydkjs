@@ -291,7 +291,7 @@ ModeJackAttack.prototype.start = function() {
                 Correct = thisMode.Player3Correct;
             }
 
-            if (ansList[answers[answer-1]] == matchList[currentQuestion-1]) { // Bonne réponse !
+            if (ansList[answers[answer-1]] == matchList[availableQuestions[0]-1]) { // Bonne réponse !
                 if (currentAnswer > 50) return false; // On revérifie, on ne sait jamais...
                 currentAnswer = 99;
                 thisMode.game.players[buzzPlayer-1].score = parseInt(thisMode.game.players[buzzPlayer-1].score) + 2000;
