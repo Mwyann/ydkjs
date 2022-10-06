@@ -191,7 +191,7 @@ if (!isset($_SESSION['id'])) {
         displaylogin();
     } else {
         ?>
-        <div style="text-align:center;font-size:24px;margin-top:20px;margin-bottom:40px">Vous possédez déjà un compte alpha ? <a href="?login=1">Connectez-vous !</a></div>
+        <!--div style="text-align:center;font-size:24px;margin-top:20px;margin-bottom:40px">Vous possédez déjà un compte alpha ? <a href="?login=1">Connectez-vous !</a></div-->
         <div style="text-align:center;font-size:30px;margin:20px">Pour jouer, quatre possibilités :</div>
         <div style="text-align:center;font-size:20px;margin:12px">- Testez la <a href="demo.php">démo originale du jeu (4 questions)</a></div>
         <div style="text-align:center;font-size:20px;margin:12px">- Commencer une partie rapide (7 questions) en local : <a href="quick.php?nbplayers=1">1 joueur</a>, <a href="quick.php?nbplayers=2">2 joueurs</a> ou <a href="quick.php?nbplayers=3">3 joueurs</a></div>
