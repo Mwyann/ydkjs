@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mwyann.ydkjs">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -12,7 +11,8 @@
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity"
                   android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
-                  android:screenOrientation="sensorLandscape">
+                  android:screenOrientation="sensorLandscape"
+                  android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
