@@ -3,7 +3,6 @@
 require_once 'local/config.inc.php';
 require_once 'common.inc.php';
 require_once 'mysql.inc.php';
-require_once 'JSON.php';
 
 // Gestion de la session
 session_readonly();
