@@ -14,6 +14,7 @@ ModeCategory.prototype.preload = function(resources) {
     anim.volume('MusicChooseCategoryStart', 70) // Volume changé dès le preload car la musique est susceptible d'être déclenchée par le mode précédent
         .volume('MusicChooseCategoryLoop', 70)
         .ended('MusicChooseCategoryStart', function() {
+            anim.reset('MusicChooseCategoryLoop');
             anim.play('MusicChooseCategoryLoop');
         });
 

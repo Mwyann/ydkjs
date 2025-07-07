@@ -102,6 +102,7 @@ function loadScriptOldSchool(sScriptSrc, oCallback) {
 }
 
 window.logError = function(msg, url, line, col, error, stack, log) {
+    if (typeof window.gamedata !== 'undefined') return;
     if (typeof log == 'undefined') log = '';
     jQuery.ajax({
         url: 'api/report-error.php',

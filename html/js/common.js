@@ -219,7 +219,7 @@ InputTextFrame.prototype.sendKeypress = function(key) {
         this.SFXTypeBack.play();
         this.text = this.text.substr(0,this.text.length-1);
     } else {
-        if (this.text.length >= 40) return false;
+        if (this.text.length >= 200) return false;
         key = String.fromCharCode(key);
         if (key == "'") key = '’';
         this.text = this.text+key;
