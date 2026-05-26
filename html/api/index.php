@@ -583,11 +583,10 @@ function resources() {
                            AND q.folder = s.folder");
         $qhdr = $res->fetch();
         $questionvalue = number_format(500*$category,0,'','');
-        $json = new Services_JSON();
-        $strings = $json->decode($qhdr['strings']);
+        $strings = json_decode($qhdr['strings'], true);
         $nbanswers = 2;
-        foreach($strings as $str) if ($str->id == 4) {
-            foreach($str->data as $d) if ($d == 3) $nbanswers = 3;
+        foreach ($strings as $str) if ($str['id'] == 4) {
+            foreach ($str['data'] as $d) if ($d == 3) $nbanswers = 3;
         }
 
         $reslist = array('value' => $questionvalue);
