@@ -474,7 +474,9 @@ var YDKJAnimList = function(resources) {
     this.checkAnim = function(name) {
         if (typeof this.animations[name] == 'undefined') {
             window.logError('checkAnim', '', 0, 0, 'checkAnim failed for animation '+name, Error().stack, window.safeJson(window.YDKJCurrentGame));
+            return false;
         }
+        return true;
     }
 };
 
@@ -509,37 +511,32 @@ YDKJAnimList.prototype.ready = function(f) {
 };
 
 YDKJAnimList.prototype.get = function(name) {
-    this.checkAnim(name);
+    if (!this.checkAnim(name)) return undefined;
     return this.animations[name];
 };
 
 YDKJAnimList.prototype.ended = function(name, a, b) {
-    this.checkAnim(name);
-    this.animations[name].ended(a, b);
+    if (this.checkAnim(name)) this.animations[name].ended(a, b);
     return this;
 };
 
 YDKJAnimList.prototype.delay = function(name, delay, f) {
-    this.checkAnim(name);
-    this.animations[name].delay(delay, f);
+    if (this.checkAnim(name)) this.animations[name].delay(delay, f);
     return this;
 };
 
 YDKJAnimList.prototype.play = function(name, delay) {
-    this.checkAnim(name);
-    this.animations[name].play(delay);
+    if (this.checkAnim(name)) this.animations[name].play(delay);
     return this;
 };
 
 YDKJAnimList.prototype.stop = function(name) {
-    this.checkAnim(name);
-    this.animations[name].stop();
+    if (this.checkAnim(name)) this.animations[name].stop();
     return this;
 };
 
 YDKJAnimList.prototype.reset = function(name, fullreset) {
-    this.checkAnim(name);
-    this.animations[name].reset(fullreset);
+    if (this.checkAnim(name)) this.animations[name].reset(fullreset);
     return this;
 };
 
@@ -560,8 +557,7 @@ YDKJAnimList.prototype.free = function(name) {
 };
 
 YDKJAnimList.prototype.click = function(name, f) {
-    this.checkAnim(name);
-    this.animations[name].click(f);
+    if (this.checkAnim(name)) this.animations[name].click(f);
     return this;
 };
 
