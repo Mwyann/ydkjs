@@ -201,7 +201,23 @@ if (!isset($_SESSION['id'])) {
         <div style="text-align:center;font-size:26px;margin:20px;color:#FF0">&Eacute;coutez <a href="itv/">l'interview exclusive de Luc Mitéran</a>, la voix de Jack !</div>
         <div style="text-align:center;font-size:26px;margin:20px;color:#FF0">Exclusif ! Saviez-vous que Jack voulait passer à la TV ?<br/>Visionnez <a href="https://www.youtube.com/watch?v=jxsfDZwQCrY" target="_blank">le pré-pilote de Wewewe</a>, l'émission présentée par Luc Mitéran (+ making of) !</div>
         <div style="text-align:center;font-size:20px;margin:10px">Projet original : <a href="http://www.ydkjs.eu/">You Don't Know Javascript</a></div>
-        <div style="text-align:center;font-size:20px">Contact : <a href="mailto:alpha@ydkj.fr">alpha@ydkj.fr</a></div>
+        <div style="text-align:center;font-size:20px">Contact : <a href="#" id="contact-link">Cliquez ici pour contacter Jack</a></div>
+        <script>(function () {
+                function r13(s) {
+                    return s.replace(/[a-zA-Z]/g, function (c) {
+                        return String.fromCharCode((c <= 'Z' ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26);
+                    });
+                }
+
+                var e = atob('d25weEBscXh3Zi5ya'+'A==');
+                e = r13(e);
+                document.getElementById('contact-link').onclick = function () {
+                    this.href = 'mailto:' + e;
+                    this.textContent = e;
+                    this.onclick = null;
+                    return false;
+                }
+            })();</script>
         <div id="warning" style="border:#F00 1px solid; background-color:#300;color:#FFF;margin:50px;padding:20px;font-family:JackCondensed;font-size:18px">
             <p style="text-align:center;font-size:24px;font-weight:bold">ATTENTION : A LIRE AVANT DE JOUER ! <span style="font-size:20px">(Si si, vraiment, au moins ce qui est <u>souligné</u>)</span></p>
             <p>
