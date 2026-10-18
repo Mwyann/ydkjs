@@ -114,7 +114,7 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
         })
 
     def create_session(self, msg=None):
-        self.leave_session()
+        self.leave_session(intentional=True)
         code = self.generate_session_code()
         log_dir = options.log_dir
         log_path = os.path.join(log_dir, f"session_{code}.log")
@@ -172,9 +172,41 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
 
         session = YDKJWebSocket.sessions[code]
         if self in session['clients']:
+            info = session['clients'][self]
+            if session.get('status') == 'in_game':
+                client_data = [
+                    {
+                        "client_id": gp["client_id"],
+                        "nick": gp["nick"],
+                        "is_host": gp["is_host"]
+                    }
+                    for gp in session.get('game_players', [])
+                ]
+                self.write_message(json.dumps({
+                    "event": "reconnected",
+                    "session": code,
+                    "client_id": info["client_id"],
+                    "is_host": info.get("is_host", False),
+                    "status": "in_game",
+                    "spectator": info.get("spectator", True),
+                    "nb_questions": session.get('nb_questions', 7),
+                    "clients": client_data,
+                    "token": info.get("token", "")
+                }))
+            else:
+                self.write_message(json.dumps({
+                    "event": "session_joined",
+                    "session": code,
+                    "client_id": info["client_id"],
+                    "is_host": info.get("is_host", False),
+                    "status": "lobby",
+                    "spectator": info.get("spectator", True),
+                    "token": info.get("token", "")
+                }))
+                self.send_lobby_state(session)
             return
 
-        self.leave_session()
+        self.leave_session(intentional=True)
         # Annuler le timer de grâce si tous les clients s'étaient déconnectés
         if session.get('grace_timer'):
             tornado.ioloop.IOLoop.current().remove_timeout(session['grace_timer'])
@@ -243,11 +275,16 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
             self.write_message(json.dumps({"event": "error", "message": "Session inexistante"}))
             return
 
+        # Si cette socket était techniquement rattachée à une autre session, la détacher d'abord
+        if self.session_code and self.session_code != code:
+            self.log_session(None, f"[CLIENT_SWITCH_SESSION] Socket rattachée à {self.session_code}, bascule vers {code}")
+            self.leave_session(intentional=True)
+
         session = YDKJWebSocket.sessions[code]
         target_info = None
 
         if client_id and token:
-            # 1. Vérifier dans les clients déconnectés
+            # 1. Vérifier dans les clients déconnectés de CETTE session
             if client_id in session.get('disconnected_clients', {}):
                 candidate = session['disconnected_clients'][client_id]
                 if candidate.get('token') == token:
@@ -285,7 +322,10 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
                 }
                 self.log_session(session, f"[SPECTATOR_JOINED_IN_GAME] client_id: {client_id}")
             else:
-                self.write_message(json.dumps({"event": "error", "message": "Impossible de restaurer la session"}))
+                # La session demandée est encore en phase de lobby et les credentials ne correspondent pas
+                # (ex: changement de session). On admet immédiatement le client dans le lobby !
+                self.log_session(session, f"[RECONNECT_FALLBACK_JOIN] Credentials inconnus pour {code}. Admission dans le lobby.")
+                self.join_session(code)
                 return
 
         session['clients'][self] = target_info
@@ -377,7 +417,7 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
         self.log_session(session, f"[SYNC_TIMEOUT] Safety 20s reached -> forced sync_complete #{seq_id}")
         self.broadcast(session, {"event": "sync_complete", "id": seq_id})
 
-    def leave_session(self):
+    def leave_session(self, intentional=False):
         if not self.session_code or self.session_code not in YDKJWebSocket.sessions:
             return
 
@@ -385,11 +425,13 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
         if self in session['clients']:
             info = session['clients'].pop(self)
             client_id = info.get('client_id')
-            self.log_session(session, f"[CLIENT_DISCONNECTED] client_id: {client_id} (nick: \"{info.get('nick')}\")")
+            action_label = "[CLIENT_LEFT]" if intentional else "[CLIENT_DISCONNECTED]"
+            self.log_session(session, f"{action_label} client_id: {client_id} (nick: \"{info.get('nick')}\")")
 
-            session.setdefault('disconnected_clients', {})[client_id] = info
+            if not intentional:
+                session.setdefault('disconnected_clients', {})[client_id] = info
 
-            # Si l'hôte se déconnecte : armer le timer de reconnexion de 10s
+            # Si l'hôte se déconnecte : armer le timer de reconnexion de 10s (ou fermeture si intentionnel)
             if info.get('is_host'):
                 self.log_session(session, f"[HOST_DISCONNECTED] L'hôte (client_id: {client_id}) s'est déconnecté. Délai de 10s armé.")
                 code = self.session_code

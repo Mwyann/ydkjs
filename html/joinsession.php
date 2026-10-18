@@ -24,6 +24,15 @@ $default_nick = '';
                 var defaultNick = <?php echo json_encode($default_nick); ?>;
                 var isPublic = <?php echo $is_public; ?>;
 
+                if (requestedSession) {
+                    var prevSession = (sessionStorage.getItem('ydkj_session') || '').toUpperCase().trim();
+                    if (prevSession && prevSession !== requestedSession) {
+                        sessionStorage.removeItem('ydkj_client_id');
+                        sessionStorage.removeItem('ydkj_token');
+                        sessionStorage.setItem('ydkj_session', requestedSession);
+                    }
+                }
+
                 var sessionCode = '';
                 var myClientId = 0;
                 var myToken = '';

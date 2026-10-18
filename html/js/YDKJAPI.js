@@ -916,12 +916,25 @@ YDKJAPI.prototype.initgame = function() {
             }
         } catch(e) {}
     }
+    var prevSession = '';
+    try {
+        prevSession = (sessionStorage.getItem('ydkj_session') || '').toUpperCase().trim();
+    } catch(e) {}
+
     this.myClientId = 0;
     this.myToken = '';
-    try {
-        this.myClientId = parseInt(sessionStorage.getItem('ydkj_client_id')) || 0;
-        this.myToken = sessionStorage.getItem('ydkj_token') || '';
-    } catch(e) {}
+    if (this.sessionCode && prevSession && this.sessionCode !== prevSession) {
+        try {
+            sessionStorage.removeItem('ydkj_client_id');
+            sessionStorage.removeItem('ydkj_token');
+            sessionStorage.setItem('ydkj_session', this.sessionCode);
+        } catch(e) {}
+    } else {
+        try {
+            this.myClientId = parseInt(sessionStorage.getItem('ydkj_client_id')) || 0;
+            this.myToken = sessionStorage.getItem('ydkj_token') || '';
+        } catch(e) {}
+    }
 
     this.getApiParams = function() {
         var params = {};
@@ -1005,7 +1018,7 @@ YDKJAPI.prototype.initgame = function() {
                     return;
                 }
 
-                if (msg.event === 'reconnected') {
+                if (msg.event === 'reconnected' || msg.event === 'session_joined') {
                     if (msg.status === 'lobby') {
                         window.location.href = 'joinsession.php?session=' + encodeURIComponent(thisAPI.sessionCode);
                         return;

@@ -32,6 +32,11 @@ if (isset($_GET['nbplayers'])) {
     var sessionCode = <?php echo json_encode($session_code); ?>;
     var nbPlayers = <?php echo json_encode($nbplayers); ?>;
     if (sessionCode) {
+      var prevSession = (sessionStorage.getItem('ydkj_session') || '').toUpperCase().trim();
+      if (prevSession && prevSession !== sessionCode) {
+        sessionStorage.removeItem('ydkj_client_id');
+        sessionStorage.removeItem('ydkj_token');
+      }
       sessionStorage.setItem('ydkj_session', sessionCode);
       sessionStorage.removeItem('ydkj_local_seed');
     } else {

@@ -68,6 +68,11 @@ Ce document consigne la conception, l'architecture et l'ensemble des travaux ré
   - `disconnected_clients` : Conservation des états avec jeton de sécurité `token` hexadécimal.
   - Timer d'absence de l'hôte (10s) : Déconnexion propre de tous les clients avec motif clair si l'hôte ne revient pas.
   - Timer de grâce (60s) : Fermeture de session si tous les clients s'absentent temporairement.
+- **Support multilingue & Mapping des ports** :
+  - Support d'alias de langues en ligne de commande : `--port=fr` (8890), `uk` (8891), `de` (8892), `us` (8893).
+- **Changement de session fluide & Résilience de reconnexion** :
+  - Si une socket était techniquement rattachée à une autre session (`self.session_code != code`), `self.leave_session()` est invoqué avant d'intégrer la nouvelle session.
+  - Si un client tente un `reconnect` avec des identifiants inconnus ou expirés sur une session en statut `lobby`, le serveur bascule automatiquement sur `join_session(code)` au lieu de lever une erreur `Impossible de restaurer la session`.
 - **Journalisation exhaustive** : Fichier dédié `logs/session_CODE.log` traçant chaque connexion, action, buzz et déconnexion.
 
 ### B. Frontend : Lobby & Transition SPA (`joinsession.php`)
@@ -75,6 +80,8 @@ Ce document consigne la conception, l'architecture et l'ensemble des travaux ré
   - Lorsque la partie démarre (`game_start`), le lobby ne fait plus de redirection HTTP vers `alpha.php`.
   - La fonction `launchGameSPA()` injecte dynamiquement `#screen`, charge `YDKJ.js?ver=11` et transmet la WebSocket déjà active via `window.YDKJ_ACTIVE_WS`.
   - Préserve le contexte d'interaction utilisateur nécessaire pour le déblocage audio dans les navigateurs stricts.
+- **Gestion des changements de sessions** :
+  - Détection automatique d'un changement de session dans `sessionStorage` : si l'URL courante ne correspond pas à la session stockée, les anciens `client_id` et `token` sont immédiatement purgés.
 - **Admission immédiate des spectateurs** :
   - Si un utilisateur tente de rejoindre une partie en cours via `joinsession.php?session=CODE` ou `alpha.php?session=CODE`, le serveur détecte l'état `in_game`.
   - L'utilisateur est immédiatement admis en spectateur (`spectator: true`), sans passer par le lobby.
@@ -85,6 +92,7 @@ Ce document consigne la conception, l'architecture et l'ensemble des travaux ré
   - Mode multijoueur : `postaction` envoie un message JSON `{event: 'postaction', data: ...}` via WebSocket.
   - `runactions` traite les actions reçues séquentiellement.
   - `selfpost` est déterminé de manière directe (`msg.client_id === thisAPI.myClientId`).
+  - Méthode utilitaire `ignoreaction(actionname)` pour réenregistrer en continu un écouteur neutre afin d'absorber les actions résiduelles sans pollution mémoire.
 - **Attribution rétro des touches buzzer** :
   - **1 joueur** : Touche **`B`** (`[98, 66]`), fidèle au CD-ROM où le joueur solo est au milieu.
   - **2 joueurs** : Touche **`Q`** (`[113, 81]`) et **`P`** (`[112, 80]`).
@@ -99,12 +107,12 @@ Ce document consigne la conception, l'architecture et l'ensemble des travaux ré
   - Fallback transparent sur `NoSleep.min.js`.
   - Rétablissement automatique lors du changement de visibilité (`visibilitychange`).
 
-### D. Correction du mode Vicieuse à 3 joueurs (`js/ModeQuestion.js`)
-- **Problème résolu** : Lors d'une vicieuse à 3 joueurs, deux actions successives sont envoyées :
-  1. `{"action": "playerScrew", "value": 0}` (activation de la vicieuse).
-  2. `{"action": "playerScrew", "value": X}` (sélection du joueur cible).
-- Après l'action 1, le handler temporaire était consommé et désenregistré (`registered['playerScrew'] = 0`), rendant les autres clients sourds au choix de la cible.
-- **Solution** : Réenregistrement explicite de l'écouteur `registerPlayerScrew()` lors de la réception de `value == 0` et garde `screwee <= 0` sur les rappels d'animation `ended`.
+### D. Améliorations et Corrections de Question (`js/ModeQuestion.js`)
+- **Correction de la Vicieuse à 3 joueurs** :
+  - Réenregistrement explicite de l'écouteur `registerPlayerScrew()` lors de la réception de `value == 0` et garde `screwee <= 0` sur les rappels d'animation `ended`.
+  - Prise en charge des clics tactiles / souris sur les joueurs adverses pour les vicier directement sans passer par le clavier.
+- **Synchronisation du TimeOut** :
+  - Diffusion de l'action `timeOut` (phase de buzz ou de réponse) pour verrouiller instantanément le chronomètre sur l'ensemble des navigateurs avec filet de sécurité réseau de 5s.
 
 ### E. Backend PHP Stateless (`api/`)
 - Suppression intégrale de `session_start()`, de `$_SESSION` et des requêtes SQL vers la base dynamique (`dyn`).

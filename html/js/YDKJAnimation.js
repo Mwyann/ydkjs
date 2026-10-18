@@ -549,7 +549,7 @@ YDKJAnimList.prototype.free = function(name) {
         }
         this.animations = {};
     } else if (this.animations[name]) {
-        // On libère l'objet mais on ne le supprime pas complètement, on se contente de désactiver tous ses prototypes, afinde ne pas générer d'erreur JS en cas d'appel en race condition.
+        // On libère l'objet mais on ne le supprime pas complètement, on se contente de désactiver tous ses prototypes, afin de ne pas générer d'erreur JS en cas d'appel en race condition.
         var anim2 = this.animations[name];
         anim2.free();
         var proto = Object.getPrototypeOf(anim2);
