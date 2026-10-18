@@ -124,7 +124,8 @@ function YDKJAnimation(resource) {
             'position':'absolute',
             'left':x+'px',
             'top':y+'px'
-        }).on('mousedown',(function() {
+        }).on('pointerdown mousedown',(function(e) {
+            if (e.type === 'mousedown' && window.PointerEvent) return;
             for(var i = 0; i < thisAnim.clickFunctions.length; i++) {
                 thisAnim.clickFunctions[i].call(thisAnim);
             }
@@ -142,7 +143,8 @@ function YDKJAnimation(resource) {
             'position':'absolute',
             'left':x+'px',
             'top':y+'px'
-        }).on('mousedown',(function() {
+        }).on('pointerdown mousedown',(function(e) {
+            if (e.type === 'mousedown' && window.PointerEvent) return;
             for(var i = 0; i < thisAnim.clickFunctions.length; i++) {
                 thisAnim.clickFunctions[i].call(thisAnim, textid);
             }

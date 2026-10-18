@@ -199,10 +199,8 @@ ModeGibberish.prototype.start = function() {
 
     var registerPlayerBuzz = 0; // Déclaré plus tard
 
-    var registerPlayerBuzzIgnore = function() { // Fonction qui ne fait rien, pour ignorer les appuis suivants TODO rendre ce genre de trucs plus propre
-        thisMode.game.api.registeraction('playerBuzz', function(data){
-            registerPlayerBuzzIgnore();
-        });
+    var registerPlayerBuzzIgnore = function() {
+        thisMode.game.api.ignoreaction('playerBuzz');
     };
 
     var typelistener = 0;
@@ -274,6 +272,11 @@ ModeGibberish.prototype.start = function() {
     });
 
     var playerWrong = function() {
+        if (typelistener) {
+            unbindKeyListener(typelistener);
+            typelistener = 0;
+        }
+        registerTypeAnswerIgnore();
         thisMode.typeframe.wrong(function () {
             setTimeout(function() {
                 thisMode.SFXPlayerLose.reset();
@@ -360,6 +363,7 @@ ModeGibberish.prototype.start = function() {
 
         unbindKeyListener(typelistener);
         typelistener = 0;
+        registerTypeAnswerIgnore();
         var resultat = checkTextWrds(text,getSTRfromID(thisMode.STR,'Wrds',128));
         if (resultat == 2) { // Bonne réponse !
             var correctAnswer = function() {
@@ -432,9 +436,7 @@ ModeGibberish.prototype.start = function() {
         });
     };
     var registerTypeAnswerIgnore = function() {
-        thisMode.game.api.registeraction('typeAnswer', function(data){
-            registerTypeAnswerIgnore();
-        });
+        thisMode.game.api.ignoreaction('typeAnswer');
     };
 
     this.SFXPlayerBuzz.ended(function() {
@@ -447,10 +449,16 @@ ModeGibberish.prototype.start = function() {
         unbindKeyListener(thisMode.listener);
         registerTypeAnswer(); // Réaction à l'api
         if (hasKeycode(thisMode.game.players[thisMode.buzzPlayer-1].keycode)) { // Ce joueur peut répondre
-            typelistener = bindKeyListener(function(key) {
+            var handleKey = function(key) {
                 thisMode.game.api.postaction({action: 'typeAnswer', value: key});
                 thisMode.typeframe.sendKeypress(key);
-            });
+            };
+            thisMode.typeframe.onKey = handleKey;
+            thisMode.typeframe.canInput = true;
+            typelistener = bindKeyListener(handleKey);
+        } else {
+            thisMode.typeframe.onKey = null;
+            thisMode.typeframe.canInput = false;
         }
         thisMode.typeframe.start();
     });

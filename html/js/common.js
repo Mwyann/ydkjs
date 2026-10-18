@@ -70,8 +70,14 @@ jQuery.fn.imagesLoaded = function(callback, fireOne) {
 
 function bindKeyListener(callback,timeout){
     if (typeof(timeout) === 'undefined') timeout = 0; // TODO ?
-    var listener = function(event){callback(event.which)};
-    var listenerbackspace = function(event){if (event.keyCode==8) callback(event.which);};
+    var listener = function(event){
+        if (event.target && (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA')) return;
+        callback(event.which);
+    };
+    var listenerbackspace = function(event){
+        if (event.target && (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA')) return;
+        if (event.keyCode==8) callback(event.which);
+    };
     jQuery(window).on('keypress',listener);
     jQuery(window).on('keydown',listenerbackspace);
     return [listener,listenerbackspace];
@@ -128,6 +134,8 @@ function InputTextFrame() {}
 InputTextFrame.prototype.start = function() {
     var thisFrame = this;
 
+    if (this.cleanupInput) this.cleanupInput();
+
     var cursorblinkInterval = 0;
     var cursor;
     this.inputframe = 0;
@@ -141,7 +149,17 @@ InputTextFrame.prototype.start = function() {
         },700);
     };
 
+    this.cleanupInput = function() {
+        thisFrame.syncInputValue = null;
+        if (thisFrame.inputElement) {
+            thisFrame.inputElement.off('keydown keyup input blur');
+            thisFrame.inputElement.remove();
+            thisFrame.inputElement = null;
+        }
+    };
+
     this.enter = function() {
+        thisFrame.cleanupInput();
         cursor.css('visibility','');
         if (cursorblinkInterval) clearInterval(cursorblinkInterval);
         thisFrame.SFXTypeHeartBeat.reset();
@@ -159,40 +177,109 @@ InputTextFrame.prototype.start = function() {
     });
 
     this.TextFrameShow.ended(function() {
+        // Si la saisie est désactivée pour ce client (ex: spectateur ou autre joueur), pas d'input invisible
+        if (thisFrame.canInput === false) return;
+
         var textframediv = this.getDiv();
-        var input = $('<input type="text" style="width:100%;height:100%;position:absolute;top:0;left:0;opacity:0;text-align:center" />');
+        var input = $('<input type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="width:100%;height:100%;position:absolute;top:0;left:0;opacity:0;text-align:center;font-size:16px;" />');
         $(textframediv).find('div').find('div:first').append(input);
+        thisFrame.inputElement = input;
         input.focus();
 
-        //for android chrome keycode fix
-        if (navigator.userAgent.match(/Android/i)) {
-            input.on('keyup',function(e){
-                var inputValue = this.value;
+        var lastValue = '';
+        var lastBackspaceTime = 0;
+        var lastEnterTime = 0;
 
-                var charKeyCode = e.keyCode || e.which;
+        var triggerKey = function(key) {
+            if (thisFrame.onKey) {
+                thisFrame.onKey(key);
+            } else {
+                thisFrame.sendKeypress(key);
+            }
+        };
 
-                if (charKeyCode == 0 || charKeyCode == 229) {
-                    charKeyCode = inputValue.charCodeAt(inputValue.length-1);
+        var triggerBackspace = function() {
+            var now = Date.now ? Date.now() : new Date().getTime();
+            if (now - lastBackspaceTime < 100) return;
+            lastBackspaceTime = now;
+            triggerKey(8);
+        };
+
+        var triggerEnter = function() {
+            var now = Date.now ? Date.now() : new Date().getTime();
+            if (now - lastEnterTime < 250) return;
+            lastEnterTime = now;
+            triggerKey(13);
+        };
+
+        thisFrame.syncInputValue = function() {
+            if (thisFrame.inputElement) {
+                thisFrame.inputElement.val(thisFrame.text);
+                lastValue = thisFrame.text;
+            }
+        };
+
+        input.on('keydown', function(e) {
+            var code = e.keyCode || e.which;
+            if (code === 8 || e.key === 'Backspace') {
+                e.preventDefault();
+                e.stopPropagation();
+                triggerBackspace();
+                return false;
+            }
+            if (code === 13 || e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+                triggerEnter();
+                return false;
+            }
+        });
+
+        input.on('keyup', function(e) {
+            var code = e.keyCode || e.which;
+            if (code === 8 || e.key === 'Backspace') {
+                e.preventDefault();
+                e.stopPropagation();
+                triggerBackspace();
+                return false;
+            }
+            if (code === 13 || e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+                triggerEnter();
+                return false;
+            }
+        });
+
+        input.on('input', function(e) {
+            var orig = e.originalEvent || e;
+            if (orig && (orig.inputType === 'deleteContentBackward' || orig.inputType === 'deleteContentForward')) {
+                triggerBackspace();
+                lastValue = this.value;
+                return;
+            }
+
+            var val = this.value;
+            if (val.length < lastValue.length) {
+                var diff = lastValue.length - val.length;
+                for (var d = 0; d < diff; d++) {
+                    triggerBackspace();
                 }
+            } else if (val.length > lastValue.length) {
+                var added = val.substring(lastValue.length);
+                for (var i = 0; i < added.length; i++) {
+                    triggerKey(added.charCodeAt(i));
+                }
+            }
+            lastValue = val;
+        });
 
-                if (charKeyCode > 0) thisFrame.sendKeypress(charKeyCode);
-                return false;
-            });
-        } else {
-            input.on('keydown',function(e){
-                var charKeyCode = e.key;
-                if (charKeyCode.length === 1) charKeyCode = charKeyCode.charCodeAt(0);
-                else if (charKeyCode === 'Backspace') charKeyCode = 8;
-                else if (charKeyCode === 'Enter') charKeyCode = 13;
-                else charKeyCode = 0;
-
-                if (charKeyCode > 0) thisFrame.sendKeypress(charKeyCode);
-                return false;
-            });
-        }
-
-        input.on('blur',function(){
-            input.focus();
+        input.on('blur', function() {
+            if (thisFrame.inputElement && thisFrame.inputframe) {
+                setTimeout(function() {
+                    if (thisFrame.inputElement) thisFrame.inputElement.focus();
+                }, 50);
+            }
         });
     });
 
@@ -228,12 +315,14 @@ InputTextFrame.prototype.sendKeypress = function(key) {
     }
     this.resetblink();
     this.inputframe.html(this.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/ /g,'&nbsp;'));
+    if (this.syncInputValue) this.syncInputValue();
     return true;
 };
 
 /* Méthode qui efface la mauvaise réponse du joueur */
 InputTextFrame.prototype.wrong = function(callback) {
     var thisFrame = this;
+    if (this.cleanupInput) this.cleanupInput();
     this.SFXEraseAnswer.play();
     var inputframe = this.game.html.screen.find('.inputframe');
 
@@ -253,6 +342,7 @@ InputTextFrame.prototype.wrong = function(callback) {
 /* Méthode qui affiche la bonne réponse */
 InputTextFrame.prototype.showAnswer = function(answer,callback) {
     var thisFrame = this;
+    if (this.cleanupInput) this.cleanupInput();
     this.SFXShowTextFrame.reset(true);
     // On boucle à la sauvage
     this.SFXShowTextFrame.ended(function() {

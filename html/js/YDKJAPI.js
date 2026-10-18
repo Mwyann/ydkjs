@@ -668,6 +668,13 @@ YDKJAPI.prototype.initdemo = function() {
         else thisAPI.registered[actionname] = 0;
     };
 
+    YDKJAPI.prototype.ignoreaction = function(actionname) {
+        var ignoreCallback = function(data) {
+            thisAPI.registeraction(actionname, ignoreCallback);
+        };
+        thisAPI.registeraction(actionname, ignoreCallback);
+    };
+
     YDKJAPI.prototype.runactions = function() {
         if (thisAPI.actionlist.length > 0) {
             var data = thisAPI.actionlist[0]; // On travaille toujours sur le premier élément uniquement
@@ -962,6 +969,13 @@ YDKJAPI.prototype.initgame = function() {
     YDKJAPI.prototype.unregisteraction = function(actionname) {
         if (actionname === true) thisAPI.registered = {};
         else thisAPI.registered[actionname] = 0;
+    };
+
+    YDKJAPI.prototype.ignoreaction = function(actionname) {
+        var ignoreCallback = function(data) {
+            thisAPI.registeraction(actionname, ignoreCallback);
+        };
+        thisAPI.registeraction(actionname, ignoreCallback);
     };
 
     YDKJAPI.prototype.runactions = function() {

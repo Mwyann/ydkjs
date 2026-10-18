@@ -23,6 +23,9 @@ ModeQuestion.prototype.start = function() {
     var screwer = 0; // Joueur ayant lancé sa vicieuse
     var screwee = 0; // Joueur ayant été vicié
     var gameOver = 0; // Fin de la question
+    var timeOutOccurred = false;
+    var waitingAnswerTimeout = false;
+    var safetyTimeoutTimer = null;
 
     // fonction qui sélectionne l'animation avec vicieuse ou non
     var IsScrew = function(player) {
@@ -47,10 +50,41 @@ ModeQuestion.prototype.start = function() {
         thisMode.game.api.unregisteraction('playerScrew');
     };
 
+    var unregisterTimeOut = function() {
+        thisMode.game.api.unregisteraction('timeOut');
+        if (safetyTimeoutTimer) {
+            clearTimeout(safetyTimeoutTimer);
+            safetyTimeoutTimer = null;
+        }
+        waitingAnswerTimeout = false;
+    };
+
+    var registerTimeOut = function() {
+        thisMode.game.api.registeraction('timeOut', function(data) {
+            timeOutOccurred = true;
+            thisMode.currentAns = -1; // Désactive immédiatement tout appui de buzzer chez tout le monde
+            unregisterPlayerBuzz();
+            registerPlayerBuzzIgnore();
+
+            // Si on attendait le timeOut de la réponse d'un joueur distant
+            if (waitingAnswerTimeout) {
+                waitingAnswerTimeout = false;
+                if (safetyTimeoutTimer) {
+                    clearTimeout(safetyTimeoutTimer);
+                    safetyTimeoutTimer = null;
+                }
+                thisMode.Timer.reset();
+                anim.play('TimerTimeOut');
+            }
+        });
+    };
+
     var playerBuzz = function() {
         if (thisMode.buzzPlayer) {
             clearTimeout(thisMode.timerTimeout);
             thisMode.timerTimeout = 0;
+            timeOutOccurred = false;
+            unregisterTimeOut();
             unregisterPlayerAnswer();
             unregisterPlayerScrew();
             if (thisMode.LastPlayers) anim.free(thisMode.LastPlayers);
@@ -86,6 +120,7 @@ ModeQuestion.prototype.start = function() {
         if (thisMode.currentAns) {
             clearTimeout(thisMode.timerTimeout);
             thisMode.timerTimeout = 0;
+            unregisterTimeOut();
             if (screwee) {
                 anim.free('Player'+screwee+'AnswerScrewed');
                 if (thisMode.game.players.length == 3) anim.reset('PlayerScrewedSelf');
@@ -118,10 +153,20 @@ ModeQuestion.prototype.start = function() {
         var screwable = screwablePlayer();
         if (tmpscrewee) screwable = tmpscrewee;
         if (screwable == -1) {
-            anim.play('Player'+screwer+'ScrewLoop')
-                .click('Player'+screwer+'ScrewLoop',function(){pressKey(firstKeycode(thisMode.game.players[screwer-1].keycode));});
-            // TODO Activer les boutons des autres joueurs afin qu'ils soient vissiables sur mobile également (en simulant les touches 1, 2 et 3)
             screwee = -1;
+            anim.play('Player'+screwer+'ScrewLoop')
+                .click('Player'+screwer+'ScrewLoop',function(){pressKey(screwer + 48);}); // Clic sur soi-même pour se vissier soi-même
+            // Activer les clics sur les joueurs disponibles afin qu'ils soient vissiables sur mobile / souris
+            for (var p = 1; p <= thisMode.game.players.length; p++) {
+                if (p !== screwer && thisMode.availPlayers[p]) {
+                    (function(targetPlayer) {
+                        var loopAnim = 'Player' + targetPlayer + 'Loop' + IsScrew(targetPlayer);
+                        anim.click(loopAnim, function() {
+                            pressKey(targetPlayer + 48);
+                        });
+                    })(p);
+                }
+            }
         } else {
             anim.free('Player'+thisMode.currentPlayer+'ScrewWho')
                 .free('Player'+screwable+'Loop'+IsScrew(screwable))
@@ -210,6 +255,7 @@ ModeQuestion.prototype.start = function() {
         if (thisMode.game.players.length == 2) doPlayerScrew(); // En mode 2 joueurs, on joue immédiatement l'animation de vissieuse
         clearTimeout(thisMode.timerTimeout);
         thisMode.timerTimeout = 0;
+        unregisterTimeOut();
     };
 
     var registerPlayerBuzz = function() {
@@ -252,22 +298,16 @@ ModeQuestion.prototype.start = function() {
         });
     };
 
-    var registerPlayerBuzzIgnore = function() { // Fonction qui ne fait rien, pour ignorer les appuis suivants TODO rendre ce genre de trucs plus propre
-        thisMode.game.api.registeraction('playerBuzz', function(data){
-            registerPlayerBuzzIgnore();
-        });
+    var registerPlayerBuzzIgnore = function() {
+        thisMode.game.api.ignoreaction('playerBuzz');
     };
 
-    var registerPlayerAnswerIgnore = function() { // Fonction qui ne fait rien, pour ignorer les appuis suivants TODO rendre ce genre de trucs plus propre
-        thisMode.game.api.registeraction('playerAnswer', function(data){
-            registerPlayerAnswerIgnore();
-        });
+    var registerPlayerAnswerIgnore = function() {
+        thisMode.game.api.ignoreaction('playerAnswer');
     };
 
-    var registerPlayerScrewIgnore = function() { // Fonction qui ne fait rien, pour ignorer les appuis suivants TODO rendre ce genre de trucs plus propre
-        thisMode.game.api.registeraction('playerScrew', function(data){
-            registerPlayerScrewIgnore();
-        });
+    var registerPlayerScrewIgnore = function() {
+        thisMode.game.api.ignoreaction('playerScrew');
     };
 
     var pressKey = function(choice) {
@@ -406,6 +446,7 @@ ModeQuestion.prototype.start = function() {
         // Plus aucun joueur ne peut jouer (timer ou tous les joueurs ont participé)
         pressKey = function(choice){};
         unbindKeyListener(thisMode.listener);
+        unregisterTimeOut();
         registerPlayerBuzzIgnore();
         registerPlayerAnswerIgnore();
         registerPlayerScrewIgnore();
@@ -437,6 +478,8 @@ ModeQuestion.prototype.start = function() {
         thisMode.game.api.synchronize(function() {
             thisMode.currentPlayer = 0;
             thisMode.currentAns = 0;
+            timeOutOccurred = false;
+            unregisterTimeOut();
 
             if (thisMode.LastPlayers) {
                 // Remise du compteur à 10
@@ -451,6 +494,7 @@ ModeQuestion.prototype.start = function() {
                 unregisterPlayerAnswer();
                 unregisterPlayerScrew();
                 registerPlayerBuzz();
+                registerTimeOut();
             } else gameover();
         });
     });
@@ -506,6 +550,7 @@ ModeQuestion.prototype.start = function() {
 
     anim.ended('TimerTimeOut', 500, function() {
         if (thisMode.currentPlayer > 0) { // Si un joueur avait buzzé
+            // TODO Est-ce qu'il ne faut pas arrêter l'animation de la vis, comme lorsque le joueur a répondu ? Voir avec le jeu original
             anim.play('TimeOut'+thisMode.currentPlayer);
         } else { // Sinon, fin de la question
             gameover();
@@ -515,12 +560,57 @@ ModeQuestion.prototype.start = function() {
     anim.ended('JingleTimer', function() {
         clearTimeout(thisMode.timerTimeout);
         thisMode.timerTimeout = 0;
-        this.delay(200,function() {
-            thisMode.currentAns = -1; // TODO Comment synchroniser la fin de la question en même temps pour tous les joueurs ?
-            this.reset();
-            thisMode.Timer.reset();
-            anim.play('TimerTimeOut');
-        });
+        thisMode.currentAns = -1;
+        unregisterPlayerBuzz();
+        registerPlayerBuzzIgnore();
+
+        if (thisMode.currentPlayer == 0) {
+            // Phase de buzz général : le premier qui arrive au timeout émet l'action pour verrouiller tout le monde
+            if (!timeOutOccurred) {
+                timeOutOccurred = true;
+                thisMode.game.api.postaction({action: 'timeOut', phase: 'buzz'});
+            }
+            this.delay(200, function() {
+                this.reset();
+                thisMode.Timer.reset();
+                anim.play('TimerTimeOut');
+            });
+        } else {
+            // Phase de réponse d'un joueur
+            unregisterPlayerAnswer();
+            unregisterPlayerScrew();
+            registerPlayerAnswerIgnore();
+            registerPlayerScrewIgnore();
+
+            if (hasKeycode(thisMode.game.players[thisMode.currentPlayer-1].keycode)) {
+                // Le joueur local répondait et n'a pas répondu à temps : il émet le timeOut
+                thisMode.game.api.postaction({action: 'timeOut', phase: 'answer', player: thisMode.currentPlayer});
+                this.delay(200, function() {
+                    this.reset();
+                    thisMode.Timer.reset();
+                    anim.play('TimerTimeOut');
+                });
+            } else {
+                // Un joueur distant répondait : si son timeOut a déjà été reçu, on joue l'animation
+                if (timeOutOccurred) {
+                    this.delay(200, function() {
+                        this.reset();
+                        thisMode.Timer.reset();
+                        anim.play('TimerTimeOut');
+                    });
+                } else {
+                    // Sinon, on attend son action (playerAnswer ou timeOut) avec le filet de sécurité réseau de 5s
+                    waitingAnswerTimeout = true;
+                    safetyTimeoutTimer = setTimeout(function() {
+                        if (waitingAnswerTimeout && !gameOver) {
+                            waitingAnswerTimeout = false;
+                            thisMode.Timer.reset();
+                            anim.play('TimerTimeOut');
+                        }
+                    }, 5000);
+                }
+            }
+        }
     });
 
     var checkAnswer = function() {
@@ -568,8 +658,7 @@ ModeQuestion.prototype.start = function() {
             this.free();
             anim.play('Player1AnswerLoop.Screw')
                 .click('Player1AnswerLoop.Screw',function(){pressKey(firstKeycode(thisMode.game.screwKeycodes));}); // Clic vicieuse
-
-        });
+        }).click('Player1Answer.Screw',function(){pressKey(firstKeycode(thisMode.game.screwKeycodes));});
         anim.ended('Player2Answer', function() {
             this.free();
             anim.play('Player2AnswerLoop');
@@ -578,7 +667,7 @@ ModeQuestion.prototype.start = function() {
             this.free();
             anim.play('Player2AnswerLoop.Screw')
                 .click('Player2AnswerLoop.Screw',function(){pressKey(firstKeycode(thisMode.game.screwKeycodes));}); // Clic vicieuse
-        });
+        }).click('Player2Answer.Screw',function(){pressKey(firstKeycode(thisMode.game.screwKeycodes));});
     }
     if (this.game.players.length == 3) {
         anim.ended('Player3Answer', function() {
@@ -589,7 +678,7 @@ ModeQuestion.prototype.start = function() {
             this.free();
             anim.play('Player3AnswerLoop.Screw')
                 .click('Player3AnswerLoop.Screw',function(){pressKey(firstKeycode(thisMode.game.screwKeycodes));}); // Clic vicieuse
-        });
+        }).click('Player3Answer.Screw',function(){pressKey(firstKeycode(thisMode.game.screwKeycodes));});
     }
 
     var PlayerBuzz = function() {
@@ -601,6 +690,7 @@ ModeQuestion.prototype.start = function() {
         registerPlayerBuzzIgnore(); // Déplacé ici car si deux appuis trop rapides venant de l'API, le 2eme appui risque d'être ignoré à cause du return juste au dessus.
         registerPlayerAnswer();
         registerPlayerScrew();
+        registerTimeOut();
     };
 
     anim.ended('SFXPlayerBuzz', 150, function() {
@@ -690,6 +780,7 @@ ModeQuestion.prototype.start = function() {
         });
         if (thisMode.game.players.length == 1) registerPlayerAnswer();  // On détecte d'abord une réponse, car si on inverse, on va accepter les deux évènements immédiatement
         registerPlayerBuzz();
+        registerTimeOut();
     });
 
     anim.ended('ShowQuestion', 500, function() {

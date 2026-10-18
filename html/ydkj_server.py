@@ -20,7 +20,29 @@ import tornado.ioloop
 import tornado.web
 import tornado.websocket
 
-define('port', type=int, default=8889, help="Port d'écoute du serveur WebSocket")
+PORT_MAPPING = {
+    'fr': 8890,
+    'uk': 8891,
+    'de': 8892,
+    'us': 8893,
+}
+
+
+def parse_port(value):
+    if isinstance(value, int):
+        return value
+    val_str = str(value).strip().lower()
+    if val_str in PORT_MAPPING:
+        return PORT_MAPPING[val_str]
+    try:
+        return int(val_str)
+    except ValueError:
+        raise ValueError(
+            f"Port invalide : '{value}'. Spécifiez un numéro de port ou l'un des alias : {', '.join(PORT_MAPPING.keys())}"
+        )
+
+
+define('port', type=parse_port, default=8889, help="Port d'écoute du serveur WebSocket (numéro ou alias : fr=8890, uk=8891, de=8892, us=8893)")
 define('log_dir', type=str, default='logs', help="Dossier de stockage des logs de session")
 
 ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"  # Sans 0, O, 1, I pour éviter les confusions
@@ -724,6 +746,7 @@ def shutdown(server, reason="Arrêt du serveur"):
 def main():
     parse_command_line()
     os.makedirs(options.log_dir, exist_ok=True)
+    port = parse_port(options.port)
 
     app = tornado.web.Application([
         (r'/YDKJ/ws', YDKJWebSocket),
@@ -731,8 +754,8 @@ def main():
     ])
 
     server = tornado.httpserver.HTTPServer(app)
-    server.listen(options.port)
-    print(f"Serveur WebSocket YDKJ démarré sur le port {options.port}")
+    server.listen(port)
+    print(f"Serveur WebSocket YDKJ démarré sur le port {port}")
     print(f"Dossier des logs : {os.path.abspath(options.log_dir)}")
 
     def sig_handler(sig, frame):
