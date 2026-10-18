@@ -167,7 +167,7 @@ ModeQuestion.prototype.start = function() {
 
         anim.ended('Player1Screw', function() {
             this.free();
-            if (thisMode.game.players.length == 3) doPlayerScrew();
+            if (thisMode.game.players.length == 3 && screwee <= 0) doPlayerScrew();
         });
 
         var PlayerScrewedEnd = function(playernum) {
@@ -183,7 +183,7 @@ ModeQuestion.prototype.start = function() {
 
         anim.ended('Player2Screw', function() {
             this.free();
-            if (thisMode.game.players.length == 3) doPlayerScrew();
+            if (thisMode.game.players.length == 3 && screwee <= 0) doPlayerScrew();
         });
 
         anim.ended('Player2Screwed', PlayerScrewedEnd(2))
@@ -192,7 +192,7 @@ ModeQuestion.prototype.start = function() {
         if (thisMode.game.players.length == 3) {
             anim.ended('Player3Screw', function() {
                 this.free();
-                if (thisMode.game.players.length == 3) doPlayerScrew();
+                if (thisMode.game.players.length == 3 && screwee <= 0) doPlayerScrew();
             });
 
             anim.ended('Player3Screwed', PlayerScrewedEnd(3))
@@ -244,7 +244,10 @@ ModeQuestion.prototype.start = function() {
                 if (val == 0) {
                     screwer = thisMode.currentPlayer;
                     playerScrew();
-                } else playerScrewChoosed(val); // screwee
+                    registerPlayerScrew(); // Réenregistrer l'écouteur pour recevoir le choix de la cible (val > 0)
+                } else {
+                    playerScrewChoosed(val); // screwee
+                }
             }
         });
     };

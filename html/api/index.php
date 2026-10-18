@@ -1,41 +1,37 @@
 <?php
 
 require_once 'local/config.inc.php';
-require_once 'common.inc.php';
 require_once 'mysql.inc.php';
 
-// Gestion de la session
-session_readonly();
-// Numéro de session et mode de la session (local ou en ligne)
+// Numéro de session
 $session_id = -1;
-$localMode = 0;
-if (isset($_SESSION['session_id'])) $session_id = intval($_SESSION['session_id']);
-if ($session_id <= 0) { // Si pas de numéro de session renseigné, on en génère un aléatoirement et on reste en mode local
-    $session_id = rand(1000000,999999999);
+if (isset($_POST['session']) && strlen(trim($_POST['session'])) > 0) {
+    $session_id = abs(crc32(trim($_POST['session']))) % 1000000;
+} else {
+    $session_id = rand(1000000, 999999999);
 }
-if ($session_id >= 1000000) $localMode = 1;
-$player_id = 0;
-if (isset($_SESSION['player_id'])) $player_id = intval($_SESSION['player_id']);
-// Liste des IDs des autres joueurs (entourés de #, exemple : #123#456#789#)
-$players_ids = '';
-if (isset($_SESSION['players_ids'])) $players_ids = $_SESSION['players_ids'];
+
 // Nombre de joueurs
 $nbplayers = 3; // Par défaut
-if (isset($_SESSION['nbplayers'])) $nbplayers = intval($_SESSION['nbplayers']);
+if (isset($_POST['nbplayers'])) $nbplayers = intval($_POST['nbplayers']);
 if (($nbplayers < 1) || ($nbplayers > 3)) $nbplayers = 3;
 
-$player1 = '';
-if (isset($_SESSION['player1'])) $player1 = htmlspecialchars(substr(trim($_SESSION['player1']['nick']),0,20));
-$player2 = '';
-if (isset($_SESSION['player2'])) $player2 = htmlspecialchars(substr(trim($_SESSION['player2']['nick']),0,20));
-$player3 = '';
-if (isset($_SESSION['player3'])) $player3 = htmlspecialchars(substr(trim($_SESSION['player3']['nick']),0,20));
+$player1 = isset($_POST['player1']) ? htmlspecialchars(substr(trim($_POST['player1']), 0, 20)) : '';
+$player2 = isset($_POST['player2']) ? htmlspecialchars(substr(trim($_POST['player2']), 0, 20)) : '';
+$player3 = isset($_POST['player3']) ? htmlspecialchars(substr(trim($_POST['player3']), 0, 20)) : '';
 
 $nbquestions = 7;
-if (isset($_SESSION['nbquestions'])) $nbquestions = intval($_SESSION['nbquestions']);
-if (isset($_SESSION['debug'])) $nbquestions = intval($_SESSION['debug']['nbquestions']);
+if (isset($_POST['nbquestions'])) $nbquestions = intval($_POST['nbquestions']);
 
-srand($session_id*130);
+$debug = null;
+if (isset($_COOKIE['ydkj_debug'])) {
+    $debug = json_decode($_COOKIE['ydkj_debug'], true);
+    if (isset($debug['nbquestions']) && intval($debug['nbquestions']) > 0) {
+        $nbquestions = intval($debug['nbquestions']);
+    }
+}
+
+srand($session_id * 130);
 
 if (!isset($_POST['call'])) die('API ready 1');
 $call = $_POST['call'];
@@ -59,7 +55,7 @@ function shuffle_rand(&$array) {
 }
 
 function gameinfo() {
-    global $VERSION, $nbplayers, $localMode, $player_id, $player1, $player2, $player3, $nbquestions;
+    global $VERSION, $nbplayers, $player1, $player2, $player3, $nbquestions;
     $players = array();
     $locale = '';
     $engineVersion = 2;
@@ -87,7 +83,7 @@ function gameinfo() {
     if ($player3 != '') $noms[2] = $player3;
     if ($nbplayers == 1)
         $players = array(
-            array('name' => $noms[0],'score' => 0,'screw' => 0,'keycode' => array(98,66)), // Si on fournit un keycode, cela veut dire que le joueur est contrôlable en local (sinon, on renvoie "0")
+            array('name' => $noms[0],'score' => 0,'screw' => 0,'keycode' => array(98,66)),
         );
     elseif ($nbplayers == 2)
         $players = array(
@@ -101,30 +97,26 @@ function gameinfo() {
             array('name' => $noms[2],'score' => 0,'screw' => 1,'keycode' => array(112,80))
         );
 
-    if (!$localMode) {
-        for($i = 0; $i < $nbplayers; $i++) if ((isset($_SESSION['player'.($i+1)])) && ($_SESSION['player'.($i+1)]['id'] != $player_id)) $players[$i]['keycode'] = 0; // Pas un joueur local, on supprime donc son keycode
-    }
-
     echo json_encode(array(
             'players' => $players,
             'locale' => $locale,
             'engineVersion' => $engineVersion,
             'nbQuestions' => $nbquestions,
-            'localMode' => $localMode,
+            'localMode' => 1,
             'screwEnabled' => 1
         ));
 }
 
 // Retourne les paramètres du prochain mode de jeu
 function gamemode() {
-    global $nbplayers;
+    global $nbplayers, $debug;
     if (!isset($_POST['currentmode'])) die('Gamemode 1');
     $currentmode = $_POST['currentmode'];
     $newmode = array();
     switch ($currentmode) {
         case 'None':
-            if (isset($_SESSION['debug'])) {
-                $newmode = array('mode' => $_SESSION['debug']['mode'], 'category' => intval($_SESSION['debug']['category']), 'questionnumber' => intval($_SESSION['debug']['questionnumber']), 'chooseplayer' => rand(1,$nbplayers)); break; // Ligne DEBUG
+            if ($debug) {
+                $newmode = array('mode' => $debug['mode'], 'category' => intval($debug['category']), 'questionnumber' => intval($debug['questionnumber']), 'chooseplayer' => rand(1,$nbplayers)); break; // Ligne DEBUG
             } else $newmode = array('mode' => 'Intro'); break;
         case 'Intro': $newmode = array('mode' => 'Category', 'category' => 1, 'questionnumber' => 1, 'chooseplayer' => rand(1,$nbplayers)); break;
         case 'Category':
@@ -148,7 +140,7 @@ function gamemode() {
 
 // Fonction qui renvoie un tableau JSON avec la liste des ressources et des URLS à aller chercher
 function resources() {
-    global $DB, $DBsta, $DEMOMODE, $VERSION, $players_ids, $nbplayers, $session_id, $nbquestions;
+    global $DB, $DBsta, $DEMOMODE, $VERSION, $nbplayers, $session_id, $nbquestions, $debug;
     $reslist = array();
     connectMysql();
 
@@ -258,10 +250,9 @@ function resources() {
             }
         }
 
-        if (substr_count($players_ids, '#') > 2) $specialGibberish = 0; // DEBUG Si on joue en ligne contre un autre joueur, on désactive les rimatologies, trop bugguées pour le moment
-
-        if (isset($_SESSION['debug'])) {
-            $specialquestion = intval($_SESSION['debug']['specialquestion']);$specialGibberish = intval($_SESSION['debug']['specialGibberish']); // Ligne DEBUG
+        if ($debug) {
+            $specialquestion = intval($debug['specialquestion']);
+            $specialGibberish = intval($debug['specialGibberish']); // Ligne DEBUG
         }
         $playersolo = 0;
         if ($nbplayers == 1) $playersolo = 1;
@@ -1094,128 +1085,9 @@ function resources() {
         ));
 }
 
-function getSocket() {
-    global $VERSION, $SOCKETPATH, $session_id;
-    @$socket = stream_socket_client('unix://'.$SOCKETPATH.'/YDKJ'.$VERSION.$session_id.'.sock',$errno,$errstr,1);
-
-    if (!$socket) {
-        exec('/usr/bin/php syncdaemon.php '.$session_id.' > /dev/null &');
-        $trials = 50;
-        while ((!$socket) && ($trials)) {
-            $trials--;
-            @$socket = stream_socket_client('unix://'.$SOCKETPATH.'/YDKJ'.$VERSION.$session_id.'.sock', $errno, $errstr, 1);
-            if (!$socket) usleep(50000);
-        }
-        if (!$trials) {
-            echo json_encode(array(
-                    'error' => 'Couldn\'t connect to the local daemon',
-                ));
-            die();
-        }
-    }
-    return $socket;
-}
-
-function subscribe() {
-    global $DB, $player_id, $session_id;
-
-    // Check en base s'il y a une nouvelle action
-    connectMysql('dyn');
-    $lastid = intval($_POST['lastid']);
-    $actions = array();
-    $res = $DB->query("SELECT *
-                       FROM actions
-                       WHERE session_id = ".$session_id."
-                       AND action_id > ".$lastid."
-                       LIMIT 0,20");
-    if ($res->rowCount() == 0) {
-        $DB = null;
-        $socket = getSocket();
-
-        stream_set_timeout($socket, 10); // Timeout de 10 secondes.
-        fwrite($socket,$player_id.",0\n"); // 0 = On se met juste en attente.
-        @fread($socket,1); // On attend une action sur le serveur
-        @fclose($socket);
-
-        // Check en base s'il y a une nouvelle action
-        connectMysql('dyn');
-        $lastid = intval($_POST['lastid']);
-        $actions = array();
-        $res = $DB->query("SELECT *
-                           FROM actions
-                           WHERE session_id = ".$session_id."
-                           AND action_id > ".$lastid."
-                           LIMIT 0,20");
-    }
-    $endgame = 0;
-    while ($action = $res->fetch()) {
-        $data = json_decode($action['actiondata'],true);
-        $data['id'] = $action['action_id'];
-        if ($data['action'] == 'endGame') $endgame = 1;
-        array_push($actions,$data);
-    }
-
-    echo json_encode(array(
-            'actions' => $actions,
-            'endgame' => $endgame
-    ));
-}
-
-function postaction() {
-    global $DB, $session_id, $player_id, $players_ids;
-    $data = $_POST['data'];
-
-    if ($players_ids != '') {
-        if (strpos($players_ids, '#'.$player_id.'#') === false) { // Si on ne fait pas partie des "joueurs" (donc on est un spectateur), alors on ne participe pas activement à l'action.
-            echo json_encode(array(
-                    'id' => -1
-                ));
-            die();
-        }
-    }
-
-    // TODO Vérifier l'action (à développer dans un second temps)
-
-    if ($data['action'] == 'sync') { // Gérer l'action 'sync'
-        $socket = getSocket();
-        stream_set_timeout($socket, 10); // Timeout de 10 secondes.
-        $nbconnections = substr_count($players_ids, '#')-1;
-        fwrite($socket,$player_id.','.$nbconnections."\n"); // n > 1 = On débloque tout le monde dès que n connexions ont envoyé un nombre > 1
-        if (fread($socket,1) == $nbconnections) { // On est le dernier : on ajoute l'action en base
-            connectMysql('dyn');
-            $DB->query("INSERT INTO actions (session_id, player_id, dateaction, actiondata) VALUES (".$session_id.", ".$player_id.", NOW(), '".addslashes(json_encode($data))."')");
-        }
-        fwrite($socket,'1'); // On valide l'action
-        @fclose($socket);
-
-        echo json_encode(array(
-                'id' => 0
-            ));
-        die();
-    }
-
-    // Ajouter l'action en base
-    connectMysql('dyn');
-
-    $DB->query("INSERT INTO actions (session_id, player_id, dateaction, actiondata) VALUES (".$session_id.", ".$player_id.", NOW(), '".addslashes(json_encode($data))."')");
-    $action_id = $DB->lastInsertId();
-
-    // "Réveiller" les autres joueurs pour leur indiquer qu'il y a une nouvelle action à lire
-    $socket = getSocket();
-    stream_set_timeout($socket, 10); // Timeout de 10 secondes.
-    fwrite($socket,$player_id.",1\n"); // 1 = On débloque tout le monde immédiatement !
-    @fclose($socket);
-
-    echo json_encode(array(
-            'id' => $action_id
-        ));
-}
-
 switch ($call) {
     case 'gameinfo': gameinfo(); break;
     case 'gamemode': gamemode(); break;
     case 'resources': resources(); break;
-    case 'subscribe': subscribe(); break;
-    case 'postaction': postaction(); break;
     default: die('API ready 2');
 }

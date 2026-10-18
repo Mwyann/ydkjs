@@ -67,7 +67,31 @@ function YDKJGame(html, demomode) {
 
         onresize = autozoom;
         autozoom();
+        enableWakeLock();
     };
+
+    var enableWakeLock = function() {
+        if ('wakeLock' in navigator && navigator.wakeLock.request) {
+            try {
+                navigator.wakeLock.request('screen').catch(function(){});
+            } catch(e) {}
+        }
+        if (typeof NoSleep !== 'undefined') {
+            try {
+                if (!window.YDKJ_NOSLEEP) {
+                    window.YDKJ_NOSLEEP = new NoSleep();
+                }
+                window.YDKJ_NOSLEEP.enable();
+            } catch(e) {}
+        }
+    };
+    thisGame.enableWakeLock = enableWakeLock;
+    jQuery(window).one('click touchend', enableWakeLock);
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible') {
+            enableWakeLock();
+        }
+    });
 
     body.bind("fullscreenchange", function(e) {
         if (body.fullScreen()) thisGame.fullscreen(function() {}); else thisGame.fullscreenoff();
@@ -91,41 +115,94 @@ YDKJGame.prototype.start = function() {
             }
             thisGame.engineVersion = gameinfo.engineVersion;
             thisGame.api.localMode = gameinfo.localMode;
-            thisGame.api.subscribe();
             window.YDKJCurrentGame = thisGame; // Utile pour le debug
             (thisGame.api.gamemode())(function (gamemode) {
-                // device detection
-                var AudioContext = window.AudioContext // Default
-                    || window.webkitAudioContext // Safari and old versions of Chrome
-                    || false;
-                var state = '';
-                if (AudioContext) {
-                    var audiocontext = new AudioContext();
-                    state = audiocontext.state;
-                }
-                if (state !== 'running') {
-                    var useraction = jQuery('<div />');
-                    useraction.html('Mobile user: please touch the screen to start the game').css({
-                        'text-align': 'center',
-                        'width': '100%',
-                        'color': 'white',
-                        'background-color': 'black',
-                        'position': 'absolute',
-                        'z-index': '99999',
-                        'top': '50%',
-                        'left': '0'
-                    });
-                    useraction.appendTo('body');
-                    var noSleep = new NoSleep();
-                    var userok = function() {
-                        if (!useraction) return;
-                        useraction.remove();
-                        useraction = 0;
-                        noSleep.enable();
+                var checkAudioAndStart = function() {
+                    // Forcer l'initialisation de l'AudioContext interne de Howler
+                    if (window.Howler && !window.Howler.ctx) {
+                        try {
+                            window.Howler.mute(false);
+                        } catch(e) {}
+                    }
+
+                    var ctx = (window.Howler && window.Howler.ctx) ? window.Howler.ctx : null;
+                    if (!ctx) {
+                        var AC = window.AudioContext || window.webkitAudioContext || false;
+                        if (AC) {
+                            try {
+                                var fallbackCtx = new AC();
+                                if (window.Howler) {
+                                    window.Howler.ctx = fallbackCtx;
+                                    ctx = fallbackCtx;
+                                }
+                            } catch(e) {}
+                        }
+                    }
+
+                    var isRunning = ctx ? (ctx.state === 'running') : true;
+
+                    if (!isRunning) {
+                        var useraction = jQuery('<div id="ydkj_audio_unlock" />');
+                        useraction.html(
+                            '<div style="max-width:580px;margin:0 auto;text-align:center">' +
+                                '<div style="font-size:26px;font-family:JackCondensed, sans-serif;letter-spacing:1px;line-height:1.3;margin-bottom:12px">' +
+                                    'CLIQUEZ N\'IMPORTE OÙ SUR L\'ÉCRAN POUR ACTIVER LE SON ET DÉMARRER LA PARTIE' +
+                                '</div>' +
+                                '<div style="font-size:16px;color:#bbb;font-family:sans-serif">' +
+                                    '(Requis par votre navigateur pour autoriser la lecture sonore)' +
+                                '</div>' +
+                            '</div>'
+                        ).css({
+                            'text-align': 'center',
+                            'width': '100%',
+                            'color': 'white',
+                            'background-color': 'rgba(0, 0, 0, 0.9)',
+                            'position': 'absolute',
+                            'z-index': '99999',
+                            'top': '0',
+                            'left': '0',
+                            'bottom': '0',
+                            'right': '0',
+                            'display': 'flex',
+                            'justify-content': 'center',
+                            'align-items': 'center',
+                            'cursor': 'pointer',
+                            'user-select': 'none'
+                        });
+                        useraction.appendTo('body');
+
+                        var unlock = function() {
+                            if (!useraction) return;
+                            useraction.remove();
+                            useraction = null;
+
+                            if (window.Howler && window.Howler.ctx) {
+                                if (typeof window.Howler.ctx.resume === 'function') {
+                                    try { window.Howler.ctx.resume(); } catch(e) {}
+                                }
+                                try {
+                                    var buffer = window.Howler.ctx.createBuffer(1, 1, 22050);
+                                    var source = window.Howler.ctx.createBufferSource();
+                                    source.buffer = buffer;
+                                    source.connect(window.Howler.ctx.destination);
+                                    source.start(0);
+                                } catch(e) {}
+                            } else if (ctx && typeof ctx.resume === 'function') {
+                                try { ctx.resume(); } catch(e) {}
+                            }
+
+                            thisGame.enableWakeLock();
+                            gamemode.start();
+                        };
+
+                        jQuery(window).one('click touchend keydown', unlock);
+                    } else {
+                        thisGame.enableWakeLock();
                         gamemode.start();
-                    };
-                    jQuery(window).one('touchend',userok).one('mouseup',userok);
-                } else gamemode.start();
+                    }
+                };
+
+                checkAudioAndStart();
             });
         });
     });

@@ -1,12 +1,5 @@
 <?php
 
-session_start();
-if (isset($_POST['resetdebug'])) {
-    unset($_SESSION['debug']);
-} elseif (isset($_POST['setdebug'])) {
-    foreach($_POST['debug'] as $key => $val) $_SESSION['debug'][$key] = $val;
-}
-
 $debug = array(
     'nbquestions' => '',
     'mode' => '',
@@ -15,12 +8,23 @@ $debug = array(
     'specialquestion' => '',
     'specialGibberish' => '',
 );
-$debugactive = 0;
-if (isset($_SESSION['debug'])) {
-    $debugactive = 1;
-    foreach($_SESSION['debug'] as $key => $val) $debug[$key] = $val;
+
+if (isset($_POST['resetdebug'])) {
+    setcookie('ydkj_debug', '', time() - 3600, '/');
+    unset($_COOKIE['ydkj_debug']);
+} elseif (isset($_POST['setdebug'])) {
+    setcookie('ydkj_debug', json_encode($_POST['debug']), time() + 86400, '/');
+    $_COOKIE['ydkj_debug'] = json_encode($_POST['debug']);
 }
-session_write_close();
+
+$debugactive = 0;
+if (!empty($_COOKIE['ydkj_debug'])) {
+    $cookieData = json_decode($_COOKIE['ydkj_debug'], true);
+    if (is_array($cookieData)) {
+        $debugactive = 1;
+        foreach($cookieData as $key => $val) $debug[$key] = $val;
+    }
+}
 
 function displaySelect($values, $selected) {
     foreach($values as $val => $text) {

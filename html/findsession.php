@@ -1,15 +1,4 @@
-<?php
-
-require 'api/local/config.inc.php';
-require 'api/common.inc.php';
-
-$user_id = 0;
-if (!$ALLOWMULTI) {
-    session_readonly();
-    $user_id = $_SESSION['id'];
-}
-
-?><!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8" />
@@ -20,22 +9,54 @@ if (!$ALLOWMULTI) {
     <script type="text/javascript">
         (function(){
             jQuery(document).ready(function() {
-                var findSession = function() {
-                    jQuery.ajax({
-                        url: 'api/listsessions.php',
-                        type: 'get',
-                        dataType: 'json',
-                        success: function (data, status, xhr) {
-                            if (data.found == '1') {
-                                window.location.href = './joinsession.php';
-                            } else {
-                                window.setTimeout(findSession,3000);
+                var wsProtocol = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
+                var wsHost = window.location.hostname;
+                var wsPort = (window.location.protocol === 'https:') ? '' : ':8889';
+                var wsUrl = wsProtocol + '//' + wsHost + wsPort + '/YDKJ/ws';
+
+                var ws = null;
+                var checkInterval = null;
+
+                function queryPublicSession() {
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({event: 'find_public_session'}));
+                    }
+                }
+
+                try {
+                    ws = new WebSocket(wsUrl);
+                } catch(e) {
+                    console.error('Erreur connexion WebSocket', e);
+                }
+
+                if (ws) {
+                    ws.onopen = function() {
+                        queryPublicSession();
+                        checkInterval = setInterval(queryPublicSession, 3000);
+                    };
+
+                    ws.onmessage = function(evt) {
+                        var msg;
+                        try {
+                            msg = JSON.parse(evt.data);
+                        } catch(e) {
+                            return;
+                        }
+
+                        if (msg.event === 'public_session_found') {
+                            if (msg.session) {
+                                if (checkInterval) clearInterval(checkInterval);
+                                window.location.href = 'joinsession.php?session=' + msg.session;
                             }
                         }
-                    });
-                };
-                findSession();
-        })})();
+                    };
+
+                    ws.onclose = function() {
+                        if (checkInterval) clearInterval(checkInterval);
+                    };
+                }
+            });
+        })();
     </script>
 </head>
 
@@ -48,7 +69,6 @@ if (!$ALLOWMULTI) {
     <div>
         Si vous ne trouvez pas rapidement une partie publique, n'hésitez pas à en créer une !
         <p style="text-align: center"><a href="joinsession.php?public=1" style="color:#F90">Créer une partie publique</a></p>
-        <?php if ((!$ALLOWMULTI) && ($user_id == 0)) { ?>(Un compte utilisateur est requis, écrivez à <a href="mailto:alpha@ydkj.fr" style="color:#F90">alpha@ydkj.fr</a> pour en obtenir un)<?php } ?>
     </div>
 </div>
 <div style="margin:20px auto 10px auto; text-align:center"><a href="./" style="color:#666">Retour à l'accueil</a></div>

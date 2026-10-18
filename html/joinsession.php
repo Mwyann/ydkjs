@@ -1,60 +1,12 @@
 <?php
 
-require 'api/local/config.inc.php';
-require 'api/common.inc.php';
-require 'api/mysql.inc.php';
-connectMysql('dyn');
+$requested_session = '';
+if (isset($_GET['session'])) $requested_session = strtoupper(trim($_GET['session']));
+elseif (isset($_GET['session_id'])) $requested_session = strtoupper(trim($_GET['session_id']));
+elseif (isset($_POST['session_id'])) $requested_session = strtoupper(trim($_POST['session_id']));
 
-$user_id = 0;
-session_start();
-
-$player = loadPlayer();
-$player_id = $player['id'];
-$player_nick = $player['nick'];
-
-// On remplace le session_id par celui donné en POST s'il existe, ce qui permet à un joueur de rejoindre une autre partie.
-// TODO : il faut donner la possibilité à quelqu'un de pouvoir créer une nouvelle partie même s'il est déjà associé à une partie (par exemple si le player_host se barre avant de créer)
-if (isset($_POST['session_id'])) $_SESSION['session_id'] = intval($_POST['session_id']);
-//if (isset($_GET['session_id'])) $_SESSION['session_id'] = intval($_GET['session_id']); // Idem en GET, pour le debug
-
-// Chargement des infos de la session (si elles existent)
-
-$player_host = 0;
-if (isset($_SESSION['session_id'])) {
-    $session_id = $_SESSION['session_id'];
-    $res = $DB->query("SELECT * FROM sessions WHERE status < 2 AND id = " . $session_id); // On ignore les sessions qui ont déjà démarré
-    if ($rs = $res->fetch()) {
-        $player_host = $rs['player_host'];
-    } else {
-        unset($_SESSION['session_id']);
-    }
-}
-
-// Si la session n'existe pas (ou plus) on la créée
-if (!isset($_SESSION['session_id'])) {
-    if ((!$DEMOMODE) && (!$ALLOWMULTI)) if (!isset($_SESSION['id'])) { // Uniquement les connectés
-        header('Location: ./');
-        die();
-    }
-    $session_id = 0;
-    while (!$session_id) {
-        $session_id = rand(1000, 9999);
-        $res = $DB->query("SELECT * FROM sessions WHERE id = " . $session_id);
-        if ($res->fetch()) $session_id = 0;
-    }
-    $player_host = $player_id;
-    $DB->query("INSERT INTO sessions (id, datecreated, player_host, public)
-                VALUES (".$session_id.",NOW(),".$player_host.",".(isset($_GET['public'])?1:0).")");
-    $_SESSION['session_id'] = $session_id;
-}
-
-$is_host = 0;
-if ($player_host == $player_id) $is_host = 1;
-
-$DB->query("UPDATE players SET last_ping = NOW(), session_id = ".$session_id." WHERE id = ".$player_id);
-cleanSessions();
-
-session_write_close();
+$is_public = (isset($_GET['public']) && $_GET['public'] == '1') ? 1 : 0;
+$default_nick = '';
 
 ?><!DOCTYPE html>
 <html>
@@ -68,210 +20,447 @@ session_write_close();
     <script type="text/javascript">
         (function(){
             jQuery(document).ready(function() {
-                var player_nick = <?php echo json_encode($player_nick); ?>;
-                var player_id = <?php echo $player_id; ?>;
-                var is_host = <?php echo $is_host; ?>;
-                var game_starting = false;
-                var start_button = jQuery('#start_game');
-                var start_counter = 0;
-                var start_interval = 0;
-                var sound = 0;
+                var requestedSession = <?php echo json_encode($requested_session); ?>;
+                var defaultNick = <?php echo json_encode($default_nick); ?>;
+                var isPublic = <?php echo $is_public; ?>;
 
-                jQuery('#change_nick').click(function() {
-                    var p = jQuery('#player_nick');
-                    player_nick = p.val();
-                    p.val('');
-                });
+                var sessionCode = '';
+                var myClientId = 0;
+                var myToken = '';
+                var isHost = false;
+                var isSpectator = true;
+                var gameStarting = false;
+                var startCounter = 5;
+                var startInterval = 0;
+                var soundAudio = null;
+                var knownClientsCount = 0;
 
-                jQuery('#player_nick').keypress(function(event) {
-                    if (event.which == 13) {
-                        jQuery('#change_nick').click();
+                var startButton = jQuery('#start_game');
+                var playerNickInput = jQuery('#player_nick');
+                var changeNickBtn = jQuery('#change_nick');
+                var listPlayers = jQuery('#list_players');
+                var sessionDisplay = jQuery('#session_code_display');
+                var check21 = jQuery('#nbquestions21');
+                var checkPublic = jQuery('#public');
+                var checkSound = jQuery('#sound');
+
+                var savedNick = sessionStorage.getItem('ydkj_nick');
+                if (savedNick) {
+                    playerNickInput.val(savedNick);
+                } else if (defaultNick) {
+                    playerNickInput.val(defaultNick);
+                }
+
+                // Auto-détection de l'URL WebSocket
+                var wsProtocol = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
+                var wsHost = window.location.hostname;
+                var wsPort = (window.location.protocol === 'https:') ? '' : ':8889';
+                var wsUrl = wsProtocol + '//' + wsHost + wsPort + '/YDKJ/ws';
+
+                var ws = null;
+
+                function wsSend(obj) {
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify(obj));
                     }
-                });
+                }
 
-                var start_game = function(active) {
-                    if (game_starting != active) {
-                        if (active) {
-                            start_counter = 5;
-                            start_interval = window.setInterval(function () {
-                                start_counter--;
-                                start_game(true);
-                            }, 1000);
-                        } else {
-                            if (start_interval) window.clearInterval(start_interval);
-                            start_interval = 0;
+                function escapeHtml(str) {
+                    return String(str)
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;');
+                }
+
+                function playJoinSound() {
+                    try {
+                        if (!soundAudio) {
+                            soundAudio = new Audio();
                         }
+                        var ext = soundAudio.canPlayType('audio/ogg') ? 'ogg' : 'mp3';
+                        soundAudio.src = 'api/soundeffect.php?sound=newplayer&num=' + Math.floor(Math.random() * 999999) + '&type=' + ext;
+                        soundAudio.play();
+                    } catch(e) {}
+                }
+
+                function applyLobbyConfig() {
+                    if (!isHost || gameStarting) return;
+                    var participants = [];
+                    listPlayers.find('.participant:checked').each(function() {
+                        var cid = parseInt(jQuery(this).closest('.player').data('client-id'));
+                        if (cid) participants.push(cid);
+                    });
+                    var nbQ = check21.is(':checked') ? 21 : 7;
+                    var isPub = checkPublic.is(':checked');
+                    wsSend({
+                        event: 'update_lobby',
+                        participants: participants,
+                        nb_questions: nbQ,
+                        public: isPub
+                    });
+                }
+
+                function updateStartButtonState(clients) {
+                    if (gameStarting) return;
+
+                    if (!isHost) {
+                        startButton.attr('disabled', 'disabled').val('En attente de l\'hôte...');
+                        return;
                     }
 
-                    game_starting = (active?1:0);
-
-                    if (game_starting) {
-                        jQuery('#player_nick').attr('disabled','disabled');
-                        jQuery('#change_nick').attr('disabled','disabled');
-                    } else {
-                        jQuery('#player_nick').removeAttr('disabled');
-                        jQuery('#change_nick').removeAttr('disabled');
-                    }
-
-                    if (!is_host) {
-                        if (!game_starting) start_button.attr('disabled', 'disabled').val('En attente des autres joueurs...');
-                        else {
-                            start_button.attr('disabled', 'disabled').val('Démarrage de la partie dans ' + start_counter + ' seconde' + (start_counter > 1 ? 's' : '') + '...');
-                            if (start_counter <= 0) {
-                                start_button.val('Démarrage de la partie en cours...');
-                                if (start_interval) window.clearInterval(start_interval);
-                                start_interval = 0;
-                            }
-                        }
-                    } else {
-                        // GAME HOST
-                        if (game_starting) {
-                            start_button.val('Démarrage de la partie dans ' + start_counter + ' seconde' + (start_counter > 1 ? 's' : '') + '... (cliquer pour annuler)');
-                            if (start_counter <= 0) {
-                                start_button.attr('disabled', 'disabled').val('Démarrage de la partie en cours...');
-                                jQuery('#list_players').find('.participant').attr('disabled','disabled');
-                                if (start_interval) window.clearInterval(start_interval);
-                                start_interval = 0;
-                                game_starting = 2;
-                            }
-                        } else {
-                            var list_participants = jQuery('#list_players').find('.participant:checked');
-
-                            var nb_participants = 0;
-                            jQuery.each(list_participants, function(i, elem) {
-                                var names = jQuery(elem).closest('div').find('.nick').html();
-                                nb_participants += names.split(', ').length;
-                            });
-
-                            if (nb_participants == 0) {
-                                start_button.attr('disabled', 'disabled').val('Sélectionnez au moins un joueur');
-                            } else if (nb_participants > 3) {
-                                start_button.attr('disabled', 'disabled').val('Sélectionnez moins de joueurs');
-                            } else {
-                                start_button.removeAttr('disabled').val('Démarrer la partie ! ('+nb_participants+' joueur'+(nb_participants > 1 ? 's' : '')+')');
-                            }
-                        }
-                    }
-                };
-
-                start_button.click(function() {
-                    start_game(!game_starting);
-                });
-
-                var updatePlayers = function(readonly) {
-                    var players_participants = [];
-                    var list_players = jQuery('#list_players');
-                    var list_participants = list_players.find('.participant:checked');
-                    for(var i = 0; i < list_participants.length; i++) {
-                        players_participants.push(jQuery(list_participants[i]).closest('.player').attr('id').replace('player',''));
-                    }
-                    if (readonly) players_participants = 0;
-                    var publicgame = 0;
-                    if (jQuery('#public').is(':checked')) publicgame = 1;
-                    var nbquestions = 7;
-                    if (jQuery('#nbquestions21').is(':checked')) nbquestions = 21;
-                    var data = {player_nick: player_nick, readonly: (readonly?1:0), players_participants: players_participants, game_starting: game_starting, nbquestions: nbquestions, 'public': publicgame};
-                    jQuery.ajax({
-                        url: 'api/listplayers.php',
-                        type: 'post',
-                        data: data,
-                        dataType: 'json',
-                        success: function (data, status, xhr) {
-                            var list_has_changed = false;
-                            if ((data.players) && (data.players.length > 0)) {
-                                for(var i = 0; i < data.players.length; i++) {
-                                    var playerdata = data.players[i];
-                                    var playerdiv = list_players.find('#player'+playerdata.id);
-                                    if (playerdiv.length == 0) { // Création du joueur
-                                        playerdiv = jQuery('<div />').attr('id','player'+playerdata.id).addClass('player');
-
-                                        var checktmp = jQuery('<input type="checkbox" class="participant"/>').css('margin', '2px 5px');
-                                        if (playerdata.spectator == '1') checktmp.prop('checked', false); else checktmp.prop('checked', true);
-                                        if (is_host) checktmp.click(function(){start_game(false)});
-                                        checktmp.appendTo(playerdiv);
-
-                                        jQuery('<span class="nick"/>').appendTo(playerdiv);
-
-                                        playerdiv.appendTo(list_players);
-
-                                        if (jQuery('#sound').is(':checked')) {
-                                            if (!sound) {
-                                                sound = jQuery('<audio />');
-                                                sound.appendTo('body');
-                                            }
-                                            var audio = sound.get(0);
-                                            audio.pause();
-                                            sound.attr('src','api/soundeffect.php?sound=newplayer&num='+(Math.floor(Math.random()*999999))+'&type='+(audio.canPlayType('audio/ogg')?'ogg':'mp3'));
-                                            audio.play();
-                                        }
-                                    }
-
-                                    // Mise à jour des infos du joueur
-                                    var playercheck = playerdiv.find('.participant');
-                                    if (!is_host) {
-                                        if (playerdata.spectator == '1') playercheck.prop('checked', false); else playercheck.prop('checked', true);
-                                        playercheck.attr('disabled', 'disabled');
-                                    } else {
-                                        if ((playerdata.nicknames != '') && (data.status < 2)) playercheck.removeAttr('disabled');
-                                    }
-                                    if (playerdata.nicknames == '') {
-                                        if (playercheck.is(':checked')) {
-                                            list_has_changed = true;
-                                            playercheck.prop('checked', false);
-                                        }
-                                        playercheck.attr('disabled', 'disabled');
-                                    }
-
-                                    var nicks = playerdata.nicknames;
-                                    if (playerdata.nicknames == '') nicks = '<i>Joueur anonyme</i>';
-                                    if (player_id == playerdata.id) nicks += ' <i style="color:#FF0">(c\'est vous)</i>';
-                                    if (playerdiv.find('.nick').html() != nicks) {
-                                        playerdiv.find('.nick').html(nicks);
-                                        list_has_changed = true;
-                                    }
-
-                                    playerdiv.addClass('ok'); // Ne pas supprimer ce joueur
-                                }
-
-                                // Retirer les joueurs qui sont partis
-                                var old_players = list_players.children('div').not('.ok');
-                                // Trouver si l'un des joueurs qui est parti était aussi un participant
-                                if (old_players.find('.participant:checked').length > 0) list_has_changed = true;
-                                old_players.remove();
-                                list_players.find('.ok').removeClass('ok');
-
-                                list_participants = list_players.find('.participant:checked');
-
-                                if (list_has_changed) start_game(false);
-                            } else {
-                                list_players.html('<div>Aucun joueur<div>');
-                                alert('La session a fermé, veuillez recommencer.');
-                                window.location.href = './';
-                            }
-
-                            if (data.status != game_starting) {
-                                if (data.status == '0') start_game(false);
-                                if (data.status == '1') start_game(true);
-                            }
-                            if (data.status == '2') window.location.href = 'alpha.php';
-                            if ((readonly) || (!is_host)) {
-                                if (data.public == '1') jQuery('#public').prop('checked', true); else jQuery('#public').prop('checked', false);
-                                if (data.nbquestions == '21') jQuery('#nbquestions21').prop('checked', true); else jQuery('#nbquestions21').prop('checked', false);
-                            }
-
-                            window.setTimeout(updatePlayers,1000);
-                            if (readonly) {
-                                if (is_host) {
-                                    jQuery('#nbquestions21').removeAttr('disabled');
-                                    jQuery('#public').removeAttr('disabled');
-                                }
-                                start_game(false);
-                            }
+                    var activeParticipants = 0;
+                    clients.forEach(function(c) {
+                        if (!c.spectator && c.nick) {
+                            var names = c.nick.split(',');
+                            activeParticipants += names.length;
                         }
                     });
-                };
-                updatePlayers(true);
-                jQuery('#sound').prop('checked', false);
+
+                    if (activeParticipants === 0) {
+                        startButton.attr('disabled', 'disabled').val('Sélectionnez au moins un joueur');
+                    } else if (activeParticipants > 3) {
+                        startButton.attr('disabled', 'disabled').val('Sélectionnez au maximum 3 joueurs (' + activeParticipants + ' sélectionnés)');
+                    } else {
+                        startButton.removeAttr('disabled').val('Démarrer la partie ! (' + activeParticipants + ' joueur' + (activeParticipants > 1 ? 's' : '') + ')');
+                    }
+                }
+
+                function renderLobbyState(msg) {
+                    var clients = msg.clients || [];
+
+                    // Mettre à jour notre propre statut
+                    var myInfo = clients.find(function(c) { return c.client_id === myClientId; });
+                    if (myInfo) {
+                        isHost = myInfo.is_host;
+                        isSpectator = myInfo.spectator;
+                    }
+
+                    // Format de partie
+                    if (msg.nb_questions === 21) {
+                        check21.prop('checked', true);
+                    } else {
+                        check21.prop('checked', false);
+                    }
+
+                    // Son de connexion
+                    if (clients.length > knownClientsCount && knownClientsCount > 0 && checkSound.is(':checked')) {
+                        playJoinSound();
+                    }
+                    knownClientsCount = clients.length;
+
+                    // Rendu de la liste des joueurs
+                    listPlayers.empty();
+                    if (clients.length === 0) {
+                        listPlayers.html('<div>Aucun joueur connecté</div>');
+                        return;
+                    }
+
+                    clients.forEach(function(c) {
+                        var row = jQuery('<div />').addClass('player').data('client-id', c.client_id).css({
+                            'margin': '4px 0',
+                            'display': 'flex',
+                            'align-items': 'center'
+                        });
+
+                        var chk = jQuery('<input type="checkbox" class="participant" />').css('margin', '2px 8px 2px 0');
+                        if (!c.spectator) {
+                            chk.prop('checked', true);
+                        }
+
+                        if (!isHost || !c.nick || gameStarting) {
+                            chk.attr('disabled', 'disabled');
+                        } else {
+                            chk.change(function() {
+                                applyLobbyConfig();
+                            });
+                        }
+                        row.append(chk);
+
+                        var nickSpan = jQuery('<span class="nick" />');
+                        var displayNick = c.nick ? escapeHtml(c.nick) : '<i>Joueur anonyme</i>';
+                        if (c.client_id === myClientId) {
+                            displayNick += ' <i style="color:#FF0">(c\'est vous)</i>';
+                        }
+                        if (c.is_host) {
+                            displayNick += ' <span style="color:#9ece6a;font-size:85%">[Hôte]</span>';
+                        }
+                        nickSpan.html(displayNick);
+                        row.append(nickSpan);
+
+                        // Bouton d'expulsion réservé à l'hôte
+                        if (isHost && c.client_id !== myClientId && !gameStarting) {
+                            var kickBtn = jQuery('<button type="button" style="margin-left:12px;padding:1px 6px;font-size:11px;background:#f7768e;color:#fff;border:none;cursor:pointer;border-radius:3px">Expulser</button>');
+                            kickBtn.click(function() {
+                                if (confirm('Voulez-vous vraiment expulser ce joueur ?')) {
+                                    wsSend({event: 'kick_client', client_id: c.client_id});
+                                }
+                            });
+                            row.append(kickBtn);
+                        }
+
+                        listPlayers.append(row);
+                    });
+
+                    updateStartButtonState(clients);
+                }
+
+                function updateCountdownButton() {
+                    if (isHost) {
+                        startButton.removeAttr('disabled').val('Démarrage dans ' + startCounter + ' seconde' + (startCounter > 1 ? 's' : '') + '... (cliquer pour annuler)');
+                    } else {
+                        startButton.attr('disabled', 'disabled').val('Démarrage de la partie dans ' + startCounter + ' seconde' + (startCounter > 1 ? 's' : '') + '...');
+                    }
+                }
+
+                function startCountdownUI() {
+                    gameStarting = true;
+                    startCounter = 5;
+                    playerNickInput.attr('disabled', 'disabled');
+                    changeNickBtn.attr('disabled', 'disabled');
+                    listPlayers.find('input, button').attr('disabled', 'disabled');
+                    check21.attr('disabled', 'disabled');
+                    checkPublic.attr('disabled', 'disabled');
+
+                    updateCountdownButton();
+
+                    if (startInterval) clearInterval(startInterval);
+                    startInterval = setInterval(function() {
+                        startCounter--;
+                        if (startCounter <= 0) {
+                            clearInterval(startInterval);
+                            startInterval = 0;
+                            if (isHost) {
+                                wsSend({event: 'start_game'});
+                            }
+                        } else {
+                            updateCountdownButton();
+                        }
+                    }, 1000);
+                }
+
+                function cancelCountdownUI() {
+                    gameStarting = false;
+                    if (startInterval) clearInterval(startInterval);
+                    startInterval = 0;
+                    playerNickInput.removeAttr('disabled');
+                    changeNickBtn.removeAttr('disabled');
+                    if (isHost) {
+                        check21.removeAttr('disabled');
+                        checkPublic.removeAttr('disabled');
+                    }
+                    if (isHost) {
+                        applyLobbyConfig();
+                    } else {
+                        startButton.attr('disabled', 'disabled').val('En attente de l\'hôte...');
+                    }
+                }
+
+                function submitNick() {
+                    var n = playerNickInput.val().trim();
+                    if (n) {
+                        sessionStorage.setItem('ydkj_nick', n);
+                        wsSend({event: 'update_nick', nick: n});
+                    }
+                }
+
+                playerNickInput.on('input change', function() {
+                    var n = jQuery(this).val().trim();
+                    if (n) sessionStorage.setItem('ydkj_nick', n);
+                });
+
+                changeNickBtn.click(submitNick);
+                playerNickInput.keypress(function(e) {
+                    if (e.which === 13) {
+                        submitNick();
+                    }
+                });
+
+                check21.change(applyLobbyConfig);
+                checkPublic.change(applyLobbyConfig);
+
+                startButton.click(function() {
+                    if (!isHost) return;
+                    if (gameStarting) {
+                        wsSend({event: 'cancel_countdown'});
+                    } else {
+                        wsSend({event: 'start_countdown'});
+                    }
+                });
+
+                function launchGameSPA() {
+                    sessionStorage.setItem('ydkj_session', sessionCode);
+                    sessionStorage.setItem('ydkj_client_id', myClientId);
+                    sessionStorage.setItem('ydkj_token', myToken);
+
+                    // Mettre à jour l'historique et l'URL pour refléter alpha.php sans recharger la page
+                    if (window.history && window.history.pushState) {
+                        window.history.pushState({session: sessionCode}, '', 'alpha.php?session=' + sessionCode);
+                    }
+
+                    // Transmettre la WebSocket active et détacher les écouteurs du lobby
+                    ws.onmessage = null;
+                    ws.onclose = null;
+                    window.YDKJ_ACTIVE_WS = ws;
+
+                    // Remplacer le contenu du lobby par l'écran de jeu
+                    jQuery('body').css({
+                        'background-color': '#000',
+                        'margin': '0',
+                        'padding': '0',
+                        'border': '0'
+                    }).html(
+                        '<div style="text-align:center;font-size:20px;margin:5px;font-family:JackCondensed, sans-serif" id="headerbuttons">' +
+                            '<a href="#" id="fullscreen" style="color:#666">Plein écran</a> &nbsp; &nbsp; &nbsp; ' +
+                            '<a href="./" style="color:#666">Retour à l\'accueil</a>' +
+                        '</div>' +
+                        '<div id="screen" style="margin-left:auto;margin-right:auto">' +
+                            '<img src="ajax-loader.gif" style="position:absolute;left:293px;top:212px" class="markedAsRemoved"/>' +
+                        '</div>'
+                    );
+
+                    // Charger le moteur YDKJ et démarrer la partie (conserve le geste utilisateur pour l'audio)
+                    jQuery.getScript('js/YDKJ.js?ver=11', function() {
+                        var game = new YDKJ(jQuery('#screen'));
+                        jQuery('#fullscreen').click(function() {
+                            jQuery('#headerbuttons').hide();
+                            game.fullscreen(function() {
+                                jQuery('#headerbuttons').show();
+                            });
+                            return false;
+                        });
+                        game.start();
+                    });
+                }
+
+                // Connexion WebSocket
+                function connectWS() {
+                    try {
+                        ws = new WebSocket(wsUrl);
+                    } catch(e) {
+                        alert('Impossible de joindre le serveur WebSocket : ' + e.message);
+                        return;
+                    }
+
+                    ws.onopen = function() {
+                        if (requestedSession) {
+                            wsSend({event: 'join_session', session: requestedSession});
+                        } else {
+                            wsSend({event: 'create_session', public: (isPublic === 1)});
+                        }
+                    };
+
+                    ws.onmessage = function(evt) {
+                        var msg;
+                        try {
+                            msg = JSON.parse(evt.data);
+                        } catch(e) {
+                            return;
+                        }
+
+                        if (msg.event === 'session_created') {
+                            sessionCode = msg.session;
+                            myClientId = msg.client_id;
+                            myToken = msg.token || '';
+                            isHost = true;
+                            isSpectator = false;
+
+                            sessionDisplay.text(sessionCode);
+                            sessionStorage.setItem('ydkj_session', sessionCode);
+                            sessionStorage.setItem('ydkj_client_id', myClientId);
+                            sessionStorage.setItem('ydkj_token', myToken);
+
+                            check21.removeAttr('disabled');
+                            checkPublic.removeAttr('disabled');
+                            if (isPublic) checkPublic.prop('checked', true);
+
+                            var curNick = playerNickInput.val().trim();
+                            if (curNick) {
+                                wsSend({event: 'update_nick', nick: curNick});
+                            }
+                        }
+                        else if (msg.event === 'session_joined') {
+                            sessionCode = msg.session;
+                            myClientId = msg.client_id;
+                            myToken = msg.token || '';
+                            isHost = msg.is_host;
+                            isSpectator = (typeof msg.spectator !== 'undefined') ? msg.spectator : true;
+
+                            sessionStorage.setItem('ydkj_session', sessionCode);
+                            sessionStorage.setItem('ydkj_client_id', myClientId);
+                            sessionStorage.setItem('ydkj_token', myToken);
+
+                            if (msg.status === 'in_game') {
+                                launchGameSPA();
+                                return;
+                            }
+
+                            sessionDisplay.text(sessionCode);
+                            check21.attr('disabled', 'disabled');
+                            checkPublic.attr('disabled', 'disabled');
+
+                            var curNick = playerNickInput.val().trim();
+                            if (curNick) {
+                                wsSend({event: 'update_nick', nick: curNick});
+                            }
+                        }
+                        else if (msg.event === 'reconnected') {
+                            sessionCode = msg.session;
+                            myClientId = msg.client_id;
+                            myToken = msg.token || '';
+                            isHost = msg.is_host;
+                            isSpectator = (typeof msg.spectator !== 'undefined') ? msg.spectator : false;
+
+                            sessionStorage.setItem('ydkj_session', sessionCode);
+                            sessionStorage.setItem('ydkj_client_id', myClientId);
+                            sessionStorage.setItem('ydkj_token', myToken);
+
+                            if (msg.status === 'in_game') {
+                                launchGameSPA();
+                                return;
+                            }
+                            renderLobbyState(msg);
+                        }
+                        else if (msg.event === 'lobby_state') {
+                            renderLobbyState(msg);
+                        }
+                        else if (msg.event === 'countdown_started') {
+                            startCountdownUI();
+                        }
+                        else if (msg.event === 'countdown_cancelled') {
+                            cancelCountdownUI();
+                        }
+                        else if (msg.event === 'game_start') {
+                            launchGameSPA();
+                        }
+                        else if (msg.event === 'kicked') {
+                            alert('Vous avez été expulsé de la session par l\'hôte.');
+                            window.location.href = './';
+                        }
+                        else if (msg.event === 'session_closed') {
+                            alert(msg.reason || 'La session a été fermée.');
+                            window.location.href = './';
+                        }
+                        else if (msg.event === 'server_shutdown') {
+                            alert(msg.message || 'Le serveur s\'est arrêté.');
+                            window.location.href = './';
+                        }
+                        else if (msg.event === 'error') {
+                            alert(msg.message || 'Erreur inconnue.');
+                            if (msg.message === 'Session inexistante') {
+                                window.location.href = './';
+                            }
+                        }
+                    };
+
+                    ws.onclose = function() {
+                        if (!gameStarting) {
+                            startButton.attr('disabled', 'disabled').val('Connexion perdue');
+                        }
+                    };
+                }
+
+                connectWS();
             });
         })();
     </script>
@@ -281,7 +470,7 @@ session_write_close();
 <div style="text-align:center;font-size:80px;margin-top:100px;line-height:0"><div style="">YOU DON’T KNOW</div>
     <div style="font-size:350%;line-height:95%">JACK<span style="font-size:10%; vertical-align:top; line-height:400%">®</span></div></div>
 <div style="border:#669 1px solid; background-color:#336;color:#FFF;padding:10px;margin:15px auto;font-family:JackCondensed;font-size:18px;width:640px">
-    <p style="text-align:center;font-size:28px;font-weight:bold;margin:10px 0 30px 0;color:#FF0">Nouvelle partie n° <span style="color:#F00"><?php echo $session_id; ?></span></p>
+    <p style="text-align:center;font-size:28px;font-weight:bold;margin:10px 0 30px 0;color:#FF0">Partie n° <span style="color:#F00" id="session_code_display">...</span></p>
 
 <div style="margin:20px 0">
     Votre nom de joueur : <input type="text" value="" id="player_nick"/> <input type="button" id="change_nick" value="Changer" /> (nécessaire pour participer)<br/>
@@ -289,7 +478,7 @@ session_write_close();
 </div>
 <div style="margin:20px 0">
     Liste des joueurs présents :
-    <div id="list_players" style="font-family:JackInput;font-size: 80%;margin:5px"><div>Chargement...</div></div>
+    <div id="list_players" style="font-family:JackInput;font-size: 80%;margin:5px"><div>Connexion au serveur...</div></div>
 </div>
 <div>
     (Cochez les joueurs qui vont participer, les autres seront spectateurs)
@@ -297,7 +486,7 @@ session_write_close();
 <div style="margin:10px 0;font-size:80%">
     <input type="checkbox" id="nbquestions21" disabled="disabled" /> <label for="nbquestions21">21 questions (7 si décoché)</label> <input type="checkbox" id="public" disabled="disabled" /> <label for="public">Partie publique</label> <input type="checkbox" id="sound"/> <label for="sound">Son à la connexion d'un nouveau joueur</label>
 </div>
-<div style="margin:20px auto 10px auto; text-align:center"><input type="button" id="start_game" value="Chargement..." disabled/></div>
+<div style="margin:20px auto 10px auto; text-align:center"><input type="button" id="start_game" value="En attente..." disabled/></div>
 <div style="margin:20px auto 10px auto; text-align:center; color:#FF0">Note : Il y a eu récemment une importante mise à jour du jeu, et il est possible que vous rencontriez quelques bugs (arrêt du jeu, bug graphique gênant...). Si tel est le cas, envoyez moi un <a href="mailto:alpha@ydkj.fr" style="color:#FFF">e-mail</a> avec une description du problème, et je jetterai un oeil. Merci !</div>
 </div>
 <div style="margin:20px auto 10px auto; text-align:center"><a href="findsession.php" style="color:#666">Trouver une autre partie publique</a> - <a href="./" style="color:#666">Retour à l'accueil</a></div>

@@ -1,0 +1,16 @@
+[Unit]
+Description=YDKJ WebSocket Server (Tornado)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/html
+ExecStart=su - tgz -s /bin/bash -c 'screen -S ydkjs -D -m python3 /home/ydkjs/www/fr/www/ydkj_server.py --port=8889 --log_dir=logs'
+ExecStop=su - tgz -s /bin/bash -c 'screen -S ydkjs -X quit'
+Restart=always
+RestartSec=2s
+User=www-data
+Group=www-data
+
+[Install]
+WantedBy=multi-user.target
