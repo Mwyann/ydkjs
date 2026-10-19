@@ -21,12 +21,11 @@ import tornado.web
 import tornado.websocket
 
 PORT_MAPPING = {
-    'fr': 8890,
-    'uk': 8891,
-    'de': 8892,
-    'us': 8893,
+    'fr': 8990,
+    'uk': 8991,
+    'de': 8992,
+    'us': 8993,
 }
-
 
 def parse_port(value):
     if isinstance(value, int):
@@ -48,7 +47,6 @@ define('log_dir', type=str, default='logs', help="Dossier de stockage des logs d
 ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"  # Sans 0, O, 1, I pour éviter les confusions
 
 is_shutting_down = False
-
 
 class YDKJWebSocket(tornado.websocket.WebSocketHandler):
     sessions = {}     # code -> dict de session
@@ -792,11 +790,13 @@ def main():
 
     app = tornado.web.Application([
         (r'/YDKJ/ws', YDKJWebSocket),
-        (r'/ws', YDKJWebSocket),
     ])
 
     server = tornado.httpserver.HTTPServer(app)
-    server.listen(port)
+    if port == 8889:
+        server.listen(port)
+    else:
+        server.listen(port, '127.0.0.1')
     print(f"Serveur WebSocket YDKJ démarré sur le port {port}")
     print(f"Dossier des logs : {os.path.abspath(options.log_dir)}")
 

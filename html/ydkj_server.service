@@ -7,10 +7,8 @@ Type=simple
 User=ydkjs
 Group=ydkjs
 WorkingDirectory=/home/ydkjs/www/%i/www
-
 ExecStart=/usr/bin/screen -S ydkjs_%i -D -m python3 /home/ydkjs/www/%i/www/ydkj_server.py --port=%i --log_dir=/home/ydkjs/www/%i/logs/sessions
 ExecStop=/usr/bin/screen -S ydkjs_%i -X quit
-
 Restart=always
 RestartSec=2s
 
