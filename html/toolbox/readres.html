@@ -12,6 +12,14 @@
 <script src="js/Animated_GIF.min.js"></script>
 
 <style>
+    body {
+        font-family: "Arial", sans-serif;
+    }
+
+    #anims > div {
+        clear: both;
+    }
+
     #anims .timings {
         font-family: "Courier New", monospace;
         float:left;
@@ -37,6 +45,9 @@ var animationFile = '';
 var Font = 0;
 
 jQuery(document).ready(function() {
+    $('#screen').show();
+    $("#slider").slider({value: 0, min: 0, max: 0, disabled: true});
+
     Font = new YDKJFont();
     Font.preload(function() {
         Font.strings[9]    = 'Bertrand';
@@ -148,8 +159,8 @@ jQuery(document).ready(function() {
         var loadAnim = function() {
             if (anim) anim.free();
             screen.html('');
-            debug.html('');
-            if (slider) $("#slider").slider({disabled: true});
+            debug.html('&nbsp;');
+            if (slider) $("#slider").slider({value: 0, min: 0, max: 0, disabled: true});
             if (animationFile == '') return;
             anim = new YDKJAnimation({urlGif: '../'+animationFile+'.gif', urlJS: '../'+animationFile+'.js'});
             anim.html = {screen: screen, debug: debug};
