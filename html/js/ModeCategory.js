@@ -3,10 +3,10 @@
 function ModeCategory() {}
 
 ModeCategory.prototype.preload = function(resources) {
-    this.questiontitles = resources['questiontitles']; delete resources['questiontitles'];
-    this.question1 = resources['question1']; delete resources['question1'];
-    this.question2 = resources['question2']; delete resources['question2'];
-    this.question3 = resources['question3']; delete resources['question3'];
+    this.questiontitles = resources['questiontitles'];
+    this.question1 = resources['question1'];
+    this.question2 = resources['question2'];
+    this.question3 = resources['question3'];
 
     this.animations = new YDKJAnimList(resources);
     var anim = this.animations;
@@ -144,7 +144,7 @@ ModeCategory.prototype.start = function() {
     });
 
     anim.ended('SFXShowCategoryScreen', function() {
-        if ((!anim.get('MusicChooseCategoryStart').isplaying) && (!anim.get('MusicChooseCategoryLoop').isplaying)) anim.play('MusicChooseCategoryStart');
+        if ((!anim.isplaying('MusicChooseCategoryStart')) && (!anim.isplaying('MusicChooseCategoryLoop'))) anim.play('MusicChooseCategoryStart');
     });
 
     // Jouer l'animation du zoom bleu

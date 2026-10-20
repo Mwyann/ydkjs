@@ -347,13 +347,13 @@ ModeQuestion.prototype.start = function() {
                     } else if (misskeyallowed != 0) {
                         // Il faudrait arrêter les LastPlayer ici ?
                         if (misskeyallowed == -1) gameReady();
-                        if (!anim.get('PlayerMissKey1').played) anim.play('PlayerMissKey1'); else if (!anim.get('PlayerMissKey2').played) anim.play('PlayerMissKey2');
+                        if (!anim.played('PlayerMissKey1')) anim.play('PlayerMissKey1'); else if (!anim.played('PlayerMissKey2')) anim.play('PlayerMissKey2');
                         misskeyallowed = 0;
                     }
                 }
                 if ((thisMode.game.players.length > 1) && (misskeyallowed) && (findKeycode(choice, thisMode.game.screwKeycodes))) { // vicieuse
                     // Il faudrait arrêter les LastPlayer ici ?
-                    if (!anim.get('PlayerMissKey1').played) anim.play('PlayerMissKey1'); else if (!anim.get('PlayerMissKey2').played) anim.play('PlayerMissKey2');
+                    if (!anim.played('PlayerMissKey1')) anim.play('PlayerMissKey1'); else if (!anim.played('PlayerMissKey2')) anim.play('PlayerMissKey2');
                     misskeyallowed = 0;
                 }
             }

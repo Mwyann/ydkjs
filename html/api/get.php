@@ -22,4 +22,5 @@ if (file_exists($file)) {
     sendFile($file);
 } else {
     header('HTTP/1.0 404 Not Found');
+    //header('Ydkj: '.$file);
 }

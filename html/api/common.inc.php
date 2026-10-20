@@ -1,6 +1,4 @@
 <?php
-
-
 function sendFile($file) {
     $filesize = filesize($file);
 

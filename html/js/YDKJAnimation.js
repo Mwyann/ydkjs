@@ -483,11 +483,14 @@ var YDKJAnimList = function(resources) {
 };
 
 YDKJAnimList.prototype.load = function(resourcename, name) {
+    var res = this.resources[resourcename];
+    if (!res || typeof res !== 'object' || Array.isArray(res) || (typeof YDKJMode !== 'undefined' && res instanceof YDKJMode)) return this;
+    if (res.urlGif === undefined && res.urlJS === undefined && res.urlAudio === undefined) return this;
     if (name === undefined) { // Nom automatique, exemple : Question/JingleQuestion => JingleQuestion
         var sp = resourcename.toString().split('/');
         name = sp[sp.length-1];
     }
-    this.animations[name] = new YDKJAnimation(this.resources[resourcename]);
+    this.animations[name] = new YDKJAnimation(res);
     this.animations[name].html = this.html;
     this.animations[name].font = this.font;
     return this;
@@ -510,6 +513,20 @@ YDKJAnimList.prototype.ready = function(f) {
 
     animlistready();
     return this;
+};
+
+YDKJAnimList.prototype.has = function(name) {
+    return (typeof this.animations[name] !== 'undefined');
+};
+
+YDKJAnimList.prototype.isplaying = function(name) {
+    if (!this.animations[name]) return false;
+    return this.animations[name].isplaying;
+};
+
+YDKJAnimList.prototype.played = function(name) {
+    if (!this.animations[name]) return false;
+    return this.animations[name].played;
 };
 
 YDKJAnimList.prototype.get = function(name) {
@@ -569,12 +586,14 @@ YDKJAnimList.prototype.frame = function(name, f) {
 };
 
 YDKJAnimList.prototype.volume = function(name, vol) {
+    if (!this.checkAnim(name)) return this;
     if (vol === undefined) return this.animations[name].volume();
     this.animations[name].volume(vol);
     return this;
 };
 
 YDKJAnimList.prototype.length = function(name) {
+    if (!this.checkAnim(name)) return 0;
     return this.animations[name].length();
 };
 

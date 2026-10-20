@@ -7,181 +7,7 @@ ModeDisOrDat.prototype.preload = function(resources) {
     this.nbchoices = 2;
     for(var a = 0; a < this.anslist.length; a++) if (this.anslist[a] == 3) this.nbchoices = 3;
 
-    this.ChoicePlayer1 = new YDKJAnimation(resources['DisOrDat/ChoicePlayer1']);
-    if (this.game.players.length >= 2) this.ChoicePlayer2 = new YDKJAnimation(resources['DisOrDat/ChoicePlayer2']);
-    if (this.game.players.length == 3) this.ChoicePlayer3 = new YDKJAnimation(resources['DisOrDat/ChoicePlayer3']);
-
-    this.AnnounceCategory = new YDKJAnimation(resources['DisOrDat/AnnounceCategory']);
-    this.TimerComesIn = new YDKJAnimation(resources['DisOrDat/TimerComesIn']);
-
-    this.Intro = new YDKJAnimation(resources['DisOrDat/Intro']);
-    this.IntroStill = new YDKJAnimation(resources['DisOrDat/IntroStill']);
-    this.MusicLoopRules1 = new YDKJAnimation(resources['DisOrDat/MusicLoopRules1']);
-    this.MusicLoopRules2 = new YDKJAnimation(resources['DisOrDat/MusicLoopRules2']);
-
-    this.ShowHeader = new YDKJAnimation(resources['DisOrDat/ShowHeader']);
-    this.ShowCategory = new YDKJAnimation(resources['DisOrDat/ShowCategory']);
-    this.HideCategory = new YDKJAnimation(resources['DisOrDat/HideCategory']);
-    this.ShowSubject = new YDKJAnimation(resources['DisOrDat/ShowSubject']);
-    this.HideSubject = new YDKJAnimation(resources['DisOrDat/HideSubject']);
-    this.ShowQuestion = new YDKJAnimation(resources['DisOrDat/ShowQuestion']);
-    this.HideQuestionSkip = new YDKJAnimation(resources['DisOrDat/HideQuestionSkip']);
-    this.HideQuestionWrong = new YDKJAnimation(resources['DisOrDat/HideQuestionWrong']);
-    this.HideQuestionCorrect = new YDKJAnimation(resources['DisOrDat/HideQuestionCorrect']);
-    this.HideQuestionTimeout = new YDKJAnimation(resources['DisOrDat/HideQuestionTimeout']);
-
-    this.JingleStartPlay1 = new YDKJAnimation(resources['DisOrDat/JingleStartPlay1']);
-    this.JingleStartPlay2 = new YDKJAnimation(resources['DisOrDat/JingleStartPlay2']);
-    this.MusicLoopPlay1 = new YDKJAnimation(resources['DisOrDat/MusicLoopPlay1']);
-    this.MusicLoopPlay2 = new YDKJAnimation(resources['DisOrDat/MusicLoopPlay2']);
-    this.MusicLoopPlay3 = new YDKJAnimation(resources['DisOrDat/MusicLoopPlay3']);
-    this.MusicLoopPlay4 = new YDKJAnimation(resources['DisOrDat/MusicLoopPlay4']);
-
-    this.QuestionTitle = new YDKJAnimation(resources['DisOrDat/QuestionTitle']);
-    this.QuestionIntro1 = new YDKJAnimation(resources['DisOrDat/QuestionIntro1']);
-    this.QuestionIntro2 = new YDKJAnimation(resources['DisOrDat/QuestionIntro2']);
-    this.QuestionAnswer1 = new YDKJAnimation(resources['DisOrDat/QuestionAnswer1']);
-    this.QuestionAnswer2 = new YDKJAnimation(resources['DisOrDat/QuestionAnswer2']);
-    this.RulesExplainBoth = new YDKJAnimation(resources['DisOrDat/RulesExplainBoth']);
-    this.RulesExplainSkip = new YDKJAnimation(resources['DisOrDat/RulesExplainSkip']);
-    this.RulesExplainCorrect = new YDKJAnimation(resources['DisOrDat/RulesExplainCorrect']);
-    this.RulesExplainWrong = new YDKJAnimation(resources['DisOrDat/RulesExplainWrong']);
-    this.RulesSkipExplain = new YDKJAnimation(resources['DisOrDat/RulesSkipExplain']);
-    this.ValueComesIn = new YDKJAnimation(resources['DisOrDat/ValueComesIn']);
-    this.ValueMinus = new YDKJAnimation(resources['DisOrDat/ValueMinus']);
-    this.ValueLeave = new YDKJAnimation(resources['DisOrDat/ValueLeave']);
-    this.SFXShowPriceCorrect = new YDKJAnimation(resources['DisOrDat/SFXShowPriceCorrect']);
-    this.SFXShowPriceWrong = new YDKJAnimation(resources['DisOrDat/SFXShowPriceWrong']);
-    this.SFXHidePrice = new YDKJAnimation(resources['DisOrDat/SFXHidePrice']);
-
-    this.MessageSpaceBarComesIn = new YDKJAnimation(resources['DisOrDat/MessageSpaceBarComesIn']);
-    this.MessageSpaceBarLeave = new YDKJAnimation(resources['DisOrDat/MessageSpaceBarLeave']);
-
-    this.SFXShowKey = new YDKJAnimation(resources['DisOrDat/SFXShowKey']);
-    this.SFXKeyPress = new YDKJAnimation(resources['DisOrDat/SFXKeyPress']);
-    this.Button1ComesIn = new YDKJAnimation(resources['DisOrDat/Button1ComesIn']);
-    this.Button1StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button1StandbyLoop']);
-    this.Button1Ready = new YDKJAnimation(resources['DisOrDat/Button1Ready']);
-    this.Button1Push = new YDKJAnimation(resources['DisOrDat/Button1Push']);
-    this.Button1Leave = new YDKJAnimation(resources['DisOrDat/Button1Leave']);
-
-    this.Button2ComesIn = new YDKJAnimation(resources['DisOrDat/Button2ComesIn']);
-    this.Button2StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button2StandbyLoop']);
-    this.Button2Ready = new YDKJAnimation(resources['DisOrDat/Button2Ready']);
-    this.Button2Push = new YDKJAnimation(resources['DisOrDat/Button2Push']);
-    this.Button2Leave = new YDKJAnimation(resources['DisOrDat/Button2Leave']);
-
-    if (this.nbchoices == 3) {
-        this.Button3ComesIn = new YDKJAnimation(resources['DisOrDat/Button3ComesIn']);
-        this.Button3StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button3StandbyLoop']);
-        this.Button3Ready = new YDKJAnimation(resources['DisOrDat/Button3Ready']);
-        this.Button3Push = new YDKJAnimation(resources['DisOrDat/Button3Push']);
-        this.Button3Leave = new YDKJAnimation(resources['DisOrDat/Button3Leave']);
-    }
-
-    this.Button4ComesIn = new YDKJAnimation(resources['DisOrDat/Button4ComesIn']);
-    this.Button4StandbyLoop = new YDKJAnimation(resources['DisOrDat/Button4StandbyLoop']);
-    this.Button4Ready = new YDKJAnimation(resources['DisOrDat/Button4Ready']);
-    this.Button4Push = new YDKJAnimation(resources['DisOrDat/Button4Push']);
-    this.Button4Leave = new YDKJAnimation(resources['DisOrDat/Button4Leave']);
-
-    this.Player1ComesIn = new YDKJAnimation(resources['DisOrDat/Player1ComesIn']);
-    this.Player1WinGrow = new YDKJAnimation(resources['DisOrDat/Player1WinGrow']);
-    this.Player1WinBig = new YDKJAnimation(resources['DisOrDat/Player1WinBig']);
-    this.Player1Win = new YDKJAnimation(resources['DisOrDat/Player1Win']);
-    this.Player1LoseGrow = new YDKJAnimation(resources['DisOrDat/Player1LoseGrow']);
-    this.Player1LoseBig = new YDKJAnimation(resources['DisOrDat/Player1LoseBig']);
-    this.Player1Lose = new YDKJAnimation(resources['DisOrDat/Player1Lose']);
-
-    this.Player2ComesIn = new YDKJAnimation(resources['DisOrDat/Player2ComesIn']);
-    this.Player2WinGrow = new YDKJAnimation(resources['DisOrDat/Player2WinGrow']);
-    this.Player2WinBig = new YDKJAnimation(resources['DisOrDat/Player2WinBig']);
-    this.Player2Win = new YDKJAnimation(resources['DisOrDat/Player2Win']);
-    this.Player2LoseGrow = new YDKJAnimation(resources['DisOrDat/Player2LoseGrow']);
-    this.Player2LoseBig = new YDKJAnimation(resources['DisOrDat/Player2LoseBig']);
-    this.Player2Lose = new YDKJAnimation(resources['DisOrDat/Player2Lose']);
-
-    this.Player3ComesIn = new YDKJAnimation(resources['DisOrDat/Player3ComesIn']);
-    this.Player3WinGrow = new YDKJAnimation(resources['DisOrDat/Player3WinGrow']);
-    this.Player3WinBig = new YDKJAnimation(resources['DisOrDat/Player3WinBig']);
-    this.Player3Win = new YDKJAnimation(resources['DisOrDat/Player3Win']);
-    this.Player3LoseGrow = new YDKJAnimation(resources['DisOrDat/Player3LoseGrow']);
-    this.Player3LoseBig = new YDKJAnimation(resources['DisOrDat/Player3LoseBig']);
-    this.Player3Lose = new YDKJAnimation(resources['DisOrDat/Player3Lose']);
-
-    this.TempScoreShow = new YDKJAnimation(resources['DisOrDat/TempScoreShow']);
-    this.TempScoreCorrectStart = new YDKJAnimation(resources['DisOrDat/TempScoreCorrectStart']);
-    this.TempScoreCorrect = new YDKJAnimation(resources['DisOrDat/TempScoreCorrect']);
-    this.TempScoreCorrectStop = new YDKJAnimation(resources['DisOrDat/TempScoreCorrectStop']);
-    this.TempScoreWrongStart = new YDKJAnimation(resources['DisOrDat/TempScoreWrongStart']);
-    this.TempScoreWrong = new YDKJAnimation(resources['DisOrDat/TempScoreWrong']);
-    this.TempScoreWrongStop = new YDKJAnimation(resources['DisOrDat/TempScoreWrongStop']);
-    this.TempScoreHide = new YDKJAnimation(resources['DisOrDat/TempScoreHide']);
-
-    this.FinalScoreWinShow = new YDKJAnimation(resources['DisOrDat/FinalScoreWinShow']);
-    this.FinalScoreWinHide = new YDKJAnimation(resources['DisOrDat/FinalScoreWinHide']);
-    this.FinalScoreLoseShow = new YDKJAnimation(resources['DisOrDat/FinalScoreLoseShow']);
-    this.FinalScoreLoseHide = new YDKJAnimation(resources['DisOrDat/FinalScoreLoseHide']);
-
-    this.SFXPlayerCorrect = new YDKJAnimation(resources['Question/SFXPlayerCorrect']);
-    this.SFXPlayerLose = new YDKJAnimation(resources['Question/SFXPlayerLose']);
-
-    this.AnnounceTimer = new YDKJAnimation(resources['DisOrDat/AnnounceTimer']);
-    this.PrepareTimer = new YDKJAnimation(resources['DisOrDat/PrepareTimer']);
-    this.GameStart = new YDKJAnimation(resources['DisOrDat/GameStart']);
-
-    this.Question1 = new YDKJAnimation(resources['DisOrDat/Question1']);
-    this.Question2 = new YDKJAnimation(resources['DisOrDat/Question2']);
-    this.Question3 = new YDKJAnimation(resources['DisOrDat/Question3']);
-    this.Question4 = new YDKJAnimation(resources['DisOrDat/Question4']);
-    this.Question5 = new YDKJAnimation(resources['DisOrDat/Question5']);
-    this.Question6 = new YDKJAnimation(resources['DisOrDat/Question6']);
-    this.Question7 = new YDKJAnimation(resources['DisOrDat/Question7']);
-    this.LastQuestionAnnounce = new YDKJAnimation(resources['DisOrDat/LastQuestionAnnounce']);
-    this.CannotSkipLast = new YDKJAnimation(resources['DisOrDat/CannotSkipLast']);
-    this.SFXCorrect = new YDKJAnimation(resources['DisOrDat/SFXCorrect']);
-    this.SFXWrong = new YDKJAnimation(resources['DisOrDat/SFXWrong']);
-    this.SFXScoreWin = new YDKJAnimation(resources['DisOrDat/SFXScoreWin']);
-    this.SFXScoreLose = new YDKJAnimation(resources['DisOrDat/SFXScoreLose']);
-    this.RestartSkipped = new YDKJAnimation(resources['DisOrDat/RestartSkipped']);
-
-    this.MusicPlayEnd = new YDKJAnimation(resources['DisOrDat/MusicPlayEnd']);
-    this.Public0on7 = new YDKJAnimation(resources['DisOrDat/Public0on7']);
-    this.Public7on7 = new YDKJAnimation(resources['DisOrDat/Public7on7']);
-
-    this.Score10on7 = new YDKJAnimation(resources['DisOrDat/Score10on7']);
-    this.Score11on7 = new YDKJAnimation(resources['DisOrDat/Score11on7']);
-    this.Score12on7 = new YDKJAnimation(resources['DisOrDat/Score12on7']);
-    this.Score13on7 = new YDKJAnimation(resources['DisOrDat/Score13on7']);
-    this.Score14on7 = new YDKJAnimation(resources['DisOrDat/Score14on7']);
-    this.Score15on7 = new YDKJAnimation(resources['DisOrDat/Score15on7']);
-    this.Score16on7 = new YDKJAnimation(resources['DisOrDat/Score16on7']);
-    this.Score17on7 = new YDKJAnimation(resources['DisOrDat/Score17on7']);
-    this.Score20on7 = new YDKJAnimation(resources['DisOrDat/Score20on7']);
-    this.Score21on7 = new YDKJAnimation(resources['DisOrDat/Score21on7']);
-    this.Score22on7 = new YDKJAnimation(resources['DisOrDat/Score22on7']);
-    this.Score23on7 = new YDKJAnimation(resources['DisOrDat/Score23on7']);
-    this.Score24on7 = new YDKJAnimation(resources['DisOrDat/Score24on7']);
-    this.Score25on7 = new YDKJAnimation(resources['DisOrDat/Score25on7']);
-    this.Score26on7 = new YDKJAnimation(resources['DisOrDat/Score26on7']);
-    this.Score27on7 = new YDKJAnimation(resources['DisOrDat/Score27on7']);
-    this.Score3Positive = new YDKJAnimation(resources['DisOrDat/Score3Positive']);
-    this.Score36on7 = new YDKJAnimation(resources['DisOrDat/Score36on7']);
-    this.Score35on7 = new YDKJAnimation(resources['DisOrDat/Score35on7']);
-    this.Score34on7 = new YDKJAnimation(resources['DisOrDat/Score34on7']);
-    this.Score3Negative = new YDKJAnimation(resources['DisOrDat/Score3Negative']);
-    this.Score32on7 = new YDKJAnimation(resources['DisOrDat/Score32on7']);
-    this.Score31on7 = new YDKJAnimation(resources['DisOrDat/Score31on7']);
-    this.Score30on7 = new YDKJAnimation(resources['DisOrDat/Score30on7']);
-
-    this.TimerTimeOut = new YDKJAnimation(resources['DisOrDat/TimerTimeOut']);
-    this.MusicEndTimeOut = new YDKJAnimation(resources['DisOrDat/MusicEndTimeOut']);
-    this.SFXTimeOut1 = new YDKJAnimation(resources['DisOrDat/SFXTimeOut1']);
-    this.MusicPlayEnd = new YDKJAnimation(resources['DisOrDat/MusicPlayEnd']);
-    this.TimeOut = new YDKJAnimation(resources['DisOrDat/TimeOut']);
-    this.TimeOutLoseMoreQuestions = new YDKJAnimation(resources['DisOrDat/TimeOutLoseMoreQuestions']);
-    this.TimeOutLoseOneQuestion = new YDKJAnimation(resources['DisOrDat/TimeOutLoseOneQuestion']);
-    this.ShowFinalScore = new YDKJAnimation(resources['DisOrDat/ShowFinalScore']);
+    this.animations = new YDKJAnimList(resources);
 
     this.Timer = this.options.timer;
     this.timerTimeout = 0;
@@ -189,38 +15,39 @@ ModeDisOrDat.prototype.preload = function(resources) {
 
 ModeDisOrDat.prototype.start = function() {
     var thisMode = this;
+    var anim = this.animations;
 
     var nextcategoryready;
 
     if (this.chooseplayer == 1) {
-        this.ChoicePlayer = this.ChoicePlayer1;
-        this.PlayerComesIn = this.Player1ComesIn;
-        this.PlayerWinGrow = this.Player1WinGrow;
-        this.PlayerWinBig = this.Player1WinBig;
-        this.PlayerWin = this.Player1Win;
-        this.PlayerLoseGrow = this.Player1LoseGrow;
-        this.PlayerLoseBig = this.Player1LoseBig;
-        this.PlayerLose = this.Player1Lose;
+        this.ChoicePlayer = anim.get('ChoicePlayer1');
+        this.PlayerComesIn = anim.get('Player1ComesIn');
+        this.PlayerWinGrow = anim.get('Player1WinGrow');
+        this.PlayerWinBig = anim.get('Player1WinBig');
+        this.PlayerWin = anim.get('Player1Win');
+        this.PlayerLoseGrow = anim.get('Player1LoseGrow');
+        this.PlayerLoseBig = anim.get('Player1LoseBig');
+        this.PlayerLose = anim.get('Player1Lose');
     }
     if (this.chooseplayer == 2) {
-        this.ChoicePlayer = this.ChoicePlayer2;
-        this.PlayerComesIn = this.Player2ComesIn;
-        this.PlayerWinGrow = this.Player2WinGrow;
-        this.PlayerWinBig = this.Player2WinBig;
-        this.PlayerWin = this.Player2Win;
-        this.PlayerLoseGrow = this.Player2LoseGrow;
-        this.PlayerLoseBig = this.Player2LoseBig;
-        this.PlayerLose = this.Player2Lose;
+        this.ChoicePlayer = anim.get('ChoicePlayer2');
+        this.PlayerComesIn = anim.get('Player2ComesIn');
+        this.PlayerWinGrow = anim.get('Player2WinGrow');
+        this.PlayerWinBig = anim.get('Player2WinBig');
+        this.PlayerWin = anim.get('Player2Win');
+        this.PlayerLoseGrow = anim.get('Player2LoseGrow');
+        this.PlayerLoseBig = anim.get('Player2LoseBig');
+        this.PlayerLose = anim.get('Player2Lose');
     }
     if (this.chooseplayer == 3) {
-        this.ChoicePlayer = this.ChoicePlayer3;
-        this.PlayerComesIn = this.Player3ComesIn;
-        this.PlayerWinGrow = this.Player3WinGrow;
-        this.PlayerWinBig = this.Player3WinBig;
-        this.PlayerWin = this.Player3Win;
-        this.PlayerLoseGrow = this.Player3LoseGrow;
-        this.PlayerLoseBig = this.Player3LoseBig;
-        this.PlayerLose = this.Player3Lose;
+        this.ChoicePlayer = anim.get('ChoicePlayer3');
+        this.PlayerComesIn = anim.get('Player3ComesIn');
+        this.PlayerWinGrow = anim.get('Player3WinGrow');
+        this.PlayerWinBig = anim.get('Player3WinBig');
+        this.PlayerWin = anim.get('Player3Win');
+        this.PlayerLoseGrow = anim.get('Player3LoseGrow');
+        this.PlayerLoseBig = anim.get('Player3LoseBig');
+        this.PlayerLose = anim.get('Player3Lose');
     }
 
     var tempscore = 0;
@@ -229,8 +56,8 @@ ModeDisOrDat.prototype.start = function() {
         nextcategoryready(function(nextcategory){
             nextcategory.modeObj.chooseplayer = thisMode.chooseplayer;
             nextcategory.modeObj.animations.free('MusicChooseCategoryLoop');
-            nextcategory.modeObj.animations.animations['MusicChooseCategoryLoop'] = thisMode.MusicLoopRules1;
-            thisMode.MusicLoopRules1 = false; // Pour ne pas être détruite au passage à la catégorie suivante
+            nextcategory.modeObj.animations.animations['MusicChooseCategoryLoop'] = anim.get('MusicLoopRules1');
+            delete anim.animations['MusicLoopRules1']; // Pour ne pas être détruite au passage à la catégorie suivante
             nextcategory.start();
         });
     };
@@ -285,11 +112,11 @@ ModeDisOrDat.prototype.start = function() {
     var sumScores = function(endmessage) {
         var finalscorehide;
         if (tempscore > 0) {
-            thisMode.FinalScoreWinShow.free();
-            finalscorehide = thisMode.FinalScoreWinHide;
+            anim.free('FinalScoreWinShow');
+            finalscorehide = anim.get('FinalScoreWinHide');
         } else {
-            thisMode.FinalScoreLoseShow.free();
-            finalscorehide = thisMode.FinalScoreLoseHide;
+            anim.free('FinalScoreLoseShow');
+            finalscorehide = anim.get('FinalScoreLoseHide');
         }
         finalscorehide.ended(-60,function(){
             var PlayerGrow;
@@ -307,11 +134,11 @@ ModeDisOrDat.prototype.start = function() {
                 var from = thisMode.game.players[thisMode.chooseplayer-1].score;
                 thisMode.game.players[thisMode.chooseplayer-1].score += tempscore;
                 if (tempscore > 0) {
-                    thisMode.SFXScoreWin.reset();
-                    thisMode.SFXScoreWin.play();
+                    anim.reset('SFXScoreWin');
+                    anim.play('SFXScoreWin');
                 } else {
-                    thisMode.SFXScoreLose.reset();
-                    thisMode.SFXScoreLose.play();
+                    anim.reset('SFXScoreLose');
+                    anim.play('SFXScoreLose');
                 }
                 animateValue(PlayerBig,PlayerBig,PlayerBig, function(newvalue) {
                     thisMode.game.font.strings[1492] = newvalue;
@@ -323,10 +150,10 @@ ModeDisOrDat.prototype.start = function() {
                         PlayerBig.free();
                         if (tempscore > 0) {
                             thisMode.PlayerWin.play();
-                            thisMode.SFXPlayerCorrect.play();
+                            anim.play('SFXPlayerCorrect');
                         } else {
                             thisMode.PlayerLose.play();
-                            thisMode.SFXPlayerLose.play();
+                            anim.play('SFXPlayerLose');
                         }
                     },200);
                 });
@@ -346,17 +173,17 @@ ModeDisOrDat.prototype.start = function() {
         var tempscoreLeave = function() {
             totalButtons--;
             if (totalButtons == 0) {
-                thisMode.TempScoreShow.free();
-                thisMode.TempScoreCorrectStop.free();
-                thisMode.TempScoreWrongStop.free();
-                thisMode.TempScoreHide.play();
+                anim.free('TempScoreShow');
+                anim.free('TempScoreCorrectStop');
+                anim.free('TempScoreWrongStop');
+                anim.play('TempScoreHide');
 
                 thisMode.game.font.strings[1480] = thisMode.game.displayCurrency(tempscore).replace('_','&thinsp;');
                 thisMode.game.font.strings[1485] = thisMode.game.font.strings[1480];
                 if (tempscore > 0) {
-                    thisMode.FinalScoreWinShow.play();
+                    anim.play('FinalScoreWinShow');
                 } else {
-                    thisMode.FinalScoreLoseShow.play();
+                    anim.play('FinalScoreLoseShow');
                 }
 
                 if (callback) callback();
@@ -370,34 +197,34 @@ ModeDisOrDat.prototype.start = function() {
             buttonsAnswer[i].Leave.play();
         }
 
-        thisMode.ShowQuestion.free();
-        thisMode.HideQuestionCorrect.free();
-        thisMode.HideQuestionWrong.free();
-        thisMode.HideQuestionTimeout.free();
+        anim.free('ShowQuestion');
+        anim.free('HideQuestionCorrect');
+        anim.free('HideQuestionWrong');
+        anim.free('HideQuestionTimeout');
 
-        thisMode.ShowSubject.free();
-        thisMode.HideSubject.play();
+        anim.free('ShowSubject');
+        anim.play('HideSubject');
     };
 
-    this.MusicPlayEnd.ended(function(){
-        thisMode.MusicLoopRules1.reset();
-        thisMode.MusicLoopRules1.play();
+    anim.ended('MusicPlayEnd', function(){
+        anim.reset('MusicLoopRules1');
+        anim.play('MusicLoopRules1');
     });
 
-    this.TimeOut.ended(300,function() {
+    anim.ended('TimeOut', 300, function() {
         var nbanswersleft = 0;
         for(var i = 0; i < currentAnswers.length; i++) if (currentAnswers[i] == 0) nbanswersleft++;
         var tm;
-        if (nbanswersleft == 1) tm = thisMode.TimeOutLoseOneQuestion;
-        else tm = thisMode.TimeOutLoseMoreQuestions;
+        if (nbanswersleft == 1) tm = anim.get('TimeOutLoseOneQuestion');
+        else tm = anim.get('TimeOutLoseMoreQuestions');
         tm.ended(-150,function(){
-            thisMode.SFXScoreLose.play();
-            thisMode.TempScoreShow.reset();
-            thisMode.TempScoreCorrectStop.reset();
-            thisMode.TempScoreWrongStop.reset();
+            anim.play('SFXScoreLose');
+            anim.reset('TempScoreShow');
+            anim.reset('TempScoreCorrectStop');
+            anim.reset('TempScoreWrongStop');
             var oldtempscore = tempscore;
             tempscore -= thisMode.options.value*nbanswersleft;
-            animateValue(thisMode.TempScoreWrongStart, thisMode.TempScoreWrong, thisMode.TempScoreWrongStop, function(newvalue) {
+            animateValue(anim.get('TempScoreWrongStart'), anim.get('TempScoreWrong'), anim.get('TempScoreWrongStop'), function(newvalue) {
                 thisMode.game.font.strings[1470] = newvalue;
                 thisMode.game.font.strings[1475] = newvalue;
             }, oldtempscore, tempscore, 6, function(){
@@ -406,17 +233,17 @@ ModeDisOrDat.prototype.start = function() {
                     for(var i = 0; i < currentAnswers.length; i++) if (currentAnswers[i] == 1) nbgoodanswers++;
 
                     var scoremessage;
-                    if (nbgoodanswers >= 4) scoremessage = thisMode.Score3Positive;
-                    else scoremessage = thisMode.Score3Negative;
+                    if (nbgoodanswers >= 4) scoremessage = anim.get('Score3Positive');
+                    else scoremessage = anim.get('Score3Negative');
 
                     var endmessage;
-                    if (nbgoodanswers == 0) endmessage = thisMode.Score30on7;
-                    if (nbgoodanswers == 1) endmessage = thisMode.Score31on7;
-                    if (nbgoodanswers == 2) endmessage = thisMode.Score32on7;
-                    if (nbgoodanswers == 3) endmessage = thisMode.Score32on7; // Partage le même son que le 2/7
-                    if (nbgoodanswers == 4) endmessage = thisMode.Score34on7;
-                    if (nbgoodanswers == 5) endmessage = thisMode.Score35on7;
-                    if (nbgoodanswers == 6) endmessage = thisMode.Score36on7;
+                    if (nbgoodanswers == 0) endmessage = anim.get('Score30on7');
+                    if (nbgoodanswers == 1) endmessage = anim.get('Score31on7');
+                    if (nbgoodanswers == 2) endmessage = anim.get('Score32on7');
+                    if (nbgoodanswers == 3) endmessage = anim.get('Score32on7'); // Partage le même son que le 2/7
+                    if (nbgoodanswers == 4) endmessage = anim.get('Score34on7');
+                    if (nbgoodanswers == 5) endmessage = anim.get('Score35on7');
+                    if (nbgoodanswers == 6) endmessage = anim.get('Score36on7');
 
                     endmessage.ended(1500,function(){
                         jumpToNextCategory();
@@ -426,54 +253,47 @@ ModeDisOrDat.prototype.start = function() {
                         sumScores(endmessage);
                     });
 
-                    thisMode.ShowFinalScore.ended(300,function(){
+                    anim.ended('ShowFinalScore', 300, function(){
                         scoremessage.play();
                     });
 
-                    thisMode.ShowFinalScore.play();
+                    anim.play('ShowFinalScore');
                 });
             });
         });
         tm.play();
     });
 
-    this.SFXTimeOut1.ended(300,function() {
-        thisMode.MusicPlayEnd.play();
-        thisMode.TimeOut.play();
+    anim.ended('SFXTimeOut1', 300, function() {
+        anim.play('MusicPlayEnd');
+        anim.play('TimeOut');
     });
 
-    this.MusicEndTimeOut.ended(function() {
-        thisMode.SFXTimeOut1.play();
+    anim.ended('MusicEndTimeOut', function() {
+        anim.play('SFXTimeOut1');
     });
 
     var askQuestion = function() {
         var str = getSTRfromID(thisMode.STR,'STR#',3);
 
-        thisMode.HideQuestionSkip.reset();
-        thisMode.HideQuestionCorrect.reset();
-        thisMode.HideQuestionWrong.reset();
+        anim.reset('HideQuestionSkip');
+        anim.reset('HideQuestionCorrect');
+        anim.reset('HideQuestionWrong');
         thisMode.game.font.resetTextStyle(1420);
         thisMode.game.font.strings[1420] = str[currentQuestion+2];
-        thisMode.ShowQuestion.play();
+        anim.play('ShowQuestion');
 
-        var thisQuestion;
-        if (currentQuestion == 0) thisQuestion = thisMode.Question1;
-        if (currentQuestion == 1) thisQuestion = thisMode.Question2;
-        if (currentQuestion == 2) thisQuestion = thisMode.Question3;
-        if (currentQuestion == 3) thisQuestion = thisMode.Question4;
-        if (currentQuestion == 4) thisQuestion = thisMode.Question5;
-        if (currentQuestion == 5) thisQuestion = thisMode.Question6;
-        if (currentQuestion == 6) thisQuestion = thisMode.Question7;
+        var thisQuestion = anim.get('Question' + (currentQuestion+1));
 
         var nbquestions = 0;
         for(var i = 0; i < currentAnswers.length; i++) if (currentAnswers[i] == 0) nbquestions++;
 
         if (nbquestions == 1) { // "la dernière" c'est quand il n'en reste plus qu'une à répondre, et on ne peut pas la passer.
-            thisMode.LastQuestionAnnounce.ended(function(){
+            anim.ended('LastQuestionAnnounce', function(){
                 thisQuestion.reset();
                 thisQuestion.play();
             });
-            thisMode.LastQuestionAnnounce.play();
+            anim.play('LastQuestionAnnounce');
         } else {
             thisQuestion.reset();
             thisQuestion.play();
@@ -483,7 +303,7 @@ ModeDisOrDat.prototype.start = function() {
 
     var afterPressAnimation;
 
-    var RestartSkipped = this.RestartSkipped;
+    var RestartSkipped = anim.get('RestartSkipped');
 
     var registerPressButton = 0; // Déclaré plus tard
 
@@ -493,7 +313,7 @@ ModeDisOrDat.prototype.start = function() {
         var nbquestions = 0;
         for(var i = 0; i < currentAnswers.length; i++) if (currentAnswers[i] == 0) nbquestions++;
         if ((nbquestions == 1) && (b == 4)) {
-            thisMode.CannotSkipLast.play();
+            anim.play('CannotSkipLast');
             return false;
         }
 
@@ -502,8 +322,8 @@ ModeDisOrDat.prototype.start = function() {
         buttonsAnswer[b].Ready.reset(true);
         bt.reset();
         bt.play();
-        thisMode.SFXKeyPress.reset();
-        thisMode.SFXKeyPress.play();
+        anim.reset('SFXKeyPress');
+        anim.play('SFXKeyPress');
 
         if (currentQuestion >= 0) {
             canPress = 0;
@@ -517,46 +337,29 @@ ModeDisOrDat.prototype.start = function() {
                 if (nbquestions == 0) {
                     clearTimeout(thisMode.timerTimeout);
                     setTimeout(endQuestion(function(){
-                        thisMode.MusicLoopPlay1.free();
-                        thisMode.MusicLoopPlay2.free();
-                        thisMode.MusicLoopPlay3.free();
-                        thisMode.MusicLoopPlay4.free();
-                        thisMode.MusicPlayEnd.play();
+                        anim.free('MusicLoopPlay1');
+                        anim.free('MusicLoopPlay2');
+                        anim.free('MusicLoopPlay3');
+                        anim.free('MusicLoopPlay4');
+                        anim.play('MusicPlayEnd');
                         var nbgoodanswers = 0;
                         for(var i = 0; i < currentAnswers.length; i++) if (currentAnswers[i] == 1) nbgoodanswers++;
 
                         if (nbgoodanswers > 3) {
-                            thisMode.Public7on7.play();
-                            thisMode.Public7on7.volume(70);
+                            anim.play('Public7on7');
+                            anim.volume('Public7on7', 70);
                         } else {
-                            thisMode.Public0on7.play();
-                            thisMode.Public0on7.volume(70);
+                            anim.play('Public0on7');
+                            anim.volume('Public0on7', 70);
                         }
                     }),300);
 
-                    thisMode.MusicPlayEnd.ended(100,function(){
+                    anim.ended('MusicPlayEnd', 100, function(){
                         var nbgoodanswers = 0;
                         for(var i = 0; i < currentAnswers.length; i++) if (currentAnswers[i] == 1) nbgoodanswers++;
 
-                        var scoremessage;
-                        var endmessage;
-                        if (nbgoodanswers == 0) scoremessage = thisMode.Score10on7;
-                        if (nbgoodanswers == 1) scoremessage = thisMode.Score11on7;
-                        if (nbgoodanswers == 2) scoremessage = thisMode.Score12on7;
-                        if (nbgoodanswers == 3) scoremessage = thisMode.Score13on7;
-                        if (nbgoodanswers == 4) scoremessage = thisMode.Score14on7;
-                        if (nbgoodanswers == 5) scoremessage = thisMode.Score15on7;
-                        if (nbgoodanswers == 6) scoremessage = thisMode.Score16on7;
-                        if (nbgoodanswers == 7) scoremessage = thisMode.Score17on7;
-
-                        if (nbgoodanswers == 0) endmessage = thisMode.Score20on7;
-                        if (nbgoodanswers == 1) endmessage = thisMode.Score21on7;
-                        if (nbgoodanswers == 2) endmessage = thisMode.Score22on7;
-                        if (nbgoodanswers == 3) endmessage = thisMode.Score23on7;
-                        if (nbgoodanswers == 4) endmessage = thisMode.Score24on7;
-                        if (nbgoodanswers == 5) endmessage = thisMode.Score25on7;
-                        if (nbgoodanswers == 6) endmessage = thisMode.Score26on7;
-                        if (nbgoodanswers == 7) endmessage = thisMode.Score27on7;
+                        var scoremessage = anim.get('Score1' + nbgoodanswers + 'on7');
+                        var endmessage = anim.get('Score2' + nbgoodanswers + 'on7');
 
                         endmessage.ended(1500,function(){
                             jumpToNextCategory();
@@ -593,25 +396,25 @@ ModeDisOrDat.prototype.start = function() {
             };
 
             if (b == 4) { // On passe la question
-                thisMode.ShowQuestion.reset();
-                thisMode.HideQuestionSkip.play();
+                anim.reset('ShowQuestion');
+                anim.play('HideQuestionSkip');
                 afterPressAnimation = function() {
                     nextQuestion();
                 };
             } else {
                 if (b == thisMode.anslist[currentQuestion]) { // Bonne réponse !
                     currentAnswers[currentQuestion] = 1;
-                    thisMode.ShowQuestion.reset();
-                    thisMode.HideQuestionCorrect.play();
+                    anim.reset('ShowQuestion');
+                    anim.play('HideQuestionCorrect');
                     afterPressAnimation = function(){
-                        thisMode.SFXCorrect.reset();
-                        thisMode.SFXCorrect.play();
-                        thisMode.TempScoreShow.reset();
-                        thisMode.TempScoreCorrectStop.reset();
-                        thisMode.TempScoreWrongStop.reset();
+                        anim.reset('SFXCorrect');
+                        anim.play('SFXCorrect');
+                        anim.reset('TempScoreShow');
+                        anim.reset('TempScoreCorrectStop');
+                        anim.reset('TempScoreWrongStop');
                         var oldtempscore = tempscore;
                         tempscore += thisMode.options.value;
-                        animateValue(thisMode.TempScoreCorrectStart, thisMode.TempScoreCorrect, thisMode.TempScoreCorrectStop, function(newvalue) {
+                        animateValue(anim.get('TempScoreCorrectStart'), anim.get('TempScoreCorrect'), anim.get('TempScoreCorrectStop'), function(newvalue) {
                             thisMode.game.font.strings[1470] = newvalue;
                             thisMode.game.font.strings[1475] = newvalue;
                         },oldtempscore,tempscore,6,function(){
@@ -620,17 +423,17 @@ ModeDisOrDat.prototype.start = function() {
                     };
                 } else { // Perdu !
                     currentAnswers[currentQuestion] = 2;
-                    thisMode.ShowQuestion.reset();
-                    thisMode.HideQuestionWrong.play();
+                    anim.reset('ShowQuestion');
+                    anim.play('HideQuestionWrong');
                     afterPressAnimation = function(){
-                        thisMode.SFXWrong.reset();
-                        thisMode.SFXWrong.play();
-                        thisMode.TempScoreShow.reset();
-                        thisMode.TempScoreCorrectStop.reset();
-                        thisMode.TempScoreWrongStop.reset();
+                        anim.reset('SFXWrong');
+                        anim.play('SFXWrong');
+                        anim.reset('TempScoreShow');
+                        anim.reset('TempScoreCorrectStop');
+                        anim.reset('TempScoreWrongStop');
                         var oldtempscore = tempscore;
                         tempscore -= thisMode.options.value;
-                        animateValue(thisMode.TempScoreWrongStart, thisMode.TempScoreWrong, thisMode.TempScoreWrongStop, function(newvalue) {
+                        animateValue(anim.get('TempScoreWrongStart'), anim.get('TempScoreWrong'), anim.get('TempScoreWrongStop'), function(newvalue) {
                             thisMode.game.font.strings[1470] = newvalue;
                             thisMode.game.font.strings[1475] = newvalue;
                         }, oldtempscore,tempscore,6,function(){
@@ -640,16 +443,6 @@ ModeDisOrDat.prototype.start = function() {
                 }
             }
         }
-
-        /*
-        // SECURITE DESACTIVEE SINON PROBLEME APRES car exécution de loopStandby en cours de jeu
-        // Normalement on a pas besoin de cette sécurité
-        var standby = false;
-        for(var i = 0; i < buttonsAnswer.length; i++) if (b != i) {
-            if (buttonsAnswer[i].StandBy.isplaying) standby = true;
-        }
-        if (!standby) loopStandBy(); // Sécurité, si on appuie et que plus aucun bouton n'est en standby
-        */
     };
 
     registerPressButton = function() {
@@ -663,28 +456,28 @@ ModeDisOrDat.prototype.start = function() {
         doPressButton(b);
     };
 
-    this.MusicLoopPlay4.ended(function(){
+    anim.ended('MusicLoopPlay4', function(){
         this.reset();
-        thisMode.MusicLoopPlay1.play();
+        anim.play('MusicLoopPlay1');
     });
 
-    this.MusicLoopPlay3.ended(function(){
+    anim.ended('MusicLoopPlay3', function(){
         this.reset();
-        thisMode.MusicLoopPlay4.play();
+        anim.play('MusicLoopPlay4');
     });
 
-    this.MusicLoopPlay2.ended(function(){
+    anim.ended('MusicLoopPlay2', function(){
         this.reset();
-        thisMode.MusicLoopPlay3.play();
+        anim.play('MusicLoopPlay3');
     });
 
-    this.MusicLoopPlay1.ended(function(){
+    anim.ended('MusicLoopPlay1', function(){
         this.reset();
-        thisMode.MusicLoopPlay2.play();
+        anim.play('MusicLoopPlay2');
     });
 
-    this.JingleStartPlay2.ended(function(){
-        thisMode.MusicLoopPlay1.play();
+    anim.ended('JingleStartPlay2', function(){
+        anim.play('MusicLoopPlay1');
     });
 
     var timerRunning = function(){
@@ -693,8 +486,8 @@ ModeDisOrDat.prototype.start = function() {
             thisMode.timerTimeout = setTimeout(timerRunning, 1000);
         } else { // Timeout
             thisMode.Timer.playTimer();
-            thisMode.ShowQuestion.reset();
-            thisMode.HideQuestionTimeout.play();
+            anim.reset('ShowQuestion');
+            anim.play('HideQuestionTimeout');
 
             clearInterval(thisMode.timerTimeout);
             unbindKeyListener(buttonslistener);
@@ -705,30 +498,30 @@ ModeDisOrDat.prototype.start = function() {
             }
 
             var timersup = function() {
-                thisMode.MusicLoopPlay1.stop();
-                thisMode.MusicLoopPlay2.stop();
-                thisMode.MusicLoopPlay3.stop();
-                thisMode.MusicLoopPlay4.stop();
+                anim.stop('MusicLoopPlay1');
+                anim.stop('MusicLoopPlay2');
+                anim.stop('MusicLoopPlay3');
+                anim.stop('MusicLoopPlay4');
 
-                thisMode.MusicEndTimeOut.play();
+                anim.play('MusicEndTimeOut');
                 thisMode.Timer.reset();
-                thisMode.TimerTimeOut.play();
+                anim.play('TimerTimeOut');
             };
 
-            thisMode.MusicLoopPlay1.ended(false);
-            thisMode.MusicLoopPlay2.ended(false);
-            thisMode.MusicLoopPlay3.ended(false);
-            thisMode.MusicLoopPlay4.ended(false);
-            thisMode.MusicLoopPlay1.ended(timersup);
-            thisMode.MusicLoopPlay2.ended(timersup);
-            thisMode.MusicLoopPlay3.ended(timersup);
-            thisMode.MusicLoopPlay4.ended(timersup);
+            anim.ended('MusicLoopPlay1', false);
+            anim.ended('MusicLoopPlay2', false);
+            anim.ended('MusicLoopPlay3', false);
+            anim.ended('MusicLoopPlay4', false);
+            anim.ended('MusicLoopPlay1', timersup);
+            anim.ended('MusicLoopPlay2', timersup);
+            anim.ended('MusicLoopPlay3', timersup);
+            anim.ended('MusicLoopPlay4', timersup);
         }
     };
 
-    this.JingleStartPlay1.ended(function(){
-        thisMode.JingleStartPlay2.play();
-        thisMode.PrepareTimer.free();
+    anim.ended('JingleStartPlay1', function(){
+        anim.play('JingleStartPlay2');
+        anim.free('PrepareTimer');
 
         var i;
 
@@ -768,32 +561,32 @@ ModeDisOrDat.prototype.start = function() {
         askQuestion();
     });
 
-    this.GameStart.ended(100,function(){
+    anim.ended('GameStart', 100, function(){
         thisMode.game.api.synchronize(function() {
-            thisMode.MusicLoopRules1.stop();
-            thisMode.JingleStartPlay1.play();
+            anim.stop('MusicLoopRules1');
+            anim.play('JingleStartPlay1');
         });
     });
 
-    this.PrepareTimer.ended(300,function(){
-        thisMode.GameStart.play();
+    anim.ended('PrepareTimer', 300, function(){
+        anim.play('GameStart');
     });
 
-    this.AnnounceTimer.ended(100,function() {
+    anim.ended('AnnounceTimer', 100, function() {
         canPress = 0;
-        thisMode.TimerComesIn.free();
-        thisMode.PrepareTimer.play();
+        anim.free('TimerComesIn');
+        anim.play('PrepareTimer');
     });
 
     var skiplistener = 0;
 
-    this.MessageSpaceBarLeave.ended(function(){
+    anim.ended('MessageSpaceBarLeave', function(){
         this.free();
     });
 
-    this.ValueLeave.ended(-100,function() {
-        thisMode.MessageSpaceBarComesIn.free();
-        thisMode.MessageSpaceBarLeave.play();
+    anim.ended('ValueLeave', -100, function() {
+        anim.free('MessageSpaceBarComesIn');
+        anim.play('MessageSpaceBarLeave');
     });
 
     var countLoopRules2 = 4; // 4 fois le MusicLoopRules2
@@ -801,28 +594,28 @@ ModeDisOrDat.prototype.start = function() {
         var i;
         if (skiplistener) unbindKeyListener(skiplistener);
         countLoopRules2 = 0; // TODO: on laisse finir la musique ou bien on arrête immédiatement ?
-        thisMode.MusicLoopRules1.ended(false); // Grosse libération globale : si on passe les explications, il faut tout arrêter immédiatement.
+        anim.ended('MusicLoopRules1', false); // Grosse libération globale : si on passe les explications, il faut tout arrêter immédiatement.
         for(i = 0; i < buttonsAnswer.length; i++) if (buttonsAnswer[i]) {
             buttonsAnswer[i].ComesIn.free();
             buttonsAnswer[i].Push.reset();
             buttonsAnswer[i].StandBy.free();
         }
-        thisMode.SFXKeyPress.stop();
-        thisMode.SFXShowKey.free();
-        thisMode.SFXShowPriceCorrect.free();
-        thisMode.SFXShowPriceWrong.free();
-        thisMode.SFXHidePrice.free();
-        thisMode.QuestionIntro1.free();
-        thisMode.QuestionIntro2.free();
-        thisMode.QuestionAnswer1.free();
-        thisMode.QuestionAnswer2.free();
-        thisMode.RulesExplainBoth.free();
-        thisMode.RulesExplainSkip.free();
-        thisMode.RulesExplainCorrect.free();
-        thisMode.RulesExplainWrong.free();
-        thisMode.ValueComesIn.free();
-        thisMode.ValueMinus.free();
-        thisMode.ValueLeave.free();
+        anim.stop('SFXKeyPress');
+        anim.free('SFXShowKey');
+        anim.free('SFXShowPriceCorrect');
+        anim.free('SFXShowPriceWrong');
+        anim.free('SFXHidePrice');
+        anim.free('QuestionIntro1');
+        anim.free('QuestionIntro2');
+        anim.free('QuestionAnswer1');
+        anim.free('QuestionAnswer2');
+        anim.free('RulesExplainBoth');
+        anim.free('RulesExplainSkip');
+        anim.free('RulesExplainCorrect');
+        anim.free('RulesExplainWrong');
+        anim.free('ValueComesIn');
+        anim.free('ValueMinus');
+        anim.free('ValueLeave');
         thisMode.PlayerComesIn.play();
         for(i = 0; i < buttonsAnswer.length; i++) if (buttonsAnswer[i]) {
             buttonsAnswer[i].Ready.play();
@@ -830,45 +623,45 @@ ModeDisOrDat.prototype.start = function() {
 
         thisMode.game.font.strings[1470] = thisMode.game.displayCurrency(0).replace('_','&thinsp;');
         thisMode.game.font.strings[1475] = thisMode.game.font.strings[1470];
-        thisMode.TempScoreShow.play();
+        anim.play('TempScoreShow');
 
         var prepareGame = function() {
-            thisMode.AnnounceTimer.delay(600,function() {
+            anim.delay('AnnounceTimer', 600, function() {
                 this.play();
             });
         };
-        if (thisMode.RulesSkipExplain.isplaying) thisMode.RulesSkipExplain.ended(prepareGame); else prepareGame();
+        if (anim.isplaying('RulesSkipExplain')) anim.ended('RulesSkipExplain', prepareGame); else prepareGame();
     };
 
-    this.ValueLeave.ended(function() {
+    anim.ended('ValueLeave', function() {
         this.free();
         endOfRules();
     });
 
-    thisMode.RulesExplainWrong.ended(150,function() {
-        thisMode.ValueMinus.free();
-        thisMode.ValueLeave.play();
-        thisMode.SFXHidePrice.play();
+    anim.ended('RulesExplainWrong', 150, function() {
+        anim.free('ValueMinus');
+        anim.play('ValueLeave');
+        anim.play('SFXHidePrice');
     });
 
-    thisMode.RulesExplainCorrect.ended(150,function() {
-        thisMode.RulesExplainWrong.play();
-        thisMode.ValueComesIn.free();
-        thisMode.ValueMinus.play();
-        thisMode.SFXShowPriceWrong.play();
+    anim.ended('RulesExplainCorrect', 150, function() {
+        anim.play('RulesExplainWrong');
+        anim.free('ValueComesIn');
+        anim.play('ValueMinus');
+        anim.play('SFXShowPriceWrong');
     });
 
     var rulesExplainNext = function() {
-        thisMode.RulesExplainCorrect.play();
-        thisMode.ValueComesIn.play();
-        thisMode.SFXShowPriceCorrect.play();
+        anim.play('RulesExplainCorrect');
+        anim.play('ValueComesIn');
+        anim.play('SFXShowPriceCorrect');
     };
 
-    this.MusicLoopRules2.ended(function() {
+    anim.ended('MusicLoopRules2', function() {
         if (countLoopRules2 <= 0) {
             this.free();
-            thisMode.MusicLoopRules1.reset();
-            thisMode.MusicLoopRules1.play();
+            anim.reset('MusicLoopRules1');
+            anim.play('MusicLoopRules1');
             return true;
         }
         countLoopRules2--;
@@ -876,65 +669,63 @@ ModeDisOrDat.prototype.start = function() {
     });
 
     var MusicLoopRules2 = function() {
-        thisMode.MusicLoopRules1.ended(function() {
+        anim.ended('MusicLoopRules1', function() {
             this.reset(true);
-            thisMode.MusicLoopRules2.play();
+            anim.play('MusicLoopRules2');
             return true;
         });
     };
 
     var rulesExplainSkip = function(){
-        thisMode.RulesExplainSkip.play();
-        thisMode.RulesExplainSkip.delay(300,function(){
+        anim.play('RulesExplainSkip');
+        anim.delay('RulesExplainSkip', 300, function(){
             buttonsAnswer[4].ComesIn.play();
-            thisMode.SFXShowKey.reset();
-            thisMode.SFXShowKey.play();
+            anim.reset('SFXShowKey');
+            anim.play('SFXShowKey');
         });
     };
 
-    thisMode.RulesExplainBoth.ended(800,function(){
+    anim.ended('RulesExplainBoth', 800, function(){
         rulesExplainSkip();
     });
 
-    thisMode.RulesExplainBoth.ended(-350,function(){
+    anim.ended('RulesExplainBoth', -350, function(){
         doPressButton(3);
     });
 
-    thisMode.QuestionAnswer2.ended(800,function(){
+    anim.ended('QuestionAnswer2', 800, function(){
         if (thisMode.nbchoices == 2) {
             rulesExplainSkip();
         } else {
-            thisMode.RulesExplainBoth.play();
+            anim.play('RulesExplainBoth');
         }
     });
 
-    thisMode.QuestionAnswer2.ended(-350,function(){
+    anim.ended('QuestionAnswer2', -350, function(){
         doPressButton(2);
     });
 
-    thisMode.QuestionAnswer1.ended(800,function(){
-        // EST-CE LA MEILLEURE MANIERE DE FAIRE ?
-        // On attend que le bouton 1 soit à nouveau en Standby avant d'appuyer, donc on attend si nécessaire que le 2 ait le temps de faire une boucle.
+    anim.ended('QuestionAnswer1', 800, function(){
         var timeleft = buttonsAnswer[1].StandBy.length()-buttonsAnswer[1].StandBy.position();
-        var anslen = thisMode.QuestionAnswer2.length()-350;
+        var anslen = anim.length('QuestionAnswer2')-350;
         var interval = timeleft - anslen + 100;
         if (interval > 0) {
             this.delay(interval,function(){
-                thisMode.QuestionAnswer2.play();
+                anim.play('QuestionAnswer2');
             });
-        } else thisMode.QuestionAnswer2.play();
+        } else anim.play('QuestionAnswer2');
     });
 
-    thisMode.QuestionAnswer1.ended(-350,function(){
+    anim.ended('QuestionAnswer1', -350, function(){
         doPressButton(1);
     });
 
     var readAnswers = function() {
-        thisMode.QuestionIntro2.delay(800, function () {
-            thisMode.QuestionIntro2.ended(function () {
-                thisMode.QuestionAnswer1.play();
+        anim.delay('QuestionIntro2', 800, function () {
+            anim.ended('QuestionIntro2', function () {
+                anim.play('QuestionAnswer1');
             });
-        })
+        });
     };
 
     var loopStandBy = function() { // Fonction servant à synchroniser les animations Standby
@@ -951,44 +742,33 @@ ModeDisOrDat.prototype.start = function() {
     var addStandBy = function(comesin, standby, push, ready, leave) {
         buttonsAnswer.push({ComesIn: comesin, StandBy: standby, Push: push, Ready: ready, Leave: leave});
         standby.ended(function(){loopStandBy()});
-        /*
-        // SECURITE DESACTIVEE SINON PROBLEME APRES car exécution de loopStandby en cours de jeu
-        // Normalement on a pas besoin de cette sécurité
-        push.ended(function() {
-            var standby = false;
-            for(var i = 0; i < buttonsAnswer.length; i++) {
-                if (buttonsAnswer[i].StandBy.isplaying) standby = true;
-            }
-            if (!standby) loopStandBy(); // Sécurité, si plus aucun bouton n'est en mode standby
-        });
-        */
     };
 
-    thisMode.ShowSubject.ended(function(){
+    anim.ended('ShowSubject', function(){
         buttonsAnswer[1].ComesIn.play();
-        thisMode.SFXShowKey.play();
+        anim.play('SFXShowKey');
     });
 
-    this.QuestionIntro1.ended(100,function() {
-        thisMode.QuestionIntro2.play();
-        thisMode.QuestionIntro2.delay(100,function(){
-            thisMode.ShowSubject.play();
+    anim.ended('QuestionIntro1', 100, function() {
+        anim.play('QuestionIntro2');
+        anim.delay('QuestionIntro2', 100, function(){
+            anim.play('ShowSubject');
         });
     });
 
-    this.QuestionTitle.ended(200,function() {
-        thisMode.QuestionIntro1.play();
-        thisMode.TimerComesIn.delay(200,function(){
+    anim.ended('QuestionTitle', 200, function() {
+        anim.play('QuestionIntro1');
+        anim.delay('TimerComesIn', 200, function(){
             this.ended(-500,function(){
-                thisMode.ShowHeader.play();
+                anim.play('ShowHeader');
             });
             this.play();
 
-            addStandBy(thisMode.Button1ComesIn, thisMode.Button1StandbyLoop, thisMode.Button1Push, thisMode.Button1Ready, thisMode.Button1Leave);
-            addStandBy(thisMode.Button2ComesIn, thisMode.Button2StandbyLoop, thisMode.Button2Push, thisMode.Button2Ready, thisMode.Button2Leave);
+            addStandBy(anim.get('Button1ComesIn'), anim.get('Button1StandbyLoop'), anim.get('Button1Push'), anim.get('Button1Ready'), anim.get('Button1Leave'));
+            addStandBy(anim.get('Button2ComesIn'), anim.get('Button2StandbyLoop'), anim.get('Button2Push'), anim.get('Button2Ready'), anim.get('Button2Leave'));
             if (thisMode.nbchoices == 2) buttonsAnswer.push(0); // Rien pour le bouton 3
-            else addStandBy(thisMode.Button3ComesIn, thisMode.Button3StandbyLoop, thisMode.Button3Push, thisMode.Button3Ready, thisMode.Button3Leave);
-            addStandBy(thisMode.Button4ComesIn, thisMode.Button4StandbyLoop, thisMode.Button4Push, thisMode.Button4Ready, thisMode.Button4Leave);
+            else addStandBy(anim.get('Button3ComesIn'), anim.get('Button3StandbyLoop'), anim.get('Button3Push'), anim.get('Button3Ready'), anim.get('Button3Leave'));
+            addStandBy(anim.get('Button4ComesIn'), anim.get('Button4StandbyLoop'), anim.get('Button4Push'), anim.get('Button4Ready'), anim.get('Button4Leave'));
 
             // Setup des boutons pour les explications
 
@@ -1017,8 +797,8 @@ ModeDisOrDat.prototype.start = function() {
                 buttonsAnswer[2].ComesIn.ended(function(){
                     this.delay(300,function(){
                         buttonsAnswer[3].ComesIn.play();
-                        thisMode.SFXShowKey.reset();
-                        thisMode.SFXShowKey.play();
+                        anim.reset('SFXShowKey');
+                        anim.play('SFXShowKey');
                     });
                 });
             }
@@ -1027,19 +807,19 @@ ModeDisOrDat.prototype.start = function() {
                 loopStandBy();
                 this.delay(300,function(){
                     buttonsAnswer[2].ComesIn.play();
-                    thisMode.SFXShowKey.reset();
-                    thisMode.SFXShowKey.play();
+                    anim.reset('SFXShowKey');
+                    anim.play('SFXShowKey');
                 });
             });
 
             var doskipexplanations = function() {
                 unbindKeyListener(skiplistener);
                 thisMode.game.api.registeraction('skipexplanations', function(data){});
-                thisMode.MessageSpaceBarComesIn.free();
-                thisMode.MessageSpaceBarLeave.play();
-                thisMode.RulesSkipExplain.play();
-                thisMode.ShowSubject.volume(0);
-                thisMode.ShowSubject.play();
+                anim.free('MessageSpaceBarComesIn');
+                anim.play('MessageSpaceBarLeave');
+                anim.play('RulesSkipExplain');
+                anim.volume('ShowSubject', 0);
+                anim.play('ShowSubject');
                 endOfRules();
             };
 
@@ -1057,22 +837,22 @@ ModeDisOrDat.prototype.start = function() {
                 if (!data.selfpost) doskipexplanations();
             });
 
-            thisMode.MessageSpaceBarComesIn.click(skipexplanations);
-            thisMode.MessageSpaceBarComesIn.play();
+            anim.click('MessageSpaceBarComesIn', skipexplanations);
+            anim.play('MessageSpaceBarComesIn');
         });
     });
 
-    this.QuestionTitle.ended(-400,function() {
-        thisMode.ShowCategory.free();
-        thisMode.HideCategory.play();
+    anim.ended('QuestionTitle', -400, function() {
+        anim.free('ShowCategory');
+        anim.play('HideCategory');
     });
 
-    this.AnnounceCategory.ended(100,function() {
-        thisMode.QuestionTitle.play();
+    anim.ended('AnnounceCategory', 100, function() {
+        anim.play('QuestionTitle');
     });
 
-    this.AnnounceCategory.ended(-400,function() {
-        thisMode.ShowCategory.play();
+    anim.ended('AnnounceCategory', -400, function() {
+        anim.play('ShowCategory');
     });
 
     this.game.font.resetTextStyle(1100);
@@ -1090,18 +870,18 @@ ModeDisOrDat.prototype.start = function() {
     this.game.font.strings[1492] = this.game.displayCurrency(this.game.players[this.chooseplayer-1].score);
     this.game.font.strings[1497] = this.game.font.strings[1492];
 
-    this.Intro.ended(function() {
+    anim.ended('Intro', function() {
         this.free();
-        thisMode.IntroStill.play();
-        thisMode.MusicLoopRules1.play();
-        thisMode.AnnounceCategory.delay(500,function(){
+        anim.play('IntroStill');
+        anim.play('MusicLoopRules1');
+        anim.delay('AnnounceCategory', 500, function(){
             this.play();
         });
     });
 
     this.ChoicePlayer.delay(500,function(){
         this.play();
-        thisMode.Intro.delay(2500,function(){
+        anim.delay('Intro', 2500, function(){
             thisMode.game.html.screen.html(''); // Je vide manuellement l'écran.
             this.play();
         });
@@ -1109,3 +889,4 @@ ModeDisOrDat.prototype.start = function() {
 
     nextcategoryready = this.game.api.gamemode(thisMode); // Préchargement de la prochaine catégorie
 };
+
