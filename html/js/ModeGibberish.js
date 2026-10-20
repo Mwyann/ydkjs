@@ -33,7 +33,7 @@ ModeGibberish.prototype.start = function() {
     var nextcategoryready;
 
     var currentpos = 0;
-    var decreasing = Math.round(thisMode.options.value/40);
+    var decreasing = Math.round(thisMode.options.value/20);
     var ShowHint = 0; // Indice programmé pour apparaitre
     if (thisMode.game.players.length >= 2) {
         anim.ended('LastPlayer1', 100, function() {if (ShowHint) ShowHint()});
@@ -48,7 +48,7 @@ ModeGibberish.prototype.start = function() {
 
     var runTimer = function() {
         currentpos++;
-        if (currentpos % 2 == 0) thisMode.game.font.strings[1305] = thisMode.game.displayCurrency(thisMode.options.value-currentpos*decreasing);
+        thisMode.game.font.strings[1305] = thisMode.game.displayCurrency(thisMode.options.value-Math.floor(currentpos/2)*decreasing);
         anim.reset('ShowPrice');
         anim.play('ShowPrice');
         if (!ShowHint) {
@@ -177,7 +177,7 @@ ModeGibberish.prototype.start = function() {
                 anim.play('SFXPlayerLose');
                 thisMode.availPlayers[thisMode.buzzPlayer] = 0;
 
-                thisMode.game.players[thisMode.buzzPlayer-1].score = parseInt(thisMode.game.players[thisMode.buzzPlayer-1].score) - (parseInt(thisMode.options.value)-currentpos*decreasing);
+                thisMode.game.players[thisMode.buzzPlayer-1].score = parseInt(thisMode.game.players[thisMode.buzzPlayer-1].score) - (parseInt(thisMode.options.value)-Math.floor(currentpos/2)*decreasing);
                 thisMode.game.font.strings[10*thisMode.buzzPlayer+105] = thisMode.game.displayCurrency(thisMode.game.players[thisMode.buzzPlayer-1].score);
 
                 anim.free('Player'+thisMode.buzzPlayer+'AnswerLoop');
@@ -213,7 +213,7 @@ ModeGibberish.prototype.start = function() {
         var resultat = checkTextWrds(text,getSTRfromID(thisMode.STR,'Wrds',128));
         if (resultat == 2) { // Bonne réponse !
             var correctAnswer = function() {
-                thisMode.game.players[thisMode.buzzPlayer-1].score = parseInt(thisMode.game.players[thisMode.buzzPlayer-1].score) + (parseInt(thisMode.options.value)-currentpos*decreasing);
+                thisMode.game.players[thisMode.buzzPlayer-1].score = parseInt(thisMode.game.players[thisMode.buzzPlayer-1].score) + (parseInt(thisMode.options.value)-Math.floor(currentpos/2)*decreasing);
                 thisMode.game.font.strings[10*thisMode.buzzPlayer+105] = thisMode.game.displayCurrency(thisMode.game.players[thisMode.buzzPlayer-1].score);
 
                 anim.reset('TextFrameShow');
