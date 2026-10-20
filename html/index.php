@@ -4,9 +4,9 @@
     <title>Jouez à You Don't Know Jack®</title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="css/ydkj.css?v=17" rel="stylesheet"/>
+    <link href="css/ydkj.css?v=18" rel="stylesheet"/>
 </head>
-<body style="background-color:#000;color:#FFF;font-family:JackCondensed, sans-serif;margin:0;padding:10px 0;border:0">
+<body>
 
 <div class="ydkj-header-logo">
     <div>YOU DON’T KNOW</div>
@@ -164,8 +164,8 @@
 </script>
 
 <div id="warning" class="ydkj-box-red">
-    <img src="jackhead.png" alt="Jack" style="position:absolute;bottom:0px;right:20px"/>
-    <p style="text-align:center;font-size:24px;font-weight:bold;margin-top:0">INFORMATIONS IMPORTANTES SUR LE JEU</p>
+    <img src="jackhead.png" alt="Jack"/>
+    <p class="ydkj-box-red-title">INFORMATIONS IMPORTANTES SUR LE JEU</p>
     <p>
         <u>Ce jeu est sous copyright <a href="http://jackboxgames.com/">Jackbox Games</a></u>. Il est sorti à l'origine en 1995 sur PC et Mac et en 1998 pour la version française (pour en savoir plus, voir la fiche du jeu sur <a href="http://fr.wikipedia.org/wiki/You_Don%27t_Know_Jack_%28s%C3%A9rie_de_jeux_vid%C3%A9o%29">Wikipedia</a>), et j'ai décidé d'en faire une version jouable dans un navigateur en extrayant les éléments graphiques et sonores des fichiers du jeu et en réécrivant (comprenez en simulant) le moteur en Javascript.<br/>
         <br/>
@@ -183,7 +183,7 @@
         Play the DE version: <a href="http://de.ydkj.eu/">de.ydkj.eu</a><br/>
     </p>
 </div>
-<div style="text-align:center;font-size:15px;color:#666;font-family:JackCondensed;padding:15px;line-height:1.4">YOU DON’T KNOW JACK® Jackbox Games, Berkeley Systems, Jellyvision, Melog Productions Inc, BMG Interactive, Take-Two Interactive</div>
+<div class="ydkj-footer">YOU DON’T KNOW JACK® Jackbox Games, Berkeley Systems, Jellyvision, Melog Productions Inc, BMG Interactive, Take-Two Interactive</div>
 
 <?php require 'analytics.php'; ?>
 </body>

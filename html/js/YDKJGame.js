@@ -1,6 +1,6 @@
 /********** YDKJGame **********/
 
-function YDKJGame(html, demomode) {
+function YDKJGame(html, demomode, loaderConfig) {
     var thisGame = this;
     if (!demomode) demomode = false;
     this.html = html;
@@ -10,6 +10,66 @@ function YDKJGame(html, demomode) {
     jQuery.fx.interval = 66;
     this.gameinfoready = this.api.gameinfo();
     this.currentmode = 0;
+
+    // Configuration du loader (valeurs par défaut si non spécifié par la page)
+    this.loaderGif = 'ajax-loader.gif';
+    this.loaderMinDuration = 1000;
+    this.endGif = null;
+    this.endGifDuration = 0;
+    this.loaderStartTime = Date.now();
+    this.endGifUrl = null;
+    var preloadEndImg = null;
+
+    this.setLoader = function(loaderGif, minDuration, endGif, endDuration) {
+        if (loaderGif !== undefined && loaderGif !== null) thisGame.loaderGif = loaderGif;
+        if (minDuration !== undefined && minDuration !== null) thisGame.loaderMinDuration = parseInt(minDuration, 10) || 0;
+        if (endGif !== undefined) thisGame.endGif = endGif;
+        if (endDuration !== undefined && endDuration !== null) thisGame.endGifDuration = parseInt(endDuration, 10) || 0;
+
+        if (thisGame.$loaderImg && thisGame.loaderGif) {
+            thisGame.$loaderImg.attr('src', thisGame.loaderGif);
+        }
+        if (thisGame.endGif) {
+            thisGame.endGifUrl = thisGame.endGif + '?t=' + thisGame.loaderStartTime;
+            preloadEndImg = new Image();
+            preloadEndImg.src = thisGame.endGifUrl;
+        } else {
+            thisGame.endGifUrl = null;
+            preloadEndImg = null;
+        }
+        return thisGame;
+    };
+
+    if (loaderConfig) {
+        this.setLoader(loaderConfig.loaderGif, loaderConfig.minDuration, loaderConfig.endGif, loaderConfig.endDuration);
+    }
+
+    // Conteneur de chargement parfaitement centré (évite tout sursaut d'affichage)
+    var $loader = jQuery('<div id="ydkj_loader" />').css({
+        'position': 'absolute',
+        'top': '0',
+        'left': '0',
+        'width': '640px',
+        'height': '480px',
+        'display': 'flex',
+        'justify-content': 'center',
+        'align-items': 'center',
+        'background': '#000',
+        'z-index': '10'
+    });
+    var $loaderImg = jQuery('<img id="ydkj_loader_img" alt="Chargement" />').attr('src', thisGame.loaderGif).css({
+        'display': 'block'
+    });
+    $loader.append($loaderImg);
+    thisGame.$loader = $loader;
+    thisGame.$loaderImg = $loaderImg;
+    thisGame.html.screen.empty().append($loader);
+
+    if (thisGame.endGif) {
+        thisGame.endGifUrl = thisGame.endGif + '?t=' + thisGame.loaderStartTime;
+        preloadEndImg = new Image();
+        preloadEndImg.src = thisGame.endGifUrl;
+    }
 
     // Gestion de l'affichage adaptatif (auto-fit 4:3) et du fullscreen
     var onfullscreenoff = function() {};
@@ -39,7 +99,9 @@ function YDKJGame(html, demomode) {
             'top': centerup + 'px',
             'left': centerleft + 'px',
             'transform-origin': '0 0',
-            'transform': 'scale(' + zoom.toFixed(4) + ',' + zoom.toFixed(4) + ')'
+            'transform': 'scale(' + zoom.toFixed(4) + ',' + zoom.toFixed(4) + ')',
+            'display': 'block',
+            'visibility': 'visible'
         });
     };
     this.autozoom = autozoom;
@@ -117,6 +179,40 @@ YDKJGame.prototype.start = function() {
             thisGame.api.localMode = gameinfo.localMode;
             window.YDKJCurrentGame = thisGame; // Utile pour le debug
             (thisGame.api.gamemode())(function (gamemode) {
+                var onGameReady = function() {
+                    var elapsed = Date.now() - (thisGame.loaderStartTime || Date.now());
+                    var remainingMin = Math.max(0, thisGame.loaderMinDuration - elapsed);
+
+                    var finishLoader = function() {
+                        if (thisGame.endGif && thisGame.endGifDuration > 0) {
+                            if (thisGame.$loaderImg) {
+                                // Redémarrer l'animation du GIF de fin depuis le début (frame 0)
+                                thisGame.$loaderImg.attr('src', '');
+                                thisGame.$loaderImg.attr('src', thisGame.endGifUrl || (thisGame.endGif + '?t=' + Date.now()));
+                            }
+                            setTimeout(function() {
+                                if (thisGame.$loader) {
+                                    thisGame.$loader.remove();
+                                    thisGame.$loader = null;
+                                }
+                                checkAudioAndStart();
+                            }, thisGame.endGifDuration);
+                        } else {
+                            if (thisGame.$loader) {
+                                thisGame.$loader.remove();
+                                thisGame.$loader = null;
+                            }
+                            checkAudioAndStart();
+                        }
+                    };
+
+                    if (remainingMin > 0) {
+                        setTimeout(finishLoader, remainingMin);
+                    } else {
+                        finishLoader();
+                    }
+                };
+
                 var checkAudioAndStart = function() {
                     // Forcer l'initialisation de l'AudioContext interne de Howler
                     if (window.Howler && !window.Howler.ctx) {
@@ -151,7 +247,7 @@ YDKJGame.prototype.start = function() {
                                 '<div style="font-size:16px;color:#bbb;font-family:sans-serif">' +
                                     '(Requis par votre navigateur pour autoriser la lecture sonore)' +
                                 '</div>' +
-                            '</div>'
+                                '</div>'
                         ).css({
                             'text-align': 'center',
                             'width': '100%',
@@ -181,7 +277,8 @@ YDKJGame.prototype.start = function() {
                                     try { window.Howler.ctx.resume(); } catch(e) {}
                                 }
                                 try {
-                                    var buffer = window.Howler.ctx.createBuffer(1, 1, 22050);
+                                    var sampleRate = (window.Howler.ctx.sampleRate) ? window.Howler.ctx.sampleRate : 22050;
+                                    var buffer = window.Howler.ctx.createBuffer(1, 1, sampleRate);
                                     var source = window.Howler.ctx.createBufferSource();
                                     source.buffer = buffer;
                                     source.connect(window.Howler.ctx.destination);
@@ -202,7 +299,7 @@ YDKJGame.prototype.start = function() {
                     }
                 };
 
-                checkAudioAndStart();
+                onGameReady();
             });
         });
     });
@@ -210,6 +307,13 @@ YDKJGame.prototype.start = function() {
 
 YDKJGame.prototype.fullscreen = function(f) {
     this.fullscreen(f);
+};
+
+YDKJGame.prototype.setLoader = function(loaderGif, minDuration, endGif, endDuration) {
+    if (this.setLoader) {
+        return this.setLoader(loaderGif, minDuration, endGif, endDuration);
+    }
+    return this;
 };
 
 

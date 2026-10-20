@@ -16,9 +16,9 @@ if (isset($_GET['nbplayers'])) {
 <head>
 <meta charset="UTF-8" />
 <title>You Don't Know Jack® ALPHA FR</title>
-<link href="css/ydkj.css?v=17" rel="stylesheet"/>
+<link href="css/ydkj.css?v=18" rel="stylesheet"/>
 <script src="js/jquery-3.5.1.min.js" type="text/javascript"></script>
-<script src="js/YDKJ.js?ver=13" type="text/javascript"></script>
+<script src="js/YDKJ.js?ver=14" type="text/javascript"></script>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
@@ -45,6 +45,7 @@ if (isset($_GET['nbplayers'])) {
       sessionStorage.setItem('ydkj_local_seed', 'LOC' + Math.floor(Math.random() * 900000 + 100000));
     }
     var game = new YDKJ(jQuery('#screen'));
+    game.setLoader('directsilence.gif', 2000, 'directsilencefin.gif', 1000);
     jQuery('#fullscreen').click(function() {
       jQuery('#headerbuttons').hide();
       game.fullscreen(function() {
@@ -62,14 +63,12 @@ if (isset($_GET['nbplayers'])) {
 </script>
 </head>
 
-<body style="background-color:#000;margin:0;padding:0;border:0;overflow:hidden">
+<body class="ydkj-game-page">
   <div id="headerbuttons" class="ydkj-game-bar">
     <a href="./" class="ydkj-bar-btn" id="btn-back"><span class="ydkj-btn-arrow">&larr;</span> RETOUR &Agrave; L'ACCUEIL</a>
     <a href="#" class="ydkj-bar-btn" id="fullscreen"><span class="ydkj-btn-icon">&#x26F6;</span> PLEIN &Eacute;CRAN</a>
   </div>
-  <div id="screen" style="margin-left:auto;margin-right:auto">
-    <img src="directsilence.gif" style="position:absolute;left:293px;top:212px" class="markedAsRemoved"/>
-  </div>
+  <div id="screen"></div>
   <?php require 'analytics.php'; ?>
 </body>
 </html>

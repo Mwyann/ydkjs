@@ -68,425 +68,562 @@ body.allowSelect span, body.allowSelect div {
     user-select: auto;
 }
 
-/* ========================================================
-   YDKJ - Styles Rétro 90s & Utilitaires Responsive
-   ======================================================== */
+/* Base */
+body {
+  background-color: #000;
+  color: #FFF;
+  font-family: 'JackCondensed', sans-serif;
+  margin: 0;
+  padding: 10px 0;
+  border: 0;
+}
 
-/* Liens rétro */
+body.ydkj-game-page {
+  padding: 0;
+  overflow: hidden;
+}
+
+#screen {
+  margin: 0 auto;
+  display: none;
+}
+
 a {
-    color: #5BF;
-    text-decoration: underline;
-}
-a:hover {
-    color: #FF0;
+  color: #5BF;
+  text-decoration: underline;
 }
 
-/* ========================================================
-   En-tête Logo rétro YDKJ (adaptatif mobile & responsive)
-   ======================================================== */
+a:hover {
+  color: #FF0;
+}
+
+/* Header Logo */
 .ydkj-header-logo {
-    text-align: center;
-    font-size: clamp(34px, 9.5vw, 80px);
-    margin-top: clamp(30px, 9vw, 100px);
-    line-height: 0;
-    user-select: none;
-    -webkit-user-select: none;
+  text-align: center;
+  font-size: clamp(34px, 9.5vw, 80px);
+  margin-top: clamp(30px, 9vw, 100px);
+  line-height: 0;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .ydkj-header-logo .ydkj-logo-jack {
-    font-size: 350%;
-    line-height: 95%;
+  font-size: 350%;
+  line-height: 95%;
 }
 
 .ydkj-header-logo .ydkj-logo-reg {
-    font-size: 10%;
-    vertical-align: top;
-    line-height: 400%;
+  font-size: 10%;
+  vertical-align: top;
+  line-height: 400%;
 }
 
-/* Barre de navigation du jeu (haut d'écran) */
+/* Navigation bar */
 .ydkj-game-bar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 16px;
-    padding: 6px 10px;
-    background-color: #000;
-    font-family: 'JackCondensed', sans-serif;
-    user-select: none;
-    -webkit-user-select: none;
-    z-index: 1000;
-    position: relative;
-    box-sizing: border-box;
-    width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding: 6px 10px;
+  background-color: #000;
+  font-family: 'JackCondensed', sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  z-index: 1000;
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .ydkj-bar-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 5px 14px;
-    min-height: 34px;
-    background: #111;
-    color: #DDD;
-    border: 1px solid #666;
-    text-decoration: none;
-    font-size: 17px;
-    font-family: 'JackCondensed', sans-serif;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    box-sizing: border-box;
-    transition: background-color 0.1s, border-color 0.1s, color 0.1s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 5px 14px;
+  min-height: 34px;
+  background: #111;
+  color: #DDD;
+  border: 1px solid #666;
+  text-decoration: none;
+  font-size: 17px;
+  font-family: 'JackCondensed', sans-serif;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: background-color 0.1s, border-color 0.1s, color 0.1s;
 }
 
 .ydkj-bar-btn:hover, .ydkj-bar-btn:focus {
-    background: #222;
-    border-color: #FF0;
-    color: #FF0;
-    text-decoration: none;
+  background: #222;
+  border-color: #FF0;
+  color: #FF0;
+  text-decoration: none;
 }
 
 .ydkj-bar-btn:active {
-    background: #FF0;
-    color: #000;
-    border-color: #FF0;
+  background: #FF0;
+  color: #000;
+  border-color: #FF0;
 }
 
-/* Boutons et champs de saisie rétro unifiés */
+/* Form controls & Buttons */
 .ydkj-btn,
 .ydkj-input {
-    font-family: 'JackCondensed', sans-serif;
-    font-size: 18px;
-    height: 38px;
-    line-height: 34px;
-    box-sizing: border-box;
-    vertical-align: middle;
-    -webkit-appearance: none;
-    appearance: none;
-    border-radius: 0;
+  font-family: 'JackCondensed', sans-serif;
+  font-size: 18px;
+  height: 38px;
+  line-height: 34px;
+  box-sizing: border-box;
+  vertical-align: middle;
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 0;
 }
 
 .ydkj-btn {
-    background-color: #000;
-    color: #FFF;
-    border: 2px solid #778;
-    padding: 0 16px;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    text-decoration: none;
-    white-space: nowrap;
-    transition: border-color 0.1s, background-color 0.1s, color 0.1s;
+  background-color: #000;
+  color: #FFF;
+  border: 2px solid #778;
+  padding: 0 16px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color 0.1s, background-color 0.1s, color 0.1s;
 }
 
 .ydkj-btn:hover, .ydkj-btn:focus {
-    border-color: #FF0;
-    color: #FF0;
-    background-color: #111;
-    text-decoration: none;
+  border-color: #FF0;
+  color: #FF0;
+  background-color: #111;
+  text-decoration: none;
 }
 
 .ydkj-btn:active {
-    background-color: #FF0;
-    color: #000;
-    border-color: #FF0;
+  background-color: #FF0;
+  color: #000;
+  border-color: #FF0;
 }
 
 .ydkj-btn:disabled, .ydkj-btn[disabled] {
-    opacity: 0.5;
-    cursor: not-allowed;
-    border-color: #444;
-    color: #888;
-    background-color: #111;
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #444;
+  color: #888;
+  background-color: #111;
 }
 
 .ydkj-input {
-    background-color: #000;
-    color: #FFF;
-    border: 2px solid #778;
-    padding: 0 10px;
-    outline: none;
+  background-color: #000;
+  color: #FFF;
+  border: 2px solid #778;
+  padding: 0 10px;
+  outline: none;
 }
 
 .ydkj-input:focus {
-    border-color: #FF0;
+  border-color: #FF0;
 }
 
-/* Panneaux rétro gris foncé (lobby joinsession & findsession) */
-.ydkj-panel, .ydkj-box-blue {
-    background: #080812;
-    border: 2px solid #334;
-    color: #FFF;
-    padding: 20px 24px;
-    margin: 20px auto;
-    font-family: 'JackCondensed', sans-serif;
-    font-size: 19px;
-    max-width: 680px;
-    width: 92%;
-    box-sizing: border-box;
-    transition: border-color 0.15s;
+/* Panels */
+.ydkj-panel {
+  background: #080812;
+  border: 2px solid #334;
+  color: #FFF;
+  padding: 20px 24px;
+  margin: 20px auto;
+  font-family: 'JackCondensed', sans-serif;
+  font-size: 19px;
+  max-width: 680px;
+  width: 92%;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
 }
 
 .ydkj-panel:hover {
-    border-color: #557;
+  border-color: #557;
 }
 
-/* Bloc d'avertissement rouge */
+.ydkj-panel-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  margin: 5px 0 20px 0;
+  color: #FF0;
+}
+
+.ydkj-session-code {
+  color: #F00;
+}
+
+.ydkj-panel-desc {
+  font-size: 19px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.ydkj-center-actions {
+  margin: 20px auto 15px auto;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Lobby controls */
+.ydkj-nick-group {
+  margin: 16px 0;
+  line-height: 1.4;
+}
+
+.ydkj-nick-group label {
+  font-size: 20px;
+}
+
+.ydkj-nick-inputs {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.ydkj-nick-inputs .ydkj-input {
+  flex: 1;
+  min-width: 180px;
+}
+
+.ydkj-nick-hint {
+  font-size: 80%;
+  color: #CCC;
+  margin-top: 4px;
+}
+
+.ydkj-players-group {
+  margin: 20px 0;
+}
+
+.ydkj-players-title {
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+
+.ydkj-players-list {
+  font-family: 'JackInput', monospace;
+  font-size: 16px;
+  background: #000;
+  border: 1px solid #334;
+  padding: 10px;
+  min-height: 50px;
+}
+
+.ydkj-players-hint {
+  font-size: 80%;
+  color: #CCC;
+  margin-top: 5px;
+}
+
+.ydkj-checkbox-options {
+  margin: 16px 0;
+  font-size: 18px;
+  line-height: 1.8;
+}
+
+.ydkj-checkbox-options label {
+  cursor: pointer;
+}
+
+.ydkj-checkbox-options input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+}
+
+.ydkj-lobby-notice {
+  margin: 15px auto 5px auto;
+  text-align: center;
+  color: #FF0;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.ydkj-lobby-notice a {
+  color: #FFF;
+}
+
+/* Warning block */
 .ydkj-box-red {
-    position: relative;
-    border: 2px solid #B00;
-    background-color: #300;
-    color: #FFF;
-    padding: 20px 24px;
-    margin: 35px auto;
-    font-family: 'JackCondensed', sans-serif;
-    font-size: 18px;
-    line-height: 1.45;
-    max-width: 960px;
-    width: 94%;
-    box-sizing: border-box;
+  position: relative;
+  border: 2px solid #B00;
+  background-color: #300;
+  color: #FFF;
+  padding: 20px 24px;
+  margin: 35px auto;
+  font-family: 'JackCondensed', sans-serif;
+  font-size: 18px;
+  line-height: 1.45;
+  max-width: 960px;
+  width: 94%;
+  box-sizing: border-box;
+}
+
+.ydkj-box-red img {
+  position: absolute;
+  bottom: 0;
+  right: 20px;
+}
+
+.ydkj-box-red-title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 0;
 }
 
 .ydkj-box-red a {
-    color: #FF0 !important;
-    text-decoration: underline;
+  color: #FF0 !important;
+  text-decoration: underline;
 }
 
 .ydkj-box-red a:hover {
-    color: #FFF !important;
+  color: #FFF !important;
 }
 
-/* ========================================================
-   Modes de jeu, cartes & grilles (Page d'accueil)
-   ======================================================== */
+/* Footer */
+.ydkj-footer {
+  text-align: center;
+  font-size: 15px;
+  color: #666;
+  font-family: 'JackCondensed', sans-serif;
+  padding: 15px;
+  line-height: 1.4;
+}
+
+/* Game modes container & cards */
 .ydkj-modes-container {
-    max-width: 960px;
-    width: 94%;
-    margin: 25px auto;
-    font-family: 'JackCondensed', sans-serif;
-    box-sizing: border-box;
+  max-width: 960px;
+  width: 94%;
+  margin: 25px auto;
+  font-family: 'JackCondensed', sans-serif;
+  box-sizing: border-box;
 }
 
 .ydkj-modes-title, .ydkj-section-title {
-    text-align: center;
-    color: #FF0;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
+  text-align: center;
+  color: #FF0;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
 .ydkj-modes-title {
-    font-size: clamp(16px, 4.5vw, 28px);
-    margin: 20px 0 25px 0;
+  font-size: clamp(16px, 4.5vw, 28px);
+  margin: 20px 0 25px 0;
 }
 
 .ydkj-section-title {
-    font-size: clamp(16px, 4.2vw, 24px);
-    margin: 35px 0 18px 0;
+  font-size: clamp(16px, 4.2vw, 24px);
+  margin: 35px 0 18px 0;
 }
 
-/* Style de base partagé des cartes */
 .ydkj-mode-card, .ydkj-sub-card {
-    background: #080812;
-    border: 2px solid #334;
-    padding: 16px 20px;
-    box-sizing: border-box;
-    transition: border-color 0.15s, background-color 0.15s;
+  background: #080812;
+  border: 2px solid #334;
+  padding: 16px 20px;
+  box-sizing: border-box;
+  transition: border-color 0.15s, background-color 0.15s;
 }
 
 .ydkj-mode-card:hover, .ydkj-sub-card:hover {
-    border-color: #669;
-    background: #0e0e1c;
+  border-color: #669;
+  background: #0e0e1c;
 }
 
-/* Carte de mode de jeu principale */
 .ydkj-mode-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-    margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 14px;
 }
 
-/* En-tête GIF + Textes pour alignement mobile */
 .ydkj-mode-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex: 1;
-    min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
 }
 
 .ydkj-mode-img-wrap {
-    flex-shrink: 0;
-    width: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  flex-shrink: 0;
+  width: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .ydkj-mode-img-wrap img {
-    max-width: 70px;
-    max-height: 70px;
-    width: auto;
-    height: auto;
-    display: block;
-    margin: 0 auto;
-    image-rendering: -webkit-optimize-contrast;
+  max-width: 70px;
+  max-height: 70px;
+  width: auto;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  image-rendering: -webkit-optimize-contrast;
 }
 
 .ydkj-mode-info {
-    flex: 1;
-    min-width: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .ydkj-mode-name {
-    font-size: 22px;
-    font-weight: bold;
-    color: #FF0;
-    margin-bottom: 4px;
-    letter-spacing: 0.5px;
+  font-size: 22px;
+  font-weight: bold;
+  color: #FF0;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
 }
 
 .ydkj-mode-desc {
-    font-size: 17px;
-    color: #BBB;
-    line-height: 1.35;
+  font-size: 17px;
+  color: #BBB;
+  line-height: 1.35;
 }
 
 .ydkj-mode-actions {
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
-/* Actions empilées verticalement pour l'option 3 */
 .ydkj-actions-stacked {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-    width: 250px;
-    max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  width: 250px;
+  max-width: 100%;
 }
 
 .ydkj-actions-stacked .ydkj-btn {
-    width: 100%;
+  width: 100%;
 }
 
 .ydkj-form-join {
-    display: flex;
-    gap: 6px;
-    width: 100%;
-    margin: 0;
+  display: flex;
+  gap: 6px;
+  width: 100%;
+  margin: 0;
 }
 
 .ydkj-form-join .ydkj-input {
-    width: 75px;
-    text-align: center;
-    text-transform: uppercase;
+  width: 75px;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 .ydkj-form-join .ydkj-btn {
-    flex: 1;
+  flex: 1;
 }
 
-/* Grille 2 colonnes pour bonus et informations */
 .ydkj-cards-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-bottom: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
 }
 
 .ydkj-sub-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .ydkj-sub-card-title {
-    font-size: 20px;
-    font-weight: bold;
-    color: #FF0;
-    margin-bottom: 6px;
-    letter-spacing: 0.5px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #FF0;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
 }
 
 .ydkj-sub-card-desc {
-    font-size: 16px;
-    color: #BBB;
-    line-height: 1.35;
-    margin-bottom: 14px;
-    flex: 1;
+  font-size: 16px;
+  color: #BBB;
+  line-height: 1.35;
+  margin-bottom: 14px;
+  flex: 1;
 }
 
 .ydkj-sub-card-action {
-    display: flex;
-    justify-content: flex-end;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-/* ========================================================
-   Adaptation responsive
-   ======================================================== */
+/* Responsive */
 @media (max-width: 768px) {
-    .ydkj-cards-grid {
-        grid-template-columns: 1fr;
-    }
-    .ydkj-mode-card {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 14px;
-        padding: 14px 16px;
-    }
-    .ydkj-mode-header {
-        width: 100%;
-        gap: 14px;
-    }
-    .ydkj-mode-img-wrap {
-        width: 60px;
-    }
-    .ydkj-mode-actions {
-        width: 100%;
-        justify-content: flex-end;
-    }
-    .ydkj-actions-stacked {
-        align-self: flex-end;
-        width: 250px;
-        max-width: 100%;
-    }
-    .ydkj-sub-card-action {
-        justify-content: flex-end;
-    }
+  .ydkj-cards-grid {
+    grid-template-columns: 1fr;
+  }
+  .ydkj-mode-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    padding: 14px 16px;
+  }
+  .ydkj-mode-header {
+    width: 100%;
+    gap: 14px;
+  }
+  .ydkj-mode-img-wrap {
+    width: 60px;
+  }
+  .ydkj-mode-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  .ydkj-actions-stacked {
+    align-self: flex-end;
+    width: 250px;
+    max-width: 100%;
+  }
+  .ydkj-sub-card-action {
+    justify-content: flex-end;
+  }
 }
 
 @media (max-width: 500px) {
-    .ydkj-game-bar {
-        gap: 8px;
-        padding: 5px 6px;
-    }
-    .ydkj-bar-btn {
-        padding: 5px 10px;
-        font-size: 15px;
-        min-height: 32px;
-    }
-    .ydkj-panel, .ydkj-box-red {
-        padding: 14px 16px;
-        font-size: 17px;
-    }
-    .ydkj-btn, .ydkj-input {
-        font-size: 16px;
-        height: 36px;
-        line-height: 32px;
-    }
-    .ydkj-btn {
-        padding: 0 12px;
-    }
+  .ydkj-game-bar {
+    gap: 8px;
+    padding: 5px 6px;
+  }
+  .ydkj-bar-btn {
+    padding: 5px 10px;
+    font-size: 15px;
+    min-height: 32px;
+  }
+  .ydkj-panel, .ydkj-box-red {
+    padding: 14px 16px;
+    font-size: 17px;
+  }
+  .ydkj-btn, .ydkj-input {
+    font-size: 16px;
+    height: 36px;
+    line-height: 32px;
+  }
+  .ydkj-btn {
+    padding: 0 12px;
+  }
 }

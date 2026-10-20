@@ -64,17 +64,30 @@ YDKJ.prototype.ready = function(f) {
     if (!this.preloaded) this.readyFunctions.push(f); else f.call(this);
 };
 
+YDKJ.prototype.setLoader = function(loaderGif, minDuration, endGif, endDuration) {
+    this.loaderConfig = {
+        loaderGif: loaderGif,
+        minDuration: minDuration,
+        endGif: endGif,
+        endDuration: endDuration
+    };
+    if (this.game && typeof this.game.setLoader === 'function') {
+        this.game.setLoader(loaderGif, minDuration, endGif, endDuration);
+    }
+    return this;
+};
+
 YDKJ.prototype.start = function() {
     this.ready(function() {
         Howler.autoSuspend = false;
-        this.game = new YDKJGame({screen: this.screen, debug: this.debug});
+        this.game = new YDKJGame({screen: this.screen, debug: this.debug}, false, this.loaderConfig);
         this.game.start();
     });
 };
 
 YDKJ.prototype.demo = function() {
     this.ready(function() {
-        this.game = new YDKJGame({screen: this.screen, debug: this.debug}, true);
+        this.game = new YDKJGame({screen: this.screen, debug: this.debug}, true, this.loaderConfig);
         this.game.start();
     });
 };
