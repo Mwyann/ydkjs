@@ -101,7 +101,26 @@
             </div>
         </div>
 
-        <!-- Info 4 : Contact -->
+        <!-- Info 4 : Autres langues -->
+        <div class="ydkj-sub-card">
+            <div class="ydkj-sub-card-title">AUTRES LANGUES</div>
+            <div class="ydkj-sub-card-desc">Les versions anglaise (UK) et allemande sont également disponibles !</div>
+            <div class="ydkj-sub-card-action">
+                <a href="https://www.ydkj.co.uk/" target="_blank" class="ydkj-btn">YDKJ.CO.UK</a>
+                <a href="https://de.ydkj.eu/" target="_blank" class="ydkj-btn">DE.YDKJ.EU</a>
+            </div>
+        </div>
+
+        <!-- Info 5 : Application Android -->
+        <div class="ydkj-sub-card">
+            <div class="ydkj-sub-card-title">APPLICATION ANDROID</div>
+            <div class="ydkj-sub-card-desc">Jouez au jeu sur votre smartphone ou tablette Android.</div>
+            <div class="ydkj-sub-card-action">
+                <a href="https://play.google.com/store/apps/details?id=com.mwyann.ydkjs&hl=fr" target="_blank" class="ydkj-btn">GOOGLE PLAY</a>
+            </div>
+        </div>
+
+        <!-- Info 6 : Contact -->
         <div class="ydkj-sub-card">
             <div class="ydkj-sub-card-title">CONTACTER JACK</div>
             <div class="ydkj-sub-card-desc">Une remarque, un bug non répertorié ou un mot doux pour l'équipe ? Cliquez ci-dessous pour nous écrire.</div>
