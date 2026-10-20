@@ -515,7 +515,7 @@ $default_nick = '';
     </div>
 
     <div class="ydkj-lobby-notice">
-        Note : En cas de bug graphique ou d'interruption, envoyez-moi un <a href="mailto:alpha@ydkj.fr">e-mail</a> avec une description du problème. Merci !
+        Note : En cas de bug graphique ou d'interruption, envoyez-moi un e-mail avec une description du problème. Merci !
     </div>
 </div>
 
