@@ -97,7 +97,7 @@
             <div class="ydkj-sub-card-title">PROJET ORIGINAL</div>
             <div class="ydkj-sub-card-desc">Découvrez le projet web original d'adaptation du moteur Jellyvision en JavaScript par l'auteur original.</div>
             <div class="ydkj-sub-card-action">
-                <a href="http://www.ydkjs.eu/" target="_blank" class="ydkj-btn">YDKJS.EU</a>
+                <a href="https://www.ydkjs.eu/" target="_blank" class="ydkj-btn">YDKJS.EU</a>
             </div>
         </div>
 
@@ -167,11 +167,11 @@
     <img src="jackhead.png" alt="Jack"/>
     <p class="ydkj-box-red-title">INFORMATIONS IMPORTANTES SUR LE JEU</p>
     <p>
-        <u>Ce jeu est sous copyright <a href="http://jackboxgames.com/">Jackbox Games</a></u>. Il est sorti à l'origine en 1995 sur PC et Mac et en 1998 pour la version française (pour en savoir plus, voir la fiche du jeu sur <a href="http://fr.wikipedia.org/wiki/You_Don%27t_Know_Jack_%28s%C3%A9rie_de_jeux_vid%C3%A9o%29">Wikipedia</a>), et j'ai décidé d'en faire une version jouable dans un navigateur en extrayant les éléments graphiques et sonores des fichiers du jeu et en réécrivant (comprenez en simulant) le moteur en Javascript.<br/>
+        <u>Ce jeu est sous copyright <a href="https://jackboxgames.com/">Jackbox Games</a></u>. Il est sorti à l'origine en 1995 sur PC et Mac et en 1998 pour la version française (pour en savoir plus, voir la fiche du jeu sur <a href="https://fr.wikipedia.org/wiki/You_Don%27t_Know_Jack">Wikipedia</a>), et j'ai décidé d'en faire une version jouable dans un navigateur en extrayant les éléments graphiques et sonores des fichiers du jeu et en réécrivant (comprenez en simulant) le moteur en Javascript.<br/>
         <br/>
         <u>Je n'ai aucun lien avec Jackbox Games, et cette version du jeu n'est pas un développement officiel.</u> Il s'agit uniquement d'un travail de passionné. La seule version française existante ayant aujourd'hui plus de 15 ans, je souhaite juste en faire profiter les plus jeunes et rendre nostalgique les anciens joueurs.<br/>
         <br/>
-        <u>La voix de Jack est celle du <a href="http://www.wppk.fr/">doubleur professionnel Luc Mitéran, dit <u>Walther Pépéka</u></a>.</u> Vous pouvez le contacter par e-mail : <a href="mailto:walther.pepeka@gmail.com">walther.pepeka@gmail.com</a>. Vous pouvez aussi écouter <a href="itv/">l'interview exclusive de Walther Pépéka</a>, afin d'en apprendre plus sur le jeu et sur son travail de comédien !<br/>
+        <u>La voix de Jack est celle du <a href="https://www.wppk.fr/">doubleur professionnel Luc Mitéran, dit <u>Walther Pépéka</u></a>.</u> Vous pouvez le contacter par e-mail : <a href="mailto:walther.pepeka@gmail.com">walther.pepeka@gmail.com</a>. Vous pouvez aussi écouter <a href="itv/">l'interview exclusive de Walther Pépéka</a>, afin d'en apprendre plus sur le jeu et sur son travail de comédien !<br/>
         <br/>
         <u>Cette version est loin d'être finie</u>, beaucoup de choses ne sont pas fonctionnelles. J'ajouterai les éléments au fur et à mesure. Pour le moment, seules les questions simples de type QCM, les Couci-Couça, la Rimatologie et les JackAttack sont jouables. Vous pouvez tester la démo du jeu (4 questions) en cliquant sur <a href="demo.php">ce lien</a>. Il est également possible de jouer à plusieurs en ligne !<br/>
         <br/>
@@ -179,8 +179,8 @@
         <br/>
         <u>Le but de ce projet est de transformer le jeu complet et d'y ajouter des fonctionnalités multi-joueurs en ligne</u>. Il reste encore beaucoup de travail pour finir le portage du jeu, mais cela avance ! Depuis 2026, je me sers notamment de l'IA pour m'assister dans certaines tâches complexes comme le multi-joueur ou l'interface par exemple.<br/>
         <br/>
-        Play the UK version: <a href="http://www.ydkj.co.uk/">www.ydkj.co.uk</a><br/>
-        Play the DE version: <a href="http://de.ydkj.eu/">de.ydkj.eu</a><br/>
+        Play the UK version: <a href="https://www.ydkj.co.uk/">www.ydkj.co.uk</a><br/>
+        Play the DE version: <a href="https://de.ydkj.eu/">de.ydkj.eu</a><br/>
     </p>
 </div>
 <div class="ydkj-footer">YOU DON’T KNOW JACK® Jackbox Games, Berkeley Systems, Jellyvision, Melog Productions Inc, BMG Interactive, Take-Two Interactive</div>
