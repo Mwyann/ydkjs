@@ -11,61 +11,49 @@ function YDKJGame(html, demomode) {
     this.gameinfoready = this.api.gameinfo();
     this.currentmode = 0;
 
-    // Gestion du fullscreen
-    var onresize = function() {};
+    // Gestion de l'affichage adaptatif (auto-fit 4:3) et du fullscreen
     var onfullscreenoff = function() {};
-    var oldcssbody = undefined;
-    var oldcssscreen = undefined;
     var body = jQuery('body');
     var thewindow = jQuery(window);
 
-    thewindow.resize(function() {
-        // This will execute whenever the window is resized
-        onresize();
-    });
+    var autozoom = function() {
+        var header = jQuery('#headerbuttons');
+        var headerHeight = 0;
+        if (header.length && header.is(':visible')) {
+            headerHeight = header.outerHeight(true) || 0;
+        }
+        var winW = thewindow.width();
+        var winH = thewindow.height();
+        var availH = Math.max(0, winH - headerHeight);
+        var zoom = Math.min(winW / 640, availH / 480);
+        if (zoom <= 0) zoom = 1;
+        var centerleft = Math.max(0, Math.round((winW - (zoom * 640)) / 2));
+        var centerup = headerHeight + Math.max(0, Math.round((availH - (zoom * 480)) / 2));
 
-    this.fullscreenoff = function() {
-        body.fullScreen(false);
-        onresize = function() {};
-        body.attr('style',oldcssbody);
-        thisGame.html.screen.attr('style',oldcssscreen);
-        onfullscreenoff();
-        onfullscreenoff = function() {};
-        oldcssbody = undefined;
-        oldcssscreen = undefined;
+        body.css({
+            'background-color': '#000',
+            'overflow': 'hidden'
+        });
+        thisGame.html.screen.css({
+            'position': 'absolute',
+            'top': centerup + 'px',
+            'left': centerleft + 'px',
+            'transform-origin': '0 0',
+            'transform': 'scale(' + zoom.toFixed(4) + ',' + zoom.toFixed(4) + ')'
+        });
     };
+    this.autozoom = autozoom;
 
-    thewindow.keyup(function(event) {
-        if ((event.keyCode == 27) && (oldcssbody !== undefined) && (oldcssscreen !== undefined)) thisGame.fullscreenoff();
+    thewindow.resize(function() {
+        autozoom();
     });
 
     this.fullscreen = function(f) {
-        if ((oldcssbody !== undefined) && (oldcssscreen !== undefined)) return false;
-        body.fullScreen(true);
-        var autozoom = function() {
-            var zoom = Math.min(jQuery(window).width()/640,jQuery(window).height()/480);
-            var centerup = Math.max(0,Math.round((jQuery(window).height()-(zoom*480))/2));
-            var centerleft = Math.max(0,Math.round((jQuery(window).width()-(zoom*640))/2));
-            body.css({
-                'background-color': '#000',
-                'overflow': 'hidden'
-            });
-            thisGame.html.screen.css({
-                'top': centerup+'px',
-                'left': centerleft+'px',
-                'transform-origin': '0 0',
-                'transform': 'scale('+zoom.toFixed(2)+','+zoom.toFixed(2)+')'
-            });
-        };
-        onfullscreenoff = f;
-        oldcssbody = body.attr('style');
-        oldcssscreen = thisGame.html.screen.attr('style');
-        thisGame.html.screen.css({
-            'position': 'absolute',
-            'top': '0',
-            'left': '0'});
-
-        onresize = autozoom;
+        if (typeof f === 'function') onfullscreenoff = f;
+        jQuery('#headerbuttons').hide();
+        if (typeof body.fullScreen === 'function') {
+            body.fullScreen(true);
+        }
         autozoom();
         enableWakeLock();
     };
@@ -93,9 +81,21 @@ function YDKJGame(html, demomode) {
         }
     });
 
-    body.bind("fullscreenchange", function(e) {
-        if (body.fullScreen()) thisGame.fullscreen(function() {}); else thisGame.fullscreenoff();
+    body.bind("fullscreenchange webkitfullscreenchange mozfullscreenchange", function(e) {
+        var isFull = (typeof body.fullScreen === 'function') ? body.fullScreen() : false;
+        if (isFull) {
+            jQuery('#headerbuttons').hide();
+        } else {
+            jQuery('#headerbuttons').show();
+            onfullscreenoff();
+            onfullscreenoff = function() {};
+        }
+        autozoom();
     });
+
+    // Activer le mode plein écran fenêtré (pleine largeur auto-fit) immédiatement
+    autozoom();
+    enableWakeLock();
 }
 
 YDKJGame.prototype.start = function() {
@@ -211,6 +211,7 @@ YDKJGame.prototype.start = function() {
 YDKJGame.prototype.fullscreen = function(f) {
     this.fullscreen(f);
 };
+
 
 YDKJGame.prototype.displayCurrency = function(value) {
     var thousandSeparator = function(value,separator,decimal) {

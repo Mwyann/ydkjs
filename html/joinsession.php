@@ -12,8 +12,9 @@ $default_nick = '';
 <html>
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>You Don't Know Jack® ALPHA FR</title>
-    <link href="css/ydkj.css" rel="stylesheet"/>
+    <link href="css/ydkj.css?v=17" rel="stylesheet"/>
     <script src="js/HackTimer.min.js" type="text/javascript"></script>
     <script src="js/jquery-3.5.1.min.js" type="text/javascript"></script>
 
@@ -199,7 +200,7 @@ $default_nick = '';
 
                         // Bouton d'expulsion réservé à l'hôte
                         if (isHost && c.client_id !== myClientId && !gameStarting) {
-                            var kickBtn = jQuery('<button type="button" style="margin-left:12px;padding:1px 6px;font-size:11px;background:#f7768e;color:#fff;border:none;cursor:pointer;border-radius:3px">Expulser</button>');
+                            var kickBtn = jQuery('<button type="button" style="margin-left:12px;padding:2px 8px;font-size:12px;font-family:JackCondensed,sans-serif;background:#2d0a0a;color:#ff6b6b;border:1px solid #7a1f1f;cursor:pointer;text-transform:uppercase">Expulser</button>');
                             kickBtn.click(function() {
                                 if (confirm('Voulez-vous vraiment expulser ce joueur ?')) {
                                     wsSend({event: 'kick_client', client_id: c.client_id});
@@ -317,19 +318,20 @@ $default_nick = '';
                         'background-color': '#000',
                         'margin': '0',
                         'padding': '0',
-                        'border': '0'
+                        'border': '0',
+                        'overflow': 'hidden'
                     }).html(
-                        '<div style="text-align:center;font-size:20px;margin:5px;font-family:JackCondensed, sans-serif" id="headerbuttons">' +
-                            '<a href="#" id="fullscreen" style="color:#666">Plein écran</a> &nbsp; &nbsp; &nbsp; ' +
-                            '<a href="./" style="color:#666">Retour à l\'accueil</a>' +
+                        '<div id="headerbuttons" class="ydkj-game-bar">' +
+                            '<a href="./" class="ydkj-bar-btn" id="btn-back"><span class="ydkj-btn-arrow">&larr;</span> RETOUR &Agrave; L\'ACCUEIL</a>' +
+                            '<a href="#" class="ydkj-bar-btn" id="fullscreen"><span class="ydkj-btn-icon">&#x26F6;</span> PLEIN &Eacute;CRAN</a>' +
                         '</div>' +
                         '<div id="screen" style="margin-left:auto;margin-right:auto">' +
-                            '<img src="ajax-loader.gif" style="position:absolute;left:293px;top:212px" class="markedAsRemoved"/>' +
+                            '<img src="directsilence.gif" style="position:absolute;left:293px;top:212px" class="markedAsRemoved"/>' +
                         '</div>'
                     );
 
                     // Charger le moteur YDKJ et démarrer la partie (conserve le geste utilisateur pour l'audio)
-                    jQuery.getScript('js/YDKJ.js?ver=11', function() {
+                    jQuery.getScript('js/YDKJ.js?ver=13', function() {
                         var game = new YDKJ(jQuery('#screen'));
                         jQuery('#fullscreen').click(function() {
                             jQuery('#headerbuttons').hide();
@@ -475,30 +477,59 @@ $default_nick = '';
     </script>
 </head>
 
-<body style="background-color:#000;color:#FFF;font-family:JackCondensed, sans-serif;margin:0;padding:0;border:0">
-<div style="text-align:center;font-size:80px;margin-top:100px;line-height:0"><div style="">YOU DON’T KNOW</div>
-    <div style="font-size:350%;line-height:95%">JACK<span style="font-size:10%; vertical-align:top; line-height:400%">®</span></div></div>
-<div style="border:#669 1px solid; background-color:#336;color:#FFF;padding:10px;margin:15px auto;font-family:JackCondensed;font-size:18px;width:640px">
-    <p style="text-align:center;font-size:28px;font-weight:bold;margin:10px 0 30px 0;color:#FF0">Partie n° <span style="color:#F00" id="session_code_display">...</span></p>
+<body style="background-color:#000;color:#FFF;font-family:JackCondensed, sans-serif;margin:0;padding:10px 0;border:0">
+<div class="ydkj-header-logo">
+    <div>YOU DON’T KNOW</div>
+    <div class="ydkj-logo-jack">JACK<span class="ydkj-logo-reg">®</span></div>
+</div>
 
-<div style="margin:20px 0">
-    Votre nom de joueur : <input type="text" value="" id="player_nick"/> <input type="button" id="change_nick" value="Changer" /> (nécessaire pour participer)<br/>
-    <span style="font-size:80%">Si vous êtes plusieurs sur le même ordinateur, séparez les noms par une virgule, exemple : Juju, Machin</span>
+<div class="ydkj-panel">
+    <p style="text-align:center;font-size:28px;font-weight:bold;margin:5px 0 20px 0;color:#FF0">Partie n° <span style="color:#F00" id="session_code_display">...</span></p>
+
+    <div style="margin:16px 0;line-height:1.4">
+        <label for="player_nick" style="font-size:20px">Votre nom de joueur :</label><br/>
+        <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
+            <input type="text" value="" id="player_nick" class="ydkj-input" style="flex:1;min-width:180px"/>
+            <input type="button" id="change_nick" value="Changer" class="ydkj-btn"/>
+        </div>
+        <div style="font-size:80%;color:#CCC;margin-top:4px">Si vous êtes plusieurs sur le même ordinateur, séparez les noms par une virgule, ex : Juju, Machin</div>
+    </div>
+
+    <div style="margin:20px 0">
+        <div style="font-size:20px;margin-bottom:6px">Liste des joueurs présents :</div>
+        <div id="list_players" style="font-family:JackInput, monospace;font-size:16px;background:#000;border:1px solid #334;padding:10px;min-height:50px">
+            <div>Connexion au serveur...</div>
+        </div>
+        <div style="font-size:80%;color:#CCC;margin-top:5px">
+            (Cochez les joueurs qui vont participer, les autres seront spectateurs)
+        </div>
+    </div>
+
+    <div style="margin:16px 0;font-size:18px;line-height:1.8">
+        <div>
+            <label style="cursor:pointer"><input type="checkbox" id="nbquestions21" disabled="disabled" style="width:18px;height:18px;vertical-align:middle"/> 21 questions (7 si décoché)</label>
+        </div>
+        <div>
+            <label style="cursor:pointer"><input type="checkbox" id="public" disabled="disabled" style="width:18px;height:18px;vertical-align:middle"/> Partie publique</label>
+        </div>
+        <div>
+            <label style="cursor:pointer"><input type="checkbox" id="sound" style="width:18px;height:18px;vertical-align:middle"/> Son à la connexion d'un nouveau joueur</label>
+        </div>
+    </div>
+
+    <div style="margin:25px auto 15px auto; text-align:center">
+        <input type="button" id="start_game" value="En attente..." class="ydkj-btn" disabled/>
+    </div>
+
+    <div style="margin:15px auto 5px auto; text-align:center; color:#FF0; font-size:16px; line-height:1.35">
+        Note : En cas de bug graphique ou d'interruption, envoyez-moi un <a href="mailto:alpha@ydkj.fr" style="color:#FFF">e-mail</a> avec une description du problème. Merci !
+    </div>
 </div>
-<div style="margin:20px 0">
-    Liste des joueurs présents :
-    <div id="list_players" style="font-family:JackInput;font-size: 80%;margin:5px"><div>Connexion au serveur...</div></div>
+
+<div style="margin:20px auto 15px auto; text-align:center; display:flex; justify-content:center; gap:12px; flex-wrap:wrap">
+    <a href="findsession.php" class="ydkj-btn">CHERCHER UNE PARTIE PUBLIQUE</a>
+    <a href="./" class="ydkj-btn">RETOUR &Agrave; L'ACCUEIL</a>
 </div>
-<div>
-    (Cochez les joueurs qui vont participer, les autres seront spectateurs)
-</div>
-<div style="margin:10px 0;font-size:80%">
-    <input type="checkbox" id="nbquestions21" disabled="disabled" /> <label for="nbquestions21">21 questions (7 si décoché)</label> <input type="checkbox" id="public" disabled="disabled" /> <label for="public">Partie publique</label> <input type="checkbox" id="sound"/> <label for="sound">Son à la connexion d'un nouveau joueur</label>
-</div>
-<div style="margin:20px auto 10px auto; text-align:center"><input type="button" id="start_game" value="En attente..." disabled/></div>
-<div style="margin:20px auto 10px auto; text-align:center; color:#FF0">Note : Il y a eu récemment une importante mise à jour du jeu, et il est possible que vous rencontriez quelques bugs (arrêt du jeu, bug graphique gênant...). Si tel est le cas, envoyez moi un <a href="mailto:alpha@ydkj.fr" style="color:#FFF">e-mail</a> avec une description du problème, et je jetterai un oeil. Merci !</div>
-</div>
-<div style="margin:20px auto 10px auto; text-align:center"><a href="findsession.php" style="color:#666">Trouver une autre partie publique</a> - <a href="./" style="color:#666">Retour à l'accueil</a></div>
 <?php require 'analytics.php'; ?>
 </body>
 </html>

@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="css/ui-lightness/jquery-ui-1.12.0.custom.min.css">
 <link rel="stylesheet" href="../css/ydkj.css"/>
 <script src="js/jquery-ui-1.12.0.custom.min.js"></script>
+<script src="js/Animated_GIF.min.js"></script>
 
 <style>
     #anims .timings {
@@ -230,6 +231,354 @@ jQuery(document).ready(function() {
             }
         });
 
+        $('#savegif').on('click', function() {
+            var framefrom = parseInt($('#framefrom').val());
+            if (isNaN(framefrom) || framefrom < 0) framefrom = 0;
+            var toInput = $('#frameto').val();
+            var hasExplicitTo = (toInput !== undefined && toInput !== null && toInput.trim() !== '' && !isNaN(parseInt(toInput, 10)));
+            var frameto = hasExplicitTo ? parseInt(toInput, 10) : -1;
+            var animloop = $('#animloop').is(':checked');
+
+            if (!animationFile) {
+                alert("Veuillez sélectionner un fichier d'animation.");
+                return false;
+            }
+
+            var $btn = $('#savegif');
+            $btn.prop('disabled', true).val('Génération GIF...');
+
+            var exportAnim = new YDKJAnimation({
+                urlGif: '../' + animationFile + '.gif',
+                urlJS: '../' + animationFile + '.js'
+            });
+
+            exportAnim.ready(function() {
+                try {
+                    var tiles = exportAnim.tiles;
+                    var frames = exportAnim.frames;
+                    var gifImg = (exportAnim.gif && exportAnim.gif.res) ? exportAnim.gif.res[0] : null;
+
+                    if (!tiles || !frames || frames.length === 0 || !gifImg) {
+                        alert("Impossible de charger les données de l'animation.");
+                        $btn.prop('disabled', false).val('Save as GIF');
+                        exportAnim.free();
+                        return;
+                    }
+
+                    var stopFrame = frames.length - 1;
+                    if (hasExplicitTo && frameto >= 0 && frameto < frames.length) {
+                        stopFrame = frameto;
+                    }
+                    if (framefrom > stopFrame) {
+                        framefrom = 0;
+                    }
+
+                    var rawFrames = [];
+                    var screenCanvas = document.createElement('canvas');
+                    screenCanvas.width = 640;
+                    screenCanvas.height = 480;
+                    var screenCtx = screenCanvas.getContext('2d');
+
+                    var bufferCanvas = document.createElement('canvas');
+                    bufferCanvas.width = 640;
+                    bufferCanvas.height = 480;
+                    var bufferCtx = bufferCanvas.getContext('2d');
+
+                    for (var framenum = framefrom; framenum <= stopFrame; framenum++) {
+                        var ourframe = frames[framenum];
+                        var val = 0;
+                        if (ourframe && ourframe.n > 0) {
+                            var left = ourframe.l[0].l;
+                            var top = ourframe.l[0].t;
+                            val = ourframe.l[0].v;
+                            for (var i = 1; i <= ourframe.n; i++) {
+                                var elem = ourframe.l[i];
+                                val = val | elem.v;
+                                // Ignorer le texte pour ne garder que les éléments graphiques du GIF
+                                if ((elem.v & 32) == 32) {
+                                    continue;
+                                }
+                                var tileid = elem.i - 1;
+                                if (tiles[tileid]) {
+                                    var ourtile = tiles[tileid];
+                                    bufferCtx.drawImage(
+                                        gifImg,
+                                        ourtile.x, ourtile.y, ourtile.w, ourtile.h,
+                                        left + elem.l, top + elem.t, ourtile.w, ourtile.h
+                                    );
+                                }
+                            }
+                        }
+
+                        if (((val & 4) == 0) || ((val & 8) != 0)) {
+                            screenCtx.clearRect(0, 0, 640, 480);
+                            screenCtx.drawImage(bufferCanvas, 0, 0);
+                            bufferCtx.clearRect(0, 0, 640, 480);
+                        }
+
+                        var frameSnap = document.createElement('canvas');
+                        frameSnap.width = 640;
+                        frameSnap.height = 480;
+                        frameSnap.getContext('2d').drawImage(screenCanvas, 0, 0);
+                        rawFrames.push(frameSnap);
+
+                        // Si la frame de fin n'est pas spécifiée, s'arrêter dès que le flag stop (val & 16) est rencontré.
+                        // Sinon (si frameto est spécifié), continuer jusqu'à stopFrame.
+                        if (!hasExplicitTo && ((val & 16) != 0)) {
+                            break;
+                        }
+                    }
+
+                    if (rawFrames.length === 0) {
+                        alert("Aucune frame à exporter.");
+                        $btn.prop('disabled', false).val('Save as GIF');
+                        exportAnim.free();
+                        return;
+                    }
+
+                    // Calcul de la boîte englobante minimale (crop)
+                    var minX = 640, minY = 480, maxX = -1, maxY = -1;
+                    var hasOpaque = false;
+
+                    for (var f = 0; f < rawFrames.length; f++) {
+                        var fCtx = rawFrames[f].getContext('2d');
+                        var imgData = fCtx.getImageData(0, 0, 640, 480);
+                        var data32 = new Uint32Array(imgData.data.buffer);
+                        for (var y = 0; y < 480; y++) {
+                            var row = y * 640;
+                            for (var x = 0; x < 640; x++) {
+                                if ((data32[row + x] & 0xFF000000) !== 0) {
+                                    hasOpaque = true;
+                                    if (x < minX) minX = x;
+                                    if (x > maxX) maxX = x;
+                                    if (y < minY) minY = y;
+                                    if (y > maxY) maxY = y;
+                                }
+                            }
+                        }
+                    }
+
+                    if (!hasOpaque) {
+                        minX = 0; minY = 0; maxX = 639; maxY = 479;
+                    }
+
+                    var cropW = maxX - minX + 1;
+                    var cropH = maxY - minY + 1;
+
+                    // Fréquence des couleurs réelles utilisées par les sprites
+                    var colorCounts = {};
+                    for (var f = 0; f < rawFrames.length; f++) {
+                        var fCtx = rawFrames[f].getContext('2d');
+                        var cropData = fCtx.getImageData(minX, minY, cropW, cropH);
+                        var d = cropData.data;
+                        for (var p = 0; p < d.length; p += 4) {
+                            if (d[p + 3] > 0) {
+                                var colKey = (d[p] << 16) | (d[p + 1] << 8) | d[p + 2];
+                                colorCounts[colKey] = (colorCounts[colKey] || 0) + 1;
+                            }
+                        }
+                    }
+
+                    // Sélection de la couleur transparente la plus éloignée des couleurs utilisées
+                    var candidates = [
+                        [0, 255, 0],     // Vert fluo #00FF00
+                        [255, 0, 255],   // Magenta #FF00FF
+                        [0, 255, 255],   // Cyan #00FFFF
+                        [255, 0, 0],     // Rouge vif
+                        [0, 0, 255],     // Bleu vif
+                        [254, 1, 253]
+                    ];
+                    var transColor = null;
+                    var maxMinDist = -1;
+                    for (var c = 0; c < candidates.length; c++) {
+                        var cand = candidates[c];
+                        var cKey = (cand[0] << 16) | (cand[1] << 8) | cand[2];
+                        if (!colorCounts[cKey]) {
+                            var minDist = 1e9;
+                            for (var k in colorCounts) {
+                                var uk = parseInt(k, 10);
+                                var ur = (uk >> 16) & 255;
+                                var ug = (uk >> 8) & 255;
+                                var ub = uk & 255;
+                                var dist = Math.abs(ur - cand[0]) + Math.abs(ug - cand[1]) + Math.abs(ub - cand[2]);
+                                if (dist < minDist) minDist = dist;
+                            }
+                            if (minDist > maxMinDist) {
+                                maxMinDist = minDist;
+                                transColor = cand;
+                            }
+                        }
+                    }
+                    if (!transColor) transColor = [0, 255, 0];
+                    var transKey = (transColor[0] << 16) | (transColor[1] << 8) | transColor[2];
+
+                    // Construction d'une palette globale fixe (index 0 = transparence garantie)
+                    var sortedColors = Object.keys(colorCounts).map(Number).sort(function(a, b) {
+                        return colorCounts[b] - colorCounts[a];
+                    });
+                    if (sortedColors.length > 255) {
+                        sortedColors = sortedColors.slice(0, 255);
+                    }
+                    var paletteArray = [transKey].concat(sortedColors);
+                    var targetLen = 2;
+                    while (targetLen < paletteArray.length && targetLen < 256) {
+                        targetLen *= 2;
+                    }
+                    while (paletteArray.length < targetLen) {
+                        paletteArray.push(0);
+                    }
+
+                    // Création des frames recadrées avec fond de couleur clé
+                    var croppedCanvases = [];
+                    for (var f = 0; f < rawFrames.length; f++) {
+                        var cCanvas = document.createElement('canvas');
+                        cCanvas.width = cropW;
+                        cCanvas.height = cropH;
+                        var cCtx = cCanvas.getContext('2d');
+                        cCtx.fillStyle = 'rgb(' + transColor[0] + ',' + transColor[1] + ',' + transColor[2] + ')';
+                        cCtx.fillRect(0, 0, cropW, cropH);
+                        cCtx.drawImage(rawFrames[f], -minX, -minY);
+                        croppedCanvases.push(cCanvas);
+                    }
+
+                    // Instanciation de Animated_GIF avec palette explicite et closest dithering
+                    var ag = new Animated_GIF({
+                        width: cropW,
+                        height: cropH,
+                        palette: paletteArray,
+                        dithering: 'closest'
+                    });
+                    ag.setSize(cropW, cropH);
+                    ag.setDelay(animationSpeed);
+                    ag.setRepeat(animloop ? 0 : null);
+
+                    for (var f = 0; f < croppedCanvases.length; f++) {
+                        ag.addFrame(croppedCanvases[f]);
+                    }
+
+                    ag.getBlobGIF(function(blob) {
+                        var reader = new FileReader();
+                        reader.onload = function() {
+                            var bytes = new Uint8Array(reader.result);
+                            makeGifTransparent(bytes, transColor[0], transColor[1], transColor[2]);
+                            var transBlob = new Blob([bytes], { type: 'image/gif' });
+
+                            var url = URL.createObjectURL(transBlob);
+                            var a = document.createElement('a');
+                            a.href = url;
+                            var saveName = $('#name').val() ? $('#name').val().trim() : '';
+                            if (!saveName) {
+                                saveName = animationFile.split('/').pop() || 'animation';
+                            }
+                            if (!saveName.toLowerCase().endsWith('.gif')) {
+                                saveName += '.gif';
+                            }
+                            a.download = saveName;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            setTimeout(function() { URL.revokeObjectURL(url); }, 10000);
+
+                            ag.destroy();
+                            exportAnim.free();
+                            $btn.prop('disabled', false).val('Save as GIF');
+                        };
+                        reader.readAsArrayBuffer(blob);
+                    });
+                } catch(err) {
+                    console.error(err);
+                    alert("Erreur lors de la génération du GIF : " + err.message);
+                    $btn.prop('disabled', false).val('Save as GIF');
+                    exportAnim.free();
+                }
+            });
+
+            return false;
+        });
+
+        function makeGifTransparent(bytes, transR, transG, transB) {
+            if (!bytes || bytes.length < 13 || bytes[0] !== 0x47 || bytes[1] !== 0x49 || bytes[2] !== 0x46) {
+                return bytes;
+            }
+            var p = 6;
+            p += 4;
+            var gctFlags = bytes[p++];
+            p++;
+            p++;
+
+            var globalPalette = null;
+            if (gctFlags & 0x80) {
+                var gctSize = 1 << ((gctFlags & 7) + 1);
+                globalPalette = bytes.subarray(p, p + gctSize * 3);
+                p += gctSize * 3;
+            }
+
+            var pendingGcePacked = -1;
+            var pendingGceTrans = -1;
+
+            while (p < bytes.length) {
+                var blockType = bytes[p++];
+                if (blockType === 0x3B) {
+                    break;
+                }
+                if (blockType === 0x21) {
+                    var extLabel = bytes[p++];
+                    if (extLabel === 0xF9) {
+                        var blockSize = bytes[p++];
+                        pendingGcePacked = p;
+                        pendingGceTrans = p + 3;
+                        p += blockSize;
+                        p++;
+                    } else {
+                        while (p < bytes.length) {
+                            var subLen = bytes[p++];
+                            if (subLen === 0) break;
+                            p += subLen;
+                        }
+                    }
+                } else if (blockType === 0x2C) {
+                    p += 8;
+                    var imgFlags = bytes[p++];
+                    var palette = globalPalette;
+                    if (imgFlags & 0x80) {
+                        var lctSize = 1 << ((imgFlags & 7) + 1);
+                        palette = bytes.subarray(p, p + lctSize * 3);
+                        p += lctSize * 3;
+                    }
+
+                    if (pendingGcePacked >= 0 && palette && palette.length > 0) {
+                        var bestIdx = 0;
+                        var bestDist = 1e9;
+                        for (var i = 0; i < palette.length / 3; i++) {
+                            var pr = palette[i * 3];
+                            var pg = palette[i * 3 + 1];
+                            var pb = palette[i * 3 + 2];
+                            var dist = (pr - transR) * (pr - transR) +
+                                       (pg - transG) * (pg - transG) +
+                                       (pb - transB) * (pb - transB);
+                            if (dist < bestDist) {
+                                bestDist = dist;
+                                bestIdx = i;
+                            }
+                        }
+                        bytes[pendingGcePacked] = (2 << 2) | 1;
+                        bytes[pendingGceTrans] = bestIdx;
+
+                        pendingGcePacked = -1;
+                        pendingGceTrans = -1;
+                    }
+
+                    p++;
+                    while (p < bytes.length) {
+                        var dataLen = bytes[p++];
+                        if (dataLen === 0) break;
+                        p += dataLen;
+                    }
+                }
+            }
+            return bytes;
+        }
+
         $('#clickfrom').on('click',function() {
             $('#framefrom').val($("#slider").slider("value"));
             return false;
@@ -450,7 +799,7 @@ function play(t) {
          <option value="res/5QDemo/off4/21000">21000 - Open Your Eyes</option>
          <option value="res/5QDemo/off4/23000">23000 - Hiscores</option>
      </select> slow <input type="checkbox" id="animslow" /> blue bg <input type="checkbox" id="bluebg" /><br/><br/>
-      Play <a href="#" style="color:#FFFFFF" id="clickfrom">from</a> <input type="text" id="framefrom" style="width:50px"/> <a href="#" style="color:#FFFFFF" id="clickto">to</a> <input type="text" id="frameto" style="width:50px"/> loop <input type="checkbox" id="animloop" /> <input type="button" id="animplay" value="Play" /> <input type="button" id="animstop" value="Stop" /><br/><br/>
+      Play <a href="#" style="color:#FFFFFF" id="clickfrom">from</a> <input type="text" id="framefrom" style="width:50px"/> <a href="#" style="color:#FFFFFF" id="clickto">to</a> <input type="text" id="frameto" style="width:50px"/> loop <input type="checkbox" id="animloop" /> <input type="button" id="animplay" value="Play" /> <input type="button" id="animstop" value="Stop" /> <input type="button" id="savegif" value="Save as GIF" /><br/><br/>
       Save as: <input type="text" id="name"/> Group: <input type="text" id="group"/> <input type="button" id="save" value="Save" /><br/><br/>
       Variant type: <input type="text" id="variantType"/> Value: <input type="text" id="variantValue"/>
   </div>
