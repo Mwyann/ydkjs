@@ -45,14 +45,17 @@ if (($handle = fopen("qhdr.csv", "r")) !== FALSE) {
     echo "OK\n";
 } else echo "Missing\n";
 
+require_once __DIR__ . '/strings-json.inc.php';
+
 echo "Importing strings... ";
 if (($handle = fopen("strings.csv", "r")) !== FALSE) {
     $DB->query("DELETE FROM strings");
-    while (($data = fgetcsv($handle, 2000, chr(0xBD), chr(0xBE))) !== FALSE) {
+    $stmt = $DB->prepare("INSERT INTO strings (folder, strings) VALUES (:folder, :strings)");
+    while (($data = fgetcsv($handle, 0, chr(0xBD), chr(0xBE))) !== FALSE) {
         $file = trim(strtr($data[0],'\\','/'),'/');
-        $DB->query("INSERT IGNORE INTO strings (folder, strings) VALUES (
-                    '".addslashes($file)."',
-                    '".addslashes(str_replace(chr(13),'\\n',str_replace(chr(10),'',$data[1])))."')");
+        $raw = str_replace(chr(13),'\\n',str_replace(chr(10),'',$data[1]));
+        $json = convertJsLiteralToJson($raw);
+        $stmt->execute([':folder' => $file, ':strings' => $json]);
     }
     fclose($handle);
     echo "OK\n";

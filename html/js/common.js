@@ -493,7 +493,7 @@ function checkTextWrds(text,wrds) {
         // On cherche le mot le plus long, qui entre le mieux dans la case (le plus à gauche)
         for(var j = 0; j < currentwords.length; j++) {
             var word = cleanText(currentwords[j]);
-            console.log(word);
+            //console.log(word);
             if (word != '') {
                 var p = text.indexOf(' ' + word + ' ');
                 if ((p >= 0) && ((bestpos > p) || ((bestpos == p) && (currentwords[j].length > word.length)))) {
@@ -507,7 +507,7 @@ function checkTextWrds(text,wrds) {
             numfoundwords++;
             text = text.substr(bestpos+bestword.length+1) + text.substr(1,bestpos+bestword.length+1); // On met le meilleur mot à la fin, si on l'a trouvé. Cela permet de trouver tous les mots, même s'ils sont dans le mauvais ordre.
         }
-        console.log(text);
+        //console.log(text);
     }
     if (numcorrectwords == wrds.length) return 2;
     if (numfoundwords >= wrds.length/2) return 1;

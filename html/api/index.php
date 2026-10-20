@@ -31,7 +31,7 @@ if (isset($_COOKIE['ydkj_debug'])) {
     }
 }
 
-srand($session_id * 130);
+mt_srand($session_id * 130);
 
 if (!isset($_POST['call'])) die('API ready 1');
 $call = $_POST['call'];

@@ -818,8 +818,6 @@ YDKJAPI.prototype.initgame = function() {
             data: data,
             dataType: 'json',
             success: function(data, status, xhr) {
-                var strtmp;
-
                 reslist = data['reslist'];
 
                 if (mode instanceof ModeCategory) {
@@ -834,9 +832,7 @@ YDKJAPI.prototype.initgame = function() {
                 }
 
                 if (mode instanceof ModeQuestion) {
-                    strtmp = [];
-                    eval('strtmp = '+reslist['STR']);
-                    mode.STR = strtmp;
+                    mode.STR = JSON.parse(reslist['STR']);
                     mode.options.value = parseInt(reslist['value']);
                     mode.options.correctanswer = reslist['correctanswer'];
                     mode.options.correctanswerisdefault = reslist['correctanswerisdefault'];
@@ -848,9 +844,7 @@ YDKJAPI.prototype.initgame = function() {
                 }
 
                 if (mode instanceof ModeDisOrDat) {
-                    strtmp = [];
-                    eval('strtmp = '+reslist['STR']);
-                    mode.STR = strtmp;
+                    mode.STR = JSON.parse(reslist['STR']);
                     mode.options.value = parseInt(reslist['value']);
                     mode.options.timer = new YDKJTimer(30);
                     var timer30ready = thisAPI.resources(mode.options.timer);
@@ -860,16 +854,12 @@ YDKJAPI.prototype.initgame = function() {
                 }
 
                 if (mode instanceof ModeGibberish) {
-                    strtmp = [];
-                    eval('strtmp = '+reslist['STR']);
-                    mode.STR = strtmp;
+                    mode.STR = JSON.parse(reslist['STR']);
                     mode.options.value = parseInt(reslist['value']);
                 }
 
                 if (mode instanceof ModeJackAttack) {
-                    strtmp = [];
-                    eval('strtmp = '+reslist['STR']);
-                    mode.STR = strtmp;
+                    mode.STR = JSON.parse(reslist['STR']);
                     mode.options.title = reslist['title'];
                     mode.options.answerseeds = reslist['answerseeds'];
                 }
