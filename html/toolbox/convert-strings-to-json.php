@@ -7,10 +7,7 @@
 
 require_once __DIR__ . '/mysql.inc.php';
 require_once __DIR__ . '/strings-json.inc.php';
-
-pdo_select_db($DBsta);
-
-echo "Conversion des chaînes de la table {$DBsta}.strings en JSON standard...\n";
+echo "Conversion des chaînes de la table strings en JSON standard...\n";
 
 $res = $DB->query("SELECT folder, strings FROM strings");
 $updateStmt = $DB->prepare("UPDATE strings SET strings = :strings WHERE folder = :folder");

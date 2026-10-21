@@ -42,7 +42,7 @@ function displaySelect($values, $selected) {
 
     <script src="../js/jquery-3.5.1.min.js" type="text/javascript"></script>
 
-    <link rel="stylesheet" href="../css/ydkj.css"/>
+    <link href="../css/ydkj.css?v=19" rel="stylesheet"/>
 
     <style>
         label {

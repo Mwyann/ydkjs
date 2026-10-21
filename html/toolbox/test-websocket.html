@@ -453,13 +453,13 @@
                     var nicks = $('#' + self.prefix + '_nick').val();
                     if (nicks) self.send({event: 'update_nick', nick: nicks});
                 }
-                else if (msg.event === 'reconnected') {
+                else if (msg.event === 'game_init') {
                     self.sessionCode = msg.session;
                     self.clientId = msg.client_id;
                     self.isHost = msg.is_host;
                     self.isSpectator = msg.spectator;
                     self.updateRoleBadge();
-                    self.log('sys', '=> RECONNECTÉ avec succès (client_id: ' + self.clientId + ')');
+                    self.log('sys', '=> INITIALISÉ / RECONNECTÉ avec succès (client_id: ' + self.clientId + ')');
                     self.enableActions();
                 }
                 else if (msg.event === 'lobby_state') {

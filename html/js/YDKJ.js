@@ -77,11 +77,12 @@ YDKJ.prototype.setLoader = function(loaderGif, minDuration, endGif, endDuration)
     return this;
 };
 
-YDKJ.prototype.start = function() {
+YDKJ.prototype.start = function(options) {
+    var thisYDKJ = this;
     this.ready(function() {
         Howler.autoSuspend = false;
-        this.game = new YDKJGame({screen: this.screen, debug: this.debug}, false, this.loaderConfig);
-        this.game.start();
+        thisYDKJ.game = new YDKJGame({screen: thisYDKJ.screen, debug: thisYDKJ.debug}, false, thisYDKJ.loaderConfig, options);
+        thisYDKJ.game.start();
     });
 };
 
@@ -117,10 +118,11 @@ function loadScriptOldSchool(sScriptSrc, oCallback) {
 window.logError = function(msg, url, line, col, error, stack, log) {
     if (typeof window.gamedata !== 'undefined') return;
     if (typeof log == 'undefined') log = '';
+    var currentSession = (typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('ydkj_session') : '') || '';
     jQuery.ajax({
         url: 'api/report-error.php',
         type: 'post',
-        data: {msg:msg, url:url, line:line, col:col, error:error, stack:stack, log:log},
+        data: {session:currentSession, msg:msg, url:url, line:line, col:col, error:error, stack:stack, log:log},
         success: function(html, status, xhr) {
             if (html == 'OK') console.log('YDKJS: An error has been found and has been reported to the developer.');
             else console.log('YDKJS: An error has been found but couldn\'t be reported.');
@@ -157,6 +159,7 @@ window.safeJson = function(obj) {
 (function() {
     var oldWindowError = window.onerror;
     window.onerror = function(msg, url, line, col, error) {
+        if (url == '') url = window.location.href;
         window.logError(msg, url, line, col, error, error.stack, window.safeJson(window.YDKJCurrentGame));
         if (oldWindowError) oldWindowError.apply(this,arguments);
     };

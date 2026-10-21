@@ -475,7 +475,7 @@ var YDKJAnimList = function(resources) {
     // Debug : tester l'existence d'une animation avant d'exécuter quoi que ce soit (et logguer l'erreur si nécessaire)
     this.checkAnim = function(name) {
         if (typeof this.animations[name] == 'undefined') {
-            window.logError('checkAnim', '', 0, 0, 'checkAnim failed for animation '+name, Error().stack, window.safeJson(window.YDKJCurrentGame));
+            window.logError('checkAnim', window.location.href, 0, 0, 'checkAnim failed for animation '+name, Error().stack, window.safeJson(window.YDKJCurrentGame));
             return false;
         }
         return true;

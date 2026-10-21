@@ -1,10 +1,11 @@
 /********** YDKJGame **********/
 
-function YDKJGame(html, demomode, loaderConfig) {
+function YDKJGame(html, demomode, loaderConfig, options) {
     var thisGame = this;
     if (!demomode) demomode = false;
+    this.options = options || {};
     this.html = html;
-    this.api = new YDKJAPI(this, demomode);
+    this.api = new YDKJAPI(this, demomode, this.options);
     this.font = new YDKJFont();
     this.demomode = demomode;
     jQuery.fx.interval = 66;
@@ -75,6 +76,33 @@ function YDKJGame(html, demomode, loaderConfig) {
     var onfullscreenoff = function() {};
     var body = jQuery('body');
     var thewindow = jQuery(window);
+
+    // Mise à jour de l'information de mode de jeu dans la barre (#headerbuttons)
+    var updateHeaderModeInfo = function() {
+        var header = jQuery('#headerbuttons');
+        if (header.length) {
+            var modeInfo = header.find('#game-mode-info');
+            if (!modeInfo.length) {
+                modeInfo = jQuery('<span class="ydkj-bar-info" id="game-mode-info" />');
+                var fullscreenBtn = header.find('#fullscreen');
+                if (fullscreenBtn.length) {
+                    modeInfo.insertBefore(fullscreenBtn);
+                } else {
+                    modeInfo.appendTo(header);
+                }
+            }
+            var infoText = '';
+            if (thisGame.demomode) {
+                infoText = 'MODE D\u00C9MO';
+            } else if (thisGame.api && thisGame.api.sessionCode) {
+                infoText = 'SESSION : ' + thisGame.api.sessionCode;
+            } else {
+                infoText = 'PARTIE LOCALE';
+            }
+            modeInfo.text(infoText);
+        }
+    };
+    updateHeaderModeInfo();
 
     var autozoom = function() {
         var header = jQuery('#headerbuttons');
@@ -167,6 +195,7 @@ YDKJGame.prototype.start = function() {
             thisGame.players = gameinfo.players;
             thisGame.locale = gameinfo.locale;
             thisGame.screwEnabled = gameinfo.screwEnabled;
+            thisGame.nbQuestions = gameinfo.nbQuestions;
             thisGame.screwKeycodes = [];
             switch(thisGame.locale) {
                 case 'fr_FR': thisGame.screwKeycodes = [118, 86]; break; // v ou V (vicieuse)
@@ -178,7 +207,7 @@ YDKJGame.prototype.start = function() {
             thisGame.engineVersion = gameinfo.engineVersion;
             thisGame.api.localMode = gameinfo.localMode;
             window.YDKJCurrentGame = thisGame; // Utile pour le debug
-            (thisGame.api.gamemode())(function (gamemode) {
+            var proceedToLaunch = function(launchCallback) {
                 var onGameReady = function() {
                     var elapsed = Date.now() - (thisGame.loaderStartTime || Date.now());
                     var remainingMin = Math.max(0, thisGame.loaderMinDuration - elapsed);
@@ -247,7 +276,7 @@ YDKJGame.prototype.start = function() {
                                 '<div style="font-size:16px;color:#bbb;font-family:sans-serif">' +
                                     '(Requis par votre navigateur pour autoriser la lecture sonore)' +
                                 '</div>' +
-                                '</div>'
+                            '</div>'
                         ).css({
                             'text-align': 'center',
                             'width': '100%',
@@ -265,7 +294,8 @@ YDKJGame.prototype.start = function() {
                             'cursor': 'pointer',
                             'user-select': 'none'
                         });
-                        useraction.appendTo('body');
+                        var targetScreen = (thisGame.html && thisGame.html.screen) ? thisGame.html.screen : 'body';
+                        useraction.appendTo(targetScreen);
 
                         var unlock = function() {
                             if (!useraction) return;
@@ -289,18 +319,101 @@ YDKJGame.prototype.start = function() {
                             }
 
                             thisGame.enableWakeLock();
-                            gamemode.start();
+                            launchCallback();
                         };
 
                         jQuery(window).one('click touchend keydown', unlock);
                     } else {
                         thisGame.enableWakeLock();
-                        gamemode.start();
+                        launchCallback();
                     }
                 };
 
                 onGameReady();
-            });
+            };
+
+            if (gameinfo.inProgress) {
+                // Partie déjà commencée : attente du prochain game_state
+                thisGame.loaderMinDuration = 0;
+                thisGame.endGifDuration = 0;
+                if (thisGame.$loader) {
+                    thisGame.$loader.remove();
+                    thisGame.$loader = null;
+                }
+
+                var waitScreen = jQuery('<div id="ydkj_midgame_wait" />');
+                waitScreen.html(
+                    '<div style="max-width:580px;margin:0 auto;text-align:center">' +
+                        '<div style="font-size:28px;font-family:JackCondensed, sans-serif;letter-spacing:1px;line-height:1.3;margin-bottom:12px;color:#FFD700">' +
+                            'PARTIE EN COURS' +
+                        '</div>' +
+                        '<div style="font-size:18px;color:#fff;font-family:JackCondensed, sans-serif;letter-spacing:1px">' +
+                            'SYNCHRONISATION AU PROCHAIN TOUR...' +
+                        '</div>' +
+                    '</div>'
+                ).css({
+                    'text-align': 'center',
+                    'width': '100%',
+                    'color': 'white',
+                    'background-color': 'rgba(0, 0, 0, 0.9)',
+                    'position': 'absolute',
+                    'z-index': '99998',
+                    'top': '0',
+                    'left': '0',
+                    'bottom': '0',
+                    'right': '0',
+                    'display': 'flex',
+                    'justify-content': 'center',
+                    'align-items': 'center',
+                    'user-select': 'none'
+                });
+                var targetScreen = (thisGame.html && thisGame.html.screen) ? thisGame.html.screen : 'body';
+                waitScreen.appendTo(targetScreen);
+
+                // Prise en compte immédiate d'un geste utilisateur sur l'écran d'attente pour débloquer l'audio au plus tôt
+                jQuery(window).one('click touchend keydown', function() {
+                    if (window.Howler && window.Howler.ctx && typeof window.Howler.ctx.resume === 'function') {
+                        try { window.Howler.ctx.resume(); } catch(e) {}
+                    }
+                });
+
+                var handleGameState = function(stateMsg) {
+                    thisGame.api.onGameStateReceived = null;
+                    thisGame.api.lastGameState = null;
+                    thisGame.api.actionlist = [];
+
+                    // Réinjection complète des joueurs (future-proof) en préservant le keycode local de ce client
+                    if (stateMsg.players && Array.isArray(stateMsg.players)) {
+                        for (var i = 0; i < stateMsg.players.length && i < thisGame.players.length; i++) {
+                            var localKeycode = thisGame.players[i].keycode;
+                            jQuery.extend(thisGame.players[i], stateMsg.players[i]);
+                            thisGame.players[i].keycode = localKeycode;
+                        }
+                    }
+
+                    proceedToLaunch(function() {
+                        if (waitScreen) {
+                            waitScreen.remove();
+                            waitScreen = null;
+                        }
+                        var nextMode = new YDKJMode(thisGame, stateMsg.modedata);
+                        nextMode.start();
+                    });
+                };
+
+                if (thisGame.api.lastGameState) {
+                    handleGameState(thisGame.api.lastGameState);
+                } else {
+                    thisGame.api.onGameStateReceived = handleGameState;
+                }
+            } else {
+                // Démarrage normal depuis le début
+                (thisGame.api.gamemode())(function (gamemode) {
+                    proceedToLaunch(function() {
+                        gamemode.start();
+                    });
+                });
+            }
         });
     });
 };

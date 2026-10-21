@@ -1,7 +1,8 @@
 /********** YDKJAPI **********/
 
-function YDKJAPI(game, demomode) {
+function YDKJAPI(game, demomode, options) {
     this.game = game;
+    this.options = options || {};
     if (demomode) this.initdemo(); else this.initgame();
 }
 
@@ -10,10 +11,10 @@ YDKJAPI.prototype.initdemo = function() {
 
     YDKJAPI.prototype.gamemode = function(currentmode) {
         var newmode;
-        if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Intro', {});
-        //if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1}); // Ligne DEBUG
-        if (currentmode instanceof ModeIntro) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: 1, chooseplayer: 3});
-        if ((currentmode instanceof ModeQuestion) || (currentmode instanceof ModeDisOrDat)) newmode = new YDKJMode(thisAPI.game, 'Category', {category: 1, questionnumber: currentmode.options.questionnumber+1});
+        if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, {mode: 'Intro'});
+        //if (currentmode === undefined) newmode = new YDKJMode(thisAPI.game, {mode: 'Category', category: 1, questionnumber: 1, chooseplayer: 3}); // Ligne DEBUG
+        if (currentmode instanceof ModeIntro) newmode = new YDKJMode(thisAPI.game, {mode: 'Category', category: 1, questionnumber: 1, chooseplayer: 3});
+        if ((currentmode instanceof ModeQuestion) || (currentmode instanceof ModeDisOrDat)) newmode = new YDKJMode(thisAPI.game, {mode: 'Category', category: 1, questionnumber: currentmode.options.questionnumber+1});
 
         return function(f) {f(newmode)}
     };
@@ -120,7 +121,7 @@ YDKJAPI.prototype.initdemo = function() {
 
                 for (i=1; i<=3; i++) {
                     reslist['questiontitles'].push(questiontitles[questions[i-1]]);
-                    reslist['question'+i] = new YDKJMode(thisAPI.game, 'Question', {category:mode.options.category,questionnumber:mode.options.questionnumber,id:questions[i-1]}); // Preload des questions suivantes
+                    reslist['question'+i] = new YDKJMode(thisAPI.game, {mode: 'Question', category:mode.options.category, questionnumber:mode.options.questionnumber, id:questions[i-1]}); // Preload des questions suivantes
                 }
             } else { // Couci-Couça
                 questions = shuffle(['DAC', 'DAL', 'DAP']);
@@ -129,7 +130,7 @@ YDKJAPI.prototype.initdemo = function() {
 
                 for (i=1; i<=3; i++) {
                     reslist['questiontitles'].push(questiontitles[questions[i-1]]);
-                    reslist['question'+i] = new YDKJMode(thisAPI.game, 'DisOrDat', {category:mode.options.category,questionnumber:mode.options.questionnumber,id:questions[i-1]}); // Preload des questions suivantes
+                    reslist['question'+i] = new YDKJMode(thisAPI.game, {mode: 'DisOrDat', category:mode.options.category, questionnumber:mode.options.questionnumber, id:questions[i-1]}); // Preload des questions suivantes
                 }
             }
             return function(f) {f(reslist)}
@@ -697,6 +698,8 @@ YDKJAPI.prototype.initdemo = function() {
     YDKJAPI.prototype.synchronize = function(callback) {
         callback(); // C'est fait, on est synchro avec nous-même ;-)
     };
+
+    YDKJAPI.prototype.sendGameState = function(modedata) {};
 };
 
 YDKJAPI.prototype.initgame = function() {
@@ -740,13 +743,7 @@ YDKJAPI.prototype.initgame = function() {
             dataType: 'json',
             success: function(data, status, xhr) {
                 var newmodedata = data['newmode'];
-
-                if (newmodedata['mode'] == 'Intro') newmode = new YDKJMode(thisAPI.game, 'Intro', {});
-                if (newmodedata['mode'] == 'Category') newmode = new YDKJMode(thisAPI.game, 'Category', {category: newmodedata['category'], questionnumber: newmodedata['questionnumber'], chooseplayer: newmodedata['chooseplayer']});
-                if (newmodedata['mode'] == 'R1WrapUp') newmode = new YDKJMode(thisAPI.game, 'R1WrapUp', {category: newmodedata['category'], questionnumber: newmodedata['questionnumber'], chooseplayer: newmodedata['chooseplayer']});
-                // Les types de questions suivantes (Question, Couci-Couça, Rimatologie, Jackattack...) sont chargées dans les ressources.
-                if (newmodedata['mode'] == 'End') newmode = new YDKJMode(thisAPI.game, 'End', {});
-
+                newmode = new YDKJMode(thisAPI.game, newmodedata);
                 ready = 1;
                 for(var i = 0; i < readyfunctions.length; i++) {
                     readyfunctions[i].call(this,newmode);
@@ -823,7 +820,7 @@ YDKJAPI.prototype.initgame = function() {
                 if (mode instanceof ModeCategory) {
                     // Précharger les questions avec l'interface de catégorie
                     for (i = 1; i <= 3; i++) {
-                        reslist['question'+i] = new YDKJMode(thisAPI.game, reslist['questiontype'+i], {category: mode.options.category, questionnumber: mode.options.questionnumber, id: reslist['question'+i]}); // Preload des questions suivantes
+                        reslist['question'+i] = new YDKJMode(thisAPI.game, {mode: reslist['questiontype'+i], category: mode.options.category, questionnumber: mode.options.questionnumber, id: reslist['question'+i]}); // Preload des questions suivantes
                     }
                 }
 
@@ -951,6 +948,9 @@ YDKJAPI.prototype.initgame = function() {
     this.actionlist = []; // Liste des actions à exécuter
     this.ws = null;
     this.pendingSyncCallback = null;
+    this.onGameStateReceived = null;
+    this.lastGameState = null;
+    this.isSpectator = (this.options && typeof this.options.isSpectator !== 'undefined') ? Boolean(this.options.isSpectator) : false;
 
     var callaction = function(data, callback) {
         thisAPI.actionlist.shift(); // On enlève le premier élément
@@ -1008,12 +1008,12 @@ YDKJAPI.prototype.initgame = function() {
                     return;
                 }
 
-                if (msg.event === 'reconnected' || msg.event === 'session_joined') {
+                if (msg.event === 'game_init') {
                     if (msg.status === 'lobby') {
                         window.location.href = 'joinsession.php?session=' + encodeURIComponent(thisAPI.sessionCode);
                         return;
                     }
-                    thisAPI.reconnectedData = msg;
+                    thisAPI.initData = msg;
                     thisAPI.myClientId = msg.client_id;
                     thisAPI.myToken = msg.token || '';
                     thisAPI.isSpectator = (typeof msg.spectator !== 'undefined') ? msg.spectator : false;
@@ -1027,6 +1027,13 @@ YDKJAPI.prototype.initgame = function() {
                 else if (msg.event === 'error') {
                     alert(msg.message || "Erreur de connexion");
                     window.location.href = './';
+                }
+                else if (msg.event === 'game_state') {
+                    thisAPI.lastGameState = msg;
+                    if (thisAPI.onGameStateReceived) {
+                        thisAPI.actionlist = [];
+                        thisAPI.onGameStateReceived(msg);
+                    }
                 }
                 else if (msg.event === 'action') {
                     var actiondata = msg.data || {};
@@ -1060,13 +1067,13 @@ YDKJAPI.prototype.initgame = function() {
             };
         };
 
-        // Si la WebSocket du lobby est déjà connectée (transition sans rechargement de page)
-        if (window.YDKJ_ACTIVE_WS && window.YDKJ_ACTIVE_WS.readyState === WebSocket.OPEN) {
-            thisAPI.ws = window.YDKJ_ACTIVE_WS;
-            window.YDKJ_ACTIVE_WS = null;
+        // Si une WebSocket active a été transmise (transition sans rechargement de page)
+        if (thisAPI.options.ws && thisAPI.options.ws.readyState === WebSocket.OPEN) {
+            thisAPI.ws = thisAPI.options.ws;
+            thisAPI.options.ws = null;
             attachWsHandlers();
             thisAPI.ws.send(JSON.stringify({
-                event: 'reconnect',
+                event: 'game_init',
                 session: thisAPI.sessionCode,
                 client_id: thisAPI.myClientId,
                 token: thisAPI.myToken
@@ -1087,9 +1094,9 @@ YDKJAPI.prototype.initgame = function() {
         }
 
         thisAPI.ws.onopen = function() {
-            // Reconnexion avec le token obtenu dans le lobby
+            // Initialisation de la partie avec le token de session
             thisAPI.ws.send(JSON.stringify({
-                event: 'reconnect',
+                event: 'game_init',
                 session: thisAPI.sessionCode,
                 client_id: thisAPI.myClientId,
                 token: thisAPI.myToken
@@ -1116,6 +1123,7 @@ YDKJAPI.prototype.initgame = function() {
                 success: function(resp) {
                     gamedata = resp;
                     gamedata.localMode = 1;
+                    gamedata.inProgress = false;
                     ready = 1;
                     for (var i = 0; i < readyfunctions.length; i++) {
                         readyfunctions[i].call(thisAPI, gamedata);
@@ -1124,8 +1132,8 @@ YDKJAPI.prototype.initgame = function() {
             });
         } else {
             // Mode multijoueur WebSocket : synchronisation avec les joueurs actifs du serveur
-            wsConnect(function(reconnectedMsg) {
-                var players = reconnectedMsg.clients || [];
+            wsConnect(function(initMsg) {
+                var players = initMsg.clients || [];
                 var rawPlayers = [];
                 for (var c = 0; c < players.length; c++) {
                     var p = players[c];
@@ -1175,13 +1183,17 @@ YDKJAPI.prototype.initgame = function() {
                     });
                 }
 
+                var isMidGameJoin = (initMsg.status === 'in_game' && !thisAPI.options.justStarted);
+                thisAPI.options.justStarted = false;
+
                 gamedata = {
                     players: playersList,
                     locale: 'fr_FR',
                     engineVersion: 2,
-                    nbQuestions: reconnectedMsg.nb_questions || 7,
+                    nbQuestions: initMsg.nb_questions || 7,
                     localMode: 0,
-                    screwEnabled: (playersList.length > 1 ? 1 : 0)
+                    screwEnabled: (playersList.length > 1 ? 1 : 0),
+                    inProgress: isMidGameJoin
                 };
 
                 ready = 1;
@@ -1215,24 +1227,37 @@ YDKJAPI.prototype.initgame = function() {
     };
 
     YDKJAPI.prototype.synchronize = function(callback) {
-        if (thisAPI.localMode) {
+        if (thisAPI.localMode || thisAPI.isSpectator) {
             callback();
             return;
         }
 
         var syncwaiting = window.setTimeout(function() {
             var syncdiv = jQuery('<div id="sync_wait_screen" />');
-            syncdiv.html('En attente des autres joueurs...').css({
+            syncdiv.html(
+                '<div style="max-width:580px;margin:0 auto;text-align:center">' +
+                    '<div style="font-size:24px;font-family:JackCondensed, sans-serif;letter-spacing:1px;color:#fff">' +
+                        'En attente des autres joueurs...' +
+                    '</div>' +
+                '</div>'
+            ).css({
                 'text-align': 'center',
                 'width': '100%',
                 'color': 'white',
-                'background-color': 'black',
+                'background-color': 'rgba(0, 0, 0, 0.9)',
                 'position': 'absolute',
                 'z-index': '99999',
-                'top': '50%',
-                'left': '0'
+                'top': '0',
+                'left': '0',
+                'bottom': '0',
+                'right': '0',
+                'display': 'flex',
+                'justify-content': 'center',
+                'align-items': 'center',
+                'user-select': 'none'
             });
-            syncdiv.appendTo('body');
+            var targetScreen = (thisAPI.game && thisAPI.game.html && thisAPI.game.html.screen) ? thisAPI.game.html.screen : 'body';
+            syncdiv.appendTo(targetScreen);
         }, 1500);
 
         thisAPI.pendingSyncCallback = function() {
@@ -1242,5 +1267,15 @@ YDKJAPI.prototype.initgame = function() {
         };
 
         thisAPI.postaction({action: 'sync'});
+    };
+
+    YDKJAPI.prototype.sendGameState = function(modedata) {
+        if (!thisAPI.localMode && thisAPI.ws && thisAPI.ws.readyState === WebSocket.OPEN && !thisAPI.isSpectator) {
+            thisAPI.ws.send(JSON.stringify({
+                event: 'game_state',
+                modedata: modedata,
+                players: (thisAPI.game && thisAPI.game.players) ? thisAPI.game.players : []
+            }));
+        }
     };
 };

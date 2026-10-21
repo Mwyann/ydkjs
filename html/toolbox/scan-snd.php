@@ -1,7 +1,6 @@
 <?php
 
 require_once 'mysql.inc.php';
-pdo_select_db($DBsta);
 
 echo 'Scanning SND...';
 

@@ -14,7 +14,7 @@ $default_nick = '';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>You Don't Know Jack® ALPHA FR</title>
-    <link href="css/ydkj.css?v=18" rel="stylesheet"/>
+    <link href="css/ydkj.css?v=19" rel="stylesheet"/>
     <script src="js/HackTimer.min.js" type="text/javascript"></script>
     <script src="js/jquery-3.5.1.min.js" type="text/javascript"></script>
 
@@ -98,7 +98,8 @@ $default_nick = '';
                     if (!isHost || gameStarting) return;
                     var participants = [];
                     listPlayers.find('.participant:checked').each(function() {
-                        var cid = parseInt(jQuery(this).closest('.player').data('client-id'));
+                        var c = jQuery(this).closest('.player').data('client');
+                        var cid = c ? c.client_id : parseInt(jQuery(this).closest('.player').data('client-id'));
                         if (cid) participants.push(cid);
                     });
                     var nbQ = check21.is(':checked') ? 21 : 7;
@@ -167,7 +168,7 @@ $default_nick = '';
                     }
 
                     clients.forEach(function(c) {
-                        var row = jQuery('<div />').addClass('player').data('client-id', c.client_id).css({
+                        var row = jQuery('<div />').addClass('player').data('client', c).data('client-id', c.client_id).css({
                             'margin': '4px 0',
                             'display': 'flex',
                             'align-items': 'center'
@@ -241,7 +242,31 @@ $default_nick = '';
                             clearInterval(startInterval);
                             startInterval = 0;
                             if (isHost) {
-                                wsSend({event: 'start_game'});
+                                var activeParticipants = [];
+                                listPlayers.find('.player').each(function() {
+                                    var c = jQuery(this).data('client');
+                                    var isParticipant = jQuery(this).find('input.participant').is(':checked');
+                                    if (c && isParticipant && c.nick) {
+                                        activeParticipants.push({
+                                            client_id: c.client_id,
+                                            nick: c.nick,
+                                            is_host: !!c.is_host
+                                        });
+                                    }
+                                });
+                                if (activeParticipants.length === 0) {
+                                    activeParticipants.push({
+                                        client_id: myClientId,
+                                        nick: playerNickInput.val().trim() || 'Hôte',
+                                        is_host: true
+                                    });
+                                }
+                                wsSend({
+                                    event: 'game_start',
+                                    session: sessionCode,
+                                    nb_questions: (check21.is(':checked') ? 21 : 7),
+                                    clients: activeParticipants
+                                });
                             }
                         } else {
                             updateCountdownButton();
@@ -298,7 +323,7 @@ $default_nick = '';
                     }
                 });
 
-                function launchGameSPA() {
+                function launchGameSPA(justStarted) {
                     sessionStorage.setItem('ydkj_session', sessionCode);
                     sessionStorage.setItem('ydkj_client_id', myClientId);
                     sessionStorage.setItem('ydkj_token', myToken);
@@ -308,22 +333,22 @@ $default_nick = '';
                         window.history.pushState({session: sessionCode}, '', 'alpha.php?session=' + sessionCode);
                     }
 
-                    // Transmettre la WebSocket active et détacher les écouteurs du lobby
+                    // Détacher les écouteurs du lobby
                     ws.onmessage = null;
                     ws.onclose = null;
-                    window.YDKJ_ACTIVE_WS = ws;
 
                     // Remplacer le contenu du lobby par l'écran de jeu
                     jQuery('body').addClass('ydkj-game-page').html(
                         '<div id="headerbuttons" class="ydkj-game-bar">' +
                             '<a href="./" class="ydkj-bar-btn" id="btn-back"><span class="ydkj-btn-arrow">&larr;</span> RETOUR &Agrave; L\'ACCUEIL</a>' +
+                            '<span class="ydkj-bar-info" id="game-mode-info">SESSION : ' + sessionCode + '</span>' +
                             '<a href="#" class="ydkj-bar-btn" id="fullscreen"><span class="ydkj-btn-icon">&#x26F6;</span> PLEIN &Eacute;CRAN</a>' +
                         '</div>' +
                         '<div id="screen"></div>'
                     );
 
                     // Charger le moteur YDKJ et démarrer la partie (conserve le geste utilisateur pour l'audio)
-                    jQuery.getScript('js/YDKJ.js?ver=14', function() {
+                    jQuery.getScript('js/YDKJ.js?ver=15', function() {
                         var game = new YDKJ(jQuery('#screen'));
                         game.setLoader('directsilence.gif', 2000, 'directsilencefin.gif', 1000);
                         jQuery('#fullscreen').click(function() {
@@ -333,7 +358,7 @@ $default_nick = '';
                             });
                             return false;
                         });
-                        game.start();
+                        game.start({ ws: ws, justStarted: justStarted });
                     });
                 }
 
@@ -395,7 +420,7 @@ $default_nick = '';
                             sessionStorage.setItem('ydkj_token', myToken);
 
                             if (msg.status === 'in_game') {
-                                launchGameSPA();
+                                launchGameSPA(false);
                                 return;
                             }
 
@@ -408,7 +433,7 @@ $default_nick = '';
                                 wsSend({event: 'update_nick', nick: curNick});
                             }
                         }
-                        else if (msg.event === 'reconnected') {
+                        else if (msg.event === 'game_init') {
                             sessionCode = msg.session;
                             myClientId = msg.client_id;
                             myToken = msg.token || '';
@@ -420,7 +445,7 @@ $default_nick = '';
                             sessionStorage.setItem('ydkj_token', myToken);
 
                             if (msg.status === 'in_game') {
-                                launchGameSPA();
+                                launchGameSPA(false);
                                 return;
                             }
                             renderLobbyState(msg);
@@ -435,7 +460,7 @@ $default_nick = '';
                             cancelCountdownUI();
                         }
                         else if (msg.event === 'game_start') {
-                            launchGameSPA();
+                            launchGameSPA(true);
                         }
                         else if (msg.event === 'kicked') {
                             alert('Vous avez été expulsé de la session par l\'hôte.');

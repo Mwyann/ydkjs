@@ -4,9 +4,9 @@
 <meta charset="UTF-8" />
 <title>Demo YDKJ</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<link href="css/ydkj.css?v=18" rel="stylesheet"/>
+<link href="css/ydkj.css?v=19" rel="stylesheet"/>
 <script src="js/jquery-3.5.1.min.js" type="text/javascript"></script>
-<script src="js/YDKJ.js?ver=14" type="text/javascript"></script>
+<script src="js/YDKJ.js?ver=15" type="text/javascript"></script>
 
 <script type="text/javascript">
 
@@ -30,6 +30,7 @@ jQuery(document).ready(function() {
 <body class="ydkj-game-page">
   <div id="headerbuttons" class="ydkj-game-bar">
     <a href="./" class="ydkj-bar-btn" id="btn-back"><span class="ydkj-btn-arrow">&larr;</span> RETOUR &Agrave; L'ACCUEIL</a>
+    <span class="ydkj-bar-info" id="game-mode-info">MODE D&Eacute;MO</span>
     <a href="#" class="ydkj-bar-btn" id="fullscreen"><span class="ydkj-btn-icon">&#x26F6;</span> PLEIN &Eacute;CRAN</a>
   </div>
   <div id="screen"></div>

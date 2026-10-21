@@ -70,7 +70,7 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
                 session['log_file'].write(line)
                 session['log_file'].flush()
             except Exception as e:
-                print(f"Erreur écriture log : {e}")
+                print(f"Log write error: {e}")
         print(f"[{session.get('code', '----') if session else '----'}] {line.strip()}")
 
     def generate_session_code(self):
@@ -85,7 +85,23 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
                 continue
             return code
 
+    def log_replay(self, session, packet):
+        if not session or not session.get('replay_file') or session['replay_file'].closed:
+            return
+        entry = {
+            "ts": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3],
+            "t": round(time.time(), 3),
+            "packet": packet
+        }
+        try:
+            session['replay_file'].write(json.dumps(entry, ensure_ascii=False) + "\n")
+            session['replay_file'].flush()
+        except Exception as e:
+            print(f"Replay write error: {e}")
+
     def broadcast(self, session, msg_dict, exclude_self=False):
+        if session.get('is_recording_replay'):
+            self.log_replay(session, msg_dict)
         payload = json.dumps(msg_dict)
         for sock in list(session['clients'].keys()):
             if exclude_self and sock == self:
@@ -93,7 +109,7 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
             try:
                 sock.write_message(payload)
             except Exception as e:
-                print(f"Erreur envoi socket : {e}")
+                print(f"Socket send error: {e}")
 
     def send_lobby_state(self, session):
         client_data = [
@@ -143,14 +159,21 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
             "sync_clients": set(),
             "sync_timeout": None,
             "grace_timer": None,
-            "log_file": log_file
+            "log_file": log_file,
+            "replay_file": None,
+            "is_recording_replay": False,
+            "last_game_state": None,
+            "game_start_packet": None,
+            "active_in_game_players": set(),
+            "waiting_players": set(),
+            "reconnect_deadlock_timer": None
         }
 
         YDKJWebSocket.sessions[code] = session
         self.session_code = code
         self.client_info = client_info
 
-        ip = getattr(self.request, 'remote_ip', 'inconnu')
+        ip = getattr(self.request, 'remote_ip', 'unknown')
         self.log_session(session, f"[SESSION_CREATED] Code: {code} by IP {ip} (client_id: 1, public: {is_public})")
 
         self.write_message(json.dumps({
@@ -172,23 +195,16 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
         if self in session['clients']:
             info = session['clients'][self]
             if session.get('status') == 'in_game':
-                client_data = [
-                    {
-                        "client_id": gp["client_id"],
-                        "nick": gp["nick"],
-                        "is_host": gp["is_host"]
-                    }
-                    for gp in session.get('game_players', [])
-                ]
+                start_pkt = session.get('game_start_packet') or {}
                 self.write_message(json.dumps({
-                    "event": "reconnected",
+                    "event": "game_init",
                     "session": code,
                     "client_id": info["client_id"],
                     "is_host": info.get("is_host", False),
                     "status": "in_game",
                     "spectator": info.get("spectator", True),
-                    "nb_questions": session.get('nb_questions', 7),
-                    "clients": client_data,
+                    "nb_questions": start_pkt.get('nb_questions', 7),
+                    "clients": start_pkt.get('clients', []),
                     "token": info.get("token", "")
                 }))
             else:
@@ -228,28 +244,21 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
         self.session_code = code
         self.client_info = client_info
 
-        ip = getattr(self.request, 'remote_ip', 'inconnu')
+        ip = getattr(self.request, 'remote_ip', 'unknown')
         role_label = "spectator"
         self.log_session(session, f"[CLIENT_JOINED] from IP {ip} (client_id: {client_id}, {role_label})")
 
         if session.get('status') == 'in_game':
-            client_data = [
-                {
-                    "client_id": info["client_id"],
-                    "nick": info["nick"],
-                    "is_host": info["is_host"]
-                }
-                for info in session.get('game_players', [])
-            ]
+            start_pkt = session.get('game_start_packet') or {}
             self.write_message(json.dumps({
-                "event": "reconnected",
+                "event": "game_init",
                 "session": code,
                 "client_id": client_id,
                 "is_host": False,
                 "status": "in_game",
                 "spectator": True,
-                "nb_questions": session.get('nb_questions', 7),
-                "clients": client_data,
+                "nb_questions": start_pkt.get('nb_questions', 7),
+                "clients": start_pkt.get('clients', []),
                 "token": token
             }))
         else:
@@ -264,7 +273,7 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
             }))
             self.send_lobby_state(session)
 
-    def reconnect(self, msg):
+    def game_init(self, msg):
         code = (msg.get('session') or "").strip().upper()
         client_id = msg.get('client_id')
         token = msg.get('token')
@@ -275,11 +284,12 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
 
         # Si cette socket était techniquement rattachée à une autre session, la détacher d'abord
         if self.session_code and self.session_code != code:
-            self.log_session(None, f"[CLIENT_SWITCH_SESSION] Socket rattachée à {self.session_code}, bascule vers {code}")
+            self.log_session(None, f"[CLIENT_SWITCH_SESSION] Socket attached to {self.session_code}, switching to {code}")
             self.leave_session(intentional=True)
 
         session = YDKJWebSocket.sessions[code]
         target_info = None
+        is_reconnecting_player = False
 
         if client_id and token:
             # 1. Vérifier dans les clients déconnectés de CETTE session
@@ -287,6 +297,7 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
                 candidate = session['disconnected_clients'][client_id]
                 if candidate.get('token') == token:
                     target_info = session['disconnected_clients'].pop(client_id)
+                    is_reconnecting_player = True
             # 2. Vérifier si l'ancienne socket n'était pas encore fermée
             elif self in session['clients']:
                 target_info = session['clients'][self]
@@ -295,12 +306,14 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
                     if info.get('client_id') == client_id and info.get('token') == token:
                         target_info = info
                         session['clients'].pop(old_sock, None)
+                        is_reconnecting_player = True
                         break
                 # 3. Vérifier dans game_players si la partie est déjà lancée
                 if not target_info and session.get('game_players'):
                     for gp in session['game_players']:
                         if gp.get('client_id') == client_id and gp.get('token') == token:
                             target_info = dict(gp)
+                            is_reconnecting_player = True
                             break
 
         if not target_info:
@@ -322,7 +335,7 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
             else:
                 # La session demandée est encore en phase de lobby et les credentials ne correspondent pas
                 # (ex: changement de session). On admet immédiatement le client dans le lobby !
-                self.log_session(session, f"[RECONNECT_FALLBACK_JOIN] Credentials inconnus pour {code}. Admission dans le lobby.")
+                self.log_session(session, f"[RECONNECT_FALLBACK_JOIN] Unknown credentials for {code}. Admitted to lobby.")
                 self.join_session(code)
                 return
 
@@ -330,24 +343,34 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
         self.session_code = code
         self.client_info = target_info
 
-        # Si c'était l'hôte, annuler le timer de déconnexion hôte
+        # Si c'était l'hôte pendant le lobby, annuler le timer de déconnexion hôte
         if target_info.get('is_host') and session.get('host_disconnect_timer'):
             tornado.ioloop.IOLoop.current().remove_timeout(session['host_disconnect_timer'])
             session['host_disconnect_timer'] = None
-            self.log_session(session, f"[HOST_RECONNECTED] L'hôte (client_id: {client_id}) s'est reconnecté avec succès. Timer annulé.")
-        else:
-            self.log_session(session, f"[CLIENT_RECONNECTED] client_id: {client_id} (nick: \"{target_info.get('nick')}\") reconnecté.")
+            self.log_session(session, f"[HOST_RECONNECTED] Host (client_id: {client_id}) reconnected successfully. Timer cancelled.")
+        elif is_reconnecting_player:
+            self.log_session(session, f"[CLIENT_RECONNECTED] client_id: {client_id} (nick: \"{target_info.get('nick')}\") reconnected.")
 
-        # Renvoyer la liste des joueurs de la partie si la partie a commencé (sans spectateurs)
-        if session.get('game_players'):
-            client_data = [
-                {
-                    "client_id": info["client_id"],
-                    "nick": info["nick"],
-                    "is_host": info["is_host"]
-                }
-                for info in session['game_players']
-            ]
+        if session.get('status') == 'in_game':
+            if not target_info.get('spectator') and (client_id not in session.get('active_in_game_players', set())):
+                session.setdefault('waiting_players', set()).add(client_id)
+                self.log_session(session, f"[CLIENT_WAITING_SYNC] client_id: {client_id} is waiting for next turn (temporarily excluded from sync).")
+
+            # Vérifier si tous les joueurs actifs sont en attente / déconnectés (deadlock F5)
+            self.check_game_deadlock(session)
+
+            start_pkt = session.get('game_start_packet') or {}
+            self.write_message(json.dumps({
+                "event": "game_init",
+                "session": code,
+                "client_id": client_id,
+                "is_host": target_info.get('is_host', False),
+                "status": "in_game",
+                "spectator": target_info.get('spectator', False),
+                "nb_questions": start_pkt.get('nb_questions', 7),
+                "clients": start_pkt.get('clients', []),
+                "token": target_info.get('token', '')
+            }))
         else:
             client_data = [
                 {
@@ -358,18 +381,17 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
                 }
                 for info in session['clients'].values()
             ]
-
-        self.write_message(json.dumps({
-            "event": "reconnected",
-            "session": code,
-            "client_id": client_id,
-            "is_host": target_info.get('is_host', False),
-            "status": session.get('status', 'lobby'),
-            "spectator": target_info.get('spectator', False),
-            "nb_questions": session.get('nb_questions', 7),
-            "clients": client_data,
-            "token": target_info.get('token', '')
-        }))
+            self.write_message(json.dumps({
+                "event": "game_init",
+                "session": code,
+                "client_id": client_id,
+                "is_host": target_info.get('is_host', False),
+                "status": "lobby",
+                "spectator": target_info.get('spectator', False),
+                "nb_questions": session.get('nb_questions', 7),
+                "clients": client_data,
+                "token": target_info.get('token', '')
+            }))
 
     def find_public_session(self):
         found_code = None
@@ -384,10 +406,18 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
 
     def check_sync_barrier(self, session):
         # Clients actifs devant synchroniser
-        if session.get('game_players'):
-            active_client_ids = {c['client_id'] for c in session['game_players']}
+        if session.get('status') == 'in_game':
+            # Seuls les joueurs actifs qui sont connectés ET en jeu (non en attente de game_state)
+            # sont requis pour franchir la barrière de synchronisation
+            active_configured_ids = {c['client_id'] for c in session.get('game_players', [])}
+            connected_client_ids = {
+                info['client_id'] for info in session['clients'].values()
+                if info.get('client_id') in active_configured_ids and not info.get('spectator')
+            }
+            active_client_ids = connected_client_ids & session.get('active_in_game_players', set())
         else:
             active_client_ids = {c['client_id'] for c in session['clients'].values() if not c.get('spectator')}
+
         if not active_client_ids:
             return
 
@@ -400,7 +430,7 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
             session['action_sequence'] += 1
             seq_id = session['action_sequence']
 
-            self.log_session(session, f"[SYNC_COMPLETE] All active clients ready -> issued id #{seq_id}")
+            self.log_session(session, f"[SYNC_COMPLETE] All active in-game clients ready -> issued id #{seq_id}")
             self.broadcast(session, {"event": "sync_complete", "id": seq_id})
 
     def handle_sync_timeout(self, code):
@@ -414,6 +444,67 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
 
         self.log_session(session, f"[SYNC_TIMEOUT] Safety 20s reached -> forced sync_complete #{seq_id}")
         self.broadcast(session, {"event": "sync_complete", "id": seq_id})
+
+    def check_game_deadlock(self, session):
+        if session.get('status') != 'in_game':
+            return
+        active_configured_ids = {c['client_id'] for c in session.get('game_players', [])}
+        connected_active_ids = {
+            info['client_id'] for info in session['clients'].values()
+            if info.get('client_id') in active_configured_ids and not info.get('spectator')
+        }
+        in_game_ids = connected_active_ids & session.get('active_in_game_players', set())
+
+        # Si des joueurs actifs sont connectés mais qu'aucun n'est en jeu
+        if connected_active_ids and not in_game_ids:
+            disconnected_active_ids = {
+                cid for cid in session.get('disconnected_clients', {})
+                if cid in active_configured_ids
+            }
+            # Si plus aucun joueur actif n'est déconnecté (tous sont connectés et en attente)
+            if not disconnected_active_ids:
+                code = session['code']
+                self.log_session(session, "[SESSION_ABANDONED] All active players are waiting for sync. Session abandoned.")
+                self.broadcast(session, {
+                    "event": "session_closed",
+                    "reason": "La partie a été interrompue car tous les joueurs actifs sont en attente de synchronisation."
+                })
+                for sock in list(session['clients'].keys()):
+                    try:
+                        sock.close(code=1000, reason="Session abandoned")
+                    except Exception:
+                        pass
+                self.destroy_session(code)
+            elif not session.get('reconnect_deadlock_timer'):
+                code = session['code']
+                session['reconnect_deadlock_timer'] = tornado.ioloop.IOLoop.current().call_later(
+                    15.0, lambda: self.handle_reconnect_deadlock_timeout(code)
+                )
+
+    def handle_reconnect_deadlock_timeout(self, code):
+        if is_shutting_down or code not in YDKJWebSocket.sessions:
+            return
+        session = YDKJWebSocket.sessions[code]
+        session['reconnect_deadlock_timer'] = None
+        if session.get('status') == 'in_game':
+            active_configured_ids = {c['client_id'] for c in session.get('game_players', [])}
+            connected_active_ids = {
+                info['client_id'] for info in session['clients'].values()
+                if info.get('client_id') in active_configured_ids and not info.get('spectator')
+            }
+            in_game_ids = connected_active_ids & session.get('active_in_game_players', set())
+            if connected_active_ids and not in_game_ids:
+                self.log_session(session, "[SESSION_ABANDONED_TIMEOUT] Reconnect timeout expired with no active in-game player. Session abandoned.")
+                self.broadcast(session, {
+                    "event": "session_closed",
+                    "reason": "La partie a été interrompue car aucun joueur actif en jeu n'a pu poursuivre la partie."
+                })
+                for sock in list(session['clients'].keys()):
+                    try:
+                        sock.close(code=1000, reason="Session abandoned")
+                    except Exception:
+                        pass
+                self.destroy_session(code)
 
     def leave_session(self, intentional=False):
         if not self.session_code or self.session_code not in YDKJWebSocket.sessions:
@@ -429,9 +520,13 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
             if not intentional:
                 session.setdefault('disconnected_clients', {})[client_id] = info
 
-            # Si l'hôte se déconnecte : armer le timer de reconnexion de 10s (ou fermeture si intentionnel)
-            if info.get('is_host'):
-                self.log_session(session, f"[HOST_DISCONNECTED] L'hôte (client_id: {client_id}) s'est déconnecté. Délai de 10s armé.")
+            if session.get('status') == 'in_game':
+                session.setdefault('active_in_game_players', set()).discard(client_id)
+                session.setdefault('waiting_players', set()).discard(client_id)
+
+            # Si l'hôte se déconnecte pendant le lobby : armer le timer de reconnexion de 10s
+            if info.get('is_host') and session.get('status') == 'lobby':
+                self.log_session(session, f"[HOST_DISCONNECTED] Host (client_id: {client_id}) disconnected from lobby. 10s grace timer armed.")
                 code = self.session_code
                 if session.get('host_disconnect_timer'):
                     tornado.ioloop.IOLoop.current().remove_timeout(session['host_disconnect_timer'])
@@ -460,7 +555,7 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
             return
         session = YDKJWebSocket.sessions[code]
         session['host_disconnect_timer'] = None
-        self.log_session(session, f"[HOST_DISCONNECT_TIMEOUT] L'hôte ne s'est pas reconnecté après 10s. Fermeture de la session.")
+        self.log_session(session, f"[HOST_DISCONNECT_TIMEOUT] Host did not reconnect within 10s. Closing session.")
         close_payload = json.dumps({
             "event": "session_closed",
             "reason": "L'hôte a quitté la partie, la session a été fermée."
@@ -488,19 +583,35 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
                     session['log_file'].close()
                 except Exception:
                     pass
+            if session.get('replay_file') and not session['replay_file'].closed:
+                try:
+                    session['replay_file'].close()
+                except Exception:
+                    pass
             YDKJWebSocket.sessions.pop(code, None)
 
     def on_message(self, message):
         if is_shutting_down:
             return
+
+        session = YDKJWebSocket.sessions.get(self.session_code) if self.session_code else None
+        client_info = session['clients'].get(self) if (session and session.get('clients')) else self.client_info
+        client_id_label = f"client_id: {client_info.get('client_id')}" if client_info else "unbound client"
+
         try:
             msg = json.loads(message)
-        except Exception:
+        except Exception as e:
+            self.log_session(session, f"[MALFORMED_MESSAGE] from {client_id_label} (invalid JSON): {repr(message)} - Error: {e}")
             return
 
         event = msg.get('event')
         if not event:
+            self.log_session(session, f"[ABNORMAL_MESSAGE] from {client_id_label} (missing 'event' field): {repr(msg)}")
             return
+
+        # Journaliser tout message reçu
+        msg_preview = repr(msg) if len(repr(msg)) < 250 else (repr(msg)[:247] + "...")
+        self.log_session(session, f"[MSG_RECV] from {client_id_label} -> event: '{event}', content: {msg_preview}")
 
         if event == 'ping':
             self.write_message(json.dumps({"event": "pong"}))
@@ -514,8 +625,8 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
             self.join_session(msg.get('session'))
             return
 
-        if event == 'reconnect':
-            self.reconnect(msg)
+        if event == 'game_init':
+            self.game_init(msg)
             return
 
         if event == 'find_public_session':
@@ -610,34 +721,59 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
                 self.broadcast(session, {"event": "countdown_cancelled"})
             return
 
-        if event == 'start_game':
+        if event == 'game_start':
             if client_info.get('is_host') and session.get('status') == 'lobby':
-                # Filtrer uniquement les participants actifs (non spectateurs, avec un pseudo valide)
-                active_players = [
+                session['status'] = 'in_game'
+                session['last_game_state'] = None
+
+                # Le serveur conserve les informations des joueurs actifs depuis le lobby pour son suivi interne (barrière sync)
+                session['game_players'] = [
                     info for info in session['clients'].values()
                     if not info.get('spectator') and (info.get('nick') or "").strip()
                 ]
-                if not active_players:
-                    return
+                if not session['game_players']:
+                    session['game_players'] = [client_info]
 
-                session['status'] = 'in_game'
-                # Ordre déterministe : l'hôte en premier, puis les autres par client_id croissant
-                active_players.sort(key=lambda c: (not c.get('is_host', False), c.get('client_id', 0)))
-                session['game_players'] = [
-                    {
-                        "client_id": info["client_id"],
-                        "nick": info["nick"].strip(),
-                        "is_host": info.get("is_host", False),
-                        "token": info.get("token", "")
-                    }
-                    for info in active_players
-                ]
-                roster_summary = [f"{c['client_id']}:{c['nick']}{'(host)' if c['is_host'] else ''}" for c in session['game_players']]
-                self.log_session(session, f"[GAME_START] Session switched to in_game. Players: {', '.join(roster_summary)}")
-                self.broadcast(session, {
-                    "event": "game_start",
-                    "session": session['code']
-                })
+                session['active_in_game_players'] = {c['client_id'] for c in session['game_players']}
+                session['waiting_players'] = set()
+
+                # Stockage du paquet d'initialisation envoyé par l'hôte, pour les futurs clients
+                session['game_start_packet'] = msg
+
+                # Initialisation de l'enregistrement du replay JSON
+                log_dir = options.log_dir
+                replay_path = os.path.join(log_dir, f"session_{session['code']}_replay.json")
+                try:
+                    session['replay_file'] = open(replay_path, "a", encoding="utf-8")
+                    session['is_recording_replay'] = True
+                except Exception as e:
+                    print(f"JSON replay creation error: {e}")
+
+                self.log_session(session, f"[GAME_START] Session switched to in_game by host. Packet: {msg}")
+
+                # Envoi tel quel à tous les clients
+                self.broadcast(session, msg)
+            return
+
+        if event == 'game_state':
+            if session.get('status') == 'in_game':
+                session['last_game_state'] = msg
+
+                # Tous les joueurs connectés de la partie reçoivent ce game_state et entrent en jeu
+                connected_players = {
+                    info['client_id'] for info in session['clients'].values()
+                    if not info.get('spectator') and (info.get('nick') or "").strip()
+                }
+                session.setdefault('active_in_game_players', set()).update(connected_players)
+                session.setdefault('waiting_players', set()).difference_update(connected_players)
+                if session.get('reconnect_deadlock_timer'):
+                    tornado.ioloop.IOLoop.current().remove_timeout(session['reconnect_deadlock_timer'])
+                    session['reconnect_deadlock_timer'] = None
+
+                mode_label = msg.get('modedata', {}).get('mode', 'unknown')
+                players_summary = json.dumps(msg.get('players', []), ensure_ascii=False)
+                self.log_session(session, f"[GAME_STATE] from client_id {client_id}: mode '{mode_label}', players: {players_summary}")
+                self.broadcast(session, msg)
             return
 
         # Traitement des actions de jeu (postaction)
@@ -690,6 +826,10 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
                 "client_id": client_id,
                 "data": data
             })
+            return
+
+        # Événement inattendu ou non géré par le protocole
+        self.log_session(session, f"[UNHANDLED_EVENT] from client_id: {client_id} -> unhandled event '{event}': {repr(msg)}")
 
     def on_close(self):
         YDKJWebSocket.all_sockets.discard(self)
@@ -698,22 +838,22 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
         self.leave_session()
 
 
-def shutdown(server, reason="Arrêt du serveur"):
+def shutdown(server, reason="Server shutdown"):
     global is_shutting_down
     if is_shutting_down:
         return
     is_shutting_down = True
 
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-    print(f"\n[{now_str}] [ARRÊT DU SERVEUR] {reason}")
-    print(f"[{now_str}] Fermeture des connexions, des sessions et des fichiers de log...")
+    print(f"\n[{now_str}] [SERVER_SHUTDOWN] {reason}")
+    print(f"[{now_str}] Closing connections, sessions and log files...")
 
     # 1. Arrêter d'accepter de nouvelles connexions
     if server:
         try:
             server.stop()
         except Exception as e:
-            print(f"Erreur arrêt serveur : {e}")
+            print(f"Server stop error: {e}")
 
     # 2. Clôturer chaque session et son fichier de log
     for code, session in list(YDKJWebSocket.sessions.items()):
@@ -747,8 +887,17 @@ def shutdown(server, reason="Arrêt du serveur"):
                 log_file.flush()
                 log_file.close()
             except Exception as e:
-                print(f"Erreur fermeture log {code} : {e}")
+                print(f"Error closing log {code}: {e}")
             session['log_file'] = None
+
+        replay_file = session.get('replay_file')
+        if replay_file and not replay_file.closed:
+            try:
+                replay_file.flush()
+                replay_file.close()
+            except Exception as e:
+                print(f"Error closing replay {code}: {e}")
+            session['replay_file'] = None
 
     # 3. Notifier et fermer toutes les sockets ouvertes (message générique unique pour les clients)
     close_payload = json.dumps({"event": "server_shutdown", "message": "Le serveur s'est arrêté"})
@@ -770,7 +919,7 @@ def shutdown(server, reason="Arrêt du serveur"):
             io_loop.stop()
         except Exception:
             pass
-        print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}] Serveur arrêté proprement.")
+        print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]}] Server shut down cleanly.")
 
     try:
         asyncio_loop = getattr(io_loop, 'asyncio_loop', None)
@@ -797,21 +946,21 @@ def main():
         server.listen(port)
     else:
         server.listen(port, '127.0.0.1')
-    print(f"Serveur WebSocket YDKJ démarré sur le port {port}")
-    print(f"Dossier des logs : {os.path.abspath(options.log_dir)}")
+    print(f"YDKJ WebSocket server listening on port {port}")
+    print(f"Log directory: {os.path.abspath(options.log_dir)}")
 
     def sig_handler(sig, frame):
         global is_shutting_down
         if is_shutting_down:
-            print("\nArrêt forcé immédiat.")
+            print("\nImmediate forced shutdown.")
             os._exit(1)
 
         if sig == signal.SIGINT:
-            reason = "Fermeture par le clavier (Ctrl-C)"
+            reason = "Keyboard interrupt (Ctrl-C)"
         elif sig == signal.SIGTERM:
-            reason = "Fermeture par l'arrêt du service (systemctl / SIGTERM)"
+            reason = "Service termination (systemctl / SIGTERM)"
         else:
-            reason = f"Fermeture par signal {sig}"
+            reason = f"Signal termination ({sig})"
 
         try:
             tornado.ioloop.IOLoop.current().add_callback_from_signal(lambda: shutdown(server, reason))
@@ -824,7 +973,7 @@ def main():
     try:
         tornado.ioloop.IOLoop.current().start()
     except KeyboardInterrupt:
-        shutdown(server, "Fermeture par le clavier (Ctrl-C)")
+        shutdown(server, "Keyboard interrupt (Ctrl-C)")
 
 
 if __name__ == '__main__':

@@ -167,6 +167,23 @@ a:hover {
   border-color: #FF0;
 }
 
+.ydkj-bar-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 5px 14px;
+  min-height: 34px;
+  background: #111;
+  color: #FF0;
+  border: 1px solid #444;
+  font-size: 17px;
+  font-family: 'JackCondensed', sans-serif;
+  letter-spacing: 0.5px;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
 /* Form controls & Buttons */
 .ydkj-btn,
 .ydkj-input {
@@ -612,6 +629,11 @@ a:hover {
   .ydkj-bar-btn {
     padding: 5px 10px;
     font-size: 15px;
+    min-height: 32px;
+  }
+  .ydkj-bar-info {
+    padding: 5px 8px;
+    font-size: 14px;
     min-height: 32px;
   }
   .ydkj-panel, .ydkj-box-red {

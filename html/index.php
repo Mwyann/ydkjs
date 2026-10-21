@@ -4,7 +4,7 @@
     <title>Jouez à You Don't Know Jack®</title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="css/ydkj.css?v=18" rel="stylesheet"/>
+    <link href="css/ydkj.css?v=19" rel="stylesheet"/>
 </head>
 <body>
 

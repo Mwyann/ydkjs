@@ -42,7 +42,7 @@ html/
 │   ├── report-error.php       # Remontée des exceptions JS client en base de données
 │   └── local/                 # Configurations locales (ignorées du VCS public)
 │       ├── config.inc.php     # Constantes de configuration ($VERSION, $DEMOMODE, etc.)
-│       └── mysql-data.inc.php # Identifiants de connexion MySQL ($DBserver, $DBuser, $DBsta, $DBdyn)
+│       └── mysql-data.inc.php # Identifiants de connexion MySQL ($DBserver, $DBuser, $DBname)
 ├── ydkj_server.py             # Serveur WebSocket Tornado (gestion en mémoire des sessions, lobbies et relais temps réel)
 ├── ydkj_server.service        # Fichier d'unité systemd pour déploiement Linux
 │
@@ -77,8 +77,14 @@ html/
 ├── res/                       # Ressources légères du jeu (animations, timers, sons de démo)
 ├── res-full/                  # Ressources audio et visuelles complètes du jeu original
 │
+├── logs/                      # Journaux d'exécution et replays (générés dynamiquement)
+│   ├── js-errors.log          # Erreurs JS clientes avec contexte de session
+│   ├── session_CODE.log       # Trace textuelle complète des échanges WebSocket
+│   └── session_CODE_replay.json # Replay réseau JSON horodaté depuis game_start
+│
 ├── toolbox/                   # Boîte à outils, scripts d'extraction et de maintenance
 │   ├── bdd/                   # Dépôts SQL des schémas statiques (v2 à v9) et dynamiques
+│   ├── export-to-sqlite.php   # Exportateur dynamique MySQL vers base SQLite (schéma, index, UTF-8)
 │   ├── import-csv.php         # Importateur de qhdr.csv et strings.csv dans la base MySQL statique
 │   ├── gamedebug.php          # Interface d'injection de session pour tester un mode ou une question précise
 │   ├── readres.html           # Visualiseur de frames, d'animations et de métadonnées
@@ -92,29 +98,29 @@ html/
 
 ---
 
-## 3. Modèle de données : Double base MySQL
+## 3. Modèle de données : Base Statique (SQLite ou MySQL) & Logs
 
-Le projet sépare strictement les données immuables extraites du CD-ROM original des données d'exécution en temps réel :
+Le projet sépare strictement les données immuables du CD-ROM original des données d'exécution en temps réel :
 
-### A. Base Statique (`sta`, ex: `ydkjfr_sta`, `ydkjuk_sta`, `ydkjde_sta`)
+### A. Base Statique (`sta`, ex: `ydkj_sta.sqlite` ou `ydkjfr_sta` MySQL)
 Contient l'ensemble des contenus créatifs et logiques extraits du jeu d'origine :
-- `qhdr` : En-têtes de questions :
-  - `id` : Code unique sur 3 lettres (ex: `AAA`, `ABG`).
-  - `title` : Titre absurde/décalé de la question.
-  - `folder` : Chemin du dossier de ressources (ex: `QFOLD1/AAA`).
-  - `qtype` : Type de question (`Question`, `Gibberish`, `DisOrDat`, `JackAttack`, `Fiber`).
-  - `qsubtype` : Sous-type (`Normal`, `Blank`, `Who`, `Eyes`).
-  - `value` : Valeur nominale (Round 1 = 1000/2000/3000 F, Round 2 = doublement).
-  - `answer` : Indice de la réponse correcte (1 à 4).
-  - `forcenext` : ID de la question suivante obligatoirement enchaînée (si applicable).
+- `qhdr` : En-têtes de questions (`id`, `title`, `folder`, `qtype`, `qsubtype`, `value`, `answer`, `forcenext`).
 - `strings` : Textes des questions, 4 choix d'options, répliques écrites et sous-titres.
 - `resani` : Définition des animations de sprites (nom, frames, minutages, coordonnées X/Y, alignements).
-- `ressnd` : Pistes audio associées aux répliques de l'animateur, jingles et bruitages avec gestion de variantes aléatoires.
+- `ressnd` : Pistes audio associées aux répliques de l'animateur, jingles et bruitages.
 - `resfiles` : Référentiel des fichiers de médias physiques.
 
-### B. Base Dynamique (`dyn`, ex: `ydkjfr_dyn`)
-Gère uniquement la télémétrie et le suivi des erreurs clientes (l'état des salons et des joueurs étant géré en mémoire vive par Tornado) :
-- `errors` : Enregistrement des erreurs JavaScript clientes remontées via `report-error.php`.
+**Modes d'accès via `api/mysql.inc.php` (`connectMysql()`)** :
+- **Requêtes unifiées sans préfixe de base** : Toutes les requêtes SQL ciblent directement les tables (`resani`, `ressnd`, `qhdr`, `strings`, `resfiles`), garantissant une compatibilité transparente entre SQLite et MySQL sans préfixe de schéma.
+- **Mode SQLite (Production / Léger recommandé)** : Activé si `$SQLITEPATH` est renseigné dans `api/local/config.inc.php` (ex: `res-full/ydkj_sta.sqlite`). La base est ouverte directement via PDO en mode immutable (`?immutable=1`, `PRAGMA temp_store = MEMORY`, zéro verrou/fichier temporaire) avec enregistrement des fonctions compatibles (`MD5`, `CONCAT`).
+- **Mode MySQL (Développement)** : Activé si `$SQLITEPATH` est vide ou absent, via les identifiants de `api/local/mysql-data.inc.php` (sélection immédiate de `$DBname`).
+- **Génération / Conversion** : L'outil `toolbox/export-to-sqlite.php` inspecte dynamiquement le schéma MySQL via `require 'mysql.inc.php'`, réplique les colonnes, types, clés primaires et index avec encodage UTF-8 complet (`PRAGMA encoding = 'UTF-8'`).
+
+### B. Journalisation et Télémétrie (Zéro BDD dynamique requise)
+L'état des salons et des parties en cours est géré intégralement en mémoire vive par Tornado (`ydkj_server.py`) :
+- **Erreurs JavaScript clientes** : `api/report-error.php` écrit directement dans `logs/js-errors.log` (message d'erreur, stacktrace, fichier, ligne, IP, horodatage et code de session multijoueur `session` si présent).
+- **Logs de sessions textuels** : `logs/session_CODE.log` enregistre l'ensemble des connexions, configurations de lobby et tous les messages reçus/émis par Tornado (y compris les trames anormales ou inattendues).
+- **Replay JSON réutilisable** : `logs/session_CODE_replay.json` stocke à partir du lancement de la partie tous les paquets réseau sérialisés avec horodatage (`ts`, timestamp Unix `t`, `packet`), débutant par le paquet `game_start` (contenant la composition des joueurs et le nombre de questions) pour reconstituer fidèlement la partie.
 
 ---
 
@@ -124,12 +130,17 @@ Gère uniquement la télémétrie et le suivi des erreurs clientes (l'état des 
    - L'hôte génère une session à 4 chiffres via `joinsession.php` (ou active une session publique) qui communique directement via WebSocket (`ydkj_server.py`).
    - Les joueurs rejoignent en spectateurs par défaut. L'hôte configure les participants (1 à 3 joueurs) et le nombre de questions (7 ou 21).
    - Les pseudonymes et l'état du lobby sont synchronisés en temps réel via des messages WebSocket (`lobby_state`).
-2. **Lancement & Transition SPA (`joinsession.php` / `alpha.php`)** :
-   - Lorsque l'hôte lance la partie, un compte à rebours synchronisé de 5 secondes s'exécute, le statut passe à `in_game`.
-   - La transition s'effectue en SPA (`launchGameSPA()`) sans rechargement de page afin de préserver l'activation audio utilisateur du navigateur. La WebSocket déjà connectée est directement transmise au moteur de jeu via `window.YDKJ_ACTIVE_WS`.
-   - Si un utilisateur rejoint via `joinsession.php?session=CODE` ou `alpha.php?session=CODE` alors que la partie est déjà lancée (`in_game`), il est immédiatement admis en tant que spectateur (sans passer par le lobby).
-   - Les spectateurs ont `keycode: 0` sur tous les joueurs, ne bloquent pas les barrières de synchronisation des joueurs actifs, et reçoivent le flux temps réel en direct.
+2. **Lancement & Initialisation (`game_start` ➔ `game_init` ➔ `game_state` ➔ `sync`)** :
+   - **`game_start` piloté par l'hôte** : Lorsque l'hôte lance la partie depuis le lobby (à la fin du décompte), il émet directement le paquet `game_start` contenant la liste des participants configurés (`clients`) et `nb_questions`. Le serveur Tornado stocke ce paquet sans analyse particulière, l'inscrit comme amorce dans le replay JSON, et le diffuse à l'identique aux clients.
+   - **Transition SPA** : La transition vers l'écran de jeu s'effectue en SPA (`launchGameSPA()`) sans rechargement de page afin de préserver l'activation audio du navigateur. La WebSocket déjà connectée et le drapeau `justStarted` sont directement transmis au moteur de jeu via les options de démarrage : `game.start({ justStarted, ws })`, évitant toute variable globale `window`.
+   - **`game_init`** : Au démarrage, le moteur client (`YDKJAPI.prototype.gameinfo`) émet `game_init` sur la WebSocket et reçoit les informations de départ (`session`, `clients`, `nb_questions`, `spectator`, et `status: 'in_game' | 'lobby'`).
+   - **Raccrochage en cours de partie (`game_state`)** :
+     - À chaque transition de mode majeure (`Intro`, `Category`, `R1WrapUp`, `End`), les joueurs actifs émettent le paquet `game_state` au moment précis où le mode démarre (`YDKJMode.prototype.start()`) et non lors de son préchargement en arrière-plan, contenant l'état complet des joueurs (`players: game.players` avec scores et vicieuses) et les paramètres du mode (`modedata`).
+     - Si un joueur ou spectateur arrive alors que la partie est déjà lancée (`status: 'in_game'` et drapeau `justStarted` absent ou faux, suite à une arrivée tardive ou un F5), il est placé sur un écran d'attente ("Synchronisation au prochain tour..."). Dès qu'il reçoit le premier `game_state`, il met à jour la structure de ses joueurs via `jQuery.extend` (en préservant son mapping clavier local `keycode`), instancie le mode correspondant via `new YDKJMode(game, modedata)`, précharge ses ressources et rejoint la barrière `sync`.
+     - Les clients déjà en jeu ignorent les paquets `game_state` suivants.
+   - **Barrière de synchronisation (`sync` / `sync_complete`)** : Une fois les ressources préchargées et l'AudioContext débloqué, chaque joueur actif émet `{ action: 'sync' }`. Le serveur attend que tous les joueurs actifs soient prêts pour diffuser `sync_complete`, démarrant le son et l'animation au même millième de seconde.
 3. **Boucle des modes de jeu (`YDKJMode`)** :
+   - Signature unique : `new YDKJMode(game, modedata)`. `modedata` est l'objet de configuration contenant `mode` et les options associées.
    - Chaque mode (`ModeIntro`, `ModeCategory`, `ModeQuestion`, etc.) suit un protocole strict :
      1. `preload(resources)` : Téléchargement et préparation des sprites, animations et sons nécessaires via Howler.
      2. `start()` : Déconnexion des anciens écouteurs de l'API (`unregisteraction`), déclenchement de l'animation et de la piste audio.
@@ -155,7 +166,7 @@ Gère uniquement la télémétrie et le suivi des erreurs clientes (l'état des 
 - **Architecture PHP 100% Stateless (Zéro Session PHP)** :
   - Le backend PHP est entièrement sans état : aucune session PHP (`session_start()`, `$_SESSION`) n'est utilisée. Cela supprime tout verrouillage d'E/S disque et garantit une réactivité maximale sur les requêtes de médias et d'API.
 - **Accès base de données** :
-  - Connexion via PDO (`connectMysql('sta')` ou `connectMysql('dyn')`).
+  - Connexion via PDO (`connectMysql()`).
   - Mode d'erreur : `PDO::ERRMODE_EXCEPTION`.
   - Fetch par défaut : `PDO::FETCH_ASSOC`.
   - Charset : Toujours `utf8` via `SET NAMES utf8`.
@@ -171,7 +182,8 @@ Gère uniquement la télémétrie et le suivi des erreurs clientes (l'état des 
   - Méthodes et propriétés en `camelCase`.
 - **Conservation du contexte (`this`)** :
   - Assigner `var thisGame = this;` ou `var thisMode = this;` au sommet des fonctions constructrices et méthodes pour garantir la persistance du contexte dans les callbacks asynchrones.
-- **Cycle de vie asynchrone** :
+- **Cycle de vie asynchrone & Signature des modes** :
+  - Instanciation standardisée : `new YDKJMode(game, modedata)`. L'objet `modedata` embarque l'identifiant du mode et l'ensemble de ses options (zéro signature polymorphique alternative).
   - Implémenter systématiquement `preload(resources)`, `start()` et `free()` sur tout nouveau composant ou mode de jeu.
   - Toujours invoquer `game.api.unregisteraction()` avant d'enregistrer les écouteurs d'un nouveau tour pour éviter les écoutes fantômes et les doubles soumissions de buzz.
 - **Gestion du temps et arrière-plan** :
@@ -207,3 +219,9 @@ Gère uniquement la télémétrie et le suivi des erreurs clientes (l'état des 
 3. **Protection des secrets locaux** : Ne jamais versionner ni divulguer les mots de passe et configurations situés dans `api/local/` ou `toolbox/mysql-data.inc.php`. Toujours s'appuyer sur les fichiers d'exemple `mysql-data.sample.inc.php`.
 4. **Architecture réseau temps réel** : Les échanges multijoueurs (lobby, buzzers, réponses, synchronisation) transitent exclusivement par le serveur WebSocket Tornado (`ydkj_server.py`). Le mode local autonome s'exécute en boucle locale interne sans dépendance réseau.
 5. **Sobriété des données et non-redondance stricte** : Éviter formellement de doublonner les informations inutilement dans les messages et les structures (ex: pas de champ `status: 'lobby'` dans un événement déjà nommé `lobby_state`, pas de liste `participants` si elle est déductible de `clients`). Ne transmettre ou stocker une information QUE si le code consommateur s'en sert réellement et qu'il est impossible de la déterminer autrement.
+6. **Refactoring direct et zéro rétrocompatibilité inutile** : Ne jamais conserver d'anciens formats, de doubles signatures ou de béquilles de rétrocompatibilité dans le code JS ou PHP lorsqu'une refactorisation ou une évolution d'API interne est décidée. Convertir immédiatement et exhaustivement l'ensemble des sites d'appels à la nouvelle syntaxe pour garder une base de code propre, lisible et cohérente.
+7. **Rôle de relais pur du serveur WebSocket ("Serveur aveugle")** : Tornado gère les sockets, la barrière de synchronisation (`check_sync_barrier`) et l'enregistrement des logs et du replay JSON, mais ne doit pas analyser, valider ou altérer la charge utile des messages métier (`game_start`, `game_state`, actions). Il relaie et stocke ces paquets tels quels sans inspection interne.
+8. **Injection de dépendances et zéro variable globale `window`** : Proscrire formellement l'utilisation de variables globales dans `window` (ex: `window.YDKJ_*`) pour faire communiquer les pages, lobbies et sous-composants du moteur. Toutes les données partagées (WebSockets actives, drapeaux d'état `justStarted`, configurations de session) doivent être passées explicitement via les options d'initialisation (`game.start({ justStarted, ws })`, `new YDKJGame(..., options)`, `new YDKJAPI(..., options)`).
+9. **Interdiction d'exécuter des commandes Git** : Ne jamais exécuter de commandes `git` (ex: `git status`, `git diff`, `git log`, etc.). Les opérations de versioning et d'inspection Git sont réservées exclusivement à l'utilisateur.
+10. **Interdiction de compiler ou vérifier la syntaxe via le terminal** : Ne jamais exécuter de commandes de compilation Python (`python -m py_compile`), de linter ou de vérification syntaxique PHP/JS via le terminal. La validation et l'exécution des tests sont réservées exclusivement à l'utilisateur.
+

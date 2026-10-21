@@ -5,5 +5,5 @@
 $VERSION = 'fr';
 $DEMOMODE = false;
 $ALLOWMULTI = true;
-$SOCKETPATH = '/tmp';
+$SQLITEPATH = 'res-full/ydkj_sta.sqlite';
 $GETsalt = 'random characters';

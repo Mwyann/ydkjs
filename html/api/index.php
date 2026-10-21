@@ -140,7 +140,7 @@ function gamemode() {
 
 // Fonction qui renvoie un tableau JSON avec la liste des ressources et des URLS à aller chercher
 function resources() {
-    global $DB, $DBsta, $DEMOMODE, $VERSION, $nbplayers, $session_id, $nbquestions, $debug;
+    global $DB, $DEMOMODE, $VERSION, $nbplayers, $session_id, $nbquestions, $debug;
     $reslist = array();
     connectMysql();
 
@@ -157,7 +157,7 @@ function resources() {
 
         // Sélection des animations
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".resani a, ".$DBsta.".resfiles f
+                           FROM resani a, resfiles f
                            WHERE a.resid = f.resid
                            AND grp = 'Intro'");
         while ($rs = $res->fetch()) {
@@ -203,7 +203,7 @@ function resources() {
 
         // Sélection des sons
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".ressnd
+                           FROM ressnd
                            WHERE grp = 'Intro'");
         while ($rs = $res->fetch()) {
             if (($rs['variantType'] == 'NumberOfPlayers') && ($rs['variantValue'] != $nbplayers)) continue; // Ignorer ce qui ne correspond pas au bon nombre de joueurs
@@ -259,7 +259,7 @@ function resources() {
 
         $reslist = array();
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".resani a, ".$DBsta.".resfiles f
+                           FROM resani a, resfiles f
                            WHERE a.resid = f.resid
                            AND grp = 'Category'");
         while ($rs = $res->fetch()) {
@@ -278,7 +278,7 @@ function resources() {
         $grooves = rand(1,12);
 
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".ressnd
+                           FROM ressnd
                            WHERE grp = 'Category'");
         while ($rs = $res->fetch()) {
             if (($rs['variantType'] == 'PlayerSolo') && ($rs['variantValue'] != $playersolo)) continue; // Uniquement ce qui correspond à un joueur
@@ -312,7 +312,7 @@ function resources() {
                 }
             }
             $res = $DB->query("SELECT *
-                               FROM ".$DBsta.".qhdr
+                               FROM qhdr
                                WHERE qtype = 'JackAttack'
                                ".$demo."
                                ORDER BY MD5(CONCAT(id,".$session_id."))
@@ -320,7 +320,7 @@ function resources() {
         } elseif ($questionnumber == $specialquestion) { // Couci-Couça ou Rimatologie
             if ($specialGibberish) {
                 $res = $DB->query("SELECT *
-                                   FROM ".$DBsta.".qhdr
+                                   FROM qhdr
                                    WHERE qtype = 'Gibberish'
                                    ORDER BY MD5(CONCAT(id,".$session_id."))
                                    LIMIT 0,3");
@@ -334,7 +334,7 @@ function resources() {
                     }
                 }
                 $res = $DB->query("SELECT *
-                                   FROM ".$DBsta.".qhdr
+                                   FROM qhdr
                                    WHERE qtype = 'DisOrDat'
                                    ".$demo."
                                    ORDER BY MD5(CONCAT(id,".$session_id."))
@@ -350,11 +350,11 @@ function resources() {
                 }
             }
             $res = $DB->query("SELECT *
-                               FROM ".$DBsta.".qhdr
+                               FROM qhdr
                                WHERE qtype = 'Question'
                                AND qsubtype = 'Normal'
                                ".$demo."
-                               AND NOT EXISTS (SELECT * FROM ".$DBsta.".qhdr a WHERE qhdr.id = a.forcenext)
+                               AND NOT EXISTS (SELECT * FROM qhdr a WHERE qhdr.id = a.forcenext)
                                ORDER BY MD5(CONCAT(id,".$session_id."))
                                LIMIT ".($questionnumber*3).",3");
         }
@@ -375,7 +375,7 @@ function resources() {
 
         // Sélection des animations
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".resani a, ".$DBsta.".resfiles f
+                           FROM resani a, resfiles f
                            WHERE a.resid = f.resid
                            AND grp = 'R1WrapUp'");
         while ($rs = $res->fetch()) {
@@ -400,7 +400,7 @@ function resources() {
 
         // Sélection des sons
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".ressnd
+                           FROM ressnd
                            WHERE grp = 'R1WrapUp'");
         while ($rs = $res->fetch()) {
             if (($rs['variantType'] == 'NumberOfPlayers') && ($rs['variantValue'] != $nbplayers)) continue; // Ignorer ce qui ne correspond pas au bon nombre de joueurs
@@ -437,7 +437,7 @@ function resources() {
         $id = $_POST['id'];
 
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".qhdr q, ".$DBsta.".strings s
+                           FROM qhdr q, strings s
                            WHERE id = '".addslashes($id)."'
                            AND q.folder = s.folder");
         $qhdr = $res->fetch();
@@ -451,7 +451,7 @@ function resources() {
 
         $reslist = array('value' => $questionvalue);
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".resani a, ".$DBsta.".resfiles f
+                           FROM resani a, resfiles f
                            WHERE a.resid = f.resid
                            AND grp = 'Question'");
         while ($rs = $res->fetch()) {
@@ -476,7 +476,7 @@ function resources() {
         }
 
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".ressnd
+                           FROM ressnd
                            WHERE grp = 'Question'");
         while ($rs = $res->fetch()) {
             if (($rs['variantType'] == 'QuestionNumber') && ($rs['variantValue'] != $questionnumber)) continue;
@@ -514,9 +514,9 @@ function resources() {
 
         // TODO faire en sorte que ça ne donne pas deux fois la même chose (sauf s'il n'y a pas assez de possibilités évidemment)
         function PickAnySnd($grp,$type) {
-            global $DB, $DBsta;
+            global $DB;
             $res = $DB->query("SELECT *
-                               FROM ".$DBsta.".ressnd
+                               FROM ressnd
                                WHERE grp = '".addslashes($grp)."'
                                AND name = '".addslashes($type)."'");
             while ($rs = $res->fetch()) {
@@ -569,7 +569,7 @@ function resources() {
         $id = $_POST['id'];
 
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".qhdr q, ".$DBsta.".strings s
+                           FROM qhdr q, strings s
                            WHERE id = '".addslashes($id)."'
                            AND q.folder = s.folder");
         $qhdr = $res->fetch();
@@ -582,7 +582,7 @@ function resources() {
 
         $reslist = array('value' => $questionvalue);
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".resani a, ".$DBsta.".resfiles f
+                           FROM resani a, resfiles f
                            WHERE a.resid = f.resid
                            AND grp = 'DisOrDat'");
         while ($rs = $res->fetch()) {
@@ -601,7 +601,7 @@ function resources() {
         }
 
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".ressnd
+                           FROM ressnd
                            WHERE grp = 'DisOrDat'
                            OR (grp = 'Question' AND name IN ('SFXPlayerCorrect','SFXPlayerLose'))");
         while ($rs = $res->fetch()) {
@@ -661,7 +661,7 @@ function resources() {
         $id = $_POST['id'];
 
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".qhdr q, ".$DBsta.".strings s
+                           FROM qhdr q, strings s
                            WHERE id = '".addslashes($id)."'
                            AND q.folder = s.folder");
         $qhdr = $res->fetch();
@@ -673,7 +673,7 @@ function resources() {
 
         $reslist = array('value' => $questionvalue);
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".resani a, ".$DBsta.".resfiles f
+                           FROM resani a, resfiles f
                            WHERE a.resid = f.resid
                            AND (grp = 'Gibberish'
                            OR (grp = 'Question' AND name LIKE 'Player%'))");
@@ -694,7 +694,7 @@ function resources() {
         }
 
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".ressnd
+                           FROM ressnd
                            WHERE grp = 'Gibberish'
                            OR (grp = 'Question' AND name IN ('SFXPlayerBuzz','SFXPlayerCorrect','SFXPlayerLose','TimerTimeOut'))");
         while ($rs = $res->fetch()) {
@@ -723,9 +723,9 @@ function resources() {
 
         // TODO faire en sorte que ça ne donne pas deux fois la même chose (sauf s'il n'y a pas assez de possibilités évidemment)
         function PickAnySnd($grp,$type) {
-            global $DB, $DBsta;
+            global $DB;
             $res = $DB->query("SELECT *
-                               FROM ".$DBsta.".ressnd
+                               FROM ressnd
                                WHERE grp = '".addslashes($grp)."'
                                AND name = '".addslashes($type)."'");
             while ($rs = $res->fetch()) {
@@ -795,14 +795,14 @@ function resources() {
         if ($nbplayers == 1) $playersolo = 1;
 
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".qhdr q, ".$DBsta.".strings s
+                           FROM qhdr q, strings s
                            WHERE id = '".addslashes($id)."'
                            AND q.folder = s.folder");
         $qhdr = $res->fetch();
 
         $reslist = array('title' => $qhdr['title']);
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".resani a, ".$DBsta.".resfiles f
+                           FROM resani a, resfiles f
                            WHERE a.resid = f.resid
                            AND (grp = 'JackAttack' OR grp = 'Intro')");
         while ($rs = $res->fetch()) {
@@ -834,7 +834,7 @@ function resources() {
         }
 
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".ressnd
+                           FROM ressnd
                            WHERE grp = 'JackAttack'");
         while ($rs = $res->fetch()) {
             if (($rs['variantType'] == 'PlayerSolo') && ($rs['variantValue'] != $playersolo)) continue;
@@ -888,7 +888,7 @@ function resources() {
     if ($mode == 'End') {
         $reslist = array();
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".resani a, ".$DBsta.".resfiles f
+                           FROM resani a, resfiles f
                            WHERE a.resid = f.resid
                            AND grp = 'End'");
         while ($rs = $res->fetch()) {
@@ -903,7 +903,7 @@ function resources() {
         }
 
         $res = $DB->query("SELECT *
-                           FROM ".$DBsta.".ressnd
+                           FROM ressnd
                            WHERE grp = 'End'");
         while ($rs = $res->fetch()) {
             $names = array($rs['name']);
