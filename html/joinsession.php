@@ -502,7 +502,7 @@ $default_nick = '';
 </div>
 
 <div class="ydkj-panel">
-    <p class="ydkj-panel-title">Partie n° <span class="ydkj-session-code" id="session_code_display">...</span></p>
+    <p class="ydkj-panel-title">Partie <span class="ydkj-session-code" id="session_code_display">...</span></p>
 
     <div class="ydkj-nick-group">
         <label for="player_nick">Votre nom de joueur :</label><br/>

@@ -93,11 +93,11 @@ function YDKJGame(html, demomode, loaderConfig, options) {
             }
             var infoText = '';
             if (thisGame.demomode) {
-                infoText = 'MODE D\u00C9MO';
+                infoText = thisGame.localizedText('demo_mode');
             } else if (thisGame.api && thisGame.api.sessionCode) {
-                infoText = 'SESSION : ' + thisGame.api.sessionCode;
+                infoText = thisGame.localizedText('session_code') + thisGame.api.sessionCode;
             } else {
-                infoText = 'PARTIE LOCALE';
+                infoText = thisGame.localizedText('demo_mode');
             }
             modeInfo.text(infoText);
         }
@@ -271,10 +271,10 @@ YDKJGame.prototype.start = function() {
                         useraction.html(
                             '<div style="max-width:580px;margin:0 auto;text-align:center">' +
                                 '<div style="font-size:26px;font-family:JackCondensed, sans-serif;letter-spacing:1px;line-height:1.3;margin-bottom:12px">' +
-                                    'CLIQUEZ N\'IMPORTE OÙ SUR L\'ÉCRAN POUR ACTIVER LE SON ET DÉMARRER LA PARTIE' +
+                                    thisGame.localizedText('activate_sound') +
                                 '</div>' +
                                 '<div style="font-size:16px;color:#bbb;font-family:sans-serif">' +
-                                    '(Requis par votre navigateur pour autoriser la lecture sonore)' +
+                                    thisGame.localizedText('activate_sound_subtext') +
                                 '</div>' +
                             '</div>'
                         ).css({
@@ -345,10 +345,10 @@ YDKJGame.prototype.start = function() {
                 waitScreen.html(
                     '<div style="max-width:580px;margin:0 auto;text-align:center">' +
                         '<div style="font-size:28px;font-family:JackCondensed, sans-serif;letter-spacing:1px;line-height:1.3;margin-bottom:12px;color:#FFD700">' +
-                            'PARTIE EN COURS' +
+                            thisGame.localizedText('game_in_progress') +
                         '</div>' +
                         '<div style="font-size:18px;color:#fff;font-family:JackCondensed, sans-serif;letter-spacing:1px">' +
-                            'SYNCHRONISATION AU PROCHAIN TOUR...' +
+                            thisGame.localizedText('game_in_progress_subtext') +
                         '</div>' +
                     '</div>'
                 ).css({
@@ -429,7 +429,6 @@ YDKJGame.prototype.setLoader = function(loaderGif, minDuration, endGif, endDurat
     return this;
 };
 
-
 YDKJGame.prototype.displayCurrency = function(value) {
     var thousandSeparator = function(value,separator,decimal) {
         if (decimal === undefined) decimal = '.';
@@ -450,3 +449,43 @@ YDKJGame.prototype.displayCurrency = function(value) {
         default: return value.toString();
     }
 };
+
+YDKJGame.prototype.localizedText = function(text) {
+    switch(this.locale) {
+        case 'fr_FR':
+            switch(text) {
+                case 'demo_mode': return 'MODE DÉMO';
+                case 'session_code': return 'SESSION : ';
+                case 'local_game': return 'PARTIE LOCALE';
+                case 'activate_sound': return 'CLIQUEZ N\'IMPORTE OÙ SUR L\'ÉCRAN POUR ACTIVER LE SON ET DÉMARRER LA PARTIE';
+                case 'activate_sound_subtext': return '(Requis par votre navigateur pour autoriser la lecture sonore)';
+                case 'game_in_progress': return 'PARTIE EN COURS';
+                case 'game_in_progress_subtext': return 'SYNCHRONISATION AU PROCHAIN TOUR...';
+                default: return text;
+            }
+        case 'de_DE':
+            switch(text) {
+                case 'demo_mode': return 'DEMO-MODUS';
+                case 'session_code': return 'SITZUNG: ';
+                case 'local_game': return 'LOKALES SPIEL';
+                case 'activate_sound': return 'KLICKEN SIE AUF DEN BILDSCHIRM, UM DEN TON ZU AKTIVIEREN UND DAS SPIEL ZU STARTEN';
+                case 'activate_sound_subtext': return '(Vom Browser erforderlich, um die Audiowiedergabe zu erlauben)';
+                case 'game_in_progress': return 'LAUFENDES SPIEL';
+                case 'game_in_progress_subtext': return 'SYNCHRONISIERUNG BEIM NÄCHSTEN ZUG...';
+                default: return text;
+            }
+        case 'en_GB':
+        case 'en_US':
+        default:
+            switch(text) {
+                case 'demo_mode': return 'DEMO MODE';
+                case 'session_code': return 'SESSION: ';
+                case 'local_game': return 'LOCAL GAME';
+                case 'activate_sound': return 'CLICK ANYWHERE ON THE SCREEN TO ENABLE SOUND AND START THE GAME';
+                case 'activate_sound_subtext': return '(Required by your browser to allow audio playback)';
+                case 'game_in_progress': return 'GAME IN PROGRESS';
+                case 'game_in_progress_subtext': return 'SYNCHRONIZING ON NEXT TURN...';
+                default: return text;
+            }
+    }
+}
