@@ -17,18 +17,16 @@ ModeCategory.prototype.preload = function(resources) {
             anim.reset('MusicChooseCategoryLoop');
             anim.play('MusicChooseCategoryLoop');
         });
-
-    if (this.options.chooseplayer) this.chooseplayer = this.options.chooseplayer;
 };
 
 ModeCategory.prototype.start = function() {
     var thisMode = this;
     var anim = this.animations;
 
-    if (!this.chooseplayer) this.chooseplayer = 1; // Déterminer un joueur qui pourra choisir la catégorie
-    this.question1.modeObj.chooseplayer = this.chooseplayer;
-    this.question2.modeObj.chooseplayer = this.chooseplayer;
-    this.question3.modeObj.chooseplayer = this.chooseplayer;
+    if (!this.options.chooseplayer) this.options.chooseplayer = 1; // Déterminer un joueur qui pourra choisir la catégorie
+    this.question1.options.chooseplayer = this.options.chooseplayer;
+    this.question2.options.chooseplayer = this.options.chooseplayer;
+    this.question3.options.chooseplayer = this.options.chooseplayer;
 
     var listener;
     var nextquestion = 0;
@@ -40,7 +38,7 @@ ModeCategory.prototype.start = function() {
         if (chosen) {
             doChooseCategory = false;
             unbindKeyListener(listener);
-            anim.free('ChooseCategoryPlayer'+thisMode.chooseplayer)
+            anim.free('ChooseCategoryPlayer'+thisMode.options.chooseplayer)
                 .free('MusicChooseCategoryStart')
                 .free('MusicChooseCategoryLoop')
                 .free('CategoryTitles')
@@ -65,10 +63,10 @@ ModeCategory.prototype.start = function() {
     };
 
     anim.ended('SFXChoiceCategory', 100, function() {
-        anim.play('ChooseCategoryPlayer'+thisMode.chooseplayer)
+        anim.play('ChooseCategoryPlayer'+thisMode.options.chooseplayer)
             .reset('SFXChoiceCategory', true);
 
-        if (hasKeycode(thisMode.game.players[thisMode.chooseplayer-1].keycode)) { // Joueur local
+        if (hasKeycode(thisMode.game.players[thisMode.options.chooseplayer-1].keycode)) { // Joueur local
             listener = bindKeyListener(function (choice) {
                 var chosed = 0;
                 if (choice == 49) chosed = 1;
@@ -119,9 +117,9 @@ ModeCategory.prototype.start = function() {
         });
     });
 
-    this.game.font.strings[100] = this.game.players[this.chooseplayer-1].name;
-    this.game.font.strings[102] = this.game.players[this.chooseplayer-1].name;
-    this.game.font.strings[103] = this.game.players[this.chooseplayer-1].name;
+    this.game.font.strings[100] = this.game.players[this.options.chooseplayer-1].name;
+    this.game.font.strings[102] = this.game.players[this.options.chooseplayer-1].name;
+    this.game.font.strings[103] = this.game.players[this.options.chooseplayer-1].name;
 
     anim.ended('ShowCategories', 300, function() {
         this.free();

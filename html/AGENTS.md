@@ -140,7 +140,7 @@ L'état des salons et des parties en cours est géré intégralement en mémoire
      - Les clients déjà en jeu ignorent les paquets `game_state` suivants.
    - **Barrière de synchronisation (`sync` / `sync_complete`)** : Une fois les ressources préchargées et l'AudioContext débloqué, chaque joueur actif émet `{ action: 'sync' }`. Le serveur attend que tous les joueurs actifs soient prêts pour diffuser `sync_complete`, démarrant le son et l'animation au même millième de seconde.
 3. **Boucle des modes de jeu (`YDKJMode`)** :
-   - Signature unique : `new YDKJMode(game, modedata)`. `modedata` est l'objet de configuration contenant `mode` et les options associées.
+   - Signature unique : `new YDKJMode(game, options)`. `options` est l'objet de configuration contenant `mode` et les paramètres associés.
    - Chaque mode (`ModeIntro`, `ModeCategory`, `ModeQuestion`, etc.) suit un protocole strict :
      1. `preload(resources)` : Téléchargement et préparation des sprites, animations et sons nécessaires via Howler.
      2. `start()` : Déconnexion des anciens écouteurs de l'API (`unregisteraction`), déclenchement de l'animation et de la piste audio.
@@ -183,7 +183,7 @@ L'état des salons et des parties en cours est géré intégralement en mémoire
 - **Conservation du contexte (`this`)** :
   - Assigner `var thisGame = this;` ou `var thisMode = this;` au sommet des fonctions constructrices et méthodes pour garantir la persistance du contexte dans les callbacks asynchrones.
 - **Cycle de vie asynchrone & Signature des modes** :
-  - Instanciation standardisée : `new YDKJMode(game, modedata)`. L'objet `modedata` embarque l'identifiant du mode et l'ensemble de ses options (zéro signature polymorphique alternative).
+  - Instanciation standardisée : `new YDKJMode(game, options)`. L'objet `options` embarque l'identifiant du mode et l'ensemble de ses paramètres (zéro signature polymorphique alternative).
   - Implémenter systématiquement `preload(resources)`, `start()` et `free()` sur tout nouveau composant ou mode de jeu.
   - Toujours invoquer `game.api.unregisteraction()` avant d'enregistrer les écouteurs d'un nouveau tour pour éviter les écoutes fantômes et les doubles soumissions de buzz.
 - **Gestion du temps et arrière-plan** :

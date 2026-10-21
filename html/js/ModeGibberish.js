@@ -121,7 +121,7 @@ ModeGibberish.prototype.start = function() {
     anim.ended('SFXPlayerCorrect', function(){
         this.delay(300,function(){
             nextcategoryready(function(nextcategory) {
-                nextcategory.modeObj.chooseplayer = thisMode.buzzPlayer; // On donne le choix au joueur qui a bien répondu
+                nextcategory.options.chooseplayer = thisMode.buzzPlayer; // On donne le choix au joueur qui a bien répondu
                 nextcategory.modeObj.animations.play('MusicChooseCategoryStart');
                 anim.delay('SFXPlayerCorrect', 300, function () {
                     anim.play('EndQuestion');
@@ -329,7 +329,7 @@ ModeGibberish.prototype.start = function() {
 
     anim.ended('SFXShowAnswerAudience', 150, function() {
         nextcategoryready(function(nextcategory) {
-            nextcategory.modeObj.chooseplayer = thisMode.chooseplayer; // On donne le choix au joueur précédent
+            nextcategory.options.chooseplayer = thisMode.options.chooseplayer; // On donne le choix au joueur précédent
             nextcategory.modeObj.animations.play('MusicChooseCategoryStart');
         });
         if (anim.has('RevealAnswer')) anim.play('RevealAnswer'); else anim.play('EndQuestion');

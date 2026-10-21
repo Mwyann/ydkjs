@@ -43,8 +43,9 @@ def parse_port(value):
 
 define('port', type=parse_port, default=8889, help="Port d'écoute du serveur WebSocket (numéro ou alias : fr=8890, uk=8891, de=8892, us=8893)")
 define('log_dir', type=str, default='logs', help="Dossier de stockage des logs de session")
+define('deadlock_recovery', type=bool, default=True, help="Restaurer le dernier checkpoint (game_state) en cas de deadlock au lieu de fermer la session")
 
-ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"  # Sans 0, O, 1, I pour éviter les confusions
+ALPHABET = "ABCDEFGHJKLMNPQRTUVWXY346789"  # Sans 0, O, 1, I, 2, Z, 5, S pour éviter les confusions
 
 is_shutting_down = False
 
@@ -463,23 +464,59 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
             }
             # Si plus aucun joueur actif n'est déconnecté (tous sont connectés et en attente)
             if not disconnected_active_ids:
-                code = session['code']
-                self.log_session(session, "[SESSION_ABANDONED] All active players are waiting for sync. Session abandoned.")
-                self.broadcast(session, {
-                    "event": "session_closed",
-                    "reason": "La partie a été interrompue car tous les joueurs actifs sont en attente de synchronisation."
-                })
-                for sock in list(session['clients'].keys()):
-                    try:
-                        sock.close(code=1000, reason="Session abandoned")
-                    except Exception:
-                        pass
-                self.destroy_session(code)
+                if options.deadlock_recovery and session.get('last_game_state'):
+                    self.recover_from_deadlock(session)
+                else:
+                    self.abandon_session(session, "La partie a été interrompue car tous les joueurs actifs sont en attente de synchronisation.")
             elif not session.get('reconnect_deadlock_timer'):
                 code = session['code']
                 session['reconnect_deadlock_timer'] = tornado.ioloop.IOLoop.current().call_later(
                     15.0, lambda: self.handle_reconnect_deadlock_timeout(code)
                 )
+
+    def abandon_session(self, session, reason):
+        code = session['code']
+        self.log_session(session, f"[SESSION_ABANDONED] {reason}")
+        self.broadcast(session, {
+            "event": "session_closed",
+            "reason": reason
+        })
+        for sock in list(session['clients'].keys()):
+            try:
+                sock.close(code=1000, reason="Session abandoned")
+            except Exception:
+                pass
+        self.destroy_session(code)
+
+    def recover_from_deadlock(self, session):
+        last_state = session.get('last_game_state')
+        if not last_state:
+            self.log_session(session, "[DEADLOCK_RECOVERY_FAILED] No checkpoint (last_game_state) available. Closing session.")
+            self.abandon_session(session, "La partie a été interrompue car tous les joueurs actifs sont en attente de synchronisation et aucun point de sauvegarde n'est disponible.")
+            return
+
+        mode_label = last_state.get('modedata', {}).get('mode', 'unknown')
+        self.log_session(session, f"[DEADLOCK_RECOVERY] Restoring checkpoint for mode '{mode_label}'. Broadcasting last_game_state to all clients.")
+
+        # Réinitialiser la barrière de synchronisation et les timers
+        session['sync_clients'].clear()
+        if session.get('sync_timeout'):
+            tornado.ioloop.IOLoop.current().remove_timeout(session['sync_timeout'])
+            session['sync_timeout'] = None
+        if session.get('reconnect_deadlock_timer'):
+            tornado.ioloop.IOLoop.current().remove_timeout(session['reconnect_deadlock_timer'])
+            session['reconnect_deadlock_timer'] = None
+
+        # Reclasser tous les joueurs actifs connectés comme en jeu
+        connected_players = {
+            info['client_id'] for info in session['clients'].values()
+            if not info.get('spectator') and (info.get('nick') or "").strip()
+        }
+        session.setdefault('active_in_game_players', set()).update(connected_players)
+        session.setdefault('waiting_players', set()).difference_update(connected_players)
+
+        # Diffuser le dernier checkpoint game_state à tous les clients
+        self.broadcast(session, last_state)
 
     def handle_reconnect_deadlock_timeout(self, code):
         if is_shutting_down or code not in YDKJWebSocket.sessions:
@@ -494,17 +531,10 @@ class YDKJWebSocket(tornado.websocket.WebSocketHandler):
             }
             in_game_ids = connected_active_ids & session.get('active_in_game_players', set())
             if connected_active_ids and not in_game_ids:
-                self.log_session(session, "[SESSION_ABANDONED_TIMEOUT] Reconnect timeout expired with no active in-game player. Session abandoned.")
-                self.broadcast(session, {
-                    "event": "session_closed",
-                    "reason": "La partie a été interrompue car aucun joueur actif en jeu n'a pu poursuivre la partie."
-                })
-                for sock in list(session['clients'].keys()):
-                    try:
-                        sock.close(code=1000, reason="Session abandoned")
-                    except Exception:
-                        pass
-                self.destroy_session(code)
+                if options.deadlock_recovery and session.get('last_game_state'):
+                    self.recover_from_deadlock(session)
+                else:
+                    self.abandon_session(session, "La partie a été interrompue car aucun joueur actif en jeu n'a pu poursuivre la partie.")
 
     def leave_session(self, intentional=False):
         if not self.session_code or self.session_code not in YDKJWebSocket.sessions:

@@ -1,10 +1,9 @@
 /********** YDKJMode **********/
 
-function YDKJMode(game, modedata) {
+function YDKJMode(game, options) {
     var thisMode = this;
-    if (!modedata) modedata = {};
-    this.modedata = modedata;
-    var modename = modedata.mode;
+    this.options = options || {};
+    var modename = this.options.mode;
     this.modeObj = false;
 
     // preload
@@ -20,7 +19,8 @@ function YDKJMode(game, modedata) {
     if (!this.modeObj) return;
 
     this.modeObj.game = game;
-    this.modeObj.options = modedata;
+    this.modeObj.options = this.options;
+
     this.resourcesready = game.api.resources(this.modeObj);
     this.resourcesready(function(resources) {
         thisMode.modeObj.preload(resources);
@@ -35,9 +35,9 @@ YDKJMode.prototype.start = function() {
     this.modeObj.skiplistener = 0;
 
     // Émission du paquet game_state lors du basculement sur un gamemode d'ancrage (Intro, Category, R1WrapUp, End)
-    if (this.modedata && ['Intro', 'Category', 'R1WrapUp', 'End'].indexOf(this.modedata.mode) !== -1) {
+    if (this.options && ['Intro', 'Category', 'R1WrapUp', 'End'].indexOf(this.options.mode) !== -1) {
         if (this.modeObj && this.modeObj.game && this.modeObj.game.api && typeof this.modeObj.game.api.sendGameState === 'function') {
-            this.modeObj.game.api.sendGameState(this.modedata);
+            this.modeObj.game.api.sendGameState(this.options);
         }
     }
 

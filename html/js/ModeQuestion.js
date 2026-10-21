@@ -388,6 +388,7 @@ ModeQuestion.prototype.start = function() {
 
         var goNextCat = function() {
             nextcategoryready(function(nextcategory) {
+                if (!nextcategory.options.chooseplayer) nextcategory.options.chooseplayer = thisMode.options.chooseplayer;
                 nextcategory.modeObj.animations.delay('MusicChooseCategoryStart', Math.max(500,2500-anim.length('EndQuestion')), function() {
                     nextcategory.start();
                 });
@@ -419,7 +420,7 @@ ModeQuestion.prototype.start = function() {
     anim.ended('SFXPlayerCorrect', function() {
         this.delay(300, function() {
             nextcategoryready(function(nextcategory) {
-                nextcategory.modeObj.chooseplayer = thisMode.currentPlayer; // On donne le choix au joueur qui a bien répondu
+                nextcategory.options.chooseplayer = thisMode.currentPlayer; // On donne le choix au joueur qui a bien répondu
                 nextcategory.modeObj.animations.play('MusicChooseCategoryStart');
                 anim.play('EndQuestion', 300);
             });
@@ -438,6 +439,7 @@ ModeQuestion.prototype.start = function() {
             });
         }
         nextcategoryready(function(nextcategory) {
+            if (!nextcategory.options.chooseplayer) nextcategory.options.chooseplayer = thisMode.options.chooseplayer;
             nextcategory.modeObj.animations.play('MusicChooseCategoryStart');
         });
     });

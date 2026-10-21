@@ -699,7 +699,7 @@ YDKJAPI.prototype.initdemo = function() {
         callback(); // C'est fait, on est synchro avec nous-même ;-)
     };
 
-    YDKJAPI.prototype.sendGameState = function(modedata) {};
+    YDKJAPI.prototype.sendGameState = function(options) {};
 };
 
 YDKJAPI.prototype.initgame = function() {
@@ -1269,11 +1269,11 @@ YDKJAPI.prototype.initgame = function() {
         thisAPI.postaction({action: 'sync'});
     };
 
-    YDKJAPI.prototype.sendGameState = function(modedata) {
+    YDKJAPI.prototype.sendGameState = function(options) {
         if (!thisAPI.localMode && thisAPI.ws && thisAPI.ws.readyState === WebSocket.OPEN && !thisAPI.isSpectator) {
             thisAPI.ws.send(JSON.stringify({
                 event: 'game_state',
-                modedata: modedata,
+                modedata: options,
                 players: (thisAPI.game && thisAPI.game.players) ? thisAPI.game.players : []
             }));
         }

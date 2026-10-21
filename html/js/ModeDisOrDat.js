@@ -19,7 +19,7 @@ ModeDisOrDat.prototype.start = function() {
 
     var nextcategoryready;
 
-    if (this.chooseplayer == 1) {
+    if (this.options.chooseplayer == 1) {
         this.ChoicePlayer = anim.get('ChoicePlayer1');
         this.PlayerComesIn = anim.get('Player1ComesIn');
         this.PlayerWinGrow = anim.get('Player1WinGrow');
@@ -29,7 +29,7 @@ ModeDisOrDat.prototype.start = function() {
         this.PlayerLoseBig = anim.get('Player1LoseBig');
         this.PlayerLose = anim.get('Player1Lose');
     }
-    if (this.chooseplayer == 2) {
+    if (this.options.chooseplayer == 2) {
         this.ChoicePlayer = anim.get('ChoicePlayer2');
         this.PlayerComesIn = anim.get('Player2ComesIn');
         this.PlayerWinGrow = anim.get('Player2WinGrow');
@@ -39,7 +39,7 @@ ModeDisOrDat.prototype.start = function() {
         this.PlayerLoseBig = anim.get('Player2LoseBig');
         this.PlayerLose = anim.get('Player2Lose');
     }
-    if (this.chooseplayer == 3) {
+    if (this.options.chooseplayer == 3) {
         this.ChoicePlayer = anim.get('ChoicePlayer3');
         this.PlayerComesIn = anim.get('Player3ComesIn');
         this.PlayerWinGrow = anim.get('Player3WinGrow');
@@ -54,7 +54,7 @@ ModeDisOrDat.prototype.start = function() {
 
     var jumpToNextCategory = function() {
         nextcategoryready(function(nextcategory){
-            nextcategory.modeObj.chooseplayer = thisMode.chooseplayer;
+            nextcategory.options.chooseplayer = thisMode.options.chooseplayer;
             nextcategory.modeObj.animations.free('MusicChooseCategoryLoop');
             nextcategory.modeObj.animations.animations['MusicChooseCategoryLoop'] = anim.get('MusicLoopRules1');
             delete anim.animations['MusicLoopRules1']; // Pour ne pas être détruite au passage à la catégorie suivante
@@ -131,8 +131,8 @@ ModeDisOrDat.prototype.start = function() {
 
             PlayerGrow.ended(200,function() {
                 this.free();
-                var from = thisMode.game.players[thisMode.chooseplayer-1].score;
-                thisMode.game.players[thisMode.chooseplayer-1].score += tempscore;
+                var from = thisMode.game.players[thisMode.options.chooseplayer-1].score;
+                thisMode.game.players[thisMode.options.chooseplayer-1].score += tempscore;
                 if (tempscore > 0) {
                     anim.reset('SFXScoreWin');
                     anim.play('SFXScoreWin');
@@ -143,7 +143,7 @@ ModeDisOrDat.prototype.start = function() {
                 animateValue(PlayerBig,PlayerBig,PlayerBig, function(newvalue) {
                     thisMode.game.font.strings[1492] = newvalue;
                     thisMode.game.font.strings[1497] = newvalue;
-                },from,thisMode.game.players[thisMode.chooseplayer-1].score,12,function(){
+                },from,thisMode.game.players[thisMode.options.chooseplayer-1].score,12,function(){
                     setTimeout(function(){
                         endmessage.ended(800,jumpToNextCategory);
                         endmessage.play();
@@ -525,7 +525,7 @@ ModeDisOrDat.prototype.start = function() {
 
         var i;
 
-        if (hasKeycode(thisMode.game.players[thisMode.chooseplayer-1].keycode)) { // Joueur local
+        if (hasKeycode(thisMode.game.players[thisMode.options.chooseplayer-1].keycode)) { // Joueur local
             for(i = 0; i < buttonsAnswer.length; i++) if (buttonsAnswer[i]) {
                 (function(){
                     var j = i;
@@ -828,7 +828,7 @@ ModeDisOrDat.prototype.start = function() {
                 doskipexplanations();
             };
 
-            if (hasKeycode(thisMode.game.players[thisMode.chooseplayer-1].keycode)) { // Joueur local
+            if (hasKeycode(thisMode.game.players[thisMode.options.chooseplayer-1].keycode)) { // Joueur local
                 skiplistener = bindKeyListener(function (choice) {
                     if (choice == 32) skipexplanations(); // Barre espace = on passe les explications
                 });
@@ -865,9 +865,9 @@ ModeDisOrDat.prototype.start = function() {
     this.game.font.strings[1440] = str[1];
     this.game.font.strings[1445] = this.game.font.strings[1440];
 
-    this.game.font.strings[1487] = this.game.players[this.chooseplayer-1].name;
+    this.game.font.strings[1487] = this.game.players[this.options.chooseplayer-1].name;
     this.game.font.strings[1491] = this.game.font.strings[1487];
-    this.game.font.strings[1492] = this.game.displayCurrency(this.game.players[this.chooseplayer-1].score);
+    this.game.font.strings[1492] = this.game.displayCurrency(this.game.players[this.options.chooseplayer-1].score);
     this.game.font.strings[1497] = this.game.font.strings[1492];
 
     anim.ended('Intro', function() {

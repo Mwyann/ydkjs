@@ -21,7 +21,7 @@ ModeR1WrapUp.prototype.start = function() {
         if (skiplistener) unbindKeyListener(skiplistener);
         for(var i = 0; i < thisMode.game.players.length; i++) thisMode.game.players[i].screw = 1; // On redonne des vicieuses à tous les joueurs (ici car si on passe les explications il faut quand même les redistribuer...
         nextcategoryready(function(nextcategory) {
-            nextcategory.modeObj.chooseplayer = thisMode.chooseplayer; // On donne le choix au joueur précédent
+            nextcategory.options.chooseplayer = thisMode.options.chooseplayer; // On donne le choix au joueur précédent
             anim.free('MusicRound2');
             nextcategory.start();
         });
