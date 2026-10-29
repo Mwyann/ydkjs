@@ -1,19 +1,19 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 37
     defaultConfig {
         applicationId "com.mwyann.ydkjs"
-        minSdkVersion 19
+        minSdkVersion 23
         //noinspection EditedTargetSdkVersion
-        targetSdkVersion 33
-        versionCode 240
-        versionName "0.2.240"
+        targetSdkVersion 37
+        versionCode 250
+        versionName "0.2.250"
     }
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
     namespace 'com.mwyann.ydkjs'
@@ -21,7 +21,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.android.support.constraint:constraint-layout:2.1.4'
-    testImplementation 'junit:junit:4.12'
+    implementation 'androidx.appcompat:appcompat:1.8.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.2'
+    testImplementation 'junit:junit:4.13.2'
 }
