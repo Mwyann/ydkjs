@@ -6,11 +6,11 @@
 
 You need the original CD, or an ISO, or a folder containing the files from the original game.
 
-Install the following packets for your server: `python3-av php-sqlite`
+Install the following packages for your server: `python3-av php-sqlite`
 
 Make a `res-full` folder in the `html` folder of this repo. Also edit `api/local/config.inc.php` and change the `$VERSION` and `$GETsalt` variables accordingly.
 
-Run the Python extractor following this syntax:
+Run the Python extractor using this syntax:
 
 `python3 YDKJ_extractor.py /path/to/source/ISO/YDKJ.iso /path/to/res-full/`
 
