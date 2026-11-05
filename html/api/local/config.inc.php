@@ -5,5 +5,5 @@
 $VERSION = 'fr';
 $DEMOMODE = false;
 $ALLOWMULTI = true;
-//$SQLITEPATH = 'res-full/ydkj_sta.sqlite'; // Si défini : on utilise le fichier SQLite, sinon la base de données MySQL
+$SQLITEPATH = 'res-full/ydkj_sta.sqlite'; // Si défini : on utilise le fichier SQLite, sinon la base de données MySQL
 $GETsalt = 'random characters';
