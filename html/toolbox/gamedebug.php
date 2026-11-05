@@ -40,7 +40,7 @@ function displaySelect($values, $selected) {
     <meta charset="UTF-8" />
     <title>Debug YDKJ</title>
 
-    <script src="../js/jquery-3.5.1.min.js" type="text/javascript"></script>
+    <script src="../js/jquery-4.0.0.min.js" type="text/javascript"></script>
 
     <link href="../css/ydkj.css?v=19" rel="stylesheet"/>
 

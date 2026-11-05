@@ -95,6 +95,10 @@ ModeIntro.prototype.start = function() {
                     .free('IntroJack');
             });
 
+            anim.ended('HideSkipRules',function() {
+                anim.free('HideSkipRules');
+            });
+
             anim.ended('HelpScrews', function() {
                 if (skiplistener) unbindKeyListener(skiplistener);
                 anim.free('ShowRound1');
@@ -151,7 +155,11 @@ ModeIntro.prototype.start = function() {
             });
 
             anim.ended('NewPlayers', 100, function () {
-                anim.play('GiveScrews');
+                if (thisMode.game.screwEnabled) anim.play('GiveScrews');
+                else {
+                    anim.free('ShowRound1');
+                    anim.play('TiltRound1');
+                }
             });
 
             if (this.game.players.length == 3) {
