@@ -16,10 +16,6 @@ $nbplayers = 3; // Par défaut
 if (isset($_POST['nbplayers'])) $nbplayers = intval($_POST['nbplayers']);
 if (($nbplayers < 1) || ($nbplayers > 3)) $nbplayers = 3;
 
-$player1 = isset($_POST['player1']) ? htmlspecialchars(substr(trim($_POST['player1']), 0, 20)) : '';
-$player2 = isset($_POST['player2']) ? htmlspecialchars(substr(trim($_POST['player2']), 0, 20)) : '';
-$player3 = isset($_POST['player3']) ? htmlspecialchars(substr(trim($_POST['player3']), 0, 20)) : '';
-
 $nbquestions = 7;
 if (isset($_POST['nbquestions'])) $nbquestions = intval($_POST['nbquestions']);
 
@@ -55,7 +51,7 @@ function shuffle_rand(&$array) {
 }
 
 function gameinfo() {
-    global $VERSION, $nbplayers, $player1, $player2, $player3, $nbquestions;
+    global $VERSION, $nbplayers, $nbquestions;
     $players = array();
     $locale = '';
     $engineVersion = 2;
@@ -64,23 +60,24 @@ function gameinfo() {
         case 'fr':  $noms = array('Joueur 1', 'Joueur 2', 'Joueur 3');
                     $locale = 'fr_FR';
                     $engineVersion = 2;
+                    $screwKeycodes = [118, 86]; // v ou V (vicieuse)
                     break;
         case 'uk':  $noms = array('Player 1', 'Player 2', 'Player 3');
                     $locale = 'en_GB';
                     $engineVersion = 2;
+                    $screwKeycodes = [115, 83]; // s ou S (screw)
                     break;
         case 'de1': $noms = array('Kandidat 1', 'Kandidat 2', 'Kandidat 3');
                     $locale = 'de_DE';
                     $engineVersion = 2;
+                    $screwKeycodes = [110, 78]; // n ou N (nageln)
                     break;
         case 'us2':  $noms = array('Player 1', 'Player 2', 'Player 3');
                     $locale = 'en_US';
                     $engineVersion = 2;
+                    $screwKeycodes = [115, 83]; // s ou S (screw)
                     break;
     }
-    if ($player1 != '') $noms[0] = $player1;
-    if ($player2 != '') $noms[1] = $player2;
-    if ($player3 != '') $noms[2] = $player3;
     if ($nbplayers == 1)
         $players = array(
             array('name' => $noms[0],'score' => 0,'screw' => 0,'keycode' => array(98,66)),
@@ -103,7 +100,8 @@ function gameinfo() {
             'engineVersion' => $engineVersion,
             'nbQuestions' => $nbquestions,
             'localMode' => 1,
-            'screwEnabled' => 1
+            'screwEnabled' => 1,
+            'screwKeycodes' => $screwKeycodes
         ));
 }
 

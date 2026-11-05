@@ -642,7 +642,7 @@ YDKJAPI.prototype.initdemo = function() {
             {name:playernames[2],score:0,keycode:[112,80]}
         ];
 
-        return function(f) {f({players: players, locale:'fr_FR', engineVersion: 2, localMode: 1, screwEnabled: 0})}
+        return function(f) {f({players: players, locale:'fr_FR', engineVersion: 2, localMode: 1, screwEnabled: 0, screwKeycodes: [118, 86]})}
     };
 
     // Emulation de l'API bien sûr
@@ -949,7 +949,7 @@ YDKJAPI.prototype.initgame = function() {
     this.ws = null;
     this.pendingSyncCallback = null;
     this.onGameStateReceived = null;
-    this.lastGameState = null;
+    this.lastGameState = null; // Utilisé dans YDKJGame pour stocker le dernier état du jeu reçu
     this.isSpectator = (this.options && typeof this.options.isSpectator !== 'undefined') ? Boolean(this.options.isSpectator) : false;
 
     var callaction = function(data, callback) {
@@ -1132,8 +1132,13 @@ YDKJAPI.prototype.initgame = function() {
             });
         } else {
             // Mode multijoueur WebSocket : synchronisation avec les joueurs actifs du serveur
-            wsConnect(function(initMsg) {
-                var players = initMsg.clients || [];
+            var serverData = null;
+            var wsInitMsg = null;
+
+            var checkInitComplete = function() {
+                if (!serverData || !wsInitMsg) return;
+
+                var players = wsInitMsg.clients || [];
                 var rawPlayers = [];
                 for (var c = 0; c < players.length; c++) {
                     var p = players[c];
@@ -1149,28 +1154,7 @@ YDKJAPI.prototype.initgame = function() {
                     }
                 }
 
-                if (rawPlayers.length === 0) {
-                    rawPlayers.push({name: 'Joueur 1', client_id: thisAPI.myClientId});
-                }
-
-                // Configuration fidèle des touches : 2 joueurs = Q et P, 3 joueurs = Q, B et P
-                var defaultKeycodes;
-                if (rawPlayers.length === 2) {
-                    defaultKeycodes = [
-                        [113, 81], // J1 : Q
-                        [112, 80]  // J2 : P
-                    ];
-                } else if (rawPlayers.length === 3) {
-                    defaultKeycodes = [
-                        [113, 81], // J1 : Q
-                        [98, 66],  // J2 : B
-                        [112, 80]  // J3 : P
-                    ];
-                } else {
-                    defaultKeycodes = [
-                        [98, 66]   // J1 seul : B
-                    ];
-                }
+                if (rawPlayers.length === 0) rawPlayers.push({name: serverData.players[0].name, client_id: thisAPI.myClientId});
 
                 var playersList = [];
                 for (var p = 0; p < rawPlayers.length; p++) {
@@ -1179,20 +1163,21 @@ YDKJAPI.prototype.initgame = function() {
                         name: rawPlayers[p].name,
                         score: 0,
                         screw: (rawPlayers.length > 1 ? 1 : 0),
-                        keycode: isMyPlayer ? defaultKeycodes[p] : 0
+                        keycode: isMyPlayer ? serverData.players[p].keycode : 0
                     });
                 }
 
-                var isMidGameJoin = (initMsg.status === 'in_game' && !thisAPI.options.justStarted);
+                var isMidGameJoin = (wsInitMsg.status === 'in_game' && !thisAPI.options.justStarted);
                 thisAPI.options.justStarted = false;
 
                 gamedata = {
                     players: playersList,
-                    locale: 'fr_FR',
-                    engineVersion: 2,
-                    nbQuestions: initMsg.nb_questions || 7,
+                    locale: serverData.locale || 'fr_FR',
+                    engineVersion: serverData.engineVersion || 2,
+                    nbQuestions: wsInitMsg.nb_questions || 7,
                     localMode: 0,
                     screwEnabled: (playersList.length > 1 ? 1 : 0),
+                    screwKeycodes: serverData.screwKeycodes || [118, 86],
                     inProgress: isMidGameJoin
                 };
 
@@ -1200,6 +1185,28 @@ YDKJAPI.prototype.initgame = function() {
                 for (var i = 0; i < readyfunctions.length; i++) {
                     readyfunctions[i].call(thisAPI, gamedata);
                 }
+            };
+
+            var data = {call: 'gameinfo'};
+            jQuery.extend(data, thisAPI.getApiParams());
+            jQuery.ajax({
+                url: 'api/',
+                type: 'post',
+                data: data,
+                dataType: 'json',
+                success: function(resp) {
+                    serverData = resp;
+                    checkInitComplete();
+                },
+                error: function() {
+                    serverData = {locale: 'fr_FR', engineVersion: 2, screwKeycodes: [118, 86]};
+                    checkInitComplete();
+                }
+            });
+
+            wsConnect(function(initMsg) {
+                wsInitMsg = initMsg;
+                checkInitComplete();
             });
         }
 

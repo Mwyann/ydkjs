@@ -78,7 +78,7 @@ function YDKJGame(html, demomode, loaderConfig, options) {
     var thewindow = jQuery(window);
 
     // Mise à jour de l'information de mode de jeu dans la barre (#headerbuttons)
-    var updateHeaderModeInfo = function() {
+    this.updateHeaderModeInfo = function() {
         var header = jQuery('#headerbuttons');
         if (header.length) {
             var modeInfo = header.find('#game-mode-info');
@@ -91,18 +91,21 @@ function YDKJGame(html, demomode, loaderConfig, options) {
                     modeInfo.appendTo(header);
                 }
             }
+            if (!thisGame.locale && modeInfo.text().trim() !== '') {
+                return;
+            }
             var infoText = '';
             if (thisGame.demomode) {
                 infoText = thisGame.localizedText('demo_mode');
             } else if (thisGame.api && thisGame.api.sessionCode) {
                 infoText = thisGame.localizedText('session_code') + thisGame.api.sessionCode;
             } else {
-                infoText = thisGame.localizedText('demo_mode');
+                infoText = thisGame.localizedText('local_game');
             }
             modeInfo.text(infoText);
         }
     };
-    updateHeaderModeInfo();
+    this.updateHeaderModeInfo();
 
     var autozoom = function() {
         var header = jQuery('#headerbuttons');
@@ -194,18 +197,12 @@ YDKJGame.prototype.start = function() {
         thisGame.gameinfoready(function (gameinfo) {
             thisGame.players = gameinfo.players;
             thisGame.locale = gameinfo.locale;
-            thisGame.screwEnabled = gameinfo.screwEnabled;
-            thisGame.nbQuestions = gameinfo.nbQuestions;
-            thisGame.screwKeycodes = [];
-            switch(thisGame.locale) {
-                case 'fr_FR': thisGame.screwKeycodes = [118, 86]; break; // v ou V (vicieuse)
-                case 'en_GB':
-                case 'en_US': thisGame.screwKeycodes = [115, 83]; break; // s ou S (screw)
-                case 'de_DE': thisGame.screwKeycodes = [110, 78]; break; // n ou N (nageln)
-                default: thisGame.screwKeycodes = [];
-            }
             thisGame.engineVersion = gameinfo.engineVersion;
             thisGame.api.localMode = gameinfo.localMode;
+            thisGame.nbQuestions = gameinfo.nbQuestions;
+            thisGame.screwEnabled = gameinfo.screwEnabled;
+            thisGame.screwKeycodes = gameinfo.screwKeycodes;
+            thisGame.updateHeaderModeInfo();
             window.YDKJCurrentGame = thisGame; // Utile pour le debug
             var proceedToLaunch = function(launchCallback) {
                 var onGameReady = function() {
