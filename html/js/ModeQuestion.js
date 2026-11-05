@@ -383,13 +383,14 @@ ModeQuestion.prototype.start = function() {
 
     var screwerLost = false; // Sera renseigné si le vissieur a perdu son "pari"
 
-    anim.ended('EndQuestion', function() {
+    var finishQuestion = function() {
         if (thisMode.timerTimeout) clearTimeout(thisMode.timerTimeout);
 
         var goNextCat = function() {
+            var len = anim.has('EndQuestion') ? anim.length('EndQuestion') : 0;
             nextcategoryready(function(nextcategory) {
                 if (!nextcategory.options.chooseplayer) nextcategory.options.chooseplayer = thisMode.options.chooseplayer;
-                nextcategory.modeObj.animations.delay('MusicChooseCategoryStart', Math.max(500,2500-anim.length('EndQuestion')), function() {
+                nextcategory.modeObj.animations.delay('MusicChooseCategoryStart', Math.max(500, 2500 - len), function() {
                     nextcategory.start();
                 });
             });
@@ -415,26 +416,39 @@ ModeQuestion.prototype.start = function() {
                         .play(animLost);
                 });
         } else goNextCat();
-    });
+    };
+
+    var endQuestion = function(delay) {
+        if (anim.has('EndQuestion')) {
+            anim.play('EndQuestion', delay);
+        } else {
+            if (delay) setTimeout(finishQuestion, delay);
+            else finishQuestion();
+        }
+    };
+
+    if (anim.has('EndQuestion')) {
+        anim.ended('EndQuestion', finishQuestion);
+    }
 
     anim.ended('SFXPlayerCorrect', function() {
         this.delay(300, function() {
             nextcategoryready(function(nextcategory) {
                 nextcategory.options.chooseplayer = thisMode.currentPlayer; // On donne le choix au joueur qui a bien répondu
                 nextcategory.modeObj.animations.play('MusicChooseCategoryStart');
-                anim.play('EndQuestion', 300);
+                endQuestion(300);
             });
         });
     });
 
     anim.ended('RevealAnswer', 300, function() {
         if (thisMode.options.correctanswerisdefault) {
-            anim.play('EndQuestion', 200);
+            endQuestion(200);
         } else {
-            anim.ended('Answer'+thisMode.correctanswer, 200,function () {
-                anim.play('EndQuestion');
+            anim.ended('Answer'+thisMode.correctanswer, 200, function () {
+                endQuestion();
             });
-            this.delay(200,function() {
+            this.delay(200, function() {
                 anim.play('Answer'+thisMode.correctanswer);
             });
         }

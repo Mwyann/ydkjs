@@ -282,7 +282,7 @@ ModeGibberish.prototype.start = function() {
             anim.reset('MusicPart2');
             anim.reset('MusicPart3');
             anim.reset('QuestionIntro2');
-            anim.reset('QuestionIntro3');
+            if (anim.has('QuestionIntro3')) anim.reset('QuestionIntro3');
             anim.reset('QuestionHint11');
             anim.reset('QuestionHint21');
             anim.reset('QuestionHint31');

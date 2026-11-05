@@ -538,7 +538,6 @@ function resources() {
         $reslist['Question/Answers'] = array('urlAudio' => uriToUid('res-full/'.$qhdr['folder'].'/snd/5'));
         $EndQuestion = 'res-full/'.$qhdr['folder'].'/snd/6';
         if (file_exists('../'.$EndQuestion.'.ogg')) $reslist['Question/EndQuestion'] = array('urlAudio' => uriToUid($EndQuestion));
-        else $reslist['Question/EndQuestion'] = array();
 
         $reslist['correctanswerisdefault'] = 0;
         for($i = 1; $i <= 4; $i++) {
