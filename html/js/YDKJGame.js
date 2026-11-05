@@ -77,8 +77,8 @@ function YDKJGame(html, demomode, loaderConfig, options) {
     var body = jQuery('body');
     var thewindow = jQuery(window);
 
-    // Mise à jour de l'information de mode de jeu dans la barre (#headerbuttons)
-    this.updateHeaderModeInfo = function() {
+    // Mise à jour de l'en-tête (#headerbuttons)
+    this.updateHeader = function() {
         var header = jQuery('#headerbuttons');
         if (header.length) {
             var modeInfo = header.find('#game-mode-info');
@@ -103,9 +103,19 @@ function YDKJGame(html, demomode, loaderConfig, options) {
                 infoText = thisGame.localizedText('local_game');
             }
             modeInfo.text(infoText);
+
+            var btnBack = header.find('#btn-back');
+            if (btnBack.length) {
+                btnBack.html('<span class="ydkj-btn-arrow">&larr;</span> ' + thisGame.localizedText('back_to_main_menu'));
+            }
+
+            var btnFullscreen = header.find('#fullscreen');
+            if (btnFullscreen.length) {
+                btnFullscreen.html('<span class="ydkj-btn-icon">&#x26F6;</span> ' + thisGame.localizedText('fullscreen'));
+            }
         }
     };
-    this.updateHeaderModeInfo();
+    this.updateHeader();
 
     var autozoom = function() {
         var header = jQuery('#headerbuttons');
@@ -202,7 +212,7 @@ YDKJGame.prototype.start = function() {
             thisGame.nbQuestions = gameinfo.nbQuestions;
             thisGame.screwEnabled = gameinfo.screwEnabled;
             thisGame.screwKeycodes = gameinfo.screwKeycodes;
-            thisGame.updateHeaderModeInfo();
+            thisGame.updateHeader();
             window.YDKJCurrentGame = thisGame; // Utile pour le debug
             var proceedToLaunch = function(launchCallback) {
                 var onGameReady = function() {
@@ -454,6 +464,8 @@ YDKJGame.prototype.localizedText = function(text) {
                 case 'demo_mode': return 'MODE DÉMO';
                 case 'session_code': return 'SESSION : ';
                 case 'local_game': return 'PARTIE LOCALE';
+                case 'back_to_main_menu': return 'RETOUR À L\'ACCUEIL';
+                case 'fullscreen': return 'PLEIN ÉCRAN';
                 case 'activate_sound': return 'CLIQUEZ N\'IMPORTE OÙ SUR L\'ÉCRAN POUR ACTIVER LE SON ET DÉMARRER LA PARTIE';
                 case 'activate_sound_subtext': return '(Requis par votre navigateur pour autoriser la lecture sonore)';
                 case 'game_in_progress': return 'PARTIE EN COURS';
@@ -465,6 +477,8 @@ YDKJGame.prototype.localizedText = function(text) {
                 case 'demo_mode': return 'DEMO-MODUS';
                 case 'session_code': return 'SITZUNG: ';
                 case 'local_game': return 'LOKALES SPIEL';
+                case 'back_to_main_menu': return 'ZURÜCK ZUM HAUPTMENÜ';
+                case 'fullscreen': return 'VOLLBILDSCHIRM';
                 case 'activate_sound': return 'KLICKEN SIE AUF DEN BILDSCHIRM, UM DEN TON ZU AKTIVIEREN UND DAS SPIEL ZU STARTEN';
                 case 'activate_sound_subtext': return '(Vom Browser erforderlich, um die Audiowiedergabe zu erlauben)';
                 case 'game_in_progress': return 'LAUFENDES SPIEL';
@@ -478,6 +492,8 @@ YDKJGame.prototype.localizedText = function(text) {
                 case 'demo_mode': return 'DEMO MODE';
                 case 'session_code': return 'SESSION: ';
                 case 'local_game': return 'LOCAL GAME';
+                case 'back_to_main_menu': return 'BACK TO MAIN MENU';
+                case 'fullscreen': return 'FULL SCREEN';
                 case 'activate_sound': return 'CLICK ANYWHERE ON THE SCREEN TO ENABLE SOUND AND START THE GAME';
                 case 'activate_sound_subtext': return '(Required by your browser to allow audio playback)';
                 case 'game_in_progress': return 'GAME IN PROGRESS';
