@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.8.4
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost
--- Généré le :  ven. 16 août 2019 à 23:27
--- Version du serveur :  5.7.26-0ubuntu0.18.04.1
--- Version de PHP :  7.2.19-0ubuntu0.18.04.1
+-- Généré le : jeu. 05 nov. 2026 à 12:53
+-- Version du serveur : 11.8.6-MariaDB-0+deb13u1 from Debian
+-- Version de PHP : 8.4.27
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -19,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données :  `ydkjfr_sta`
+-- Base de données : `ydkjfr_sta`
 --
 
 -- --------------------------------------------------------
@@ -38,7 +37,7 @@ CREATE TABLE `qhdr` (
   `value` tinyint(1) DEFAULT NULL,
   `answer` tinyint(1) DEFAULT NULL,
   `forcenext` varchar(3) DEFAULT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 -- --------------------------------------------------------
 
@@ -51,12 +50,12 @@ CREATE TABLE `resani` (
   `grp` varchar(16) NOT NULL,
   `name` varchar(64) NOT NULL,
   `variantType` varchar(32) NOT NULL DEFAULT '',
-  `variantValue` int(7) NOT NULL DEFAULT '0',
-  `resid` int(7) NOT NULL,
-  `framestart` int(7) NOT NULL DEFAULT '0',
-  `framestop` int(7) DEFAULT NULL,
-  `loopani` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `variantValue` int(11) NOT NULL DEFAULT 0,
+  `resid` int(11) NOT NULL,
+  `framestart` int(11) NOT NULL DEFAULT 0,
+  `framestop` int(11) DEFAULT NULL,
+  `loopani` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 --
 -- Déchargement des données de la table `resani`
@@ -711,9 +710,9 @@ INSERT INTO `resani` (`grp`, `name`, `variantType`, `variantValue`, `resid`, `fr
 
 DROP TABLE IF EXISTS `resfiles`;
 CREATE TABLE `resfiles` (
-  `resid` int(7) NOT NULL,
+  `resid` int(11) NOT NULL,
   `filename` varchar(40) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 --
 -- Déchargement des données de la table `resfiles`
@@ -853,11 +852,11 @@ CREATE TABLE `ressnd` (
   `grp` varchar(16) NOT NULL,
   `name` varchar(64) NOT NULL,
   `variantType` varchar(32) NOT NULL,
-  `variantValue` int(7) NOT NULL,
+  `variantValue` int(11) NOT NULL,
   `resfolder` varchar(64) NOT NULL,
   `val` varchar(256) NOT NULL DEFAULT '1',
-  `loopsnd` tinyint(1) NOT NULL DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+  `loopsnd` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 --
 -- Déchargement des données de la table `ressnd`
@@ -1046,11 +1045,11 @@ INSERT INTO `ressnd` (`grp`, `name`, `variantType`, `variantValue`, `resfolder`,
 ('End', 'HiScorePlayer3First', '', 0, 'CREDITS/Ml50', '1,2,3,4,5,6,7,8,9,10', 0),
 ('End', 'HiScorePlayer1on1', '', 0, 'CREDITS/Ml52', '1,2,3,4,5,6,7,8,9,10', 0),
 ('End', 'MusicHiScoreLoop', '', 0, 'CREDITS/Ml60', '1', 1),
-('End', 'SFXHideScore', '', 0, 'CREDITS/Ml43', '1', 0),
-('End', 'SFXShowHiScore3Times', '', 0, 'CREDITS/Ml59', '1', 0),
-('End', 'SFXShowHiScoreOnce', '', 0, 'CREDITS/Ml41', '1', 0),
-('End', 'SFXShowHiScoreTwice', '', 0, 'CREDITS/Ml58', '1', 0),
-('End', 'SFXShowScore', '', 0, 'CREDITS/Ml42', '1', 0),
+('End', 'SFXHideScore', '', 0, 'HISCORES/Ml43', '1', 0),
+('End', 'SFXShowHiScore3Times', '', 0, 'HISCORES/Ml59', '1', 0),
+('End', 'SFXShowHiScoreOnce', '', 0, 'HISCORES/Ml41', '1', 0),
+('End', 'SFXShowHiScoreTwice', '', 0, 'HISCORES/Ml58', '1', 0),
+('End', 'SFXShowScore', '', 0, 'HISCORES/Ml42', '1', 0),
 ('End', 'SuggestPlayAgain', '', 0, 'CREDITS/Ml04', '1,2,3,4', 0),
 ('Question', 'JingleQuestion1', 'QuestionNumber', 1, 'QNUMBERS/snd', '1002', 0),
 ('Question', 'JingleQuestion1', 'QuestionNumber', 2, 'QNUMBERS/snd', '2002', 0),
@@ -1223,7 +1222,7 @@ DROP TABLE IF EXISTS `strings`;
 CREATE TABLE `strings` (
   `folder` varchar(64) NOT NULL,
   `strings` text NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci;
 
 --
 -- Index pour les tables déchargées
