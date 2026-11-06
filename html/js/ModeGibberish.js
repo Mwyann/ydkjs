@@ -291,7 +291,7 @@ ModeGibberish.prototype.start = function() {
             if (anim.has('QuestionHint32')) anim.reset('QuestionHint32');
             anim.reset('TimerDance');
             anim.play('TimerStop');
-            anim.reset('AboutToRevealAnswer');
+            if (anim.has('AboutToRevealAnswer')) anim.reset('AboutToRevealAnswer');
 
             anim.reset('SFXPlayerBuzz');
             anim.play('SFXPlayerBuzz');
